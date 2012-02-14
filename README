@@ -15,6 +15,7 @@ Some Details:
 
 Usage:
 ------
+
 - Pathfind to entity: PFQueue.getPath(yourent, target, maxPFRange);
 - Pathfind to location: PFQueue.getPath(this, x, y, z, maxPFRange);
 - Pathfind to entity TOP PRIORITY: PFQueue.getPath(yourent, target, maxPFRange, 1);
@@ -31,4 +32,5 @@ Current Limitations:
 
 Future:
 -------
+
 Will probably eventually try to extend PathEntity for backwards compatibility on vanilla mobs, and use reflection to update any fields that Notch didnt provide public access to (and theres a lot of those), but depending on the rate of access required it might become a performance issue.
