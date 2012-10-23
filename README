@@ -1,8 +1,11 @@
 Originally based off of the Minecraft pathfinding code.
 
-New Features:
--------------
+Features:
+---------
 
+- "Unlimited" pathfind range, tries smaller angles of approach when destination is outside set max full pathfind range
+- Interface with callback for custom mobs
+- Injects path data if used on vanilla mobs if their default targetting system isnt actively overriding it
 - Contains various fixes, eg: fences, doors, logic blocks are dealt with properly now
 - Designed to run on a thread
 - Uses a queue system to manage pathfind requests
@@ -16,21 +19,12 @@ Some Details:
 Usage:
 ------
 
+- For custom mobs, c_IEnhPF Interface has a pathfind callback, use setPathExToEntity(...)
 - Pathfind to entity: PFQueue.getPath(yourent, target, maxPFRange);
 - Pathfind to location: PFQueue.getPath(this, x, y, z, maxPFRange);
-- Pathfind to entity TOP PRIORITY: PFQueue.getPath(yourent, target, maxPFRange, 1);
-- Pathfind to location TOP PRIORITY: PFQueue.getPath(this, x, y, z, maxPFRange, 1);
+- Pathfind to entity TOP PRIORITY: PFQueue.getPath(yourent, target, maxPFRange, -1);
+- Pathfind to location TOP PRIORITY: PFQueue.getPath(this, x, y, z, maxPFRange, -1);
 
-- The priorities puts the pathfind call at the top of the queue list, if there is even a queue
-- Recommended you avoid having maxPFRange over 64 unless you make sure its called rarely
+- The priorities puts the pathfind call at the top of the queue list, even if there is a queue
+- If range is bigger than maxPFRange, up to 5 ~20 block, slightly randomly angled ranged attempts are made aimed towards the destination, if those fail to find a presentable path, it tries a surface level pathfind as well.
 - Pathfind calls that take over 5 seconds to get to in the queue are automatically aborted, prevents a buildup of the queue incase you overload it with jobs.
-
-Current Limitations:
---------------------
-
-- At the moment this version requires an override on updateEntityActionState that uses the new PathEntityEx as well as a couple references to Tropicraft entity classes in PFQueue
-
-Future:
--------
-
-Will probably eventually try to extend PathEntity for backwards compatibility on vanilla mobs, and use reflection to update any fields that Notch didnt provide public access to (and theres a lot of those), but depending on the rate of access required it might become a performance issue.
