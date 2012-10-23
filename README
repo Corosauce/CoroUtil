@@ -1,3 +1,6 @@
+CoroAI
+======
+
 Originally based off of the Minecraft pathfinding code.
 
 Features:
@@ -13,8 +16,7 @@ Features:
 Some Details:
 -------------
 
-- Given its threaded in a game I'd rather not edit base classes in, it does some clever 'temp path' stuff while the thread does its work
-- When a Pathfind request is made, the entity is given a fake 1 node path immediately that is at placed a few blocks above their heads, this keeps them still and in a pathfinding state, then when the thread has a path ready, it replaces the fake path data on the entity with the real one
+- Latest compiled against MCP/MinecraftForge build #301
 
 Usage:
 ------
