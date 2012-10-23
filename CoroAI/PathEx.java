@@ -1,4 +1,4 @@
-package net.CoroAI;
+package CoroAI;
 
 public class PathEx
 {
@@ -15,7 +15,7 @@ public class PathEx
     {
         if (pathpoint.index >= 0)
         {
-            throw new IllegalStateException("OW KNOWS!");
+            //throw new IllegalStateException("OW KNOWS!");
         }
         if (count == pathPoints.length)
         {

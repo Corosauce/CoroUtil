@@ -1,4 +1,4 @@
-package net.CoroAI;
+package CoroAI;
 
 import java.util.HashMap;
 
@@ -9,13 +9,20 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 
+import CoroAI.entity.c_EnhAI;
+
+
 public class Behaviors {
 	
 	public static Behaviors instance;
 	
 	public static HashMap entFields;
 	
+	public static HashMap<Entity, Boolean> aiEnhanced = new HashMap();
+	
 	public static float followTriggerDist = 32F;
+	
+	
 	
 	Behaviors() {
 		if (instance == null) {
@@ -26,8 +33,8 @@ public class Behaviors {
 	
 	public static void check(Entity me) {
 		if (instance == null) new Behaviors();
-		if (!(entFields.containsKey(me))) {
-			entFields.put(me, new DataLatcher());
+		if (!(entFields.containsKey(me.entityId))) {
+			entFields.put(me.entityId, new DataLatcher());
 		}
 	}
 	
@@ -38,18 +45,29 @@ public class Behaviors {
 		check(me);
 		
 		//default is set here now
-		int ticks = 0;
-		if(notMoving(me, 0.15F)) {
-			ticks = (Integer)getData(me, DataTypes.noMoveTicks) + 1;
+		int ticks = (Integer)getData(me, DataTypes.noMoveTicks);
+		//System.out.println("NMT: " + ticks);
+		if((me.isInWater() && notMoving(me, 0.05F)) || (!me.isInWater()) && notMoving(me, 0.10F)) {
+			ticks++;
+			if (me.isInWater()) {
+				double var2 = me.prevPosX - me.posX;
+		        double var4 = me.prevPosZ - me.posZ;
+		        float var6 = (float)Math.sqrt(var2 * var2 + var4 * var4);
+		        /*if (ticks > 0) *///System.out.println("NMT: " + var6 + " - " + ticks);
+		        
+			}
+			
 			
 
-            if(ticks > 50) {
+            if(ticks > 150) {
                 if(me.worldObj.rand.nextInt(10) == 0) {
                     //System.out.println("idle trigger! - " + ticks);
-                	me.setEntityToAttack(null);
-                    me.setPathToEntity(null);
-                    if (me instanceof EntityTropicraftPlayerProxy) {
-                    	((EntityTropicraftPlayerProxy)me).setPathExToEntity(null);
+                	
+                    if (me instanceof c_IEnhPF) {
+                    	((c_IEnhPF)me).noMoveTriggerCallback();
+                    } else {
+                    	me.setAttackTarget(null);
+                        me.setPathToEntity(null);
                     }
                     ticks = 0;
                 }
@@ -67,12 +85,82 @@ public class Behaviors {
 		//((DataLatcher)entFields.get(me)).values.put(DataTypes.noMoveTicks, ticks);
 	}
 	
+	public static void enhanceMonsterAIClose(EntityCreature koa, EntityCreature entHit) {
+		entHit.setAttackTarget(koa);
+	}
+	
+	public static void enhanceMonsterAI(EntityLiving ent) {
+		
+		c_EnhAI koa = null;
+		if (ent instanceof c_EnhAI) {
+			koa = (c_EnhAI)ent;
+		} else {
+			//psh!
+			return;
+		}
+		
+		int huntRange = 32;
+		List list = ent.worldObj.getEntitiesWithinAABB(EntityCreature.class, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+        for(int j = 0; j < list.size(); j++)
+        {
+            Entity entity1 = (Entity)list.get(j);
+            if (entity1 instanceof EntityCreature) {
+            	EntityCreature entC = ((EntityCreature)entity1);
+            	
+            	if (entC.getEntityToAttack() instanceof EntityPlayer/* && entC.getEntityToAttack() != ModLoader.getMinecraftInstance().thePlayer*/) {
+            		entC.setTarget(null);
+            	}
+            	
+            	//if(entC.getEntityToAttack() == null/* || entC.worldObj.rand.nextInt(5) == 0*/) {
+            		if (koa.isEnemy(entity1)) {
+	                	if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
+	                		//if (sanityCheck(entity1)) 
+	                		/*if (entC.getNavigator().getPath() == null || entC.getNavigator().getPath().isFinished()) {
+	                			PathPoint points[] = new PathPoint[1];
+    					        points[0] = new PathPoint((int)ent.posX, (int)ent.posY, (int)ent.posZ);
+	                			entC.getNavigator().setPath(new PathEntity(points), entC.getAIMoveSpeed());
+	                		}*/
+	                		if (entC.getDistanceToEntity(ent) <= 16F) {
+	                			entC.setAttackTarget(ent);
+	                			entC.getNavigator().setPath(entC.getNavigator().getPathToEntityLiving(ent), 0.23F);
+	                			if (!aiEnhanced.containsKey(entC)) {
+	                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, entC.getAIMoveSpeed(), true));
+	                				aiEnhanced.put(entC, true);
+	                			}
+	                			
+	                			//System.out.println("ENHANCE!" + entC + "targetting: " + ent);
+	                			//entC.setTarget(ent);
+	                			//entC.set
+	                		}
+	                		//PFQueue.getPath(entity1, ent, huntRange);
+	                			//huntTarget(entity1);
+	    	            		//found = true;
+	    	            		//break;
+	                		//}
+	                		//this.hasAttacked = true;
+	                		//getPathOrWalkableBlock(entity1, 16F);
+	                	}
+            		}
+                /*} else {
+                	
+                }*/
+            }
+            
+        }
+	}
+	
 	public static void setData(Entity ent, DataTypes dtEnum, Object obj) {
-		((DataLatcher)entFields.get(ent)).values.put(dtEnum, obj);
+		//System.out.println("set: " + ent.entityId);
+		//DataLatcher dl = (DataLatcher)entFields.get(ent.entityId);
+		//System.out.println("set: " + ent.entityId + "|" + dl);
+		((DataLatcher)entFields.get(ent.entityId)).values.put(dtEnum, obj);
 	}
 	
 	public static Object getData(Entity ent, DataTypes dtEnum) {
-		return ((DataLatcher)entFields.get(ent)).values.get(dtEnum);
+		
+		//DataLatcher dl = (DataLatcher)entFields.get(ent.entityId);
+		//System.out.println("get: " + ent.entityId + "|" + dl);
+		return ((DataLatcher)entFields.get(ent.entityId)).values.get(dtEnum);
 	}
 	
 	public static void wheatFollow(EntityCreature me) {
@@ -128,7 +216,9 @@ public class Behaviors {
     		
     		//entFields.put(me, targ);
     	//}
-		me.setEntityToAttack(targ);
+    		if (targ instanceof EntityLiving) {
+    			me.setAttackTarget((EntityLiving)targ);
+    		}
 	}
 	
 	public static void follow(EntityCreature me, Entity targ, float dist) {

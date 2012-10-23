@@ -1,12 +1,14 @@
-package net.CoroAI;
+package CoroAI;
 
 import net.minecraft.src.*;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 
-import org.lwjgl.opengl.GL11;
+//import org.lwjgl.opengl.GL11;
 
 public class PFQueue implements Runnable {
 
@@ -15,9 +17,12 @@ public class PFQueue implements Runnable {
 	public static HashMap pfDelays;
 	public static boolean renderLine = true;
 	
-	public static long maxRequestAge = 5000;
+	public static long maxRequestAge = 1000;
+	public static long maxNodeIterations;
 	
-	public World worldMap;
+	
+	
+	public static World worldMap;
 	
 	//Temp used stuff
     private PathEx path = new PathEx();
@@ -26,7 +31,8 @@ public class PFQueue implements Runnable {
 
     public boolean foundEnd;
     public boolean canClimb = false;
-    public boolean canUseLadder = false;
+    public static boolean canUseLadder = false;
+    public static long dropSize = 4; //adjusted per queue request
     
     //hmmmmmmm
     public EntityCreature entH = null;
@@ -35,6 +41,8 @@ public class PFQueue implements Runnable {
     //public boolean firstUse = true;
     
     //public boolean tryAgain = false;
+    
+    
     
     private static class PFQueueItem {
     	public int x;
@@ -47,6 +55,8 @@ public class PFQueue implements Runnable {
     	public Entity entTargRef; //always null check - not used for now?
     	public int priority;
     	public long timeCreated;
+    	public int retryState;
+    	public int maxNodeIterations;
     	
     	//Possible keepers
     	public boolean canClimb = false;
@@ -60,6 +70,8 @@ public class PFQueue implements Runnable {
         	entSourceRef = ent;
         	priority = pri;
         	timeCreated = System.currentTimeMillis();
+        	retryState = 0;
+        	maxNodeIterations = 15000;
         }
     	
     }
@@ -83,51 +95,167 @@ public class PFQueue implements Runnable {
         //}
     	while (true) {
     		
-    		if (queue.size() > 8) {
-    			System.out.println("PF Size: " + queue.size());
-    		}
+    		manageQueue();
     		
-    		if (queue.size() > 0) {
-    			if (queue.get(0).timeCreated + this.maxRequestAge > System.currentTimeMillis()) {
+    	}
+    	
+    	
+    }
+    
+    public void manageQueue() {
+    	//System.out.print("!!");
+    	//c_CoroAIUtil.watchWorldObj(); - depreciated, uses entity world obj for multi dimension use
+    	
+    	if (queue.size() > 30) {
+			System.out.println("PF Size: " + queue.size());
+		}
+		
+    	boolean processed = false;
+    	while (!processed && queue.size() > 0) {
+			if (queue.size() > 0) {
+				if (queue.get(0).timeCreated + this.maxRequestAge > System.currentTimeMillis()) {
+					processed = true;
 	    			this.path.clearPath();
 	    	        this.pointMap.clearMap();
 	    	        foundEnd = false;
 	    	        
-	    	        //hmmmmmmmmmmmmmmm
-	    	        if (queue.get(0).entSourceRef instanceof EntityCreature) {
-	    	        	entH = (EntityCreature)queue.get(0).entSourceRef;
-	    	        }
-	    			
-	    	        //Pathfind
-	    			PathEntityEx pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
-	    			
-	    			//Callback code goes here
-	    			
-	    			//Direct path setting code
-	    			if (queue.get(0).entSourceRef instanceof EntityTropicraftPlayerProxy) {
-	    				if (pathEnt != null) {
-	    					((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(pathEnt);
-	    				} else {
-	    					//System.out.println("?!?!!?!?");
-	    					PathPointEx points[] = new PathPointEx[1];
-	    			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-	    			        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntityEx(points));
-	    				}
-	    			}
-    			} else {
-    				PathPointEx points[] = new PathPointEx[1];
-			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-			        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntityEx(points));
-    			}
-    			
-    			//Finally delete entry
-    			queue.remove();
-    		}
-    		
-    		try { Thread.sleep(1); } catch (Exception ex) {} 
+	    	        //catching any game exit errors
+		    	        try {
+		    	        
+			    	        //hmmmmmmmmmmmmmmm
+			    	        if (queue.get(0).entSourceRef instanceof EntityCreature) {
+			    	        	entH = (EntityCreature)queue.get(0).entSourceRef;
+			    	        }
+			    	        
+			    	        //Fishermen hook for preventing dropdown pathing
+			    	        if (queue.get(0).entSourceRef instanceof c_IEnhAI && ((c_IEnhAI)queue.get(0).entSourceRef).canUseLadders()) {
+			    	        	//if (((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.mFISHERMAN || ((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.fFISHERMAN) {
+			    	        		dropSize = 2;
+			    	        		canUseLadder = true;
+			    	        	//}
+			    	        } else {
+			    	        	//Vanilla defaults
+			    	        	dropSize = 4;
+			    	        	canUseLadder = true;
+			    	        }
+			    			
+			    	        
+			    	        
+			    	        //Pathfind
+			    	        maxNodeIterations = queue.get(0).maxNodeIterations;
+			    	        //Multi world dimension pathfinding fix 
+			    	        worldMap = queue.get(0).entSourceRef.worldObj;
+			    			PathEntityEx pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
+			    			//PathEntity pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
+			    			//System.out.println(pathEnt.pathLength);
+			    			//Callback code goes here
+			    			
+			    			//Direct path setting code
+			    			//if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+			    				if (pathEnt != null) {
+			    					//my system..... still used?
+			    					if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+			    						//((c_IEnhPF)queue.get(0).entSourceRef).setPathToEntity(pathEnt);
+			    						
+			    						((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(pathEnt);
+			    						
+			    					} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
+			    						c_CoroAIUtil.playerPathfindCallback(pathEnt);
+			    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
+			    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
+			    					}
+			    					
+			    					
+			    					
+			    				} else {
+			    					if (queue.get(0).retryState < 4) {
+				    					//System.out.println("retryState: " + queue.get(0).retryState);
+				    					PathPointEx points[] = new PathPointEx[1];
+				    			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+				    			        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+				    			        ((c_IEnhPF)queue.get(0).entSourceRef).faceCoord(queue.get(0).x, queue.get(0).y, queue.get(0).z, 180F, 180F);
+				    			        
+				    			        EntityLiving center = (EntityLiving)queue.get(0).entSourceRef;
+				    			        
+				    			        
+				    			        
+				    			        float look = worldMap.rand.nextInt(90)-45;
+				    			        //int height = 10;
+				    			        double dist = worldMap.rand.nextInt(26)+(queue.get(0).retryState * 6);
+				    			        int gatherX = (int)(center.posX + ((double)(-Math.sin((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
+				    			        int gatherY = (int)(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
+				    			        int gatherZ = (int)(center.posZ + ((double)(Math.cos((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
+				    			        
+				    			        int id = getBlockId(gatherX, gatherY, gatherZ);
+				    			        
+				    			        int offset = -5;
+				    			        
+				    			        while (offset < 5) {
+				    			        	if (id == 0) {
+				    			        		break;
+				    			        	}
+				    			        	
+				    			        	id = getBlockId(gatherX, gatherY+offset++, gatherZ);
+				    			        }
+				    			        
+				    			        if (offset < 5) {
+				    			        	//retry path! found air
+				    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, gatherY, gatherZ, queue.get(0).dist, 0);
+				    			        	job.maxNodeIterations = 1000;
+				    			        	job.retryState = queue.get(0).retryState + 1;
+				    				    	queue.add(job);
+				    				    	
+				    			        } else {
+				    			        	//System.out.println("topmost block pf");
+				    			        	//retry path to topmost block
+				    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, worldMap.getHeightValue(gatherX, gatherZ)+1, gatherZ, queue.get(0).dist, 0);
+				    			        	job.maxNodeIterations = 1500;
+				    			        	job.retryState = queue.get(0).retryState + 1;
+				    				    	queue.add(job);
+				    			        }
+			    					} else {
+			    						if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+			    							PathPointEx points[] = new PathPointEx[1];
+			    					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+			    					        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+			    					        //((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(new PathEntityEx(points)), 0.23F);
+			    						} else {
+			    							/*PathPoint points[] = new PathPoint[1];
+			    					        points[0] = new PathPoint(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+			    					        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntity(points));*/
+			    						}
+			    					}
+			    				}
+			    			//}
+			    				
+			    				
+		    	        } catch (Exception ex) {
+		    	        	//do nothing
+		    	        }
+		    	       
+				} else {
+					if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+						PathPointEx points[] = new PathPointEx[1];
+				        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+				        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+					} else {
+						/*PathPoint points[] = new PathPoint[1];
+				        points[0] = new PathPoint(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+				        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntity(points));*/
+					}
+				}
+				
+				//Finally delete entry
+				queue.remove();
+			}
     	}
-    	
-    	
+		
+		if (processed || queue.size() == 0) {
+			try {
+				int sleep = 50-queue.size();
+				if (sleep < 1) { sleep = 1; }
+				Thread.sleep(sleep);/*if (queue.size() < 20) { Thread.sleep(100); } else { Thread.sleep(10); }*/ } catch (Exception ex) {}
+		}
     }
     
     // MAIN INTERFACE FUNCTIONS START \\
@@ -137,7 +265,8 @@ public class PFQueue implements Runnable {
     
     public static boolean getPath(Entity var1, Entity var2, float var3, int priority) {
 		if(var1 != null && var2 != null) {
-			return tryPath(var1, (int)(var2.posX+0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ+0.5F), var3, priority);
+			//(par2 - (double)(par1Entity.width / 2.0F)), MathHelper.floor_double(par4), MathHelper.floor_double(par6 - (double)(par1Entity.width / 2.0F))
+			return tryPath(var1, MathHelper.floor_double(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority);
 			
 		} else {
 			return false;
@@ -157,8 +286,13 @@ public class PFQueue implements Runnable {
     	
     	if (!var1.onGround) {
     		if (!var1.isInWater()) {
-    			while (var1.worldObj.getBlockId(x, y--, z) == 0) { }    				
+    			while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { }    				
     			y--;
+    			int id = var1.worldObj.getBlockId(x, y, z);
+    			if (id > 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+    				y--;
+    			}
+    			//System.out.println("Y-1 ID: " + var1.worldObj.getBlockId(x, y-1, z));
 	    		/*if (var1 instanceof EntityTropicraftPlayerProxy) {
 	    			((EntityTropicraftPlayerProxy)var1).setPathExToEntity(null);
 	    		} else if (var1 instanceof EntityCreature) {
@@ -166,7 +300,9 @@ public class PFQueue implements Runnable {
 	    		}
 	    		return false;*/
     		} else {
-    			while (var1.worldObj.getBlockId(x, y++, z) != 0) { }
+    			while (var1.worldObj.getBlockId(x, y, z) != 0) { y++; }
+    			y-=1;
+    			//System.out.println("water Y-1 ID: " + var1.worldObj.getBlockId(x, y-1, z));
     		}
     	}
     	
@@ -176,7 +312,7 @@ public class PFQueue implements Runnable {
     	}
     	
     	
-    	int delay = 1000;
+    	int delay = 3000;
     	boolean tryPath = true;
     	
     	//System.out.println(pfDelays.size());
@@ -194,19 +330,22 @@ public class PFQueue implements Runnable {
     		pfDelays.put(var1, System.currentTimeMillis() + delay);
     	}
     	
-    	if (tryPath) {
+    	if (tryPath || priority == -1) {
     	
 	    	PFQueueItem job = new PFQueueItem(var1, x, y, z, var2, priority);
 	    	
-	    	if (priority == 0) { queue.add(job); }
-	    	else {
-	    		//Basic fake
-	    		//queue.addFirst(job);
-	    		
-	    		//Real
-	    		int pos = 0;
-	    		while (queue.size() > 0 && priority < queue.get(pos++).priority) { } queue.add(pos, job);
-	    	}
+	    	try {
+		    	if (priority == 0) { queue.add(job); }
+		    	else if (priority == -1) { queue.addFirst(job); }
+		    	else {
+		    		//Basic fake
+		    		//queue.addFirst(job);
+		    		
+		    		//Real
+		    		int pos = 0;
+		    		while (queue.size() > 0 && priority < queue.get(pos++).priority) { } queue.add(pos, job);
+		    	}
+	    	} catch (Exception ex) { if (false/*mod_EntMover.masterDebug*/) System.out.println("pfqueue job aborted: " + ex); }
 	    	
 	    	// IMPORTANT!!!!! //
 	    	// implement a per entity time delay, a hashmap of entity instance->int perhaps? clean it with isDead checks? its threaded!
@@ -219,18 +358,102 @@ public class PFQueue implements Runnable {
 	    	///////////////////////////////////////////////
 	    	
 	    	//If an AI entity is the one asking for a path, set a temp path
-	    	if (var1 instanceof EntityTropicraftPlayerProxy) {
-	    		EntityTropicraftPlayerProxy entC = (EntityTropicraftPlayerProxy)var1;
+	    	if (var1 instanceof c_IEnhPF) {
+	    		c_IEnhPF entC = (c_IEnhPF)var1;
 	    		//Give entity temp path thats above their head they cant hit
-		    	PathPointEx points[] = new PathPointEx[1];
-		        points[0] = new PathPointEx((int)(var1.posX-0.5), (int)(var1.posY + 4D), (int)(var1.posZ-0.5));
-		        entC.setPathToEntity(new PathEntityEx(points));
+		    	//PathPointEx points[] = new PathPointEx[1];
+		        //points[0] = new PathPointEx((int)(var1.posX-0.5), (int)(var1.posY + 4D), (int)(var1.posZ-0.5));
+		        //entC.setPathToEntity(new PathEntityEx(points));
+	    	} else if (var1 instanceof EntityLiving) {
+	    		//EntityLiving entL = (EntityLiving)var1;
+	    		//PathPoint points[] = new PathPoint[1];
+		        //points[0] = new PathPoint((int)(var1.posX-0.5), (int)(var1.posY + 4D), (int)(var1.posZ-0.5));
+	    		//entL.getNavigator().setPath(new PathEntity(points), 0.23F);
+	    		try {
+	    			//EntityAITasks tasks = (EntityAITasks)ModLoader.getPrivateValue(EntityLiving.class, entL, "tasks");
+	    			//ArrayList tasksToDo = (ArrayList)ModLoader.getPrivateValue(EntityAITasks.class, tasks, "tasksToDo");
+	    			//ModLoader.setPrivateValue(EntityAIAttackOnCollide.class, tasksToDo.get(2), "field_48269_i", 999);	    			
+	    		} catch (Exception ex) {}
+	    		
+	    		
 	    	}
 	    	return true;
     	} else {
     		return false;
     	}
     }
+    
+    public static PathEntity convertToPathEntity(PathEntityEx pathEx) {
+    	
+    	if (pathEx != null) {
+	    	PathPoint points[] = new PathPoint[pathEx.pathLength];
+	    	for (int i = 0; i < points.length; i++) {
+	    		int y = pathEx.points[i].yCoord;
+	    		int id = worldMap.getBlockId(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
+	    		
+	    		//just 0
+	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y+=1;
+	    		}
+	    		
+	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y-=1;
+	    		}
+	    		
+	    		//check 1 lower
+	    		id = worldMap.getBlockId(pathEx.points[i].xCoord, y-1, pathEx.points[i].zCoord);
+	    		
+	    		//just 0
+	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y+=0;
+	    		}
+	    		
+	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y-=1;
+	    		}
+	    		
+	    		points[i] = new PathPoint(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
+	    	}
+	    	return new PathEntity(points);
+    	}
+    	return null;
+    }
+    
+    /*public PathEntityEx convertToPathEntityEx(PathEntity pathEx) {
+    	
+    	if (pathEx != null) {
+	    	PathPointEx points[] = new PathPointEx[pathEx.pathLength];
+	    	for (int i = 0; i < points.length; i++) {
+	    		int y = pathEx.points[i].yCoord;
+	    		int id = worldMap.getBlockId(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
+	    		
+	    		//just 0
+	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y+=1;
+	    		}
+	    		
+	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y-=1;
+	    		}
+	    		
+	    		//check 1 lower
+	    		id = worldMap.getBlockId(pathEx.points[i].xCoord, y-1, pathEx.points[i].zCoord);
+	    		
+	    		//just 0
+	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y+=0;
+	    		}
+	    		
+	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+	    			//y-=1;
+	    		}
+	    		
+	    		points[i] = new PathPointEx(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
+	    	}
+	    	return new PathEntityEx(points);
+    	}
+    	return null;
+    }*/
 
     public PathEntityEx createEntityPathTo(Entity var1, Entity var2, float var3) {
         return this.createEntityPathTo(var1, var2.posX, var2.boundingBox.minY, var2.posZ, var3);
@@ -240,7 +463,7 @@ public class PFQueue implements Runnable {
         return this.createEntityPathTo(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F), var5);
     }
 
-    private PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8) {
+    public PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8) {
         PathPointEx var9 = this.openPoint(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
         PathPointEx var10 = this.openPoint(MathHelper.floor_double(var2 - (double)(var1.width / 2.0F)), MathHelper.floor_double(var4), MathHelper.floor_double(var6 - (double)(var1.width / 2.0F)));
         PathPointEx var11 = new PathPointEx(MathHelper.floor_float(var1.width + 1.0F), MathHelper.floor_float(var1.height + 1.0F), MathHelper.floor_float(var1.width + 1.0F));
@@ -271,7 +494,7 @@ public class PFQueue implements Runnable {
         int lookCount = 0;
         int sleepCount = 0;
         
-        while(!this.path.isPathEmpty() && lookCount++ < 3000) {
+        while(!this.path.isPathEmpty() && lookCount++ < maxNodeIterations) {
         	try {
         		if (sleepCount++ > 100) {
         			Thread.sleep(1);
@@ -514,7 +737,7 @@ public class PFQueue implements Runnable {
             while(var3 > 0 && (var9 = this.getVerticalOffset(var1, var2, var3 - 1, var4, var5)) == 1) {
                 ++var8;
 
-                if(var8 >= 4) {
+                if(var8 >= dropSize) {
                     return null;
                 }
 
@@ -534,7 +757,7 @@ public class PFQueue implements Runnable {
     }
 
     private final PathPointEx openPoint(int var1, int var2, int var3) {
-        int var4 = PathPointEx.func_22329_a(var1, var2, var3);
+        int var4 = PathPointEx.makeHash(var1, var2, var3);
         PathPointEx var5 = (PathPointEx)this.pointMap.lookup(var4);
 
         if(var5 == null) {
@@ -553,7 +776,7 @@ public class PFQueue implements Runnable {
 
                     if(var9 > 0) {
                         if(var9 != Block.doorSteel.blockID && var9 != Block.doorWood.blockID) {
-                            if (var9 == Block.fence.blockID) {
+                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID/* || c_CoroAIUtil.isNoPathBlock(var9)*/) {
                                 return -2;
                             }
                             
@@ -570,11 +793,16 @@ public class PFQueue implements Runnable {
                             }
 
                             Material var11 = Block.blocksList[var9].blockMaterial;
+                            Block block = Block.blocksList[var9];
 
-                            if(var11.getIsSolid()) {
+                            if(var11.isSolid()) {
                                 return 0;
                             }
 
+                            if (block != null && block instanceof BlockFlowing) {
+                            	return -2;
+                            }
+                            
                             if(var11 == Material.water) {
                                 return -1;
                             }
@@ -617,7 +845,7 @@ public class PFQueue implements Runnable {
         return new PathEntityEx(var5);
     }
     
-    private PathEntityEx simplifyPath(PathEntityEx pathentity, PathPointEx pathpoint)
+    public PathEntityEx simplifyPath(PathEntityEx pathentity, PathPointEx pathpoint)
     {
         if(pathentity == null)
         {
@@ -748,31 +976,33 @@ public class PFQueue implements Runnable {
     	return worldMap.getBlockMetadata(x, y, z);
     }
     
-    public static void renderPFLines(EntityLiving entityliving, double d, double d1, double d2, 
+    /*public static void renderPFLines(EntityLiving entityliving, double d, double d1, double d2, 
 			float f, float f1) {
     	
     	if (renderLine) {
-        	entityliving.ignoreFrustumCheck = true;
+        	entityliving.ignoreFrustrumCheck = true;
         } else {
-        	entityliving.ignoreFrustumCheck = false;
+        	entityliving.ignoreFrustrumCheck = false;
         }
     	
-    	if (renderLine && entityliving instanceof EntityTropicraftPlayerProxy) {
-    		EntityTropicraftPlayerProxy koa = ((EntityTropicraftPlayerProxy)entityliving);
-    		if (koa.pathToEntity != null && koa.pathToEntity.points != null) {
-	            if (koa.pathToEntity.points.length > 1) {
-	            	for (int i = 0; i < koa.pathToEntity.points.length-1; i++) {
-	            		PathPointEx ppx = koa.pathToEntity.points[i];
-	            		PathPointEx ppx2 = koa.pathToEntity.points[i+1];
+    	if (renderLine && entityliving instanceof c_IEnhPF) {
+    		c_IEnhPF koa = ((c_IEnhPF)entityliving);
+    		if (koa.getPath() != null && koa.getPath().points != null) {
+	            if (koa.getPath().points.length > 1) {
+	            	int ii = koa.getPath().pathIndex - 1;
+	            	if (ii < 0) ii = 0;
+	            	for (int i = ii; i < koa.getPath().points.length-1; i++) {
+	            		PathPointEx ppx = koa.getPath().points[i];
+	            		PathPointEx ppx2 = koa.getPath().points[i+1];
 	
 	        	        if(ppx == null || ppx2 == null)
 	        	            return;
 	        	
 	        	        if (renderLine) {
-	        	        	entityliving.ignoreFrustumCheck = true;
+	        	        	entityliving.ignoreFrustrumCheck = true;
 	        	            renderLine(ppx, ppx2, d, d1, d2, f, f1);
 	        	        } else {
-	        	        	entityliving.ignoreFrustumCheck = false;
+	        	        	entityliving.ignoreFrustrumCheck = false;
 	        	        }
 	            	}
 	            	
@@ -802,13 +1032,13 @@ public class PFQueue implements Runnable {
 	    double fishX = castProgress*(entX - pirateX);
 	    double fishY = castProgress*(entY - pirateY);
 	    double fishZ = castProgress*(entZ - pirateZ);
-	    GL11.glDisable(3553 /*GL_TEXTURE_2D*/);
-	    GL11.glDisable(2896 /*GL_LIGHTING*/);
+	    GL11.glDisable(3553 GL_TEXTURE_2D);
+	    GL11.glDisable(2896 GL_LIGHTING);
 	    tessellator.startDrawing(3);
 	    int stringColor = 0x888888;
-	   /* if (((EntityNode)entitypirate).render) {
+	    if (((EntityNode)entitypirate).render) {
 	    	stringColor = 0x880000;
-	    } else {*/
+	    } else {
 	    	stringColor = 0xEF4034;
 		//}
 	    tessellator.setColorOpaque_I(stringColor);
@@ -823,7 +1053,99 @@ public class PFQueue implements Runnable {
 	    }
 	    
 	    tessellator.draw();
-	    GL11.glEnable(2896 /*GL_LIGHTING*/);
-	    GL11.glEnable(3553 /*GL_TEXTURE_2D*/);
-	}
+	    GL11.glEnable(2896 GL_LIGHTING);
+	    GL11.glEnable(3553 GL_TEXTURE_2D);
+	}*/
+    
+    //CJBs render pylon code -> 2012-03-20_19.23.58.png in my pictures / his dropbox
+    /*private void drawWaypoint(float x, float y, float z, byte r, byte g, byte b)
+    {
+    	//GL11.glEnable(GL11.GL_LIGHTING);
+    	
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+        y += 2f;
+        float f1 = 0f;
+        float f2 = 1f;
+        float f3 = 0.5f;
+        
+        GL11.glColor4ub(r, g, b, (byte)200);
+        GL11.glBegin(GL11.GL_QUADS);
+	        //FRONT
+		        GL11.glVertex3f(x+f1,y+f1,z+f2);
+		        GL11.glVertex3f(x+f2,y+f1,z+f2); 
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+	        
+	        //BACK
+		        GL11.glVertex3f(x+f1,y+f1,z+f1);
+		        GL11.glVertex3f(x+f3,y+f2,z+f3); 
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+		        GL11.glVertex3f(x+f2,y+f1,z+f1);
+
+	        //RIGHT
+		        GL11.glVertex3f(x+f2,y+f1,z+f1);
+		        GL11.glVertex3f(x+f3,y+f2,z+f3); 
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+		        GL11.glVertex3f(x+f2,y+f1,z+f2);
+	        //LEFT
+		        GL11.glVertex3f(x+f1,y+f1,z+f1);
+		        GL11.glVertex3f(x+f1,y+f1,z+f2); 
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+		        GL11.glVertex3f(x+f3,y+f2,z+f3);
+        GL11.glEnd();
+        
+        y-= 1;
+        
+        GL11.glBegin(GL11.GL_QUADS);
+        //FRONT
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+	        GL11.glVertex3f(x+f3,y+f1,z+f3); 
+	        GL11.glVertex3f(x+f2,y+f2,z+f2);
+	        GL11.glVertex3f(x+f1,y+f2,z+f2);
+        
+        //BACK
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+	        GL11.glVertex3f(x+f1,y+f2,z+f1); 
+	        GL11.glVertex3f(x+f2,y+f2,z+f1);
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+
+        //RIGHT
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+	        GL11.glVertex3f(x+f2,y+f2,z+f1); 
+	        GL11.glVertex3f(x+f2,y+f2,z+f2);
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+        //LEFT
+	        GL11.glVertex3f(x+f3,y+f1,z+f3);
+	        GL11.glVertex3f(x+f3,y+f1,z+f3); 
+	        GL11.glVertex3f(x+f1,y+f2,z+f2);
+	        GL11.glVertex3f(x+f1,y+f2,z+f1);
+	        GL11.glEnd();
+	        
+	        GL11.glColor4f(1, 1, 1, 1.0f);
+	        GL11.glBegin(GL11.GL_LINES);
+
+		        GL11.glVertex3f(x+f1,y+f2,z+f1); GL11.glVertex3f(x+f1,y+f2,z+f2); 
+		        GL11.glVertex3f(x+f1,y+f2,z+f2); GL11.glVertex3f(x+f2,y+f2,z+f2);
+		        GL11.glVertex3f(x+f2,y+f2,z+f2); GL11.glVertex3f(x+f2,y+f2,z+f1);
+		        GL11.glVertex3f(x+f2,y+f2,z+f1); GL11.glVertex3f(x+f1,y+f2,z+f1);
+	        
+		        GL11.glVertex3f(x+f3,y+f1,z+f3); GL11.glVertex3f(x+f1,y+f2,z+f1);
+		        GL11.glVertex3f(x+f3,y+f1,z+f3); GL11.glVertex3f(x+f1,y+f2,z+f2);
+	        	GL11.glVertex3f(x+f3,y+f1,z+f3); GL11.glVertex3f(x+f2,y+f2,z+f2);
+	        	GL11.glVertex3f(x+f3,y+f1,z+f3); GL11.glVertex3f(x+f2,y+f2,z+f1);
+	        	
+	        	y+=1;
+	        	GL11.glVertex3f(x+f1,y+f1,z+f1); GL11.glVertex3f(x+f3,y+f2,z+f3);
+		        GL11.glVertex3f(x+f1,y+f1,z+f2); GL11.glVertex3f(x+f3,y+f2,z+f3);
+	        	GL11.glVertex3f(x+f2,y+f1,z+f2); GL11.glVertex3f(x+f3,y+f2,z+f3);
+	        	GL11.glVertex3f(x+f2,y+f1,z+f1); GL11.glVertex3f(x+f3,y+f2,z+f3);
+	        
+	        GL11.glEnd();
+        
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+    }*/
 }

@@ -1,4 +1,4 @@
-package net.CoroAI;
+package CoroAI;
 
 import net.minecraft.src.*;
 
@@ -24,11 +24,15 @@ public class PathEntityEx/* extends PathEntity*/
         return pathIndex >= points.length;
     }
 
-    public Vec3D getPosition(Entity entity)
+    public Vec3 getPosition(Entity entity)
     {
-        double d = (double)points[pathIndex].xCoord + (double)(int)(entity.width + 1.0F) * 0.5D;
-        double d1 = points[pathIndex].yCoord;
-        double d2 = (double)points[pathIndex].zCoord + (double)(int)(entity.width + 1.0F) * 0.5D;
-        return Vec3D.createVector(d, d1, d2);
+    	try {
+	        double d = (double)points[pathIndex].xCoord + (double)(int)(entity.width + 1.0F) * 0.5D;
+	        double d1 = points[pathIndex].yCoord;
+	        double d2 = (double)points[pathIndex].zCoord + (double)(int)(entity.width + 1.0F) * 0.5D;
+	        return Vec3.createVectorHelper(d, d1, d2);
+    	} catch (Exception ex) { 
+    		return null;//thread crash
+    	}
     }
 }

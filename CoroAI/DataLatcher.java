@@ -1,4 +1,4 @@
-package net.CoroAI;
+package CoroAI;
 
 import java.util.HashMap;
 
@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class DataLatcher {
 	
-	public static HashMap values;
+	public HashMap values;
 	
 	DataLatcher() {
 		values = new HashMap();
