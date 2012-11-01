@@ -1247,7 +1247,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	        homeY = var1.getInteger("homeY");
 	        homeZ = var1.getInteger("homeZ");
 	        
-	        initJobAndStates(EnumJob.get(var1.getInteger("primaryOccupation")), true);
+	        initJobAndStates(EnumJob.get(var1.getInteger("primaryOccupation")), false);
 	        currentAction = EnumActState.get(var1.getInteger("currentAction"));
 	        
 	        job.getJobClass().tradeTimeout = var1.getInteger("tradeTimeout");

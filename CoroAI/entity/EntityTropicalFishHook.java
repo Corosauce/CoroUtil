@@ -40,6 +40,13 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    }
    
    @Override
+   public boolean isInRangeToRenderVec3D(Vec3 asd)
+   {
+	   return asd.distanceTo(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)) < 80; 
+       
+   }
+   
+   @Override
    public void setDead()
    {
 	   if (!inGround) {

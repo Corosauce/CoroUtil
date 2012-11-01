@@ -1158,8 +1158,10 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	//??!?!!?!? REMOVE ME?!
     	//Behaviors.AI(this);
     	
+    	//setDead();
+    	
     	if (!worldObj.isRemote) {
-    		if (fakePlayer == null || fakePlayer.playerNetServerHandler == null) {
+    		if (fakePlayer == null && fakePlayer.playerNetServerHandler == null) {
 	    		try {
 	            	fakePlayer = newFakePlayer(worldObj);
 	            	
@@ -1372,7 +1374,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         entityToAttack = entity;
     }
 
-    protected float getSpeedModifier()
+    public float getSpeedModifier()
     {
         float f = super.getSpeedModifier();
         if(fleeingTick > 0)
