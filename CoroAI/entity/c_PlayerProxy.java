@@ -126,15 +126,19 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     
     protected void attackEntity(Entity var1, float var2) {
     	sync();
-    	aimAtEnt(var1);
+    	
     	if (isAimedAtTarget(var1)) {
 	    	if (var2 < maxReach_Melee && var1.boundingBox.maxY > this.boundingBox.minY && var1.boundingBox.minY < this.boundingBox.maxY) {
+	    		aimAtEnt(var1);
+	    		//this.faceEntity(this, 180, 180);
 	    		if (curCooldown_Melee <= 0) {
 	    			this.setCurrentSlot(slot_Melee);
 	        		leftClickItem(var1);
 	        		this.curCooldown_Melee = cooldown_Melee;
 	        	}
 	    	} else if (var2 < maxReach_Ranged) {
+	    		//aimAtEnt(var1);
+	    		this.faceEntity(this, 180, 180);
 	    		if (curCooldown_Ranged <= 0) {
 	    			this.setCurrentSlot(slot_Ranged);
 	        		rightClickItem();
@@ -438,9 +442,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             //info = noMoveTicks;
         } else {
         	if(this.isCollidedHorizontally/* && !forcejump*/) {
-                this.isJumping = true;
+                //this.isJumping = true;
             } else {
-            	this.isJumping = false;
+            	//this.isJumping = false;
             }
         }
 
@@ -639,7 +643,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     
     public MovingObjectPosition getAimBlock(int yOffset, boolean noYaw) {
     	
-    	if (true) return null;
+    	//if (true) return null;
     	
     	EntityLiving entityliving = this;
     	float f = 1.0F;
@@ -1116,9 +1120,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         //(new StringBuilder()).append("state - ").append(state).toString();
 
     	if(this.isCollidedHorizontally/* && !this.swingArm*/) {
-            this.isJumping = true;
+            //this.isJumping = true;
         } else {
-        	this.isJumping = false;
+        	//this.isJumping = false;
         }
     	
         if(getEntityToAttack() != null) {
@@ -1150,7 +1154,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             return true;
         }*/
 
-        return this.canEntityBeSeen(var1) && (this.getDistanceToEntity(var1) < 4.0F) && Math.abs(this.posY - (double)this.yOffset - (var1.posY - (double)var1.yOffset)) <= 2.5D;
+        return this.canEntityBeSeen(var1) && (this.getDistanceToEntity(var1) < 3.0F) && Math.abs(this.posY - (double)this.yOffset - (var1.posY - (double)var1.yOffset)) <= 2.5D;
     }
     
     @Override

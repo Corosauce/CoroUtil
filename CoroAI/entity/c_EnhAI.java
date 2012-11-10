@@ -466,12 +466,14 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		//setDead();
 		//super.onLivingUpdate();
 		if (worldObj.isRemote) {
-			//System.out.println(mX + " - " + mZ);
-			//motionX = mX;
-			//motionY = mY;
-			//motionZ = mZ;
-			
+			if (dataWatcher.getWatchableObjectInt(22) == 1) motionY = 0F;
 			//this.setCurrentSlot(this.dataWatcher.getWatchableObjectInt(22));
+		} else {
+			if (onGround) {
+				dataWatcher.updateObject(22, Integer.valueOf(1));
+			} else {
+				dataWatcher.updateObject(22, Integer.valueOf(0));
+			}
 		}
 		
 		if (c_CoroAIUtil.isServer()) {
@@ -675,6 +677,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		super.entityInit();
         this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
+        this.dataWatcher.addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
     }
 	
 	@Override
@@ -733,12 +736,12 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		
 		if (var12 > 0.0D)
         {
-            this.isJumping = true;
+            //this.isJumping = true;
         }
 		
 		if (this.isCollidedHorizontally && this.hasPath())
 		{
-		    this.isJumping = true;
+		    //this.isJumping = true;
 		    //if (onGround) jump();
 		}
 		

@@ -284,12 +284,14 @@ public class PFQueue implements Runnable {
 
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority) {
     	
+    	//y += 10;
+    	
     	if (!var1.onGround) {
     		if (!var1.isInWater()) {
     			while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { }    				
     			y--;
     			int id = var1.worldObj.getBlockId(x, y, z);
-    			if (id > 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
+    			if (id > 0 && Block.blocksList[id] != null && (Block.blocksList[id].blockMaterial == Material.water || Block.blocksList[id].blockMaterial == Material.circuits)) {
     				y--;
     			}
     			//System.out.println("Y-1 ID: " + var1.worldObj.getBlockId(x, y-1, z));
@@ -460,11 +462,45 @@ public class PFQueue implements Runnable {
     }
 
     public PathEntityEx createEntityPathTo(Entity var1, int var2, int var3, int var4, float var5) {
-        return this.createEntityPathTo(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F), var5);
+    	/*double x = MathHelper.floor_double(var1.boundingBox.minX);
+    	double y = MathHelper.floor_double(var1.boundingBox.minY);
+    	double z = MathHelper.floor_double(var1.boundingBox.minZ);
+    	if (!var1.onGround) {
+    		if (!var1.isInWater()) {
+    			y++;
+    			while (getBlockId((int)x, (int)--y, (int)z) == 0 && y > 0) { }    				
+    			y--;
+    			int id = getBlockId((int)x, (int)y, (int)z);
+    			if (id > 0 && Block.blocksList[id] != null && (Block.blocksList[id].blockMaterial == Material.water || Block.blocksList[id].blockMaterial == Material.circuits)) {
+    				y--;
+    			}
+    		} else {
+    			while (getBlockId((int)x, (int)y, (int)z) != 0) { y++; }
+    			y-=1;
+    		}
+    	}*/
+    	
+    	int y = 0;
+    	
+    	if (getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY-1), MathHelper.floor_double(var1.boundingBox.minZ)) == 0) {
+    		y--;
+    	}
+    	
+    	int id = getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
+    	
+    	if (id == Block.stoneSingleSlab.blockID || id == Block.woodSingleSlab.blockID) {
+    		y++;
+    	}
+    	
+        return this.createEntityPathTo(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F), var5, y/*(int)(y - MathHelper.floor_double(var1.boundingBox.minY))*/);
     }
 
     public PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8) {
-        PathPointEx var9 = this.openPoint(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
+    	return createEntityPathTo(var1, var2, var4, var6, var8, 0);
+    }
+    
+    public PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8, int yOffset) {
+        PathPointEx var9 = this.openPoint(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY) + yOffset, MathHelper.floor_double(var1.boundingBox.minZ));
         PathPointEx var10 = this.openPoint(MathHelper.floor_double(var2 - (double)(var1.width / 2.0F)), MathHelper.floor_double(var4), MathHelper.floor_double(var6 - (double)(var1.width / 2.0F)));
         PathPointEx var11 = new PathPointEx(MathHelper.floor_float(var1.width + 1.0F), MathHelper.floor_float(var1.height + 1.0F), MathHelper.floor_float(var1.width + 1.0F));
         PathEntityEx var12 = this.addToPath(var1, var9, var10, var11, var8);
@@ -776,8 +812,16 @@ public class PFQueue implements Runnable {
 
                     if(var9 > 0) {
                         if(var9 != Block.doorSteel.blockID && var9 != Block.doorWood.blockID) {
-                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID/* || c_CoroAIUtil.isNoPathBlock(var9)*/) {
+                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID) {
                                 return -2;
+                            }
+                            
+                            Material var11 = Block.blocksList[var9].blockMaterial;
+                            Block block = Block.blocksList[var9];
+                            int meta = worldMap.getBlockMetadata(var2, var3, var4);
+                            
+                            if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
+                            	return -2;
                             }
                             
                             /*if (var9 == Block.ladder.blockID) {
@@ -788,12 +832,19 @@ public class PFQueue implements Runnable {
                             	return 1;
                             }*/
 
+                            if (block instanceof BlockStep) {
+                            	return -2;
+                            }
+                            
+                            if (var11 == Material.circuits) {
+                            	return 1;
+                            }
+                            
                             if (var9 == Block.pressurePlatePlanks.blockID || var9 == Block.pressurePlateStone.blockID) {
                                 return 1;
                             }
 
-                            Material var11 = Block.blocksList[var9].blockMaterial;
-                            Block block = Block.blocksList[var9];
+                            
 
                             if(var11.isSolid()) {
                                 return 0;
@@ -807,15 +858,15 @@ public class PFQueue implements Runnable {
                                 return -1;
                             }
 
-                            if(var11 == Material.lava) {
+                            if(var11 == Material.lava || var11 == Material.fire || var11 == Material.cactus) {
                                 return -2;
                             }
+                            
+                            
                         } else {
-                            int var10 = getBlockMetadata(var6, var7, var8);
-
-                            /*if(!BlockDoor.isOpen(var10) && !mod_PathingActivated.redMoonActive) {
-                                return 1;
-                            }*/
+                            if(!((BlockDoor)Block.doorWood).isDoorOpen(var1.worldObj, var6, var7, var8)) {
+                                return -2;
+                            }
                         }
                     }
                 }

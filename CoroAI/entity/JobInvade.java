@@ -2,6 +2,8 @@ package CoroAI.entity;
 
 import java.util.List;
 
+import build.render.Overlays;
+
 import CoroAI.PFQueue;
 
 import net.minecraft.src.*;
@@ -104,6 +106,7 @@ public class JobInvade extends JobBase {
 		
 		
 		
+		
 		//if (true) return;
 		
 		//health = 8;
@@ -151,6 +154,7 @@ public class JobInvade extends JobBase {
 		        	} else {
 		        		if (retargetDelayCount == 0 && (clEnt.getDistanceToEntity(ent) < retargetDist || ent.entityToAttack == null)) {
 		        			//Only retarget if they can be seen, to prevent weird long distance pf derps?
+		        			
 		        			if (ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished() || ((EntityLiving) clEnt).canEntityBeSeen(ent)) {
 		        				retargetDelayCount = retargetDelay;
 			        			ent.huntTarget(clEnt);
@@ -171,15 +175,17 @@ public class JobInvade extends JobBase {
 			} else {
 				
 				if (ent.entityToAttack != null) {
-					if (!ent.hasPath() && ent.getDistanceToEntity(ent.entityToAttack) > 5F) {
-						//System.out.println("huntTarget repath");
-						PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange);
+					if (((ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) && (retargetDelayCount == 0/* && ent.entityToAttack.getDistanceToEntity(ent) < retargetDist*/))/* && ent.getDistanceToEntity(ent.entityToAttack) > 5F*/) {
+						retargetDelayCount = retargetDelay;
+						if (PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange, -1)) {
+							//System.out.println("huntTarget repath");
+						}
 					}
 				}
 				
 			}
 			
-			if (clEnt == null) {
+			if (clEnt == null && ent.entityToAttack == null) {
 				//GET PLAYER SINCE NO CLOSE TARGETS!!!!!
 	        	EntityPlayer entP = getClosestVulnerablePlayerToEntity(ent, -1F);
 	        	if (entP != null && entP.getHealth() > 0) {

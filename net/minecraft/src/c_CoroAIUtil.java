@@ -89,7 +89,29 @@ public class c_CoroAIUtil {
 		} else mc = ModLoader.getMinecraftInstance();
 	}
 	
-	public static boolean isNoPathBlock(int id) {
+	public static boolean isNoPathBlock(Entity ent, int id, int meta) {
+		if (ent instanceof EntityPlayer) {
+			//barricades
+			if (id >= 192 && id <= 197) {
+				return true;
+			}
+			
+			Block block = Block.blocksList[id];
+			
+			if (block != null && block instanceof BlockFence) {
+				return true;
+			}
+			
+			if (block != null && block instanceof BlockWall) {
+				return true;
+			}
+			
+			if (block != null && block instanceof BlockFenceGate) {
+				return !BlockFenceGate.isFenceGateOpen(meta);
+			}
+			
+			
+		}
 		//if (false) {
 		/*if (id == ZCBlocks.barrier.blockID) {
 			return true;
