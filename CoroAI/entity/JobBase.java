@@ -49,13 +49,32 @@ public class JobBase {
 	}
 	
 	public void onLowHealth() {
+		PathEntity pe = ent.getNavigator().getPath();
 		
+		if (pe != null && !pe.isFinished()) {
+			
+			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+				pe.incrementPathIndex();
+				//System.out.println("next path!");
+			}
+			
+			/*int pIndex = pe.pathIndex+1;
+			if (pIndex < this.pathToEntity.points.length) {
+				if (this.worldObj.rayTraceBlocks(Vec3.createVectorHelper((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
+					this.pathToEntity.pathIndex++;
+				}
+			}*/
+		}
+		
+		if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
+    		ent.jump();
+		}
 	}
 	
 	public void onIdleTick() {
 		
 		//slaughter entitycreature ai update function and put idle wander invoking code here
-        if(((ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) && ent.rand.nextInt(5) == 0/* || ent.rand.nextInt(80) == 0*/))
+        if(((ent.getNavigator().noPath()) && ent.rand.nextInt(5) == 0/* || ent.rand.nextInt(80) == 0*/))
         {
         	
         	//System.out.println("home dist: " + ent.getDistance(ent.homeX, ent.homeY, ent.homeZ));
@@ -73,7 +92,7 @@ public class JobBase {
         		ent.walkTo(ent, ent.homeX+ent.rand.nextInt(randsize) - (randsize/2), ent.homeY+1, ent.homeZ+ent.rand.nextInt(randsize) - (randsize/2),ent.maxPFRange, 600);
         	}
         } else {
-        	if (ent.getNavigator().getPath() == null) {
+        	if (ent.getNavigator().noPath()) {
     			ent.lookForItems();
         	}
         }
@@ -163,11 +182,11 @@ public class JobBase {
         PathEntity path = ent.getNavigator().getPath();
         //System.out.println("koa " + ent.name + " health: " + ent.getHealth());
         if (clEnt != null) {
-        	if (clEnt != ent.lastFleeEnt || (ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished())) {
+        	if (clEnt != ent.lastFleeEnt || (ent.getNavigator().noPath())) {
         		ent.lastFleeEnt = clEnt;
         		if (actOnTrue && fleeDelay <= 0) fleeFrom(clEnt);
         	}
-        } else if (/*(ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) && */ent.lastFleeEnt != null) {
+        } else if (/*(ent.getNavigator().noPath()) && */ent.lastFleeEnt != null) {
     		if (actOnTrue && fleeDelay <= 0) fleeFrom(ent.lastFleeEnt);
         }
         
@@ -230,13 +249,17 @@ public class JobBase {
         	id = ent.worldObj.getBlockId(gatherX, gatherY+offset++, gatherZ);
         }
         
-        if (offset < 10) {
-        	//System.out.println("flee");
-        	ent.walkTo(ent, gatherX, gatherY, gatherZ, ent.maxPFRange, 600, -1);
-        	//this.walkTo(this, homeX, homeY, homeZ, maxPFRange, 600);
+        double homeDist = ent.getDistance(ent.homeX, ent.homeY, ent.homeZ);
+        
+        if (ent.job.getJobClass() instanceof JobHunt && homeDist > ent.maxDistanceFromHome / 2) {
+        	ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, (float) homeDist/*ent.maxPFRange*/, 600);
         } else {
-        	//System.out.println("flee failed");
-        	ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, ent.maxPFRange, 600);
+        	if (offset < 10) {
+        		ent.walkTo(ent, gatherX, gatherY, gatherZ, ent.maxPFRange, 600, -1);
+        	} else {
+        		//System.out.println("flee failed");
+            	ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, (float) homeDist/*ent.maxPFRange*/, 600);
+        	}
         }
 	}
 	
@@ -348,12 +371,16 @@ public class JobBase {
 		return false;
 	}
 	
-	public EntityPlayer getClosestVulnerablePlayerToEntity(Entity par1Entity, double par2)
+	public EntityPlayer getClosestVulnerablePlayerToEntity(Entity par1Entity, double par2) {
+		return getClosestPlayerToEntity(par1Entity, par2, true);
+	}
+	
+	public EntityPlayer getClosestPlayerToEntity(Entity par1Entity, double par2, boolean survivalOnly)
     {
-        return this.getClosestVulnerablePlayer(par1Entity.worldObj, par1Entity.posX, par1Entity.posY, par1Entity.posZ, par2);
+        return this.getClosestPlayer(par1Entity.worldObj, par1Entity.posX, par1Entity.posY, par1Entity.posZ, par2, survivalOnly);
     }
 	
-	public EntityPlayer getClosestVulnerablePlayer(World world, double par1, double par3, double par5, double par7)
+	public EntityPlayer getClosestPlayer(World world, double par1, double par3, double par5, double par7, boolean survivalOnly)
     {
         double var9 = -1.0D;
         EntityPlayer var11 = null;
@@ -362,7 +389,7 @@ public class JobBase {
         {
             EntityPlayer var13 = (EntityPlayer)world.playerEntities.get(var12);
 
-            if (!var13.capabilities.disableDamage && var13.getHealth() > 0)
+            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.getHealth() > 0)
             {
                 double var14 = var13.getDistanceSq(par1, par3, par5);
 
@@ -376,6 +403,131 @@ public class JobBase {
 
         return var11;
     }
+	
+	//transferCount: -1 for all, foodOverride: makes id not used, scans for ItemFood
+	public void transferItems(IInventory invFrom, IInventory invTo, int id, int transferCount, boolean foodOverride) {
+
+		int count = 0;
+		for(int j = 0; j < invFrom.getSizeInventory(); j++)
+        {
+			//
+			ItemStack ourStack = invFrom.getStackInSlot(j);
+			if (ourStack != null && ((id == -1 && !foodOverride) || ourStack.itemID == id || (ourStack.getItem() instanceof ItemFood && foodOverride)))
+            {
+            	for (int k = 0; k < invTo.getSizeInventory(); k++) {
+            		ItemStack theirStack = invTo.getStackInSlot(k);
+            		
+            		
+            		
+            		if(theirStack == null) {
+            			//no problem
+            			/*theirStack = ourStack.copy();
+            			invTo.setInventorySlotContents(k, theirStack);
+            			invFrom.setInventorySlotContents(j, null);*/
+            			
+            			int space = 64;
+            			
+            			int addCount = ourStack.stackSize;
+            			
+            			if (ourStack.stackSize < 0) {
+            				System.out.println("!! ourStack.stackSize < 0");
+            			}
+            			
+            			//if (space < ourStack.stackSize) addCount = space;
+            			if (transferCount < addCount && transferCount != -1) addCount = transferCount;
+            			
+            			//transfer! the sexyness! lol haha i typ so gut ikr
+            			ourStack.stackSize -= addCount;
+            			//theirStack.stackSize += addCount;
+            			invTo.setInventorySlotContents(k, new ItemStack(ourStack.itemID, addCount, ourStack.getItemDamage()));
+            			if (transferCount != -1) transferCount -= addCount;
+            			
+            			if (ourStack.stackSize == 0) {
+            				invFrom.setInventorySlotContents(j, null);
+	            			break;
+            			} else if (ourStack.stackSize < 0) {
+            				System.out.println("ourStack.stackSize < 0");
+            			}
+            			
+            			if (transferCount == 0) {
+            				//System.out.println("final transferCount: " + transferCount);
+            				return;
+            			}
+            			
+            			//break;
+            		} else if (ourStack.itemID == theirStack.itemID && theirStack.stackSize < theirStack.getMaxStackSize()) {
+            			int space = theirStack.getMaxStackSize() - theirStack.stackSize;
+            			
+            			int addCount = ourStack.stackSize;
+            			
+            			if (space < ourStack.stackSize) addCount = space;
+            			if (transferCount < addCount && transferCount != -1) addCount = transferCount;
+            			
+            			//transfer! the sexyness! lol haha i typ so gut ikr
+            			ourStack.stackSize -= addCount;
+            			theirStack.stackSize += addCount;
+            			if (transferCount != -1) transferCount -= addCount;
+            			
+            			if (ourStack.stackSize == 0) {
+            				invFrom.setInventorySlotContents(j, null);
+	            			break;
+            			}
+            			
+            			if (transferCount == 0) {
+            				//System.out.println("final transferCount: " + transferCount);
+            				return;
+            			}
+            		}
+            	}
+            }
+        }
+	}
+	
+	public void onCloseCombatTick() {
+		
+		//ent.lungeFactor = 1.2F;
+		
+		if (ent.isBreaking()) return;
+		
+		//temp
+		//ent.setMoveSpeed(0.35F);
+		//ent.entityCollisionReduction = 0.1F;
+		//ent.lungeFactor = 1.05F;
+		
+		
+		
+		float closeFactor = 1F;
+		
+		if (ent.getDistanceToEntity(ent.entityToAttack) < 1.1F) {
+			closeFactor = 0.5F;
+		}
+		
+		if (!ent.onGround) {
+			closeFactor = 0.1F;
+		}
+		
+		float speed = ent.getMoveSpeed() * ent.lungeFactor * closeFactor;
+		ent.getMoveHelper().setMoveTo(ent.entityToAttack.posX, ent.entityToAttack.posY, ent.entityToAttack.posZ, speed);
+		//System.out.println("lunging!: " + ent.getMoveSpeed() + " - " + ent.lungeFactor + " - " + speed);
+		
+		ent.getDataWatcher().updateObject(20, 1);
+		
+		//jump over drops
+		MovingObjectPosition aim = ent.getAimBlock(-2, true);
+    	if (aim != null) {
+    		if (aim.typeOfHit == EnumMovingObjectType.TILE) {
+    			
+    		}
+    	} else {
+    		if (ent.onGround) {
+    			ent.jump();
+    		}
+    	}
+		
+    	if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
+    		ent.jump();
+		}
+	}
 	
 	// Job shared functions //
 	

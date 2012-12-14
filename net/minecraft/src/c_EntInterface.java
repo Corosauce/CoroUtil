@@ -49,22 +49,20 @@ public class c_EntInterface extends EntityMob
         //int dim = world.worldInfo.getDimension();
         c_EntityPlayerMPExt player = null;//
 
-        player = new c_EntityPlayerMPExt(mc, world, "fakePlayer", new ItemInWorldManager(world));
+        //System.out.println("DEBUG FIX 2: ");
+        //player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_", new ItemInWorldManager(world));
+        if (worldObj.chunkExists((int)(posX / 16), (int)(posZ / 16))) {
+        	player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_" + this.entityId, new ItemInWorldManager(world));
+        	inventory = player.inventory;
+        } else {
+        	//System.out.println("Chunk doesnt exist, cant create fake player, posX: " + posX + " | posZ: " + posZ);
+        }
         
-        if (world.playerEntities.size() > 0)
-        {
-        	
-        	
-            if (world.playerEntities.get(0) instanceof EntityPlayerMP)
-            {
-                player.playerNetServerHandler = ((EntityPlayerMP)world.playerEntities.get(0)).playerNetServerHandler;
-                player.dimension = ((EntityPlayerMP)world.playerEntities.get(0)).dimension;
-            }
-        }
-        else
-        {
-            //System.out.println("fakeplayer has no netserverhandler, might behave oddly");
-        }
+        
+        
+        
+        
+        //System.out.println("c_CoroAIUtil.playerToAILookup.put(player.username, this); OFF");
 
         //mc.configManager.netManager
         //player.movementInput = new MovementInputFromOptions(mod_ZombieCraft.mc.gameSettings);
@@ -120,6 +118,7 @@ public class c_EntInterface extends EntityMob
 
     public void setThrower(EntityThrowable prj, EntityLiving ent)
     {
-        prj.thrower = ent;
+    	c_CoroAIUtil.setPrivateValueBoth(EntityThrowable.class, prj, c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ent);
+        //prj.thrower = ent;
     }
 }

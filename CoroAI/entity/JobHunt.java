@@ -18,6 +18,7 @@ public class JobHunt extends JobBase {
 	
 	@Override
 	public void tick() {
+		super.tick();
 		jobHunter();
 	}
 	
@@ -33,20 +34,26 @@ public class JobHunt extends JobBase {
 
 	@Override
 	public void onLowHealth() {
+		//super.onLowHealth();
 		//if (this.name.equals("Makani")) {
 		
 		//}
+		//System.out.println("hitAndRunDelay: " + hitAndRunDelay);
 		if (hitAndRunDelay == 0 && ent.getDistanceToEntity(ent.lastFleeEnt) > 3F) {
 			hitAndRunDelay = ent.cooldown_Ranged+1;
 			ent.entityToAttack = ent.lastFleeEnt;
 			if (ent.entityToAttack != null) {
-				//ent.faceEntity(ent.entityToAttack, 180F, 180F);
-				//ent.rightClickItem();
+				ent.faceEntity(ent.entityToAttack, 180F, 180F);
+				ent.rightClickItem();
 				//ent.attackEntity(ent.entityToAttack, ent.getDistanceToEntity(ent.entityToAttack));
 				//System.out.println("H&R " + ent.name + " health: " + ent.getHealth());
 			}
 		} else {
 			ent.entityToAttack = null;
+		}
+		
+		if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
+    		ent.jump();
 		}
 	}
 	
@@ -139,7 +146,7 @@ public class JobHunt extends JobBase {
 			} else {
 				
 				if (ent.entityToAttack != null) {
-					if (!ent.hasPath() && ent.getDistanceToEntity(ent.entityToAttack) > 5F) {
+					if (ent.getNavigator().noPath() && ent.getDistanceToEntity(ent.entityToAttack) > 5F) {
 						PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange);
 					}
 				}
@@ -186,7 +193,7 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ent.getHealth() < 10) {
+		if (ent.getHealth() < 6) {
 			return false;
 		}
 		

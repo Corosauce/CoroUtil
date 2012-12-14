@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Map;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -17,7 +18,7 @@ public class PFQueue implements Runnable {
 	public static HashMap pfDelays;
 	public static boolean renderLine = true;
 	
-	public static long maxRequestAge = 1000;
+	public static long maxRequestAge = 8000;
 	public static long maxNodeIterations;
 	
 	
@@ -105,150 +106,196 @@ public class PFQueue implements Runnable {
     public void manageQueue() {
     	//System.out.print("!!");
     	//c_CoroAIUtil.watchWorldObj(); - depreciated, uses entity world obj for multi dimension use
+    	maxRequestAge = 2000;
+    	//list cleanup of > 30 second unused references
     	
-    	if (queue.size() > 30) {
-			System.out.println("PF Size: " + queue.size());
-		}
+    	try {
+	    	Iterator it = pfDelays.entrySet().iterator();
+	        while (it.hasNext()) {
+	            Map.Entry pairs = (Map.Entry)it.next();
+	            //System.out.println(pairs.getKey() + " = " + pairs.getValue());
+	            long time = (Long)pairs.getValue();
+	            if (time < System.currentTimeMillis() - 30000) {
+	    			pfDelays.remove(pairs.getKey());
+	    			
+	    		}
+	            //it.remove(); // avoids a ConcurrentModificationException
+	        }
+    	} catch (Exception ex) {
+    		//ex.printStackTrace();
+    	}
+    	
+    	
+    	
 		
-    	boolean processed = false;
-    	while (!processed && queue.size() > 0) {
-			if (queue.size() > 0) {
-				if (queue.get(0).timeCreated + this.maxRequestAge > System.currentTimeMillis()) {
-					processed = true;
-	    			this.path.clearPath();
-	    	        this.pointMap.clearMap();
-	    	        foundEnd = false;
-	    	        
-	    	        //catching any game exit errors
-		    	        try {
+    	
+	    	boolean processed = false;
+	    	while (!processed && queue.size() > 0) {
+				if (queue.size() > 0) {
+					
+					if (queue.size() > 10) {
+						//System.out.println("PF Size: " + queue.size());
+					}
+					
+					try {
+						
+					if (queue.get(0).timeCreated + this.maxRequestAge > System.currentTimeMillis()) {
+						processed = true;
+		    			this.path.clearPath();
+		    	        this.pointMap.clearMap();
+		    	        foundEnd = false;
 		    	        
-			    	        //hmmmmmmmmmmmmmmm
-			    	        if (queue.get(0).entSourceRef instanceof EntityCreature) {
-			    	        	entH = (EntityCreature)queue.get(0).entSourceRef;
+		    	        //System.out.println("PROCESS PF!");
+		    	        
+		    	        //catching any game exit errors
+			    	        try {
+			    	        
+				    	        //hmmmmmmmmmmmmmmm
+				    	        if (queue.get(0).entSourceRef instanceof EntityCreature) {
+				    	        	entH = (EntityCreature)queue.get(0).entSourceRef;
+				    	        }
+				    	        
+				    	        //Fishermen hook for preventing dropdown pathing
+				    	        if (queue.get(0).entSourceRef instanceof c_IEnhAI && ((c_IEnhAI)queue.get(0).entSourceRef).canUseLadders()) {
+				    	        	//if (((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.mFISHERMAN || ((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.fFISHERMAN) {
+				    	        		dropSize = 2;
+				    	        		canUseLadder = true;
+				    	        	//}
+				    	        } else {
+				    	        	//Vanilla defaults
+				    	        	dropSize = 4;
+				    	        	canUseLadder = true;
+				    	        }
+				    			
+				    	        cleanup(queue.get(0).entSourceRef);
+				    	        
+				    	        //Pathfind
+				    	        maxNodeIterations = queue.get(0).maxNodeIterations;
+				    	        //Multi world dimension pathfinding fix 
+				    	        worldMap = queue.get(0).entSourceRef.worldObj;
+				    			PathEntityEx pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
+				    			//PathEntity pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
+				    			//System.out.println(pathEnt.pathLength);
+				    			//Callback code goes here
+				    			
+				    			//Direct path setting code
+				    			//if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+				    				if (pathEnt != null) {
+				    					//my system..... still used?
+				    					if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+				    						//((c_IEnhPF)queue.get(0).entSourceRef).setPathToEntity(pathEnt);
+				    						
+				    						((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(pathEnt);
+				    						
+				    					} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
+				    						c_CoroAIUtil.playerPathfindCallback(pathEnt);
+				    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
+				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
+				    					}
+				    					
+				    					
+				    					
+				    				} else {
+				    					if (queue.get(0).retryState < 4) {
+					    					//System.out.println("retryState: " + queue.get(0).retryState);
+					    					PathPointEx points[] = new PathPointEx[1];
+					    			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+					    			        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+					    			        ((c_IEnhPF)queue.get(0).entSourceRef).faceCoord(queue.get(0).x, queue.get(0).y, queue.get(0).z, 180F, 180F);
+					    			        
+					    			        EntityLiving center = (EntityLiving)queue.get(0).entSourceRef;
+					    			        
+					    			        
+					    			        
+					    			        float look = worldMap.rand.nextInt(90)-45;
+					    			        //int height = 10;
+					    			        double dist = worldMap.rand.nextInt(26)+(queue.get(0).retryState * 6);
+					    			        int gatherX = (int)(center.posX + ((double)(-Math.sin((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
+					    			        int gatherY = (int)(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
+					    			        int gatherZ = (int)(center.posZ + ((double)(Math.cos((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
+					    			        
+					    			        int id = getBlockId(gatherX, gatherY, gatherZ);
+					    			        
+					    			        int offset = -5;
+					    			        
+					    			        while (offset < 5) {
+					    			        	if (id == 0) {
+					    			        		break;
+					    			        	}
+					    			        	
+					    			        	id = getBlockId(gatherX, gatherY+offset++, gatherZ);
+					    			        }
+					    			        
+					    			        if (offset < 5) {
+					    			        	//retry path! found air
+					    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, gatherY, gatherZ, queue.get(0).dist, 0);
+					    			        	job.maxNodeIterations = 1000;
+					    			        	job.retryState = queue.get(0).retryState + 1;
+					    				    	queue.add(job);
+					    				    	
+					    			        } else {
+					    			        	//System.out.println("topmost block pf");
+					    			        	//retry path to topmost block
+					    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, worldMap.getHeightValue(gatherX, gatherZ)+1, gatherZ, queue.get(0).dist, 0);
+					    			        	job.maxNodeIterations = 1500;
+					    			        	job.retryState = queue.get(0).retryState + 1;
+					    				    	queue.add(job);
+					    			        }
+				    					} else {
+				    						if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+				    							PathPointEx points[] = new PathPointEx[1];
+				    					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+				    					        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+				    					        //((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(new PathEntityEx(points)), 0.23F);
+				    						} else {
+				    							/*PathPoint points[] = new PathPoint[1];
+				    					        points[0] = new PathPoint(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+				    					        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntity(points));*/
+				    						}
+				    					}
+				    				}
+				    			//}
+				    				
+				    				
+			    	        } catch (Exception ex) {
+			    	        	//do nothing
 			    	        }
-			    	        
-			    	        //Fishermen hook for preventing dropdown pathing
-			    	        if (queue.get(0).entSourceRef instanceof c_IEnhAI && ((c_IEnhAI)queue.get(0).entSourceRef).canUseLadders()) {
-			    	        	//if (((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.mFISHERMAN || ((EntityKoaMember)queue.get(0).entSourceRef).occupation == EnumKoaOccupation.fFISHERMAN) {
-			    	        		dropSize = 2;
-			    	        		canUseLadder = true;
-			    	        	//}
-			    	        } else {
-			    	        	//Vanilla defaults
-			    	        	dropSize = 4;
-			    	        	canUseLadder = true;
-			    	        }
-			    			
-			    	        
-			    	        
-			    	        //Pathfind
-			    	        maxNodeIterations = queue.get(0).maxNodeIterations;
-			    	        //Multi world dimension pathfinding fix 
-			    	        worldMap = queue.get(0).entSourceRef.worldObj;
-			    			PathEntityEx pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
-			    			//PathEntity pathEnt = createEntityPathTo(queue.get(0).entSourceRef, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
-			    			//System.out.println(pathEnt.pathLength);
-			    			//Callback code goes here
-			    			
-			    			//Direct path setting code
-			    			//if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
-			    				if (pathEnt != null) {
-			    					//my system..... still used?
-			    					if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
-			    						//((c_IEnhPF)queue.get(0).entSourceRef).setPathToEntity(pathEnt);
-			    						
-			    						((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(pathEnt);
-			    						
-			    					} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
-			    						c_CoroAIUtil.playerPathfindCallback(pathEnt);
-			    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
-			    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
-			    					}
-			    					
-			    					
-			    					
-			    				} else {
-			    					if (queue.get(0).retryState < 4) {
-				    					//System.out.println("retryState: " + queue.get(0).retryState);
-				    					PathPointEx points[] = new PathPointEx[1];
-				    			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-				    			        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
-				    			        ((c_IEnhPF)queue.get(0).entSourceRef).faceCoord(queue.get(0).x, queue.get(0).y, queue.get(0).z, 180F, 180F);
-				    			        
-				    			        EntityLiving center = (EntityLiving)queue.get(0).entSourceRef;
-				    			        
-				    			        
-				    			        
-				    			        float look = worldMap.rand.nextInt(90)-45;
-				    			        //int height = 10;
-				    			        double dist = worldMap.rand.nextInt(26)+(queue.get(0).retryState * 6);
-				    			        int gatherX = (int)(center.posX + ((double)(-Math.sin((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
-				    			        int gatherY = (int)(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
-				    			        int gatherZ = (int)(center.posZ + ((double)(Math.cos((center.rotationYaw+look) / 180.0F * 3.1415927F) * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)) * dist));
-				    			        
-				    			        int id = getBlockId(gatherX, gatherY, gatherZ);
-				    			        
-				    			        int offset = -5;
-				    			        
-				    			        while (offset < 5) {
-				    			        	if (id == 0) {
-				    			        		break;
-				    			        	}
-				    			        	
-				    			        	id = getBlockId(gatherX, gatherY+offset++, gatherZ);
-				    			        }
-				    			        
-				    			        if (offset < 5) {
-				    			        	//retry path! found air
-				    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, gatherY, gatherZ, queue.get(0).dist, 0);
-				    			        	job.maxNodeIterations = 1000;
-				    			        	job.retryState = queue.get(0).retryState + 1;
-				    				    	queue.add(job);
-				    				    	
-				    			        } else {
-				    			        	//System.out.println("topmost block pf");
-				    			        	//retry path to topmost block
-				    			        	PFQueueItem job = new PFQueueItem(queue.get(0).entSourceRef, gatherX, worldMap.getHeightValue(gatherX, gatherZ)+1, gatherZ, queue.get(0).dist, 0);
-				    			        	job.maxNodeIterations = 1500;
-				    			        	job.retryState = queue.get(0).retryState + 1;
-				    				    	queue.add(job);
-				    			        }
-			    					} else {
-			    						if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
-			    							PathPointEx points[] = new PathPointEx[1];
-			    					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-			    					        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
-			    					        //((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(new PathEntityEx(points)), 0.23F);
-			    						} else {
-			    							/*PathPoint points[] = new PathPoint[1];
-			    					        points[0] = new PathPoint(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-			    					        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntity(points));*/
-			    						}
-			    					}
-			    				}
-			    			//}
-			    				
-			    				
-		    	        } catch (Exception ex) {
-		    	        	//do nothing
-		    	        }
-		    	       
-				} else {
-					if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+			    	       
+					} else {
+						
+						//System.out.println("PF Job aborted, too old: " + (System.currentTimeMillis() - queue.get(0).timeCreated));
+						
 						PathPointEx points[] = new PathPointEx[1];
 				        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-				        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
-					} else {
-						/*PathPoint points[] = new PathPoint[1];
-				        points[0] = new PathPoint(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-				        ((EntityTropicraftPlayerProxy)queue.get(0).entSourceRef).setPathToEntity(new PathEntity(points));*/
+						
+						if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
+							
+					        ((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(new PathEntityEx(points));
+						} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
+    						c_CoroAIUtil.playerPathfindCallback(new PathEntityEx(points));
+    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
+    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(new PathEntityEx(points)), 0.23F);
+    					}
+						
+						queue.remove();
 					}
+					
+					//Finally delete entry
+					
+					
+					} catch (Exception ex) {
+			    		//ex.printStackTrace();
+			    	} finally {
+			    		try {
+			    			queue.remove();
+			    		} catch (Exception ex2) {
+			    			//ex2.printStackTrace();
+			    		}
+			    	}
 				}
-				
-				//Finally delete entry
-				queue.remove();
-			}
-    	}
+	    	}
+    	   	
+	    	
 		
 		if (processed || queue.size() == 0) {
 			try {
@@ -256,6 +303,12 @@ public class PFQueue implements Runnable {
 				if (sleep < 1) { sleep = 1; }
 				Thread.sleep(sleep);/*if (queue.size() < 20) { Thread.sleep(100); } else { Thread.sleep(10); }*/ } catch (Exception ex) {}
 		}
+		
+    	
+    }
+    
+    public synchronized void cleanup(Entity ent) {
+    	//pfDelays.remove(ent);
     }
     
     // MAIN INTERFACE FUNCTIONS START \\
@@ -286,7 +339,8 @@ public class PFQueue implements Runnable {
     	
     	//y += 10;
     	
-    	if (!var1.onGround) {
+    	//bugged? using source entity on ground check, then adjusting destination x y z? makes no sense
+    	if (false && !var1.onGround) {
     		if (!var1.isInWater()) {
     			while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { }    				
     			y--;
@@ -314,10 +368,11 @@ public class PFQueue implements Runnable {
     	}
     	
     	
-    	int delay = 3000;
+    	int delay = 3000 + (queue.size() * 20);
     	boolean tryPath = true;
     	
     	//System.out.println(pfDelays.size());
+    	
     	
     	if (pfDelays.containsKey(var1)) {
     		long time = (Long)pfDelays.get(var1); 
@@ -329,11 +384,15 @@ public class PFQueue implements Runnable {
     		}
     		//int time = (int)Integer.pfDelays.get(var1).;
     	} else {
+    		//System.out.println("new unique pfdelay entry, count: " + pfDelays.size());
     		pfDelays.put(var1, System.currentTimeMillis() + delay);
     	}
     	
     	if (tryPath || priority == -1) {
     	
+    		if (priority == -1) {
+    			int hwta = 0;
+    		}
 	    	PFQueueItem job = new PFQueueItem(var1, x, y, z, var2, priority);
 	    	
 	    	try {
@@ -483,7 +542,7 @@ public class PFQueue implements Runnable {
     	int y = 0;
     	
     	if (getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY-1), MathHelper.floor_double(var1.boundingBox.minZ)) == 0) {
-    		y--;
+    		//y--;
     	}
     	
     	int id = getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
@@ -812,7 +871,7 @@ public class PFQueue implements Runnable {
 
                     if(var9 > 0) {
                         if(var9 != Block.doorSteel.blockID && var9 != Block.doorWood.blockID) {
-                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID) {
+                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID || var9 == Block.cobblestoneWall.blockID) {
                                 return -2;
                             }
                             
@@ -820,8 +879,19 @@ public class PFQueue implements Runnable {
                             Block block = Block.blocksList[var9];
                             int meta = worldMap.getBlockMetadata(var2, var3, var4);
                             
-                            if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
-                            	return -2;
+                            
+                            int noOverrideID = -66;
+                            
+                            if (var1 instanceof c_IEnhAI) {
+                            	int override = ((c_IEnhAI)var1).overrideBlockPathOffset((c_IEnhAI)var1, var9, meta, var2, var3, var4);
+                            	
+                            	if (override != noOverrideID) {
+                            		return override;
+                            	}
+                            } else {
+                            	if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
+                            		return 2;
+                            	}
                             }
                             
                             /*if (var9 == Block.ladder.blockID) {
@@ -831,10 +901,6 @@ public class PFQueue implements Runnable {
                             /*if (mod_PathingActivated.redMoonActive && entH != null && entH instanceof EntityZombie && entH.team != 1 && (var9 == Block.dirt.blockID || Block.blocksList[var9].blockMaterial == Material.wood || Block.blocksList[var9].blockMaterial == Material.glass)) {
                             	return 1;
                             }*/
-
-                            if (block instanceof BlockStep) {
-                            	return -2;
-                            }
                             
                             if (var11 == Material.circuits) {
                             	return 1;
@@ -858,7 +924,7 @@ public class PFQueue implements Runnable {
                                 return -1;
                             }
 
-                            if(var11 == Material.lava || var11 == Material.fire || var11 == Material.cactus) {
+                            if(var11 == Material.lava || var11 == Material.cactus) {
                                 return -2;
                             }
                             

@@ -15,19 +15,21 @@ public class JobProtect extends JobBase {
 	
 	@Override
 	public boolean shouldExecute() {
-		checkPlayer();
-		EntityPlayer entP = ent.worldObj.getPlayerEntityByName(playerName);
-		if (entP != null) {
-			if (ent.getDistanceToEntity(entP) > maxDist) {
-				return true;
-			}
-		}
-		return false;
+		
+		
+		return true;
 	}
 	
 	@Override
 	public boolean shouldContinue() {
-		return !shouldExecute();
+		/*EntityPlayer entP = ent.worldObj.getPlayerEntityByName(playerName);
+		if (entP != null) {
+			//System.out.println(ent.getDistanceToEntity(entP));
+			if (ent.getDistanceToEntity(entP) > maxDist) {
+				return false;
+			}
+		}*/
+		return true;
 	}
 	
 	public void checkPlayer() {
@@ -61,7 +63,7 @@ public class JobProtect extends JobBase {
 				//ent.faceEntity(entP, 30F, 30F);
 				
 				//setJobState(EnumJobState.W2);
-			} else if (walkingTimeout <= 0 || ent.getNavigator().getPath() == null) {
+			} else if (walkingTimeout <= 0 || ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) {
 				//ent.setPathExToEntity(null);
 				ent.walkTo(ent, pX, pY, pZ, ent.maxPFRange, 600);
 			}

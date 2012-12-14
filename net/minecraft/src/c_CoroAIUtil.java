@@ -20,11 +20,11 @@ import net.minecraft.src.*;
 public class c_CoroAIUtil {
 	
 	public static String refl_mcp_Item_maxStackSize = "maxStackSize";
-	public static String refl_c_Item_maxStackSize = "cg";
-    public static String refl_s_Item_maxStackSize = "cg";
+	public static String refl_c_Item_maxStackSize = "ch";
+    public static String refl_s_Item_maxStackSize = "ch";
 	public static String refl_mcp_Item_navigator = "navigator";
-	public static String refl_c_Item_navigator = "bN";
-	public static String refl_s_Item_navigator = "bN";
+	public static String refl_c_Item_navigator = "bL";
+	public static String refl_s_Item_navigator = "bL";
 	
 	public static String refl_mcp_EntityPlayer_itemInUse = "itemInUse";
 	public static String refl_c_EntityPlayer_itemInUse = "f";
@@ -36,6 +36,9 @@ public class c_CoroAIUtil {
 	public static String refl_c_FoodStats_foodLevel = "a";
 	public static String refl_s_FoodStats_foodLevel = "a";
 	
+	public static String refl_thrower_mcp = "thrower";
+	public static String refl_thrower_obf = "g";
+	
 	@SideOnly(Side.CLIENT)
 	public static Minecraft mc;
 	
@@ -46,6 +49,8 @@ public class c_CoroAIUtil {
 	public static Item fishingRodTropical;
 	public static Item swordZircon;
 	public static Item leafBall;
+	
+	public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
 	
 	public c_CoroAIUtil() {
 		
@@ -380,7 +385,7 @@ public class c_CoroAIUtil {
     	TileEntityChest chest = (TileEntityChest)ent.worldObj.getBlockTileEntity(x, y, z);
 		if (chest != null) {
 			ent.openHomeChest();
-			ent.transferItems(ent.inventory, chest, -1, -1, true);
+			ent.job.getPrimaryJobClass().transferItems(ent.inventory, chest, -1, -1, true);
 			return true;
 		}
 		return false;

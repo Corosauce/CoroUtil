@@ -15,6 +15,8 @@ import CoroAI.*;
 
 public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 
+	public int entID = -1;
+	
 	public MovingObjectPosition aimHit = null;
 	public int blockID = Block.ladder.blockID;
 	
@@ -42,6 +44,10 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	public int itemSearchRange;
 	public List wantedItems;
 	
+	//added for gun handling
+	public int curCooldown_FireGun;
+	public int curCooldown_Reload;
+	public int curClipAmount;
 	
 	//Trading fields
 	public int slot_Trade;
@@ -77,7 +83,11 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         //attackStrength = 5;
         //health = 40;
         
-        if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer";
+        
+        
+        //System.out.println("DEBUG FIX: ");
+        //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
+        if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
 
         if (fakePlayer != null) {
         	inventory = fakePlayer.inventory;
@@ -129,18 +139,21 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	
     	if (isAimedAtTarget(var1)) {
 	    	if (var2 < maxReach_Melee && var1.boundingBox.maxY > this.boundingBox.minY && var1.boundingBox.minY < this.boundingBox.maxY) {
-	    		aimAtEnt(var1);
 	    		//this.faceEntity(this, 180, 180);
 	    		if (curCooldown_Melee <= 0) {
+	    			aimAtEnt(var1);
 	    			this.setCurrentSlot(slot_Melee);
 	        		leftClickItem(var1);
 	        		this.curCooldown_Melee = cooldown_Melee;
 	        	}
 	    	} else if (var2 < maxReach_Ranged) {
 	    		//aimAtEnt(var1);
-	    		this.faceEntity(this, 180, 180);
+	    		//
+	    		//System.out.println("curCooldown_Ranged: " + curCooldown_Ranged);
 	    		if (curCooldown_Ranged <= 0) {
 	    			this.setCurrentSlot(slot_Ranged);
+	    			this.faceEntity(var1, 180, 180);
+	    			sync();
 	        		rightClickItem();
 	        		this.curCooldown_Ranged = cooldown_Ranged;
 	    		}
@@ -150,11 +163,23 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     
     public void leftClickItem(Entity var1) {
     	try {
-    		fakePlayer.attackTargetEntityWithCurrentItem(var1);
+    		if (this.getCurrentEquippedItem() == null) {
+    			attackEntityWithNothing(var1);
+    		} else {
+    			fakePlayer.attackTargetEntityWithCurrentItem(var1);
+    		}
     	} catch (Exception ex) {
     		//ex.printStackTrace();
     	}
 		swingItem();
+    }
+    
+    public void attackEntityWithNothing(Entity var1) {
+    	fakePlayer.attackTargetEntityWithCurrentItem(var1);
+    }
+    
+    public boolean customRightClick(World world, ItemStack stack, EntityPlayer player) {
+    	return false;
     }
     
     public void rightClickItem() {
@@ -175,13 +200,20 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 						sync();
 					}
 					
-					wasFired = c_CoroAIUtil.AIRightClickHook(this, itemToUse);
-					
-					try {
-						itemToUse.useItemRightClick(worldObj, fakePlayer);
-					} catch (Exception ex) { 
-						//ex.printStackTrace();
+					if (customRightClick(worldObj, itemToUse, fakePlayer)) {
+						
+					} else {
+						try {
+							itemToUse.useItemRightClick(worldObj, fakePlayer);
+							swingItem();
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
 					}
+					
+					//wasFired = c_CoroAIUtil.AIRightClickHook(this, itemToUse);
+					
+					
 					
 					if (itemToUse.getItem() instanceof ItemBow || itemToUse.getItem() instanceof ItemFood) {
 						//fakePlayer.itemInUseCount = 0;
@@ -215,7 +247,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 				}*/
 			}
 		}
-		swingItem();
+		
 	}
     
     public void switchItem(int id) {
@@ -338,6 +370,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     public void swingItem()
     {
     	swingArm = true;
+    	if (!worldObj.isRemote) {
+    		this.dataWatcher.updateObject(21, 1);
+    	}
     	fakePlayer.addExhaustion(0.14F);
     }
     
@@ -384,10 +419,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 			setPathToEntity(pathentity);
 		}
 	}
-
-    public void onLivingUpdate() {
-
-        if(swingArm) {
+    
+    public void updateSwing() {
+    	if(swingArm) {
             swingTick++;
 
             
@@ -400,6 +434,15 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         }
 
         swingProgress = (float)swingTick / 8F;
+    }
+
+    public void onLivingUpdate() {
+
+    	if (fakePlayer != null) {
+    		this.inventory.decrementAnimations();
+    	}
+    	
+    	updateSwing();
     	
     	if (this.worldObj.isRemote || fakePlayer == null) {
     		super.onLivingUpdate();
@@ -455,6 +498,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         //Cooldowns
         if (curCooldown_Melee > 0) { curCooldown_Melee--; }
         if (curCooldown_Ranged > 0) { curCooldown_Ranged--; }
+        if (curCooldown_FireGun > 0) { curCooldown_FireGun--; }
+        if (curCooldown_Reload > 0) { curCooldown_Reload--; }
+        
         
         //Parts taken from EntityPlayer.onUpdate / onLivingUpdate
         
@@ -492,7 +538,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         
         int healthDiff = getPlHealth() - health;
         if (healthDiff > 0) {
-        	System.out.println("player proxy health: " + health + " | " + healthDiff);
+        	//System.out.println("player proxy health: " + health + " | " + healthDiff);
         	fakePlayer.addExhaustion(0.18F * healthDiff);
         }
         
@@ -508,22 +554,29 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         
         super.onLivingUpdate();
         
-        if(this.health > 0) {
-            List var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.0D, 1.0D, 2.0D));
-
-            if(var3 != null) {
-                for(int var4 = 0; var4 < var3.size(); ++var4) {
-                    Entity var5 = (Entity)var3.get(var4);
-
-                    if(!var5.isDead) {
-                    	if (var5 instanceof EntityCreature && isEnemy(var5) && this instanceof c_EnhAI && !(var5 instanceof c_EnhAI)) { Behaviors.enhanceMonsterAIClose((c_EnhAI)this, (EntityCreature)var5); }
-                    	if ((grabXP || !(var5 instanceof EntityXPOrb)) && (grabItems || !(var5 instanceof EntityItem))) {
-                    		var5.onCollideWithPlayer(fakePlayer);
-                    	}
-                        
-                    }
-                }
-            }
+        List var3;
+        
+        try {
+	        if(this.health > 0) {
+	        	var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.0D, 1.0D, 2.0D));
+	
+	            if(var3 != null) {
+	                for(int var4 = 0; var4 < var3.size(); ++var4) {
+	                    Entity var5 = (Entity)var3.get(var4);
+	
+	                    if(!var5.isDead) {
+	                    	if (var5 instanceof EntityCreature && isEnemy(var5) && this instanceof c_EnhAI && !(var5 instanceof c_EnhAI)) { Behaviors.enhanceMonsterAIClose((c_EnhAI)this, (EntityCreature)var5); }
+	                    	if ((grabXP || !(var5 instanceof EntityXPOrb)) && (grabItems || !(var5 instanceof EntityItem))) {
+	                    		var5.onCollideWithPlayer(fakePlayer);
+	                    	}
+	                        
+	                    }
+	                }
+	            }
+	        }
+        } catch (Exception ex) {
+        	//System.out.println("list access crash: ");
+        	ex.printStackTrace();
         }
         
         
@@ -644,42 +697,46 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     public MovingObjectPosition getAimBlock(int yOffset, boolean noYaw) {
     	
     	//if (true) return null;
-    	
-    	EntityLiving entityliving = this;
-    	float f = 1.0F;
-        float f1 = entityliving.prevRotationPitch + (entityliving.rotationPitch - entityliving.prevRotationPitch) * f;
-    	float f3 = entityliving.prevRotationYaw + (entityliving.rotationYaw - entityliving.prevRotationYaw) * f;
-    	if (noYaw) f3 = 0.00001F;
-        //int i = (int)Math.floor((double)(f3 / 90F) + 0.5D);
-        //f3 = (float)i * 90F;
-        double d = entityliving.prevPosX + (entityliving.posX - entityliving.prevPosX) * (double)f;
-        double d1 = ((entityliving.prevPosY + (entityliving.posY - entityliving.prevPosY) * (double)f + 1.6200000000000001D)) - (double)entityliving.yOffset + yOffset;
-        double d2 = entityliving.prevPosZ + (entityliving.posZ - entityliving.prevPosZ) * (double)f;
-        Vec3 vec3d = Vec3.createVectorHelper(d, d1, d2);
-        float f4 = MathHelper.cos(-f3 * 0.01745329F - 3.141593F);
-        float f5 = MathHelper.sin(-f3 * 0.01745329F - 3.141593F);
-        float f6 = -MathHelper.cos(-f1 * 0.01745329F - 0.7853982F);
-        float f7 = MathHelper.sin(-f1 * 0.01745329F - 0.7853982F);
-        float f8 = f5 * f6;
-        float f9 = f7;
-        float f10 = f4 * f6;
-        //entityliving.info = f3;
-        double d3 = 2.0D;
-        Vec3 vec3d1 = vec3d.addVector((double)f8 * d3, (double)f9 * d3, (double)f10 * d3);              // \/ water collide check
-        MovingObjectPosition movingobjectposition = entityliving.worldObj.rayTraceBlocks_do(vec3d, vec3d1, true);
-
-        int id = -1;
-        
-        if(movingobjectposition == null) {
-            return null;
-        }
-        
-        if(movingobjectposition.typeOfHit == EnumMovingObjectType.TILE) {
-        	//id = worldObj.getBlockId(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ);
-	    	//System.out.println(movingobjectposition.blockX + " - " + movingobjectposition.blockY + " - " + movingobjectposition.blockZ);
-        }
-        
-        return movingobjectposition;
+    	try {
+	    	EntityLiving entityliving = this;
+	    	float f = 1.0F;
+	        float f1 = entityliving.prevRotationPitch + (entityliving.rotationPitch - entityliving.prevRotationPitch) * f;
+	    	float f3 = entityliving.prevRotationYaw + (entityliving.rotationYaw - entityliving.prevRotationYaw) * f;
+	    	if (noYaw) f3 = 0.00001F;
+	        //int i = (int)Math.floor((double)(f3 / 90F) + 0.5D);
+	        //f3 = (float)i * 90F;
+	        double d = entityliving.prevPosX + (entityliving.posX - entityliving.prevPosX) * (double)f;
+	        double d1 = ((entityliving.prevPosY + (entityliving.posY - entityliving.prevPosY) * (double)f + 1.6200000000000001D)) - (double)entityliving.yOffset + yOffset;
+	        double d2 = entityliving.prevPosZ + (entityliving.posZ - entityliving.prevPosZ) * (double)f;
+	        Vec3 vec3d = Vec3.createVectorHelper(d, d1, d2);
+	        float f4 = MathHelper.cos(-f3 * 0.01745329F - 3.141593F);
+	        float f5 = MathHelper.sin(-f3 * 0.01745329F - 3.141593F);
+	        float f6 = -MathHelper.cos(-f1 * 0.01745329F - 0.7853982F);
+	        float f7 = MathHelper.sin(-f1 * 0.01745329F - 0.7853982F);
+	        float f8 = f5 * f6;
+	        float f9 = f7;
+	        float f10 = f4 * f6;
+	        //entityliving.info = f3;
+	        double d3 = 2.0D;
+	        Vec3 vec3d1 = vec3d.addVector((double)f8 * d3, (double)f9 * d3, (double)f10 * d3);              // \/ water collide check
+	        MovingObjectPosition movingobjectposition = entityliving.worldObj.rayTraceBlocks_do(vec3d, vec3d1, true);
+	
+	        int id = -1;
+	        
+	        if(movingobjectposition == null) {
+	            return null;
+	        }
+	        
+	        if(movingobjectposition.typeOfHit == EnumMovingObjectType.TILE) {
+	        	//id = worldObj.getBlockId(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ);
+		    	//System.out.println(movingobjectposition.blockX + " - " + movingobjectposition.blockY + " - " + movingobjectposition.blockZ);
+	        }
+	        
+	        return movingobjectposition;
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		return null;
+    	}
     }
     
     public void tryPlace(EntityCreature entityliving) {
@@ -1165,16 +1222,40 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	//setDead();
     	
     	if (!worldObj.isRemote) {
-    		if (fakePlayer == null && fakePlayer.playerNetServerHandler == null) {
+    		
+    		//if chunk doesnt exist on ai spawn, it cant make fakeplayer due to fake player constructor lookup up chunk and initializing endless ai load loop
+    		if (fakePlayer == null) {
+                fakePlayer = newFakePlayer(worldObj);
+            }
+    		
+    		if (fakePlayer != null && fakePlayer.playerNetServerHandler == null) {
 	    		try {
-	            	fakePlayer = newFakePlayer(worldObj);
+	            	//fakePlayer = newFakePlayer(worldObj);
 	            	
-	            	if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer";
-
-	                if (fakePlayer != null) {
-	                	inventory = fakePlayer.inventory;
-	                	sync();
-	                }
+	    			if (worldObj.playerEntities.size() > 0)
+	    	        {
+	    	            if (worldObj.playerEntities.get(0) instanceof EntityPlayerMP)
+	    	            {
+	    	                fakePlayer.playerNetServerHandler = ((EntityPlayerMP)worldObj.playerEntities.get(0)).playerNetServerHandler;
+	    	                fakePlayer.dimension = ((EntityPlayerMP)worldObj.playerEntities.get(0)).dimension;
+	    	            }
+	    	        }
+	    	        else
+	    	        {
+	    	            //System.out.println("fakeplayer has no netserverhandler, might behave oddly");
+	    	        }
+	            	
+	            	//System.out.println("DEBUG FIX 3: ");
+	                //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
+	                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
+	                
+	                //if (fakePlayer != null) {
+                	inventory = fakePlayer.inventory;
+                	sync();
+                	
+            	    c_CoroAIUtil.playerToAILookup.put(fakePlayer.username, this);
+                    
+	                //}
 	            } catch (Exception ex) {
 	            	ex.printStackTrace();
 	            	return;
@@ -1301,7 +1382,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 
     public boolean hasPath()
     {
-        return pathToEntity != null;
+        return pathToEntity != null && !pathToEntity.isFinished();
     }
     
     //Addition

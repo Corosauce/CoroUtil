@@ -16,12 +16,11 @@ import net.minecraft.src.*;
 public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 {
 
-	public int entID = -1;
-	
 	public boolean debug = false;
 	
 	public EnumActState currentAction;
 	public String name;
+	public String debugInfo;
     
     public Random rand;
 	public int jobTimeout;
@@ -87,6 +86,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		
 		initJobAndStates(EnumJob.FISHERMAN, false);
 		
+		
 		homeX = -114;
 		homeY = 64;
 		homeZ = 908;
@@ -96,10 +96,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		homeZ = 311;
 		//name = ".";
 		
-		moveSpeed = 0.8F;
+		setMoveSpeed(0.28F);
 		
-		fleeSpeed = 1.1F;
-		oldMoveSpeed = moveSpeed;
+		fleeSpeed = 0.32F;
+		
+		entityCollisionReduction = 0.9F;
 	}
 	
 	public void initJobAndStates(EnumJob job) {
@@ -116,10 +117,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		//System.out.println("init job " + job);
 		
 		this.job.setPrimaryJob(job);
-		
+		setState(EnumActState.IDLE);
 		
 		
 		//this.job.swapJob(job);
+		//this could really be done in each unique entities init, or is this more of a template setup?
 		this.job.clearJobs();
 		if (job == EnumJob.HUNTER) {
 			addJob(EnumJob.FINDFOOD);
@@ -131,12 +133,18 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			addJob(EnumJob.GATHERER);
 		} else if (job == EnumJob.INVADER) {
 			addJob(EnumJob.INVADER);
+		} else if (job == EnumJob.PROTECT) {
+			addJob(EnumJob.PROTECT);
+			addJob(EnumJob.HUNTER);
 		} else {
 			addJob(EnumJob.UNEMPLOYED);
 		}
 		
 		if (initItems) {
 			
+			if (fakePlayer == null) {
+                fakePlayer = newFakePlayer(worldObj);
+            }
 			setOccupationItems();
 			if (entID == -1) entID = rand.nextInt(999999999);
 		}
@@ -208,6 +216,21 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	public void setDead() {
 		//if (!this.worldObj.isRemote) System.out.println(name + ", A KOA HAS DIED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		super.setDead();
+		
+		//cleanup, if this isnt called server side when the entity is dead, memory leak
+		if (fakePlayer != null) {
+			c_CoroAIUtil.playerToAILookup.remove(fakePlayer.username);
+			//System.out.println("removing instance: " + fakePlayer.username);
+			//System.out.println("c_CoroAIUtil.playerToAILookup: " + c_CoroAIUtil.playerToAILookup.size());
+		}
+		
+		if (PFQueue.pfDelays != null) PFQueue.pfDelays.remove(this);
+		if (job != null) {
+			job.clearJobs();
+			job.jobTypes.clear();
+			job.ent = null;
+		}
+		setLastAttackingEntity((EntityLiving)null);
 	}
 	
 	public double getDistanceXZ(double par1, double par5)
@@ -276,9 +299,10 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
             if(entity1 instanceof EntityCreature)
             {
             	Entity targ = ((EntityCreature)entity1).getEntityToAttack();
-            	if (targ instanceof EntityPlayer && ((EntityPlayer)targ).username == "fakePlayer") {
-            		//((EntityCreature)entity1).setEntityToAttack(null);
-            		//System.out.println("fakeplayer de-targeted");
+            	if (targ instanceof EntityPlayer && ((EntityPlayer)targ).username.contains("fakePlayer")) {
+            		((EntityCreature)entity1).setAttackTarget(null);
+            		
+            		//System.out.println("fakeplayer de-targeting broken");
             	}
             }
         }
@@ -362,6 +386,14 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	public float getMoveSpeed() {
 		return moveSpeed;
+	}
+	
+	public void setMoveSpeed(float var) {
+		moveSpeed = var;
+		oldMoveSpeed = var;
+		if (!worldObj.isRemote) {
+			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
+		}
 	}
 	
 	public void pathNav() {
@@ -463,6 +495,15 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	//@Override
 	public void onLivingUpdate() {
 		
+		//dynamic speed adjuster syncer
+		if (worldObj.isRemote) {
+			float speed = this.dataWatcher.getWatchableObjectInt(23) / 1000;
+			
+			if (this.moveSpeed != speed) {
+				this.setMoveSpeed(speed);
+			}
+		}
+		
 		//setDead();
 		//super.onLivingUpdate();
 		if (worldObj.isRemote) {
@@ -482,8 +523,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			//System.out.println("Client lunge: " + lungeFactor);
 		}
 		
-		float factor = 0.35F * lungeFactor;
-		factor = 0.35F * lungeFactor;
+		float factor = lungeFactor;
+		factor = lungeFactor;
 		if (this.dataWatcher.getWatchableObjectInt(20) == 1) {
 			//this.getMoveHelper().setMoveTo(entityToAttack.posX, entityToAttack.posY, entityToAttack.posZ, this.moveSpeed*factor);
 			//this.moveSpeed = this.moveForward = 0.7F * lungeFactor;
@@ -511,14 +552,21 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			
 		}
 		
-		if (this.dataWatcher.getWatchableObjectInt(21) == 1) {
-			if (c_CoroAIUtil.isServer()) {
-				//System.out.println("Server swingArm: " + swingArm);
-			} else {
-				//System.out.println("Client swingArm: " + swingArm);
+		//client side listens and sets swingArm, server side resets after something made it swing
+		if (worldObj.isRemote) {
+			if (this.dataWatcher.getWatchableObjectInt(21) == 1) {
+				if (c_CoroAIUtil.isServer()) {
+					//System.out.println("Server swingArm: " + swingArm);
+				} else {
+					//System.out.println("Client swingArm: " + swingArm);
+				}
+				swingArm = true;
+				//this.dataWatcher.updateObject(21, 0);
 			}
-			swingArm = true;
-			this.dataWatcher.updateObject(21, 0);
+		} else {
+			if (this.dataWatcher.getWatchableObjectInt(21) == 1) {
+				this.dataWatcher.updateObject(21, 0);
+			}
 		}
 		
 		//setAIMoveSpeed(0.24F);
@@ -528,42 +576,44 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		super.onLivingUpdate();
 	}
 	
+	@Override
+
+	/**
+	 * Updates the arm swing progress counters and animation progress
+	 */
+	public void updateArmSwingProgress() {
+		//do nothing, cancel out the entity living arm swing so ours works
+	}
+	
+	@Override
+	public void jump()
+    {
+		super.jump();
+    }
+	
 	public void doMovement() {
 		
 		//setDead();
 		
 		if (this.deathTime > 0) return;
 		
-		float factor = 0.35F * lungeFactor;
+		//float factor = lungeFactor;
 		
 		//Lunge speed!
 		if (fleeing) {
 			//this.func_48098_g(moveSpeed);
 			this.dataWatcher.updateObject(20, 1);
 		
-		} else if (entityToAttack != null && this.isSolidPath(entityToAttack) && this.onGround)	{
+		} else if (entityToAttack != null && this.isSolidPath(entityToAttack))	{
 			//if (moveForward == 0F) {
 			//if (getNavigator().func_48670_c() == null) {
 				//getNavigator().func_48670_c().func_48644_d();
 				//getNavigator().clearPathEntity();
 				//System.out.println("what?!");
-				this.getMoveHelper().setMoveTo(entityToAttack.posX, entityToAttack.posY, entityToAttack.posZ, this.getMoveHelper().getSpeed());
-				this.dataWatcher.updateObject(20, 1);
+			
+				job.getJobClass().onCloseCombatTick();
+			
 				
-				//jump over drops
-				
-				MovingObjectPosition aim = getAimBlock(-2, true);
-		    	if (aim != null) {
-		    		if (aim.typeOfHit == EnumMovingObjectType.TILE) {
-		    			
-		    		}
-		    	} else {
-		    		if (this.onGround) {
-		    			jump();
-		    		}
-		    	}
-				
-		    	
 		    	
 				//this.moveSpeed = this.moveForward = 0.7F * lungeFactor;
 				//System.out.println(this.moveSpeed);
@@ -574,8 +624,10 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		/*this.moveForward = this.moveSpeed;
 		this.faceEntity(entityToAttack, 30, 30);
 		this.moveEntityWithHeading(this.moveStrafing, this.moveForward * 0.1F);*/
-		} else if (this.getNavigator().getPath() != null) {
+		} else if (!this.getNavigator().noPath()) {
 			this.dataWatcher.updateObject(20, 1);
+			Vec3 vec = this.getNavigator().getPath().getPosition(this);
+			//getLookHelper().setLookPosition(vec.xCoord, vec.yCoord+this.getEyeHeight(), vec.zCoord, 10.0F, (float)getVerticalFaceSpeed());
 		} else {
 			//this.func_48098_g(moveSpeed);
 			this.dataWatcher.updateObject(20, 0);
@@ -655,9 +707,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			}
 		}
 		
-		if (this.onGround && this.isCollidedHorizontally) {
-			jump();
-		}
+		
 		
 		if (this.onGround && this.jumpDelay == 0)
         {
@@ -671,6 +721,10 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		lastTickPosZ = posZ;
 	}
 	
+	public boolean isBreaking() {
+		return false;
+	}
+	
 	@Override
 	protected void entityInit()
     {
@@ -678,16 +732,18 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
         this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
         this.dataWatcher.addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
+        this.dataWatcher.addObject(23, Integer.valueOf(0)); //uhhh??
+        //24 is used in baseentai
     }
 	
 	@Override
 	public void swingItem()
     {
-    	//super.swingItem();
+    	super.swingItem();
     	//if (serverMode) {
 		//swingArm = true;
-    	fakePlayer.addExhaustion(0.14F);
-    	this.dataWatcher.updateObject(21, 1);
+    	//fakePlayer.addExhaustion(0.14F);
+    	//this.dataWatcher.updateObject(21, 1);
     	//}
     }
 	
@@ -699,14 +755,22 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	public void updateAI() {
+		
+		if (isDead) return;
+		
+		//debug = false;
+		//setState(EnumActState.IDLE);
 		//temp overrides, test settings?
 		//maxDistanceFromHome = 512F;
 		//maxReach_Ranged = 12F;
-		//if (true) return;
+		if (false) {
+			setDead();
+			return;
+		}
 		//this.setAttackTarget(null);
 		//this.setEntityToAttack(null);
 		//System.out.println(name);
-		//setDead();
+		
 		//STUFF MOVED FROM ENTITY CREATURE
 		//pathNav();
 		doMovement();
@@ -730,6 +794,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
             {
                 //this.attackBlockedEntity(this.entityToAttack, var2);
             }
+		} else {
+			entityToAttack = null;
 		}
 		
 		double var12 = 1D;//var5.yCoord - (double)var21;
@@ -749,12 +815,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		
 		
 		
-		//stuff that needs adjusting depending on active job?
-		if (job.priJob == EnumJob.FISHERMAN) {
-			entityCollisionReduction = 0.9F;
-		} else {
-			entityCollisionReduction = 0.8F;
-		}
+		
 		
 		//AI Timeouts
 		if (pfTimeout > 0) { pfTimeout--; }
@@ -765,7 +826,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		//Base class free vanilla mob ai awareness increasing
 		if (enhancedAIDelay-- <= 0) {
 			enhancedAIDelay = 100 + rand.nextInt(50);
-			if (enhanceAIEnemies) Behaviors.enhanceMonsterAI(this); // disabled!
+			if (enhanceAIEnemies) Behaviors.enhanceMonsterAI(this);
 		}
 		
 		if (this.openedChest > 0) {
@@ -817,13 +878,19 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				homeZ = z;
 			}
 		}*/
+		
+		
+		debugInfo = new StringBuilder().append(oldName + ": " + health + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
+		//name = debugInfo;
+		//System.out.println(debugInfo);
+		
 		if (debug) {
 			/*name = new StringBuilder().append(oldName + ": " + currentAction + " | " + health
 					+ " | " + fakePlayer.foodStats.getFoodLevel() + " | " + fakePlayer.foodStats.getFoodSaturationLevel()
 					+ " | " + occupation + " -> " + occupationState + " - " + walkingTimeout + "|" + (Integer)Behaviors.getData(this, DataTypes.noMoveTicks)
 					+ "|" + this.facingWater + "|" + pfNodes).toString();*/
 			
-			name = new StringBuilder().append(oldName + ": " + health + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
+			
 		} else {
 			name = oldName;
 			//name = new StringBuilder().append(oldName + ": " + health + "|" + getFoodLevel() + " | " + job.getJob() + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
@@ -877,22 +944,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 					}
 				}*/
 				
-				PathEntity pe = this.getNavigator().getPath();
 				
-				if (pe != null && !pe.isFinished()) {
-					
-					if (this.worldObj.rayTraceBlocks(pe.getPosition(this), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
-						pe.incrementPathIndex();
-						//System.out.println("next path!");
-					}
-					
-					/*int pIndex = pe.pathIndex+1;
-					if (pIndex < this.pathToEntity.points.length) {
-						if (this.worldObj.rayTraceBlocks(Vec3.createVectorHelper((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
-							this.pathToEntity.pathIndex++;
-						}
-					}*/
-				}
 				
 				this.moveSpeed = fleeSpeed;
 			}
@@ -1016,85 +1068,6 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		return count;
 	}
 	
-	//transferCount: -1 for all, foodOverride: makes id not used, scans for ItemFood
-	public void transferItems(IInventory invFrom, IInventory invTo, int id, int transferCount, boolean foodOverride) {
-
-		int count = 0;
-		for(int j = 0; j < invFrom.getSizeInventory(); j++)
-        {
-			//
-			ItemStack ourStack = invFrom.getStackInSlot(j);
-			if (ourStack != null && ((id == -1 && !foodOverride) || ourStack.itemID == id || (ourStack.getItem() instanceof ItemFood && foodOverride)))
-            {
-            	for (int k = 0; k < invTo.getSizeInventory(); k++) {
-            		ItemStack theirStack = invTo.getStackInSlot(k);
-            		
-            		
-            		
-            		if(theirStack == null) {
-            			//no problem
-            			/*theirStack = ourStack.copy();
-            			invTo.setInventorySlotContents(k, theirStack);
-            			invFrom.setInventorySlotContents(j, null);*/
-            			
-            			int space = 64;
-            			
-            			int addCount = ourStack.stackSize;
-            			
-            			if (ourStack.stackSize < 0) {
-            				System.out.println("!! ourStack.stackSize < 0");
-            			}
-            			
-            			//if (space < ourStack.stackSize) addCount = space;
-            			if (transferCount < addCount && transferCount != -1) addCount = transferCount;
-            			
-            			//transfer! the sexyness! lol haha i typ so gut ikr
-            			ourStack.stackSize -= addCount;
-            			//theirStack.stackSize += addCount;
-            			invTo.setInventorySlotContents(k, new ItemStack(ourStack.itemID, addCount, ourStack.getItemDamage()));
-            			if (transferCount != -1) transferCount -= addCount;
-            			
-            			if (ourStack.stackSize == 0) {
-            				invFrom.setInventorySlotContents(j, null);
-	            			break;
-            			} else if (ourStack.stackSize < 0) {
-            				System.out.println("ourStack.stackSize < 0");
-            			}
-            			
-            			if (transferCount == 0) {
-            				//System.out.println("final transferCount: " + transferCount);
-            				return;
-            			}
-            			
-            			//break;
-            		} else if (ourStack.itemID == theirStack.itemID && theirStack.stackSize < theirStack.getMaxStackSize()) {
-            			int space = theirStack.getMaxStackSize() - theirStack.stackSize;
-            			
-            			int addCount = ourStack.stackSize;
-            			
-            			if (space < ourStack.stackSize) addCount = space;
-            			if (transferCount < addCount && transferCount != -1) addCount = transferCount;
-            			
-            			//transfer! the sexyness! lol haha i typ so gut ikr
-            			ourStack.stackSize -= addCount;
-            			theirStack.stackSize += addCount;
-            			if (transferCount != -1) transferCount -= addCount;
-            			
-            			if (ourStack.stackSize == 0) {
-            				invFrom.setInventorySlotContents(j, null);
-	            			break;
-            			}
-            			
-            			if (transferCount == 0) {
-            				//System.out.println("final transferCount: " + transferCount);
-            				return;
-            			}
-            		}
-            	}
-            }
-        }
-	}
-	
 	public void openHomeChest() {
 		if (isChest(this.worldObj.getBlockId(homeX, homeY, homeZ))) {
 			TileEntityChest chest = (TileEntityChest)worldObj.getBlockTileEntity(homeX, homeY, homeZ);
@@ -1131,7 +1104,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				
 				openHomeChest();
 				
-				transferItems(chest, inventory, id, 1, food);
+				job.getPrimaryJobClass().transferItems(chest, inventory, id, 1, food);
 			}
 		}
 	}
@@ -1163,11 +1136,13 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	public void actWalk() {
 		job.getJobClass().walkingTimeout--;
 		//System.out.println(this.getDistance(targX, targY, targZ));
-		if (this.getDistance(targX, targY, targZ) < 2F || getNavigator().getPath() == null) {
+		if (this.getDistance(targX, targY, targZ) < 2F || getNavigator().getPath() == null || getNavigator().getPath().isFinished()) {
 			this.setPathToEntity((PathEntityEx)null);
 			getNavigator().clearPathEntity();
 			setState(EnumActState.IDLE);
 		} else if (job.getJobClass().walkingTimeout <= 0) {
+			this.setPathToEntity((PathEntityEx)null);
+			getNavigator().clearPathEntity();
 			setState(EnumActState.IDLE);
 		}
 	}
@@ -1240,7 +1215,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
         	
         	entID = var1.getInteger("entID");
         	
-        	System.out.println("nbt loaded koa id: " + entID);
+        	//System.out.println("nbt loaded c_EnhAI id: " + entID);
         	
 	        targX = var1.getInteger("targX");
 	        targY = var1.getInteger("targY");
@@ -1315,7 +1290,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			this.getGroupInfo(EnumKoaInfo.DIPL_WARN);
 		}*/
 		
-		job.getJobClass().hitHook(damagesource, i);
+		if (job != null && job.getJobClass() != null) job.getJobClass().hitHook(damagesource, i);
 		
 		return super.attackEntityFrom(damagesource, i);
 	}
@@ -1338,9 +1313,26 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		return false;
 	}
 	
-	public void setPathExToEntity(PathEntityEx pathentity)
+	//public boolean pathfindLocked = false;
+	public boolean waitingForNewPath = false;
+	
+	public void checkPathfindLock() {
+		if (waitingForNewPath) {
+			getNavigator().setPath(PFQueue.convertToPathEntity(pathToEntity), getMoveSpeed());
+			waitingForNewPath = false;
+		}
+	}
+	
+	@Override
+	public synchronized void setPathExToEntity(PathEntityEx pathentity)
     {
-		getNavigator().setPath(PFQueue.convertToPathEntity(pathentity), getMoveSpeed() * 0.35F);
         pathToEntity = pathentity;
+        waitingForNewPath = true;
     }
+	
+	@Override
+	public int overrideBlockPathOffset(c_IEnhAI ent, int id, int meta, int x, int y, int z) {
+		// TODO Auto-generated method stub
+		return -66;
+	}
 }

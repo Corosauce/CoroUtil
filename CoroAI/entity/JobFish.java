@@ -26,6 +26,7 @@ public class JobFish extends JobBase {
 	
 	@Override
 	public void tick() {
+		super.tick();
 		jobFisherman();
 	}
 	
@@ -42,12 +43,15 @@ public class JobFish extends JobBase {
 
 	@Override
 	public void onLowHealth() {
+		super.onLowHealth();
 		if (ent.fishEntity != null) ent.fishEntity.catchFish();
 		if (ent.rand.nextInt(5) == 0) {
 			ent.entityToAttack = null;
 		} else {
 			
 		}
+		
+		
 	}
 	
 	protected void jobFisherman() {
@@ -56,7 +60,7 @@ public class JobFish extends JobBase {
 		
 		ent.maxDistanceFromHome = 16F;
 		
-		if (!(state == EnumJobState.IDLE)) { ent.setEntityToAttack(null); }
+		//if (!(state == EnumJobState.IDLE)) { ent.setEntityToAttack(null); }
 		
 		//Finding water, might need delay
 		if (state == EnumJobState.IDLE) {
@@ -65,7 +69,7 @@ public class JobFish extends JobBase {
 			if (findWater()) {
 				setJobState(EnumJobState.W1);
 			} else {
-				if (ent.rand.nextInt(150) == 0 && !ent.hasPath()) {
+				if (ent.rand.nextInt(150) == 0 && ent.getNavigator().noPath()) {
 					ent.updateWanderPath();
 				}
 			}
@@ -75,7 +79,7 @@ public class JobFish extends JobBase {
 			//setState(EnumKoaActivity.WALKING);
 			//moveSpeed = oldMoveSpeed;
 			if (!ent.isInWater()) {
-				if (walkingTimeout <= 0 || !ent.hasPath()) {
+				if (walkingTimeout <= 0 || ent.getNavigator().noPath()) {
 					float tdist = (float)ent.getDistance((int)ent.targX, (int)ent.targY, (int)ent.targZ);
 					/*if (ent.name.startsWith("Akamu")) {
 						int ee = 1;
@@ -88,7 +92,9 @@ public class JobFish extends JobBase {
 				}
 			}
 			
-			if (ent.getDistance(ent.targX, ent.targY, ent.targZ) < 5F || ent.isInWater() || ent.facingWater || nextNodeWater()) {
+			//System.out.println("ent.getDistance(ent.targX, ent.targY, ent.targZ) " + ent.getDistance(ent.targX, ent.targY, ent.targZ));
+			
+			if (ent.getDistance(ent.targX, ent.targY, ent.targZ) < 8F || ent.isInWater() || ent.facingWater || nextNodeWater()) {
 				//Aim at location
 				//ent.rotationPitch -= 35;
 				if (ent.canCoordBeSeenFromFeet((int)ent.targX, (int)ent.targY, (int)ent.targZ)) {
@@ -168,7 +174,7 @@ public class JobFish extends JobBase {
 				ent.fishEntity.catchFish();
 			}
 			//moveSpeed = oldMoveSpeed;
-			if (walkingTimeout <= 0 || !ent.hasPath()) {
+			if (walkingTimeout <= 0 || ent.getNavigator().noPath()) {
 				//ent.setPathExToEntity(null);
 				ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, ent.maxPFRange, 600);
 			}
@@ -184,7 +190,7 @@ public class JobFish extends JobBase {
 		//Get back to dry cast spot and cast
 		} else if (state == EnumJobState.W4) {
 			
-			if (walkingTimeout <= 0 || !ent.hasPath()) {
+			if (walkingTimeout <= 0 || ent.getNavigator().noPath()) {
 				//ent.setPathExToEntity(null);
 				if (ent.getDistance(dryCastX, dryCastY, dryCastZ) < 10F) {
 					ent.walkTo(ent, dryCastX, dryCastY, dryCastZ, ent.maxPFRange, 600);

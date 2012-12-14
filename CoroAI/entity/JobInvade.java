@@ -2,7 +2,7 @@ package CoroAI.entity;
 
 import java.util.List;
 
-import build.render.Overlays;
+import cpw.mods.fml.server.FMLServerHandler;
 
 import CoroAI.PFQueue;
 
@@ -38,6 +38,7 @@ public class JobInvade extends JobBase {
 
 	@Override //never called if avoid() returns false
 	public void onLowHealth() {
+		super.onLowHealth();
 		/*if (hitAndRunDelay == 0 && ent.getDistanceToEntity(ent.lastFleeEnt) > 6F) {
 			hitAndRunDelay = ent.cooldown_Ranged+1;
 			ent.entityToAttack = ent.lastFleeEnt;
@@ -104,7 +105,7 @@ public class JobInvade extends JobBase {
 		
 		
 		
-		
+		//retargetDelay = 20;
 		
 		
 		//if (true) return;
@@ -129,7 +130,7 @@ public class JobInvade extends JobBase {
 		            if(ent.isEnemy(entity1))
 		            {
 		            	//if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
-		            		if (sanityCheck(entity1) && entity1 instanceof EntityPlayer && ((EntityPlayer)entity1).getHealth() > 0) {
+		            		if (sanityCheck(entity1) && entity1 instanceof EntityLiving && ((EntityLiving)entity1).getHealth() > 0) {
 		            			float dist = ent.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
 		            				closest = dist;
@@ -149,21 +150,22 @@ public class JobInvade extends JobBase {
 		        	
 		        	if (ent.isSolidPath(clEnt)) {
 		        		
-		        		ent.huntTarget(clEnt, -1);
+		        		if (!ent.isBreaking()) {
+		        			ent.huntTarget(clEnt, -1);
+		        		}
 		        		//System.out.println("huntTarget instant");
 		        	} else {
-		        		if (retargetDelayCount == 0 && (clEnt.getDistanceToEntity(ent) < retargetDist || ent.entityToAttack == null)) {
+		        		float dist = clEnt.getDistanceToEntity(ent);
+		        		if (retargetDelayCount == 0 && ((dist < retargetDist && dist > 2F) || ent.entityToAttack == null)) {
 		        			//Only retarget if they can be seen, to prevent weird long distance pf derps?
 		        			
-		        			if (ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished() || ((EntityLiving) clEnt).canEntityBeSeen(ent)) {
+		        			if (ent.getNavigator().noPath() || ((EntityLiving) clEnt).canEntityBeSeen(ent)) {
 		        				retargetDelayCount = retargetDelay;
-			        			ent.huntTarget(clEnt);
+		        				if (!ent.isBreaking()) {
+		        					ent.huntTarget(clEnt);
+		        				}
 		        			}
 		        			
-		        		}
-		        		if (ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) {
-		        			
-		        			//System.out.println("huntTarget close");
 		        		}
 		        	}
 		        } else {
@@ -175,10 +177,16 @@ public class JobInvade extends JobBase {
 			} else {
 				
 				if (ent.entityToAttack != null) {
-					if (((ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) && (retargetDelayCount == 0/* && ent.entityToAttack.getDistanceToEntity(ent) < retargetDist*/))/* && ent.getDistanceToEntity(ent.entityToAttack) > 5F*/) {
+					
+					float dist = ent.getDistanceToEntity(ent.entityToAttack);
+					//ent.getLookHelper().setLookPositionWithEntity(ent.entityToAttack, 10.0F, (float)ent.getVerticalFaceSpeed());
+					
+					if (((ent.getNavigator().noPath()) && (retargetDelayCount == 0 && dist > 2F/* && ent.entityToAttack.getDistanceToEntity(ent) < retargetDist*/))/* && ent.getDistanceToEntity(ent.entityToAttack) > 5F*/) {
 						retargetDelayCount = retargetDelay;
-						if (PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange, -1)) {
-							//System.out.println("huntTarget repath");
+						if (!ent.isBreaking()) {
+							if (PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange)) {
+								//System.out.println("huntTarget repath");
+							}
 						}
 					}
 				}
@@ -187,9 +195,9 @@ public class JobInvade extends JobBase {
 			
 			if (clEnt == null && ent.entityToAttack == null) {
 				//GET PLAYER SINCE NO CLOSE TARGETS!!!!!
-	        	EntityPlayer entP = getClosestVulnerablePlayerToEntity(ent, -1F);
+	        	EntityPlayer entP = getClosestPlayerToEntity(ent, -1F, false);
 	        	if (entP != null && entP.getHealth() > 0) {
-		        	if (ent.getNavigator().getPath() == null || ent.getNavigator().getPath().isFinished()) {
+		        	if (ent.getNavigator().noPath()) {
 		        		//System.out.println("huntTarget far");
 	        			ent.huntTarget(entP);
 	        		}
@@ -205,19 +213,6 @@ public class JobInvade extends JobBase {
 		ent.prevHealth = ent.getHealth();
 	}
 	
-	
-	
-	public void hunterHitHook(DamageSource ds, int damage) {
-		
-		/*if (health < getMaxHealth() / 4 * 3) {
-			if (ds.getEntity() != null) {
-				lastFleeEnt = ds.getEntity();
-				tryingToFlee = true;
-				//fleeFrom(ds.getEntity());
-			}
-		}
-		prevKoaHealth = health;*/
-	}
 	
 	public boolean sanityCheck(Entity target) {
 		

@@ -55,6 +55,7 @@ public class JobManager {
 				break;
 			}
 		}
+		//System.out.println(debug);
 	}
 	
 	
@@ -74,11 +75,13 @@ public class JobManager {
 		return null;
 	}
 	
+	public JobBase getPrimaryJobClass() {
+		return getJobClass();
+	}
+	
 	public EnumJobState getJobState() {
 		return getJobClass().state;
 	}
-	
-	
 	
 	//use this mainly since we dont need to 'add' jobs yet
 	public void swapJob(EnumJob newJob) {

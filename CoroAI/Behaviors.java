@@ -100,6 +100,10 @@ public class Behaviors {
 		}
 		
 		int huntRange = 32;
+		
+		//float closestDist = 9999;
+		//EntityCreature closestEnt = null;
+		
 		List list = ent.worldObj.getEntitiesWithinAABB(EntityCreature.class, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
         for(int j = 0; j < list.size(); j++)
         {
@@ -120,13 +124,32 @@ public class Behaviors {
     					        points[0] = new PathPoint((int)ent.posX, (int)ent.posY, (int)ent.posZ);
 	                			entC.getNavigator().setPath(new PathEntity(points), entC.getAIMoveSpeed());
 	                		}*/
-	                		if (entC.getDistanceToEntity(ent) <= 16F) {
-	                			entC.setAttackTarget(ent);
-	                			entC.getNavigator().setPath(entC.getNavigator().getPathToEntityLiving(ent), 0.23F);
-	                			if (!aiEnhanced.containsKey(entC)) {
-	                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, entC.getAIMoveSpeed(), true));
-	                				aiEnhanced.put(entC, true);
+	                		
+	                		float dist = entC.getDistanceToEntity(ent);
+	                		
+	                		if (dist <= 16F) {
+	                			/*if (dist < closestDist) {
+	                				closestDist = dist;
+	                				closestEnt = entity1;
+	                			}*/
+	                			
+	                			if (entC.getAttackTarget() == null || (entC.getAttackTarget() != null && dist < entC.getAttackTarget().getDistanceToEntity(ent))) {
+	                				entC.setAttackTarget(ent);
+		                			entC.setTarget(ent);
+		                			
+		                			//entC.getNavigator().setPath(entC.getNavigator().getPathToEntityLiving(ent), 0.3F);
+		                			PFQueue.getPath(entC, ent, 16F);
+		                			if (!aiEnhanced.containsKey(entC)) {
+		                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, 0.23F/*entC.getAIMoveSpeed()*/, true));
+		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, entC, "bn", "targetTasks");
+		                				if (targetTasks != null) {
+		                					targetTasks.addTask(2, new EntityAINearestAttackableTarget(entC, c_EnhAI.class, 16.0F, 0, true));
+		                				} else System.out.println("update targetTasks reflection");
+		                				aiEnhanced.put(entC, true);
+		                			}
 	                			}
+	                			
+	                			
 	                			
 	                			//System.out.println("ENHANCE!" + entC + "targetting: " + ent);
 	                			//entC.setTarget(ent);
@@ -147,6 +170,10 @@ public class Behaviors {
             }
             
         }
+        
+        //if (closestEnt != null) {
+        	
+        //}
 	}
 	
 	public static void setData(Entity ent, DataTypes dtEnum, Object obj) {

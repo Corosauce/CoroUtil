@@ -54,6 +54,7 @@ public class JobGather extends JobBase {
 
 	@Override
 	public void onLowHealth() {
+		super.onLowHealth();
 		if (ent.fishEntity != null) ent.fishEntity.catchFish();
 		if (ent.rand.nextInt(5) == 0) {
 			ent.entityToAttack = null;
@@ -322,7 +323,7 @@ public class JobGather extends JobBase {
 		            	}
 		            }
 		        }*/
-				ent.transferItems(ent.inventory, chest, -1, -1, true);
+				transferItems(ent.inventory, chest, -1, -1, true);
 			}
 		} else {
 			//if (mod_EntMover.debug) System.out.println("no chest for items");
