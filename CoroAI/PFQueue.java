@@ -190,7 +190,7 @@ public class PFQueue implements Runnable {
 				    					} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
 				    						c_CoroAIUtil.playerPathfindCallback(pathEnt);
 				    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
-				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
+				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, "bG", "moveSpeed"));
 				    					}
 				    					
 				    					
