@@ -1,6 +1,6 @@
 package CoroAI.entity;
 
-import net.minecraft.src.*;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class JobProtect extends JobBase {
 	

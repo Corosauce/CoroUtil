@@ -1,0 +1,73 @@
+package CoroAI.componentAI.jobSystem;
+
+import java.util.ArrayList;
+
+import CoroAI.componentAI.AIAgent;
+
+public class JobManager {
+	
+	//public HashMap<EnumJob, JobBase> jobTypes = new HashMap();
+	//public ArrayList<JobBase> jobTypes = new ArrayList();
+	
+	//Entity reference
+	public AIAgent ai = null;
+	
+	public ArrayList<JobBase> curJobs = new ArrayList();
+	public JobBase priJob;
+	public JobBase lastJobRun;
+	public int lastJobRunID;
+	
+	public String debug = "";
+	
+	public JobManager(AIAgent entRef) {
+		ai = entRef;
+		
+		
+		//setPrimaryJob(JobIdle());
+		
+		//swapJob(priJob);
+	}
+	
+	public void tick() {
+		debug = "";
+		for (int i = 0; i < curJobs.size(); i++) {
+			JobBase job = curJobs.get(i);
+			if (job.shouldExecute()) {
+				debug = debug + job.toString() + " | ";
+				job.tick();
+				lastJobRun = curJobs.get(i);
+				lastJobRunID = i;
+			}
+			if (!job.shouldContinue()) {
+				break;
+			}
+		}
+		//System.out.println(debug);
+	}
+	
+	public void addPrimaryJob(JobBase job) {
+		priJob = job;
+		addJob(job, -1);
+	}
+	
+	public JobBase getPrimaryJob() {
+		return priJob;
+	}
+	
+	public void addJob(JobBase newJob) {
+		addJob(newJob, -1);
+	}
+	
+	public void addJob(JobBase newJob, int priority) {
+		if (priority != -1) {
+			curJobs.add(priority, newJob);
+		} else {
+			curJobs.add(newJob);
+		}
+	}
+	
+	public void clearJobs() {
+		curJobs.clear();
+	}
+	
+}

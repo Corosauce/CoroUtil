@@ -1,17 +1,34 @@
 package CoroAI.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import java.util.List;
 import java.util.Random;
 
-import CoroAI.*;
-import CoroAI.entity.*;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
 
-import net.minecraft.src.*;
+import CoroAI.Behaviors;
+import CoroAI.PFQueue;
+import CoroAI.PathEntityEx;
+import CoroAI.c_IEnhAI;
 
 public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 {
@@ -129,6 +146,10 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		} else if (job == EnumJob.FISHERMAN) {
 			addJob(EnumJob.FINDFOOD);
 	        addJob(EnumJob.FISHERMAN);
+		} else if (job == EnumJob.TRADING) {
+			addJob(EnumJob.FINDFOOD);
+			addJob(EnumJob.TRADING);
+	        addJob(EnumJob.HUNTER);
 		} else if (job == EnumJob.GATHERER) {
 			addJob(EnumJob.GATHERER);
 		} else if (job == EnumJob.INVADER) {
@@ -185,6 +206,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		}
 	}
 	
+	@Override
+	public boolean interact(EntityPlayer var1) {
+    	return job.getPrimaryJobClass().interact(var1);
+    }
+	
 	public void alertHunters(Entity target) {
 		
 		int alertRange = 128;
@@ -202,7 +228,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
             		if (((c_EnhAI) entity1).job.getJobState() == EnumJobState.IDLE && ((c_EnhAI) entity1).currentAction == EnumActState.IDLE && ((c_EnhAI) entity1).entityToAttack == null) {
             			if (((c_EnhAI) entity1).job.getJobClass().sanityCheckHelp(this, target)) {
 	            			((c_EnhAI) entity1).huntTarget(target);
-	            			System.out.println(((c_EnhAI) entity1).name + " alerted");
+	            			//System.out.println(((c_EnhAI) entity1).name + " alerted");
 	            			alertCount++;
 	            			if (alertCount > alertCountMax) return;
             			}
@@ -211,6 +237,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
             }
         }
 	}
+	
+	
 	
 	@Override
 	public void setDead() {
@@ -599,6 +627,21 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		
 		//float factor = lungeFactor;
 		
+		//fix for last node being too high
+		if (!worldObj.isRemote) {
+			PathEntity pe = this.getNavigator().getPath();
+			if (pe != null) {
+				if (pe.getCurrentPathLength() == 1) {
+					//if (job.priJob == EnumJob.TRADING) {
+						if (pe.getFinalPathPoint().yCoord - posY > 0.1F) {
+							//System.out.println(pe.getFinalPathPoint().yCoord - posY);
+							this.getNavigator().clearPathEntity();
+						}
+					//}
+				}
+			}
+		}
+		
 		//Lunge speed!
 		if (fleeing) {
 			//this.func_48098_g(moveSpeed);
@@ -685,6 +728,17 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 					}
 				}
 				
+				if (this.isInWater()) {
+					if (!this.getNavigator().noPath()) {
+						if (Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ) > 0.001F && Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ) < 0.5F) {
+							this.moveFlying(this.moveStrafing, this.moveForward, 0.04F);
+							//this.motionX *= 1.3F;
+							//this.motionZ *= 1.3F;
+						}
+					}
+					
+				}
+				
 				if (false && this.isInWater())
 		        {
 					//this.getNavigator().setPath(null, this.moveSpeed);
@@ -767,6 +821,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			setDead();
 			return;
 		}
+		
+		/*if (job.getPrimaryJobClass() instanceof JobTrade) {
+			System.out.println("exec: " + this);
+		}*/
+		
 		//this.setAttackTarget(null);
 		//this.setEntityToAttack(null);
 		//System.out.println(name);
@@ -849,6 +908,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		} else {
 			wasInWater = true;
 			facingWater = false;
+			
+			
 		}
 		
 		if (homeX == 0) getGroupInfo(EnumInfo.HOME_COORD);
@@ -949,6 +1010,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				this.moveSpeed = fleeSpeed;
 			}
 		}
+		
+		/*if (job.getJob() == EnumJob.TRADING) {
+			int wweaeaweawe = 0;
+			System.out.println(job.getJobState());
+		}*/
 		
 		if (currentAction == EnumActState.IDLE && job.getJobState() == EnumJobState.IDLE) {
 			
@@ -1180,7 +1246,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	                if(!var5.isDead && var5 instanceof EntityItem) {
 	                	EntityItem ent = (EntityItem)var5;
-	                	if (wantedItems.contains(ent.item.getItem().shiftedIndex)) {
+	                	if (wantedItems.contains(ent.func_92014_d().getItem().shiftedIndex)) {
 		                	if (this.canEntityBeSeen(var5)) {
 		                		//if (this.team == 1) {
 		                		if (!var5.isInsideOfMaterial(Material.water)) {

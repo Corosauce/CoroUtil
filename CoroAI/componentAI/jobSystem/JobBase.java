@@ -1,29 +1,37 @@
-package CoroAI.entity;
+package CoroAI.componentAI.jobSystem;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import java.util.List;
 
 import CoroAI.PFQueue;
+import CoroAI.componentAI.AIAgent;
+import CoroAI.componentAI.ICoroAI;
+import CoroAI.entity.EnumActState;
+import CoroAI.entity.EnumJob;
+import CoroAI.entity.EnumJobState;
 
 public class JobBase {
 	
 	public JobManager jm = null;
-	public c_EnhAI ent = null;
+	public AIAgent ai = null;
+	public EntityLiving ent = null;
+	public ICoroAI entInt = null;
 	
 	public EnumJobState state;
 	
@@ -33,28 +41,24 @@ public class JobBase {
 	public int walkingTimeout;
 	
 	public int fleeDelay = 0;
+	public boolean dontStray = false;
 	
 	public JobBase() {
 		
 	}
 	
-	public JobBase(JobManager jm) {
-		this.jm = jm;
-		this.ent = jm.ent;
+	public JobBase(JobManager parJm) {
+		this.jm = parJm;
+		this.ai = jm.ai;
+		this.ent = jm.ai.ent;
+		this.entInt = jm.ai.entInt;
+		//this.ent = (EntityLiving)jm.ent;
 		setJobState(EnumJobState.IDLE);
 	}
 	
 	public void setJobState(EnumJobState ekos) {
 		state = ekos;
 		//System.out.println("jobState: " + occupationState);
-	}
-	
-	public boolean interact(EntityPlayer ent) {
-		return false;
-	}
-	
-	public void tradeConfirmCallback() {
-		
 	}
 
 	public void tick() {
@@ -90,43 +94,85 @@ public class JobBase {
 			}*/
 		}
 		
-		if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
-    		ent.jump();
+		if (ent.onGround && ent.isCollidedHorizontally && !entInt.isBreaking()) {
+    		c_CoroAIUtil.jump(ent);
 		}
 	}
 	
 	public void onIdleTick() {
 		
+		//System.out.println("TEMP OFF FOR REFACTOR");
+		
 		//slaughter entitycreature ai update function and put idle wander invoking code here
-        if(((ent.getNavigator().noPath()) && ent.rand.nextInt(5) == 0/* || ent.rand.nextInt(80) == 0*/))
+        if(((ent.getNavigator().noPath()) && ai.rand.nextInt(5) == 0))
         {
-        	
-        	//System.out.println("home dist: " + ent.getDistance(ent.homeX, ent.homeY, ent.homeZ));
-        	if (ent.getDistance(ent.homeX, ent.homeY, ent.homeZ) < ent.maxDistanceFromHome) {
-        		if (ent.rand.nextInt(5) == 0) {
-        			int randsize = 8;
-            		ent.walkTo(ent, ent.homeX+ent.rand.nextInt(randsize) - (randsize/2), ent.homeY+0, ent.homeZ+ent.rand.nextInt(randsize) - (randsize/2),ent.maxPFRange, 600);
-        		} else {
-        			ent.updateWanderPath();
-        		}
-        		
-        		
+        	if (!dontStray) {
+        		ai.updateWanderPath();
         	} else {
-        		int randsize = 8;
-        		ent.walkTo(ent, ent.homeX+ent.rand.nextInt(randsize) - (randsize/2), ent.homeY+0, ent.homeZ+ent.rand.nextInt(randsize) - (randsize/2),ent.maxPFRange, 600);
+        	//System.out.println("home dist: " + ent.getDistance(ent.homeX, ent.homeY, ent.homeZ));
+	        	if (ent.getDistance(ai.homeX, ai.homeY, ai.homeZ) < ai.maxDistanceFromHome) {
+	        		if (ai.rand.nextInt(5) == 0) {
+	        			int randsize = 8;
+	            		ai.walkTo(ent, ai.homeX+ai.rand.nextInt(randsize) - (randsize/2), ai.homeY+1, ai.homeZ+ai.rand.nextInt(randsize) - (randsize/2),ai.maxPFRange, 600);
+	        		} else {
+	        			ai.updateWanderPath();
+	        		}
+	        		
+	        		
+	        	} else {
+	        		int randsize = 8;
+	        		ai.walkTo(ent, ai.homeX+ai.rand.nextInt(randsize) - (randsize/2), ai.homeY+1, ai.homeZ+ai.rand.nextInt(randsize) - (randsize/2),ai.maxPFRange, 600);
+	        	}
         	}
         } else {
         	if (ent.getNavigator().noPath()) {
-    			ent.lookForItems();
+    			if (ai.useInv) lookForItems();
         	}
         }
 		
 		
 	}
 	
+	public long itemLookDelay;
+	public int itemSearchRange;
+    public void lookForItems() {
+    	itemSearchRange = 10;
+    	if (itemLookDelay < System.currentTimeMillis()) {
+    		itemLookDelay = System.currentTimeMillis() + 500;
+    	
+	    	List var3 = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(itemSearchRange*1.0D, itemSearchRange*1.0D, itemSearchRange*1.0D));
+	
+	        if(var3 != null) {
+	            for(int var4 = 0; var4 < var3.size(); ++var4) {
+	                Entity var5 = (Entity)var3.get(var4);
+	
+	                if(!var5.isDead && var5 instanceof EntityItem) {
+	                	EntityItem entTemp = (EntityItem)var5;
+	                	if (ai.entInv.wantedItems.contains(entTemp.func_92014_d().getItem().shiftedIndex)) {
+		                	if (this.ent.canEntityBeSeen(var5)) {
+		                		//if (this.team == 1) {
+		                		if (!var5.isInsideOfMaterial(Material.water)) {
+		                			//targetItem(var5);
+		                			PFQueue.getPath(ent, var5, itemSearchRange+2F);
+		                		}
+		                	}
+	                	}
+	                } else if (var5 instanceof EntityXPOrb) {
+	                	if (ent.canEntityBeSeen(var5)) {
+	                		if (!var5.isInsideOfMaterial(Material.water)) {
+	                			//targetItem(var5);
+	                			PFQueue.getPath(ent, var5, itemSearchRange+2F);
+	                		}
+	                	}
+	                }
+	            }
+	        }
+    	}
+    }
+	
 	public void onJobRemove() {
 		//Job cleanup stuff - 
-		this.ent.setCurrentSlot(0);
+		if (ai.useInv) this.ai.entInv.setCurrentSlot(0);
 	}
 	
 	public void setJobItems() {
@@ -156,9 +202,12 @@ public class JobBase {
 	// Job shared functions \\
 	
 	public boolean checkHunger() {
-		if (/*health < getMaxHealth() / 4 * 3 && */ent.getFoodLevel() <= 16) {
-			//System.out.println("OH: " + + fakePlayer.foodStats.getFoodLevel()); 
-			if (ent.eat()) {
+		//System.out.println("TEMP OFF FOR REFACTOR");
+		
+		if (!ai.useInv || ai.entInv.fakePlayer == null) return false;
+		
+		if (ai.entInv.fakePlayer.getFoodStats().getFoodLevel() <= 16) {
+			if (ai.entInv.eat()) {
 				//System.out.println("NH: " + fakePlayer.foodStats.getFoodLevel());
 			} else {
 				//fallback();
@@ -176,7 +225,7 @@ public class JobBase {
 		Entity clEnt = null;
 		float closest = 9999F;
 		
-		if (ent.lastFleeEnt != null && ent.lastFleeEnt.isDead) { ent.lastFleeEnt = null; }
+		if (ai.lastFleeEnt != null && ai.lastFleeEnt.isDead) { ai.lastFleeEnt = null; }
 		if (fleeDelay > 0) fleeDelay--;
 		
 		float range = 15F;
@@ -185,7 +234,7 @@ public class JobBase {
         for(int j = 0; j < list.size(); j++)
         {
             Entity entity1 = (Entity)list.get(j);
-            if(!entity1.isDead && ent.isEnemy(entity1))
+            if(!entity1.isDead && ai.entInt.isEnemy(entity1))
             {
             	if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
             		//if (sanityCheck(entity1)) {
@@ -206,18 +255,18 @@ public class JobBase {
         PathEntity path = ent.getNavigator().getPath();
         //System.out.println("koa " + ent.name + " health: " + ent.getHealth());
         if (clEnt != null) {
-        	if (clEnt != ent.lastFleeEnt || (ent.getNavigator().noPath())) {
-        		ent.lastFleeEnt = clEnt;
+        	if (clEnt != ai.lastFleeEnt || (ent.getNavigator().noPath())) {
+        		ai.lastFleeEnt = clEnt;
         		if (actOnTrue && fleeDelay <= 0) fleeFrom(clEnt);
         	}
-        } else if (/*(ent.getNavigator().noPath()) && */ent.lastFleeEnt != null) {
-    		if (actOnTrue && fleeDelay <= 0) fleeFrom(ent.lastFleeEnt);
+        } else if (/*(ent.getNavigator().noPath()) && */ai.lastFleeEnt != null) {
+    		if (actOnTrue && fleeDelay <= 0) fleeFrom(ai.lastFleeEnt);
         }
         
         //no idle wander for now
-		if (ent.lastFleeEnt != null) {
-			if (ent.lastFleeEnt.isDead) { ent.lastFleeEnt = null; }
-			if (this.jm.priJob == EnumJob.HUNTER) setJobState(EnumJobState.W1);
+		if (ai.lastFleeEnt != null) {
+			if (ai.lastFleeEnt.isDead) { ai.lastFleeEnt = null; }
+			if (this.jm.priJob instanceof JobHunt) setJobState(EnumJobState.W1);
 		} else {
 			//setJobState(EnumJobState.IDLE);
 		}
@@ -251,9 +300,9 @@ public class JobBase {
         
         float yaw = (float)((Math.atan2(d1, d) * 180D) / 3.1415927410125732D) - ent.rotationYaw;;
 		
-		float look = ent.rand.nextInt(8)-4;
+		float look = ai.rand.nextInt(8)-4;
         //int height = 10;
-        double dist = ent.rand.nextInt(8)+8;
+        double dist = ai.rand.nextInt(8)+8;
         int gatherX = (int)(ent.posX + ((double)(-Math.sin((yaw+look) / 180.0F * 3.1415927F) * Math.cos(ent.rotationPitch / 180.0F * 3.1415927F)) * dist));
         int gatherY = (int)(ent.posY-0.5 + (double)(-MathHelper.sin(ent.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
         int gatherZ = (int)(ent.posZ + ((double)(Math.cos((yaw+look) / 180.0F * 3.1415927F) * Math.cos(ent.rotationPitch / 180.0F * 3.1415927F)) * dist));
@@ -273,36 +322,37 @@ public class JobBase {
         	id = ent.worldObj.getBlockId(gatherX, gatherY+offset++, gatherZ);
         }
         
-        double homeDist = ent.getDistance(ent.homeX, ent.homeY, ent.homeZ);
+        double homeDist = ent.getDistance(ai.homeX, ai.homeY, ai.homeZ);
         
-        if (false && ent.job.getJobClass() instanceof JobHunt && homeDist > ent.maxDistanceFromHome / 4 * 3) {
-        	ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, (float) homeDist/*ent.maxPFRange*/, 600);
+        System.out.println("TEMP OFF FOR REFACTOR");
+        /*if (false && ai.jobMan.getJobClass() instanceof JobHunt && homeDist > ai.maxDistanceFromHome / 4 * 3) {
+        	ai.walkTo(ent, ai.homeX, ai.homeY, ai.homeZ, (float) homeDist, 600);
         } else {
         	if (offset < 100) {
-        		ent.walkTo(ent, gatherX, gatherY, gatherZ, ent.maxPFRange, 600, -1);
+        		ai.walkTo(ent, gatherX, gatherY, gatherZ, ai.maxPFRange, 600, -1);
         	} else {
         		//System.out.println("flee failed");
-            	ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, (float) homeDist/*ent.maxPFRange*/, 600);
+            	ai.walkTo(ent, ai.homeX, ai.homeY, ai.homeZ, (float) homeDist, 600);
         	}
-        }
+        }*/
 	}
 	
 	public boolean findWater() {
 		
-		int scanSize = ent.maxPFRange;
+		int scanSize = ai.maxPFRange;
 		int scanSizeY = 60;
 		
 		int tryX;// = ((int)this.posX) + rand.nextInt(scanSize)-scanSize/2;
 		int tryY = ((int)ent.posY) - 1;
 		int tryZ;// = ((int)this.posZ) + rand.nextInt(scanSize)-scanSize/2;
 		
-		int i = tryY + ent.rand.nextInt(scanSizeY)-scanSizeY/2;
+		int i = tryY + ai.rand.nextInt(scanSizeY)-scanSizeY/2;
 		
 		//System.out.println(tryX + " " + i + " " + tryZ);
 		for (int ii = 0; ii <= 5; ii++) {
-			tryX = ((int)ent.posX) + ent.rand.nextInt(scanSize)-scanSize/2;
-			i = tryY + ent.rand.nextInt(scanSizeY)-scanSizeY/2;
-			tryZ = ((int)ent.posZ) + ent.rand.nextInt(scanSize)-scanSize/2;
+			tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
+			i = tryY + ai.rand.nextInt(scanSizeY)-scanSizeY/2;
+			tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
 			if (ent.worldObj.getBlockId(tryX, i, tryZ) == Block.waterStill.blockID || (Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)] != null && Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)].blockMaterial == Material.water)) {
 				//System.out.println("found water");
 				
@@ -321,11 +371,11 @@ public class JobBase {
 				
 				//if (!this.hasPath()) { System.out.println("no path"); }
 				
-				ent.setState(EnumActState.WALKING);
+				ai.setState(EnumActState.WALKING);
 				walkingTimeout = 300;
-				ent.targX = tryX;
-				ent.targY = tryY;
-				ent.targZ = tryZ;
+				ai.targX = tryX;
+				ai.targY = tryY;
+				ai.targZ = tryZ;
 				//System.out.println(tryX + " " + i + " " + tryZ);
 				return true;
 				
@@ -337,35 +387,13 @@ public class JobBase {
 		return false;
 	}
 	
-	public boolean nextNodeWater() {
-		if (ent.pathToEntity != null && ent.pathToEntity.points.length > 2) {
-			int index = ent.pathToEntity.pathIndex+1;
-			if (index >= ent.pathToEntity.points.length) index = ent.pathToEntity.points.length-1;
-			int x = ent.pathToEntity.points[index].xCoord;
-			int y = ent.pathToEntity.points[index].yCoord;
-			int z = ent.pathToEntity.points[index].zCoord;
-			int id = ent.worldObj.getBlockId(x, y-1, z);
-			
-			//dont wanna use a loop here, enough goddamn loops already! just adjust lookup beyond the safe drop size
-			if (id == 0) {
-				y = ent.pathToEntity.points[index].yCoord - 5;
-				id = ent.worldObj.getBlockId(x, y, z);
-			}
-			
-			if (Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	public boolean findLand() {
 		
 		int scanSize = 64;
 		
-		int tryX = ((int)ent.posX) + ent.rand.nextInt(scanSize)-scanSize/2;
+		int tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
 		int tryY = ((int)ent.posY) - 1;
-		int tryZ = ((int)ent.posZ) + ent.rand.nextInt(scanSize)-scanSize/2;
+		int tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
 		
 		//System.out.println(this.worldObj.getBlockId(tryX, tryY, tryZ));
 		for (int i = tryY; i > tryY - 10; i--) {
@@ -379,11 +407,11 @@ public class JobBase {
 				
 				//if (!this.hasPath()) { System.out.println("no path"); }
 				
-				ent.setState(EnumActState.WALKING);
+				ai.setState(EnumActState.WALKING);
 				walkingTimeout = 300;
-				ent.targX = tryX;
-				ent.targY = tryY;
-				ent.targZ = tryZ;
+				ai.targX = tryX;
+				ai.targY = tryY;
+				ai.targZ = tryZ;
 				
 				return true;
 				
@@ -509,9 +537,9 @@ public class JobBase {
 	
 	public void onCloseCombatTick() {
 		
-		//ent.lungeFactor = 1.2F;
+		//ai.lungeFactor = 1.2F;
 		
-		if (ent.isBreaking()) return;
+		if (entInt.isBreaking()) return;
 		
 		//temp
 		//ent.setMoveSpeed(0.35F);
@@ -522,7 +550,7 @@ public class JobBase {
 		
 		float closeFactor = 1F;
 		
-		if (ent.getDistanceToEntity(ent.entityToAttack) < 1.1F) {
+		if (ent.getDistanceToEntity(ai.entityToAttack) < 1.1F) {
 			closeFactor = 0.5F;
 		}
 		
@@ -530,27 +558,29 @@ public class JobBase {
 			closeFactor = 0.1F;
 		}
 		
-		float speed = ent.getMoveSpeed() * ent.lungeFactor * closeFactor;
-		ent.getMoveHelper().setMoveTo(ent.entityToAttack.posX, ent.entityToAttack.posY, ent.entityToAttack.posZ, speed);
+		float speed = c_CoroAIUtil.getMoveSpeed(ent) * ai.lungeFactor * closeFactor;
+		ent.getMoveHelper().setMoveTo(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ, speed);
 		//System.out.println("lunging!: " + ent.getMoveSpeed() + " - " + ent.lungeFactor + " - " + speed);
 		
 		ent.getDataWatcher().updateObject(20, 1);
 		
+		System.out.println("TEMP OFF FOR REFACTOR");
+		
 		//jump over drops
-		MovingObjectPosition aim = ent.getAimBlock(-2, true);
+		/*MovingObjectPosition aim = ai.getAimBlock(-2, true);
     	if (aim != null) {
     		if (aim.typeOfHit == EnumMovingObjectType.TILE) {
     			
     		}
     	} else {
     		if (ent.onGround) {
-    			ent.jump();
+    			c_CoroAIUtil.jump(ent);
     		}
     	}
 		
     	if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
-    		ent.jump();
-		}
+    		c_CoroAIUtil.jump(ent);
+		}*/
 	}
 	
 	// Job shared functions //

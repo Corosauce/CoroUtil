@@ -1,4 +1,4 @@
-package CoroAI.entity;
+package CoroAI.componentAI.jobSystem;
 
 
 public class JobIdle extends JobBase {

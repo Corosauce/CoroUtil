@@ -3,15 +3,55 @@ package CoroAI.entity;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntitySnowball;
+import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.src.c_EntInterface;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumMovingObjectType;
+import net.minecraft.util.FoodStats;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.util.List;
 import java.util.LinkedList;
-import java.util.Random;
+import java.util.List;
 
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.*;
-import CoroAI.*;
+import CoroAI.Behaviors;
+import CoroAI.PFQueue;
+import CoroAI.PathEntityEx;
+import CoroAI.c_IEnhPF;
 
 public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 
@@ -129,6 +169,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         return new EntityCow(worldObj);
     }
     
+    @Override
     public boolean interact(EntityPlayer var1) {
     	//ModLoader.getMinecraftInstance().displayGuiScreen(new GuiTrade(this.inventory, var1.inventory));
     	return false;
@@ -225,10 +266,12 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 						//set to 1, because onUpdate performs -- and checks if == 0
 						int inUseCount = 1;
 						
-						ItemFood food = (ItemFood) itemToUse.getItem();
-						
-						//food.onFoodEaten(itemToUse, worldObj, fakePlayer);
-						fakePlayer.getFoodStats().addStats(food);
+						if (itemToUse.getItem() instanceof ItemFood) {
+							ItemFood food = (ItemFood) itemToUse.getItem();
+							
+							//food.onFoodEaten(itemToUse, worldObj, fakePlayer);
+							fakePlayer.getFoodStats().addStats(food);
+						}
 						
 						c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, "f", "itemInUseCount", inUseCount);
 						
@@ -339,10 +382,10 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     
     public void faceCoord(int x, int y, int z, float f, float f1)
     {
-        double d = x - posX;
-        double d2 = z - posZ;
+        double d = x+0.5F - posX;
+        double d2 = z+0.5F - posZ;
         double d1;
-        d1 = y - (posY + (double)getEyeHeight());
+        d1 = y+0.5F - (posY + (double)getEyeHeight());
         
         double d3 = MathHelper.sqrt_double(d * d + d2 * d2);
         float f2 = (float)((Math.atan2(d2, d) * 180D) / 3.1415927410125732D) - 90F;
@@ -500,7 +543,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         if (curCooldown_Ranged > 0) { curCooldown_Ranged--; }
         if (curCooldown_FireGun > 0) { curCooldown_FireGun--; }
         if (curCooldown_Reload > 0) { curCooldown_Reload--; }
-        
+        if (fakePlayer.xpCooldown > 0) { fakePlayer.xpCooldown--; }
         
         //Parts taken from EntityPlayer.onUpdate / onLivingUpdate
         
@@ -531,9 +574,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
                 }
             }
         }
-        if(fakePlayer.xpCooldown > 0) {
-            --fakePlayer.xpCooldown;
-        }
+        
         fakePlayer.getFoodStats().onUpdate(fakePlayer);
         
         int healthDiff = getPlHealth() - health;
@@ -1250,6 +1291,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
 	                
 	                //if (fakePlayer != null) {
+	                if (cachedNBT != null) loadInPlayerData(cachedNBT);
                 	inventory = fakePlayer.inventory;
                 	sync();
                 	
@@ -1487,29 +1529,35 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     public void readEntityFromNBT(NBTTagCompound var1) {
         super.readEntityFromNBT(var1);
         try {
-	        if (fakePlayer != null) {
-		        NBTTagList var2 = var1.getTagList("Inventory");
-		        this.inventory.readFromNBT(var2);
-		        fakePlayer.dimension = var1.getInteger("Dimension");
-		        setSleeping(var1.getBoolean("Sleeping"));
-		        //fakePlayer.sleepTimer = var1.getShort("SleepTimer");
-		        fakePlayer.experience = var1.getFloat("XpP");
-		        fakePlayer.experienceLevel = var1.getInteger("XpLevel");
-		        fakePlayer.experienceTotal = var1.getInteger("XpTotal");
-		
-		        if(getSleeping()) {
-		        	fakePlayer.playerLocation = new ChunkCoordinates(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
-		        	fakePlayer.wakeUpPlayer(true, true, false);
-		        }
-		
-		        /*if(var1.hasKey("SpawnX") && var1.hasKey("SpawnY") && var1.hasKey("SpawnZ")) {
-		        	fakePlayer.playerSpawnCoordinate = new ChunkCoordinates(var1.getInteger("SpawnX"), var1.getInteger("SpawnY"), var1.getInteger("SpawnZ"));
-		        }*/
-		
-		        getFoodStats().readNBT(var1);
-		        fakePlayer.capabilities.readCapabilitiesFromNBT(var1);
-	        }
+        	cachedNBT = var1;
         } catch (Exception ex) { ex.printStackTrace(); }
+    }
+    
+    NBTTagCompound cachedNBT;
+    
+    public void loadInPlayerData(NBTTagCompound var1) {
+    	if (fakePlayer != null) {
+	        NBTTagList var2 = var1.getTagList("Inventory");
+	        this.inventory.readFromNBT(var2);
+	        fakePlayer.dimension = var1.getInteger("Dimension");
+	        setSleeping(var1.getBoolean("Sleeping"));
+	        //fakePlayer.sleepTimer = var1.getShort("SleepTimer");
+	        fakePlayer.experience = var1.getFloat("XpP");
+	        fakePlayer.experienceLevel = var1.getInteger("XpLevel");
+	        fakePlayer.experienceTotal = var1.getInteger("XpTotal");
+	
+	        if(getSleeping()) {
+	        	fakePlayer.playerLocation = new ChunkCoordinates(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
+	        	fakePlayer.wakeUpPlayer(true, true, false);
+	        }
+	
+	        /*if(var1.hasKey("SpawnX") && var1.hasKey("SpawnY") && var1.hasKey("SpawnZ")) {
+	        	fakePlayer.playerSpawnCoordinate = new ChunkCoordinates(var1.getInteger("SpawnX"), var1.getInteger("SpawnY"), var1.getInteger("SpawnZ"));
+	        }*/
+	
+	        getFoodStats().readNBT(var1);
+	        fakePlayer.capabilities.readCapabilitiesFromNBT(var1);
+        }
     }
 
     public void writeEntityToNBT(NBTTagCompound var1) {

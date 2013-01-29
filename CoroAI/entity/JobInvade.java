@@ -1,12 +1,13 @@
 package CoroAI.entity;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
+
 import java.util.List;
 
-import cpw.mods.fml.server.FMLServerHandler;
-
 import CoroAI.PFQueue;
-
-import net.minecraft.src.*;
 
 /* JobInvade: For Omnipotent focused invasions */
 

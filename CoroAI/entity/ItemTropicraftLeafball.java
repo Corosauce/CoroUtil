@@ -1,8 +1,9 @@
 package CoroAI.entity;
 
-import java.util.Random;
-
-import net.minecraft.src.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 public class ItemTropicraftLeafball extends Item
 {

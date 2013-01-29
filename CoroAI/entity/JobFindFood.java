@@ -1,6 +1,5 @@
 package CoroAI.entity;
 
-import net.minecraft.src.*;
 
 public class JobFindFood extends JobBase {
 	

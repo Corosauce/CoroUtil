@@ -1,13 +1,28 @@
 package CoroAI;
 
-import net.minecraft.src.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockFlowing;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.IntHashMap;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
+
+import CoroAI.componentAI.ICoroAI;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -88,7 +103,8 @@ public class PFQueue implements Runnable {
 	        (new Thread(this, "Pathfinder Thread")).start();
 	        
     	} else {
-    		System.out.println("duplicate creation PFQueue!");
+    		//not duplicate, just using different instance to prevent thread crashes on internal temp lists 
+    		//System.out.println("duplicate creation PFQueue!");
     	}
     }
 
@@ -186,11 +202,15 @@ public class PFQueue implements Runnable {
 				    						//((c_IEnhPF)queue.get(0).entSourceRef).setPathToEntity(pathEnt);
 				    						
 				    						((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(pathEnt);
-				    						
+				    					} else if (queue.get(0).entSourceRef instanceof ICoroAI) {
+				    						((ICoroAI)queue.get(0).entSourceRef).setPathToEntity(convertToPathEntity(pathEnt));
 				    					} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
 				    						c_CoroAIUtil.playerPathfindCallback(pathEnt);
+				    					} else if (queue.get(0).entSourceRef instanceof EntityCreeper) {
+				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
 				    					} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
-				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, "bG", "moveSpeed"));
+				    						//System.out.println("setting path on living ent: " + pathEnt.pathLength + " - " + (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, c_CoroAIUtil.refl_obf_Item_moveSpeed, c_CoroAIUtil.refl_mcp_Item_moveSpeed));
+				    						((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, c_CoroAIUtil.refl_obf_Item_moveSpeed, c_CoroAIUtil.refl_mcp_Item_moveSpeed));
 				    					}
 				    					
 				    					
@@ -558,6 +578,15 @@ public class PFQueue implements Runnable {
     	return createEntityPathTo(var1, var2, var4, var6, var8, 0);
     }
     
+    //Pathfinding without a required entity
+    public PathEntityEx createPathTo(AxisAlignedBB aabb, float width, float height, double var2, double var4, double var6, float var8, int yOffset) {
+    	PathPointEx var9 = this.openPoint(MathHelper.floor_double(aabb.minX), MathHelper.floor_double(aabb.minY) + yOffset, MathHelper.floor_double(aabb.minZ));
+        PathPointEx var10 = this.openPoint(MathHelper.floor_double(var2 - (double)(width / 2.0F)), MathHelper.floor_double(var4), MathHelper.floor_double(var6 - (double)(width / 2.0F)));
+        PathPointEx var11 = new PathPointEx(MathHelper.floor_float(width + 1.0F), MathHelper.floor_float(height + 1.0F), MathHelper.floor_float(width + 1.0F));
+        PathEntityEx var12 = this.addToPath((Entity)null, var9, var10, var11, var8);
+        return var12;
+    }
+    
     public PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8, int yOffset) {
         PathPointEx var9 = this.openPoint(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY) + yOffset, MathHelper.floor_double(var1.boundingBox.minZ));
         PathPointEx var10 = this.openPoint(MathHelper.floor_double(var2 - (double)(var1.width / 2.0F)), MathHelper.floor_double(var4), MathHelper.floor_double(var6 - (double)(var1.width / 2.0F)));
@@ -877,7 +906,7 @@ public class PFQueue implements Runnable {
                             
                             Material var11 = Block.blocksList[var9].blockMaterial;
                             Block block = Block.blocksList[var9];
-                            int meta = worldMap.getBlockMetadata(var2, var3, var4);
+                            int meta = getBlockMetadata(var2, var3, var4);
                             
                             
                             int noOverrideID = -66;
@@ -889,10 +918,12 @@ public class PFQueue implements Runnable {
                             		return override;
                             	}
                             } else {
-                            	if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
-                            		return 2;
-                            	}
+                            	
                             }
+                            
+                            if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
+                        		return 2;
+                        	}
                             
                             /*if (var9 == Block.ladder.blockID) {
                                 return -1;
@@ -930,7 +961,7 @@ public class PFQueue implements Runnable {
                             
                             
                         } else {
-                            if(!((BlockDoor)Block.doorWood).isDoorOpen(var1.worldObj, var6, var7, var8)) {
+                            if(!((BlockDoor)Block.doorWood).isDoorOpen(worldMap, var6, var7, var8)) {
                                 return -2;
                             }
                         }

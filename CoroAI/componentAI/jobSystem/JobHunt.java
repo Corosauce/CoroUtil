@@ -1,4 +1,4 @@
-package CoroAI.entity;
+package CoroAI.componentAI.jobSystem;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -8,11 +8,12 @@ import net.minecraft.util.DamageSource;
 import java.util.List;
 
 import CoroAI.PFQueue;
+import CoroAI.entity.EnumJobState;
 
 public class JobHunt extends JobBase {
 	
 	public long huntRange = 24;
-	public boolean dontStray = true;
+	
 	public boolean xRay = false;
 	
 	public JobHunt(JobManager jm) {
@@ -22,7 +23,6 @@ public class JobHunt extends JobBase {
 	@Override
 	public void tick() {
 		super.tick();
-		
 		jobHunter();
 	}
 	
@@ -33,7 +33,7 @@ public class JobHunt extends JobBase {
 	
 	@Override
 	public boolean shouldContinue() {
-		return ent.entityToAttack == null;
+		return ai.entityToAttack == null;
 	}
 
 	@Override
@@ -43,33 +43,38 @@ public class JobHunt extends JobBase {
 		
 		//}
 		//System.out.println("hitAndRunDelay: " + hitAndRunDelay);
-		if (hitAndRunDelay == 0 && ent.getDistanceToEntity(ent.lastFleeEnt) > 3F) {
-			hitAndRunDelay = ent.cooldown_Ranged+1;
-			ent.entityToAttack = ent.lastFleeEnt;
-			if (ent.entityToAttack != null) {
-				ent.faceEntity(ent.entityToAttack, 180F, 180F);
-				ent.rightClickItem();
+		if (hitAndRunDelay == 0 && ent.getDistanceToEntity(ai.lastFleeEnt) > 3F) {
+			hitAndRunDelay = entInt.getCooldownRanged()+1;
+			ai.entityToAttack = ai.lastFleeEnt;
+			if (ai.entityToAttack != null) {
+				ent.faceEntity(ai.entityToAttack, 180F, 180F);
+				if (ai.useInv) {
+					ai.entInv.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
+    			} else {
+    				entInt.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
+    			}
 				//ent.attackEntity(ent.entityToAttack, ent.getDistanceToEntity(ent.entityToAttack));
 				//System.out.println("H&R " + ent.name + " health: " + ent.getHealth());
 			}
 		} else {
-			ent.entityToAttack = null;
+			ai.entityToAttack = null;
 		}
 		
-		if (ent.onGround && ent.isCollidedHorizontally && !ent.isBreaking()) {
-    		ent.jump();
+		if (ent.onGround && ent.isCollidedHorizontally && !entInt.isBreaking()) {
+    		c_CoroAIUtil.jump(ent);
 		}
 	}
 	
 	@Override
 	public void hitHook(DamageSource ds, int damage) {
-		if (ent.isEnemy(ds.getEntity())) {
-			ent.entityToAttack = ds.getEntity();
+		if (entInt.isEnemy(ds.getEntity())) {
+			ai.entityToAttack = ds.getEntity();
 		}
 		
 		if (ent.getHealth() < ent.getMaxHealth() / 2 && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()) {
-			ent.dipl_hostilePlayer = true;
-			ent.getGroupInfo(EnumInfo.DIPL_WARN);
+			System.out.println("TEMP OFF FOR REFACTOR");
+			/*ai.dipl_hostilePlayer = true;
+			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
 		}
 		 
 		
@@ -82,14 +87,14 @@ public class JobHunt extends JobBase {
 	@Override
 	public void setJobItems() {
 		
-		c_CoroAIUtil.setItems_JobHunt(ent);
+		c_CoroAIUtil.setItems_JobHunt(ai.entInv);
 		
 		
 	}
 	
 	protected void jobHunter() {
 	
-		
+		dontStray = false;
 		
 		//this whole function is crap, redo it bitch
 		
@@ -103,13 +108,7 @@ public class JobHunt extends JobBase {
 		}*/
 		
 		//huntRange = 24;
-		dontStray = true;
-		
-		if (ent.worldObj.isDaytime()) {
-			ent.maxDistanceFromHome = 36F;
-		} else {
-			ent.maxDistanceFromHome = 12F;
-		}
+		ai.maxDistanceFromHome = 48F;
 		
 		
 		//if (true) return;
@@ -121,7 +120,7 @@ public class JobHunt extends JobBase {
 		} else {*/
 			setJobState(EnumJobState.IDLE);
 			
-			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ent.entityToAttack == null || ent.rand.nextInt(20) == 0)) {
+			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
 				boolean found = false;
 				Entity clEnt = null;
 				float closest = 9999F;
@@ -129,7 +128,7 @@ public class JobHunt extends JobBase {
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
-		            if(ent.isEnemy(entity1))
+		            if(entInt.isEnemy(entity1))
 		            {
 		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
 		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
@@ -148,16 +147,17 @@ public class JobHunt extends JobBase {
 		            }
 		        }
 		        if (clEnt != null) {
-		        	ent.huntTarget(clEnt);
+		        	//System.out.println("TEMP OFF FOR REFACTOR");
+		        	ai.huntTarget(clEnt);
 		        }
 		        /*if (!found) {
 		        	setState(EnumKoaActivity.IDLE);
 		        }*/
 			} else {
 				
-				if (ent.entityToAttack != null) {
-					if (ent.getNavigator().noPath() && ent.getDistanceToEntity(ent.entityToAttack) > 5F) {
-						PFQueue.getPath(ent, ent.entityToAttack, ent.maxPFRange);
+				if (ai.entityToAttack != null) {
+					if (ent.getNavigator().noPath() && ent.getDistanceToEntity(ai.entityToAttack) > 5F) {
+						PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange);
 					}
 				}
 				
@@ -192,11 +192,11 @@ public class JobHunt extends JobBase {
 		}
 		
 		if (dontStray) {
-			if (target.getDistance(ent.homeX, ent.homeY, ent.homeZ) > ent.maxDistanceFromHome * 1.5) {
+			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome * 1.5) {
 				return false;
 			}
 		}
-		if (ent.rand.nextInt(2) == 0) {
+		if (ai.rand.nextInt(2) == 0) {
 			return true;
 		}
 		return false;
@@ -208,7 +208,7 @@ public class JobHunt extends JobBase {
 		}
 		
 		if (dontStray) {
-			if (target.getDistance(ent.homeX, ent.homeY, ent.homeZ) > ent.maxDistanceFromHome) {
+			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome) {
 				return false;
 			}
 		}

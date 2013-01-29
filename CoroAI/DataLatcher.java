@@ -2,13 +2,6 @@ package CoroAI;
 
 import java.util.HashMap;
 
-import net.minecraft.src.*;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Iterator;
-import java.util.HashMap;
-
 public class DataLatcher {
 	
 	public HashMap values;

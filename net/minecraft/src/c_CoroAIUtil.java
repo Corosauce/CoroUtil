@@ -1,30 +1,42 @@
 package net.minecraft.src;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockChest;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockFenceGate;
+import net.minecraft.block.BlockWall;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntityWaterMob;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.FoodStats;
+import net.minecraft.world.World;
 
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
+import CoroAI.componentAI.AIInventory;
+import CoroAI.componentAI.ICoroAI;
 import CoroAI.entity.c_EnhAI;
 import CoroAI.entity.c_PlayerProxy;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.src.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class c_CoroAIUtil {
 	
 	public static String refl_mcp_Item_maxStackSize = "maxStackSize";
-	public static String refl_c_Item_maxStackSize = "ch";
-    public static String refl_s_Item_maxStackSize = "ch";
-	public static String refl_mcp_Item_navigator = "navigator";
-	public static String refl_c_Item_navigator = "bL";
-	public static String refl_s_Item_navigator = "bL";
+	public static String refl_c_Item_maxStackSize = "ck";
+    public static String refl_s_Item_maxStackSize = "ck";
+	public static String refl_mcp_Item_moveSpeed = "moveSpeed";
+	public static String refl_obf_Item_moveSpeed = "bH";
 	
 	public static String refl_mcp_EntityPlayer_itemInUse = "itemInUse";
 	public static String refl_c_EntityPlayer_itemInUse = "f";
@@ -51,6 +63,7 @@ public class c_CoroAIUtil {
 	public static Item leafBall;
 	
 	public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
+	public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();
 	
 	public c_CoroAIUtil() {
 		
@@ -317,6 +330,40 @@ public class c_CoroAIUtil {
 		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
     }
     
+    public static void setItems_JobTrade(c_PlayerProxy ent) {
+    	//System.out.println("setItems_JobHunt broken");
+    	//Melee slot
+    	getTropiItemRefl("swordZircon", swordZircon);
+    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+		//Ranged slot
+    	getTropiItemRefl("leafBall", leafBall);
+    	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
+		
+		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
+		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
+		ent.wantedItems.add(Item.porkRaw.shiftedIndex);
+		ent.wantedItems.add(Item.porkCooked.shiftedIndex);
+		ent.wantedItems.add(Item.chickenRaw.shiftedIndex);
+		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
+    }
+    
+    public static void setItems_JobHunt(AIInventory ent) {
+    	//System.out.println("setItems_JobHunt broken");
+    	//Melee slot
+    	getTropiItemRefl("swordZircon", swordZircon);
+    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+		//Ranged slot
+    	getTropiItemRefl("leafBall", leafBall);
+    	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
+		
+		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
+		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
+		ent.wantedItems.add(Item.porkRaw.shiftedIndex);
+		ent.wantedItems.add(Item.porkCooked.shiftedIndex);
+		ent.wantedItems.add(Item.chickenRaw.shiftedIndex);
+		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
+    }
+    
     public static Item getTropiItemRefl(String fieldName, Item cache) {
 		//Item item = null;
     	try {
@@ -432,4 +479,13 @@ public class c_CoroAIUtil {
     	/*c_AIP.i.*/pathToEntity = pathEx;
     	newPath = true;
     }
+    
+    public static int getAge(EntityLiving ent) { return ent.entityAge; }
+    public static void addAge(EntityLiving ent, int offsetAge) { ent.entityAge += offsetAge; }
+    public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
+    public static float getMoveSpeed(EntityLiving ent) { return ent.moveSpeed; }
+    public static void setHealth(EntityLiving ent, int health) { ent.health = health; }
+    public static void jump(EntityLiving ent) { ent.jump(); }
+    public static boolean chunkExists(World world, int x, int z) { return world.chunkExists(x, z); }
+    //public static void dropItems(EntityLiving ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

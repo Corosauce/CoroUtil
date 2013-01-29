@@ -3,8 +3,6 @@ package CoroAI.entity;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import net.minecraft.src.*;
-
 public class JobManager {
 	
 	public HashMap<EnumJob, JobBase> jobTypes = new HashMap();
@@ -36,6 +34,7 @@ public class JobManager {
 		jobTypes.put(EnumJob.GATHERER, new JobGather(this));
 		
 		
+		
 		setPrimaryJob(EnumJob.UNEMPLOYED);
 		
 		//swapJob(priJob);
@@ -43,19 +42,23 @@ public class JobManager {
 	
 	public void tick() {
 		debug = "";
-		for (int i = 0; i < curJobs.size(); i++) {
-			JobBase job = enumToJob(curJobs.get(i));
-			if (job.shouldExecute()) {
-				debug = debug + job.toString() + " | ";
-				job.tick();
-				lastJobRun = curJobs.get(i);
-				lastJobRunID = i;
+		try {
+			for (int i = 0; i < curJobs.size(); i++) {
+				JobBase job = enumToJob(curJobs.get(i));
+				if (job.shouldExecute()) {
+					debug = debug + job.toString() + " | ";
+					job.tick();
+					lastJobRun = curJobs.get(i);
+					lastJobRunID = i;
+				}
+				if (!job.shouldContinue()) {
+					break;
+				}
 			}
-			if (!job.shouldContinue()) {
-				break;
-			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		//System.out.println(debug);
+		//
 	}
 	
 	

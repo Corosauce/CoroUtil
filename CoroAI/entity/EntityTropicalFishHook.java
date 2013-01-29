@@ -1,16 +1,28 @@
 package CoroAI.entity;
 
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
+
 import java.util.List;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Side;
-import cpw.mods.fml.common.asm.SideOnly;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraft.src.*;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class EntityTropicalFishHook extends Entity implements IEntityAdditionalSpawnData {
 
@@ -44,6 +56,12 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    {
 	   return asd.distanceTo(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)) < 80; 
        
+   }
+   
+   @Override
+   public float getEyeHeight()
+   {
+       return 0.5F;
    }
    
    @Override

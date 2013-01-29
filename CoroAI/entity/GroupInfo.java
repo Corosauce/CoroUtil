@@ -1,12 +1,9 @@
 package CoroAI.entity;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.minecraft.block.Block;
 
-import net.minecraft.src.Block;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GroupInfo 
 {

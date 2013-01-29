@@ -1,9 +1,11 @@
 package CoroAI.entity;
 
-import net.minecraft.src.EntityPlayer;
-import net.minecraft.src.Item;
-import net.minecraft.src.ItemStack;
-import net.minecraft.src.World;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
+import CoroAI.componentAI.AIInventory;
 
 public class ItemTropicalFishingRod extends Item 
 {
@@ -20,6 +22,25 @@ public class ItemTropicalFishingRod extends Item
 
     public boolean shouldRotateAroundWhenRendering() {
         return true;
+    }
+    
+    public ItemStack onItemRightClick3(ItemStack var1, World var2, AIInventory var3, float speed) {
+    	//System.out.println(System.currentTimeMillis() + " - try cast item, fishEntity:" + var3.fishEntity);
+        if(var3.fishEntity != null) {
+            int var4 = var3.fishEntity.catchFish();
+            //var1.damageItem(var4, var3);
+            var3.ai.ent.swingItem();
+        } else {
+            var2.playSoundAtEntity(var3.ai.ent, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
+
+            if(!var2.isRemote) {
+                var2.spawnEntityInWorld(new EntityTropicalFishHook(var2, var3.ai.ent, speed));
+            }
+
+            var3.ai.ent.swingItem();
+        }
+
+        return var1;
     }
     
     public ItemStack onItemRightClick2(ItemStack var1, World var2, c_PlayerProxy var3, float speed) {

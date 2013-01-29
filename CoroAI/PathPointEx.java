@@ -1,6 +1,6 @@
 package CoroAI;
 
-import net.minecraft.src.*;
+import net.minecraft.util.MathHelper;
 
 public class PathPointEx
 {

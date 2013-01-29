@@ -1,6 +1,7 @@
 package CoroAI;
 
-import net.minecraft.src.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.Vec3;
 
 public class PathEntityEx/* extends PathEntity*/
 {

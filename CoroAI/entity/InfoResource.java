@@ -1,8 +1,5 @@
 package CoroAI.entity;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 public class InfoResource extends InfoArea
 {

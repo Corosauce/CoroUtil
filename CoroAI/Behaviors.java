@@ -1,13 +1,18 @@
 package CoroAI;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.ai.EntityAIAttackOnCollide;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.src.c_CoroAIUtil;
+
 import java.util.HashMap;
-
-import net.minecraft.src.*;
-
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Iterator;
-import java.util.HashMap;
 
 import CoroAI.entity.c_EnhAI;
 

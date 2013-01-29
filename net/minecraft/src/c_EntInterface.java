@@ -3,14 +3,17 @@ package net.minecraft.src;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Random;
-
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.projectile.EntityThrowable;
+import net.minecraft.item.ItemInWorldManager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.*;
-import CoroAI.*;
-import CoroAI.entity.*;
+import net.minecraft.world.World;
+
+import CoroAI.entity.c_EntityPlayerMPExt;
 
 public class c_EntInterface extends EntityMob
 {

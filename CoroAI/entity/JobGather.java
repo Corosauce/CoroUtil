@@ -1,11 +1,15 @@
 package CoroAI.entity;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.tileentity.TileEntityChest;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
-import net.minecraft.src.*;
 
 public class JobGather extends JobBase {
 	

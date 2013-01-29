@@ -1,14 +1,14 @@
 package CoroAI.entity;
 
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemInWorldManager;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.world.World;
 
-import net.minecraft.src.*;
+import java.lang.reflect.Field;
 
 public class c_EntityPlayerMPExt extends EntityPlayerMP
 {
