@@ -4,7 +4,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 import java.util.List;
@@ -26,7 +28,8 @@ public class AIAgent {
 	public JobManager jobMan;
 	
 	//Path
-	public boolean waitingForNewPath;
+	public boolean pathAvailable; //marks that the callback fired
+	public boolean pathRequested; //marks that the ai is already waiting for a path (prevents redundant path requests flooding up the queue)
 	public PathEntity pathToEntity;
 	
 	// AI fields \\
@@ -87,6 +90,11 @@ public class AIAgent {
 		jobMan = new JobManager(this);
 		rand = new Random();
 		setState(EnumActState.IDLE);
+	}
+	
+	public boolean notPathing() {
+		if (!pathRequested && this.ent.getNavigator().noPath()) return true;
+		return false;
 	}
 	
 	public void initJobs() {
@@ -189,7 +197,7 @@ public class AIAgent {
 				}
 				
 				if (ent.isInWater()) {
-					if (!ent.getNavigator().noPath()) {
+					if (!notPathing()) {
 						if (Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) > 0.001F && Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) < 0.5F) {
 							//ent.moveFlying(ent.moveStrafing, ent.moveForward, 0.04F);
 							//this.motionX *= 1.3F;
@@ -413,16 +421,23 @@ public class AIAgent {
     }
 	
 	public void checkPathfindLock() {
-		if (waitingForNewPath) {
+		if (pathAvailable) {
 			ent.getNavigator().setPath(pathToEntity, c_CoroAIUtil.getMoveSpeed(ent));
-			waitingForNewPath = false;
+			pathAvailable = false;
+			pathRequested = false;
 		}
 	}
 	
 	public void setPathToEntity(PathEntity pathentity)
     {
+		jobMan.getPrimaryJob().setPathToEntity(pathentity);
+    }
+	
+	public void setPathToEntityForce(PathEntity pathentity)
+    {
+		//System.out.println("force set path");
         pathToEntity = pathentity;
-        waitingForNewPath = true;
+        pathAvailable = true;
     }
 	
 	public void walkTo(Entity var1, int x, int y, int z, float var2, int timeout) {
@@ -430,7 +445,8 @@ public class AIAgent {
 	}
 	
 	public void walkTo(Entity var1, int x, int y, int z, float var2, int timeout, int priority) {
-		PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
+		pathRequested = true; //redundancy preventer
+		PFQueue.getPath(ent, x, y, z, var2, priority);
 		setState(EnumActState.WALKING);
 		jobMan.getPrimaryJob().walkingTimeout = timeout;
 		targX = x;
@@ -438,7 +454,26 @@ public class AIAgent {
 		targZ = z;
 	}
 	
+	public void walkToMark(Entity var1, PathEntity pe, int timeout) {
+		//PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
+		setState(EnumActState.WALKING);
+		jobMan.getPrimaryJob().walkingTimeout = timeout;
+		targX = pe.getFinalPathPoint().xCoord;
+		targY = pe.getFinalPathPoint().yCoord;
+		targZ = pe.getFinalPathPoint().zCoord;
+	}
+	
+	public void walkToMark(Entity var1, ChunkCoordinates coords, int timeout) {
+		//PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
+		setState(EnumActState.WALKING);
+		jobMan.getPrimaryJob().walkingTimeout = timeout;
+		targX = coords.posX;
+		targY = coords.posY;
+		targZ = coords.posZ;
+	}
+	
 	public void huntTarget(Entity parEnt, int pri) {
+		pathRequested = true; //redundancy preventer
 		PFQueue.getPath(ent, parEnt, maxPFRange, pri);
 		//System.out.println("huntTarget call: " + ent);
 		this.entityToAttack = parEnt;
@@ -448,4 +483,48 @@ public class AIAgent {
 	public void huntTarget(Entity parEnt) {
 		huntTarget(parEnt, 0);
 	}
+	
+	public void faceCoord(ChunkCoordinates coord, float f, float f1) {
+		faceCoord(coord.posX, coord.posY, coord.posZ, f, f1);
+	}
+	
+	public void faceCoord(int x, int y, int z, float f, float f1)
+    {
+        double d = x+0.5F - ent.posX;
+        double d2 = z+0.5F - ent.posZ;
+        double d1;
+        d1 = y+0.5F - (ent.posY + (double)ent.getEyeHeight());
+        
+        double d3 = MathHelper.sqrt_double(d * d + d2 * d2);
+        float f2 = (float)((Math.atan2(d2, d) * 180D) / 3.1415927410125732D) - 90F;
+        float f3 = (float)(-((Math.atan2(d1, d3) * 180D) / 3.1415927410125732D));
+        ent.rotationPitch = -updateRotation(ent.rotationPitch, f3, f1);
+        ent.rotationYaw = updateRotation(ent.rotationYaw, f2, f);
+    }
+	
+	public float updateRotation(float f, float f1, float f2)
+    {
+        float f3;
+        for(f3 = f1 - f; f3 < -180F; f3 += 360F) { }
+        for(; f3 >= 180F; f3 -= 360F) { }
+        if(f3 > f2)
+        {
+            f3 = f2;
+        }
+        if(f3 < -f2)
+        {
+            f3 = -f2;
+        }
+        return f + f3;
+    }
+	
+	public MovingObjectPosition rayTrace(double reachDist, float yOffset)
+    {
+		float partialTick = 1F;
+		
+        Vec3 var4 = ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY+yOffset, ent.posZ);
+        Vec3 var5 = ent.getLook(partialTick);
+        Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
+        return ent.worldObj.rayTraceBlocks(var4, var6);
+    }
 }

@@ -156,7 +156,7 @@ public class JobHunt extends JobBase {
 			} else {
 				
 				if (ai.entityToAttack != null) {
-					if (ent.getNavigator().noPath() && ent.getDistanceToEntity(ai.entityToAttack) > 5F) {
+					if (entInt.getAIAgent().notPathing() && ent.getDistanceToEntity(ai.entityToAttack) > 5F) {
 						PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange);
 					}
 				}

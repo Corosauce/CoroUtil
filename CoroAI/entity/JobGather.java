@@ -278,7 +278,7 @@ public class JobGather extends JobBase {
 	
 	protected boolean isFish(int id) {
 		//Add other fish here as there are more to actually get
-		return id == Item.fishRaw.shiftedIndex;
+		return id == Item.fishRaw.itemID;
 	}
 	
 	protected void transferJobItems(int x, int y, int z) {

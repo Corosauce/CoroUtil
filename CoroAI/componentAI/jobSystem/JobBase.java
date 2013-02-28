@@ -104,7 +104,7 @@ public class JobBase {
 		//System.out.println("TEMP OFF FOR REFACTOR");
 		
 		//slaughter entitycreature ai update function and put idle wander invoking code here
-        if(((ent.getNavigator().noPath()) && ai.rand.nextInt(5) == 0))
+        if(((entInt.getAIAgent().notPathing()) && ai.rand.nextInt(40) == 0))
         {
         	if (!dontStray) {
         		ai.updateWanderPath();
@@ -125,7 +125,7 @@ public class JobBase {
 	        	}
         	}
         } else {
-        	if (ent.getNavigator().noPath()) {
+        	if (entInt.getAIAgent().notPathing()) {
     			if (ai.useInv) lookForItems();
         	}
         }
@@ -148,7 +148,7 @@ public class JobBase {
 	
 	                if(!var5.isDead && var5 instanceof EntityItem) {
 	                	EntityItem entTemp = (EntityItem)var5;
-	                	if (ai.entInv.wantedItems.contains(entTemp.func_92014_d().getItem().shiftedIndex)) {
+	                	if (ai.entInv.wantedItems.contains(entTemp.func_92014_d().getItem().itemID)) {
 		                	if (this.ent.canEntityBeSeen(var5)) {
 		                		//if (this.team == 1) {
 		                		if (!var5.isInsideOfMaterial(Material.water)) {
@@ -255,7 +255,7 @@ public class JobBase {
         PathEntity path = ent.getNavigator().getPath();
         //System.out.println("koa " + ent.name + " health: " + ent.getHealth());
         if (clEnt != null) {
-        	if (clEnt != ai.lastFleeEnt || (ent.getNavigator().noPath())) {
+        	if (clEnt != ai.lastFleeEnt || (entInt.getAIAgent().notPathing())) {
         		ai.lastFleeEnt = clEnt;
         		if (actOnTrue && fleeDelay <= 0) fleeFrom(clEnt);
         	}
@@ -324,7 +324,10 @@ public class JobBase {
         
         double homeDist = ent.getDistance(ai.homeX, ai.homeY, ai.homeZ);
         
-        System.out.println("TEMP OFF FOR REFACTOR");
+        //System.out.println("TEMP OFF FOR REFACTOR");
+        
+        ai.walkTo(ent, gatherX, gatherY, gatherZ, ai.maxPFRange, 600, -1);
+        
         /*if (false && ai.jobMan.getJobClass() instanceof JobHunt && homeDist > ai.maxDistanceFromHome / 4 * 3) {
         	ai.walkTo(ent, ai.homeX, ai.homeY, ai.homeZ, (float) homeDist, 600);
         } else {
@@ -585,4 +588,8 @@ public class JobBase {
 	
 	// Job shared functions //
 	
+	public void setPathToEntity(PathEntity pathentity)
+    {
+		entInt.getAIAgent().setPathToEntityForce(pathentity);
+    }
 }

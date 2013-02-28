@@ -1246,7 +1246,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	                if(!var5.isDead && var5 instanceof EntityItem) {
 	                	EntityItem ent = (EntityItem)var5;
-	                	if (wantedItems.contains(ent.func_92014_d().getItem().shiftedIndex)) {
+	                	if (wantedItems.contains(ent.func_92014_d().getItem().itemID)) {
 		                	if (this.canEntityBeSeen(var5)) {
 		                		//if (this.team == 1) {
 		                		if (!var5.isInsideOfMaterial(Material.water)) {

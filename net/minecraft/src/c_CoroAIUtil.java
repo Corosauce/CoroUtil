@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.FoodStats;
 import net.minecraft.world.World;
 
@@ -299,7 +300,7 @@ public class c_CoroAIUtil {
     
     public static boolean AIRightClickHook(c_PlayerProxy ent, ItemStack itemToUse) {
     	/*if (itemToUse.getItem() instanceof ZCSdkItemGun) {
-			if (ZCSdkTools.useItemInInventory(ent.fakePlayer, ((ZCSdkItemGun)itemToUse.getItem()).requiredBullet.shiftedIndex) <= 0) {
+			if (ZCSdkTools.useItemInInventory(ent.fakePlayer, ((ZCSdkItemGun)itemToUse.getItem()).requiredBullet.itemID) <= 0) {
 				return false;
 			}
 		}*/
@@ -322,12 +323,12 @@ public class c_CoroAIUtil {
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
 		
-		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
-		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
-		ent.wantedItems.add(Item.porkRaw.shiftedIndex);
-		ent.wantedItems.add(Item.porkCooked.shiftedIndex);
-		ent.wantedItems.add(Item.chickenRaw.shiftedIndex);
-		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
+		ent.wantedItems.add(Item.fishRaw.itemID);
+		ent.wantedItems.add(Item.fishCooked.itemID);
+		ent.wantedItems.add(Item.porkRaw.itemID);
+		ent.wantedItems.add(Item.porkCooked.itemID);
+		ent.wantedItems.add(Item.chickenRaw.itemID);
+		ent.wantedItems.add(Item.chickenCooked.itemID);
     }
     
     public static void setItems_JobTrade(c_PlayerProxy ent) {
@@ -339,12 +340,12 @@ public class c_CoroAIUtil {
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
 		
-		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
-		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
-		ent.wantedItems.add(Item.porkRaw.shiftedIndex);
-		ent.wantedItems.add(Item.porkCooked.shiftedIndex);
-		ent.wantedItems.add(Item.chickenRaw.shiftedIndex);
-		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
+		ent.wantedItems.add(Item.fishRaw.itemID);
+		ent.wantedItems.add(Item.fishCooked.itemID);
+		ent.wantedItems.add(Item.porkRaw.itemID);
+		ent.wantedItems.add(Item.porkCooked.itemID);
+		ent.wantedItems.add(Item.chickenRaw.itemID);
+		ent.wantedItems.add(Item.chickenCooked.itemID);
     }
     
     public static void setItems_JobHunt(AIInventory ent) {
@@ -356,12 +357,12 @@ public class c_CoroAIUtil {
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
 		
-		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
-		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
-		ent.wantedItems.add(Item.porkRaw.shiftedIndex);
-		ent.wantedItems.add(Item.porkCooked.shiftedIndex);
-		ent.wantedItems.add(Item.chickenRaw.shiftedIndex);
-		ent.wantedItems.add(Item.chickenCooked.shiftedIndex);
+		ent.wantedItems.add(Item.fishRaw.itemID);
+		ent.wantedItems.add(Item.fishCooked.itemID);
+		ent.wantedItems.add(Item.porkRaw.itemID);
+		ent.wantedItems.add(Item.porkCooked.itemID);
+		ent.wantedItems.add(Item.chickenRaw.itemID);
+		ent.wantedItems.add(Item.chickenCooked.itemID);
     }
     
     public static Item getTropiItemRefl(String fieldName, Item cache) {
@@ -391,13 +392,13 @@ public class c_CoroAIUtil {
     		//ex.printStackTrace();
     	}
     	return cache;
-    	//ent.setCurrentItem(TropicraftMod.fishingRodTropical.shiftedIndex);
+    	//ent.setCurrentItem(TropicraftMod.fishingRodTropical.itemID);
     }
     
     public static void equipFishingRod(c_EnhAI ent) {
     	
     	getTropiItemRefl("fishingRodTropical", fishingRodTropical);
-    	if (fishingRodTropical != null) ent.setCurrentItem(fishingRodTropical.shiftedIndex);
+    	if (fishingRodTropical != null) ent.setCurrentItem(fishingRodTropical.itemID);
     	
     	/*try {
     		if (hasTropicraft) {
@@ -410,13 +411,13 @@ public class c_CoroAIUtil {
 	    					hasTropicraft = false;
 	    					return;
 	    				} else {
-	    					ent.setCurrentItem(fishingRodTropical.shiftedIndex);
+	    					ent.setCurrentItem(fishingRodTropical.itemID);
 	    				}
 	    			} else {
 	    				hasTropicraft = false;    				
 	    			}
     			} else {
-    				ent.setCurrentItem(fishingRodTropical.shiftedIndex);
+    				ent.setCurrentItem(fishingRodTropical.itemID);
     			}
     		}
     	} catch (Exception ex) {
@@ -424,7 +425,7 @@ public class c_CoroAIUtil {
     		System.out.println("this really shouldnt ever happen unless fishing job is used outside tropicraft");
     		//ex.printStackTrace();
     	}*/
-    	//ent.setCurrentItem(TropicraftMod.fishingRodTropical.shiftedIndex);
+    	//ent.setCurrentItem(TropicraftMod.fishingRodTropical.itemID);
     }
     
     public static boolean tryTransferToChest(c_EnhAI ent, int x, int y, int z) {
@@ -449,8 +450,8 @@ public class c_CoroAIUtil {
     	getTropiItemRefl("fishingRodTropical", fishingRodTropical);
     	if (fishingRodTropical != null) ent.inventory.addItemStackToInventory(new ItemStack(fishingRodTropical, 1));
 		
-		ent.wantedItems.add(Item.fishRaw.shiftedIndex);
-		ent.wantedItems.add(Item.fishCooked.shiftedIndex);
+		ent.wantedItems.add(Item.fishRaw.itemID);
+		ent.wantedItems.add(Item.fishCooked.itemID);
     }
     
     public static boolean isServer() {
@@ -487,5 +488,6 @@ public class c_CoroAIUtil {
     public static void setHealth(EntityLiving ent, int health) { ent.health = health; }
     public static void jump(EntityLiving ent) { ent.jump(); }
     public static boolean chunkExists(World world, int x, int z) { return world.chunkExists(x, z); }
+    public static ChunkCoordinates entToCoord(Entity ent) { return new ChunkCoordinates((int)ent.posX, (int)ent.posY, (int)ent.posZ); }
     //public static void dropItems(EntityLiving ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

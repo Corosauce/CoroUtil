@@ -60,7 +60,7 @@ public class JobManager {
 	
 	public void addJob(JobBase newJob, int priority) {
 		if (priority != -1) {
-			curJobs.add(priority, newJob);
+			curJobs.add(priority, newJob); //this may be flawed, injects job at index, but doesnt exactly guarantee priority ordering
 		} else {
 			curJobs.add(newJob);
 		}

@@ -279,12 +279,12 @@ public class JobFish extends JobBase {
 	
 	protected int getFishCount() {
 		//Add other fish here as there are more to actually get
-		return ent.getItemCount(Item.fishRaw.shiftedIndex);
+		return ent.getItemCount(Item.fishRaw.itemID);
 	}
 	
 	protected boolean isFish(int id) {
 		//Add other fish here as there are more to actually get
-		return id == Item.fishRaw.shiftedIndex;
+		return id == Item.fishRaw.itemID;
 	}
 	
 	protected void transferJobItems(int x, int y, int z) {

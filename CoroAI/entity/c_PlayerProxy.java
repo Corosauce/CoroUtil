@@ -294,9 +294,9 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	}
     
     public void switchItem(int id) {
-    	if (Item.swordDiamond.shiftedIndex == id) {
+    	if (Item.swordDiamond.itemID == id) {
     		curCooldown_Melee = 0;
-    	} else if (Item.bow.shiftedIndex == id) {
+    	} else if (Item.bow.itemID == id) {
     		
     	}
     	
