@@ -2,12 +2,12 @@ package CoroAI.componentAI.jobSystem;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.util.DamageSource;
 
 import java.util.List;
 
 import CoroAI.PFQueue;
+import CoroAI.c_CoroAIUtil;
 import CoroAI.entity.EnumJobState;
 
 public class JobHunt extends JobBase {
@@ -33,7 +33,7 @@ public class JobHunt extends JobBase {
 	
 	@Override
 	public boolean shouldContinue() {
-		return ai.entityToAttack == null;
+		return ai.entityToAttack == null || ai.entityToAttack.getDistanceToEntity(ent) > huntRange;
 	}
 
 	@Override
@@ -59,15 +59,11 @@ public class JobHunt extends JobBase {
 		} else {
 			ai.entityToAttack = null;
 		}
-		
-		if (ent.onGround && ent.isCollidedHorizontally && !entInt.isBreaking()) {
-    		c_CoroAIUtil.jump(ent);
-		}
 	}
 	
 	@Override
-	public void hitHook(DamageSource ds, int damage) {
-		if (entInt.isEnemy(ds.getEntity())) {
+	public boolean hitHook(DamageSource ds, int damage) {
+		if (isEnemy(ds.getEntity())) {
 			ai.entityToAttack = ds.getEntity();
 		}
 		
@@ -77,7 +73,7 @@ public class JobHunt extends JobBase {
 			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
 		}
 		 
-		
+		return true;
 		//temp fun code
 		/*if (ds.getEntity() instanceof ZCSdkEntitySentry) {
 			ent.entityToAttack = ds.getEntity();
@@ -128,7 +124,7 @@ public class JobHunt extends JobBase {
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
-		            if(entInt.isEnemy(entity1))
+		            if(isEnemy(entity1))
 		            {
 		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
 		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
@@ -147,8 +143,14 @@ public class JobHunt extends JobBase {
 		            }
 		        }
 		        if (clEnt != null) {
-		        	//System.out.println("TEMP OFF FOR REFACTOR");
-		        	ai.huntTarget(clEnt);
+		        	if (ai.entityToAttack != clEnt) {
+		        		ai.huntTarget(clEnt);
+		        	} else {
+		        		//if (ent.getNavigator().noPath()) {
+		        			ai.huntTarget(clEnt);
+		        		//}
+		        	}
+		        	
 		        }
 		        /*if (!found) {
 		        	setState(EnumKoaActivity.IDLE);
@@ -156,8 +158,9 @@ public class JobHunt extends JobBase {
 			} else {
 				
 				if (ai.entityToAttack != null) {
-					if (entInt.getAIAgent().notPathing() && ent.getDistanceToEntity(ai.entityToAttack) > 5F) {
-						PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange);
+					if (ent.getNavigator().noPath()/* && ent.getDistanceToEntity(ai.entityToAttack) > 5F*/) {
+						ai.huntTarget(ai.entityToAttack);
+						/*if (ent.isInWater() || !isInFormation() || ai.activeFormation.leader == entInt) */
 					}
 				}
 				

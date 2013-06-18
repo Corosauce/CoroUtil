@@ -1,5 +1,10 @@
 package CoroAI.componentAI;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -11,28 +16,31 @@ import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.c_CoroAIUtil;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-
+import CoroAI.c_CoroAIUtil;
 import CoroAI.entity.EntityTropicalFishHook;
 import CoroAI.entity.ItemTropicalFishingRod;
 import CoroAI.entity.ItemTropicraftLeafball;
 import CoroAI.entity.c_EntityPlayerMPExt;
 
-public class AIInventory {
+public class AIFakePlayer {
 
 	//fake player
 	//item use cooldowns
 	
 	//handle food ticks, or make a food handling interface, but then who'd have the fakeplayer? rename this interface and manager to AIPlayer?
+	//- renamed, but make this class just handle inventory and food objects with the fake player
+	
+	//Design rules/experience
+	//- fake player does NOT like initializing on constructor, remember you have to watch and wait in tick for ...... a player instance to borrow off of?
+	
 	
 	//Main AI reference
 	public AIAgent ai;
@@ -40,6 +48,7 @@ public class AIInventory {
 	//Fake Player
 	public InventoryPlayer inventory;
     public c_EntityPlayerMPExt fakePlayer;
+    public NBTTagCompound cachedNBT;
 
     //Item
     public int slot_Melee = 0;
@@ -52,7 +61,7 @@ public class AIInventory {
 	public EntityTropicalFishHook fishEntity;
 	public float castingStrength = 1F;
     
-    public AIInventory(AIAgent parAI) {
+    public AIFakePlayer(AIAgent parAI) {
     	ai = parAI;
     	wantedItems = new ArrayList();
     }
@@ -72,9 +81,21 @@ public class AIInventory {
 		ai.jobMan.priJob.setJobItems();
 	}
     
+    public void postFakePlayerCreationInit() {
+    	ai.dbg(ai.ent.entityId + " - CALLED: postFakePlayerCreationInit()");
+    	inventory = fakePlayer.inventory;
+    	sync();
+    	if (cachedNBT != null) loadInPlayerData(cachedNBT);
+    }
+    
     public void updateTick() {
     	
-    	watchFakePlayerAndSync();
+    	if (ai.waitingToMakeFakePlayer) {
+    		if (watchFakePlayerAndSync()) {
+    			ai.waitingToMakeFakePlayer = false;
+    			postFakePlayerCreationInit();
+    		}
+    	}
     	
     	if (fakePlayer == null) return;
     	
@@ -84,59 +105,68 @@ public class AIInventory {
     	
     }
     
-    public void watchFakePlayerAndSync() {
+    public boolean watchFakePlayerAndSync() {
     	//if (!ai.ent.worldObj.isRemote) {
     		
+    		boolean success = false;
+    	
     		//if chunk doesnt exist on ai spawn, it cant make fakeplayer due to fake player constructor lookup up chunk and initializing endless ai load loop
     		if (fakePlayer == null) {
                 fakePlayer = newFakePlayer(ai.ent.worldObj);
             }
     		
-    		if (fakePlayer != null && fakePlayer.playerNetServerHandler == null) {
-	    		try {
-	            	//fakePlayer = newFakePlayer(worldObj);
-	            	
-	    			if (ai.ent.worldObj.playerEntities.size() > 0)
-	    	        {
-	    	            if (ai.ent.worldObj.playerEntities.get(0) instanceof EntityPlayerMP)
-	    	            {
-	    	                fakePlayer.playerNetServerHandler = ((EntityPlayerMP)ai.ent.worldObj.playerEntities.get(0)).playerNetServerHandler;
-	    	                fakePlayer.dimension = ((EntityPlayerMP)ai.ent.worldObj.playerEntities.get(0)).dimension;
-	    	            }
-	    	        }
-	    	        else
-	    	        {
-	    	            //System.out.println("fakeplayer has no netserverhandler, might behave oddly");
-	    	        }
-	            	
-	            	//System.out.println("DEBUG FIX 3: ");
-	                //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
-	                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + ai.ent.entityId;
-	                
-	                //if (fakePlayer != null) {
-                	inventory = fakePlayer.inventory;
-                	sync();
-                	
-            	    c_CoroAIUtil.playerToCompAILookup.put(fakePlayer.username, ai.entInt);
-                    
-	                //}
-	            } catch (Exception ex) {
-	            	ex.printStackTrace();
-	            	return;
-	            }
+    		if (fakePlayer != null) { 
+    			if(fakePlayer.playerNetServerHandler == null) {
+    		
+		    		try {
+		            	//fakePlayer = newFakePlayer(worldObj);
+		            	
+		    			if (ai.ent.worldObj.playerEntities.size() > 0)
+		    	        {
+		    	            if (ai.ent.worldObj.playerEntities.get(0) instanceof EntityPlayerMP)
+		    	            {
+		    	                fakePlayer.playerNetServerHandler = ((EntityPlayerMP)ai.ent.worldObj.playerEntities.get(0)).playerNetServerHandler;
+		    	                fakePlayer.dimension = ((EntityPlayerMP)ai.ent.worldObj.playerEntities.get(0)).dimension;
+		    	            }
+		    	        }
+		    	        else
+		    	        {
+		    	            //System.out.println("fakeplayer has no netserverhandler, might behave oddly");
+		    	        }
+		            	
+		            	//System.out.println("DEBUG FIX 3: ");
+		                //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
+		                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + ai.ent.entityId;
+		                
+		                //if (fakePlayer != null) {
+	                	
+	            	    c_CoroAIUtil.playerToCompAILookup.put(fakePlayer.username, ai.entInt);
+	            	    
+	            	    success = true;
+	                    
+		                //}
+		            } catch (Exception ex) {
+		            	ex.printStackTrace();
+		            	return false;
+		            }
+    			}
+    		} else {
+    			return false;
     		}
     	//}
     	
     	if (fakePlayer != null) {
 	    	if (fakePlayer.isDead) { 
-	    		ai.ent.health = 0;
+	    		c_CoroAIUtil.setHealth(ai.ent, 0);
 	    	} else {
-	    		if (fakePlayer.health > 0) {
+	    		if (fakePlayer.getHealth() > 0) {
 	    			ai.ent.deathTime = 0;
 	    			sync();
 	    		}
 	    	}
     	}
+    	
+    	return success;
     }
     
 	public void attackMelee(Entity ent, float dist) {
@@ -372,5 +402,64 @@ public class AIInventory {
         //mc.configManager.netManager
         //player.movementInput = new MovementInputFromOptions(mod_ZombieCraft.mc.gameSettings);
         return player;
+    }
+	
+	public void readEntityFromNBT(NBTTagCompound var1) {
+        //super.readEntityFromNBT(var1);
+		ai.dbg(ai.ent.entityId + " - CALLED: readEntityFromNBT()");
+        try {
+        	cachedNBT = var1;
+        } catch (Exception ex) { ex.printStackTrace(); }
+	}
+    
+    public void loadInPlayerData(NBTTagCompound var1) {
+    	ai.dbg(ai.ent.entityId + " - CALLED: loadInPlayerData()");
+    	if (fakePlayer != null) {
+	        NBTTagList var2 = var1.getTagList("Inventory");
+	        this.inventory.readFromNBT(var2);
+	        fakePlayer.dimension = var1.getInteger("Dimension");
+	        //setSleeping(var1.getBoolean("Sleeping"));
+	        //fakePlayer.sleepTimer = var1.getShort("SleepTimer");
+	        fakePlayer.experience = var1.getFloat("XpP");
+	        fakePlayer.experienceLevel = var1.getInteger("XpLevel");
+	        fakePlayer.experienceTotal = var1.getInteger("XpTotal");
+	
+	        /*if(getSleeping()) {
+	        	fakePlayer.playerLocation = new ChunkCoordinates(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ));
+	        	fakePlayer.wakeUpPlayer(true, true, false);
+	        }*/
+	
+	        /*if(var1.hasKey("SpawnX") && var1.hasKey("SpawnY") && var1.hasKey("SpawnZ")) {
+	        	fakePlayer.playerSpawnCoordinate = new ChunkCoordinates(var1.getInteger("SpawnX"), var1.getInteger("SpawnY"), var1.getInteger("SpawnZ"));
+	        }*/
+	
+	        fakePlayer.getFoodStats().readNBT(var1);
+	        fakePlayer.capabilities.readCapabilitiesFromNBT(var1);
+        }
+    }
+
+    public void writeEntityToNBT(NBTTagCompound var1) {
+    	ai.dbg(ai.ent.entityId + " - CALLED: writeEntityToNBT()");
+        //super.writeEntityToNBT(var1);
+        try {
+        	if (fakePlayer != null) {
+		        var1.setTag("Inventory", this.inventory.writeToNBT(new NBTTagList()));
+		        var1.setInteger("Dimension", fakePlayer.dimension);
+		        //var1.setBoolean("Sleeping", getSleeping());
+		        //par1NBTTagCompound.setShort("SleepTimer", (short)this.sleepTimer);
+		        var1.setFloat("XpP", fakePlayer.experience);
+		        var1.setInteger("XpLevel", fakePlayer.experienceLevel);
+		        var1.setInteger("XpTotal", fakePlayer.experienceTotal);
+		
+		        /*if(this.playerSpawnCoordinate != null) {
+		            var1.setInteger("SpawnX", this.playerSpawnCoordinate.posX);
+		            var1.setInteger("SpawnY", this.playerSpawnCoordinate.posY);
+		            var1.setInteger("SpawnZ", this.playerSpawnCoordinate.posZ);
+		        }*/
+		
+		        fakePlayer.getFoodStats().writeNBT(var1);
+		        fakePlayer.capabilities.writeCapabilitiesToNBT(var1);
+        	}
+        } catch (Exception ex) { ex.printStackTrace(); }
     }
 }

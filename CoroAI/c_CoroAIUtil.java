@@ -1,4 +1,7 @@
-package net.minecraft.src;
+package CoroAI;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -14,30 +17,25 @@ import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.src.ModLoader;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.FoodStats;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-
-import CoroAI.PFQueue;
-import CoroAI.PathEntityEx;
-import CoroAI.componentAI.AIInventory;
+import CoroAI.componentAI.AIFakePlayer;
 import CoroAI.componentAI.ICoroAI;
 import CoroAI.entity.c_EnhAI;
 import CoroAI.entity.c_PlayerProxy;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 public class c_CoroAIUtil {
 	
 	public static String refl_mcp_Item_maxStackSize = "maxStackSize";
-	public static String refl_c_Item_maxStackSize = "ck";
-    public static String refl_s_Item_maxStackSize = "ck";
+	public static String refl_c_Item_maxStackSize = "cq";
+    public static String refl_s_Item_maxStackSize = "cq";
 	public static String refl_mcp_Item_moveSpeed = "moveSpeed";
-	public static String refl_obf_Item_moveSpeed = "bH";
+	public static String refl_obf_Item_moveSpeed = "bI";
 	
 	public static String refl_mcp_EntityPlayer_itemInUse = "itemInUse";
 	public static String refl_c_EntityPlayer_itemInUse = "f";
@@ -52,36 +50,46 @@ public class c_CoroAIUtil {
 	public static String refl_thrower_mcp = "thrower";
 	public static String refl_thrower_obf = "g";
 	
-	@SideOnly(Side.CLIENT)
-	public static Minecraft mc;
+	public static String refl_loadedChunks_mcp = "loadedChunks";
+	public static String refl_loadedChunks_obf = "g";
 	
-	//Tropicraft reflection
-	public static boolean hasTropicraft = true; //try reflection once
-	public static String tcE = "net.tropicraft.entities.";
-	public static String[] koaEnemyWhitelist = {"EntityVMonkey", "EntityTropicalFish", "EntityEIH", "EntityTropicraftWaterMob", "EntityTropiCreeper", "EntityAmphibian"};
-	public static Item fishingRodTropical;
-	public static Item swordZircon;
-	public static Item leafBall;
+	public static String refl_curBlockDamageMP_mcp = "curBlockDamageMP";
+	public static String refl_curBlockDamageMP_obf = "g";
+	
+	
+	
+	public static boolean checkforMCP = true;
+	public static boolean runningMCP = true;
 	
 	public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
 	public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();
 	
+	//Tropicraft reflection
+	public static boolean hasTropicraft = true; //try reflection once
+	public static String tcE = "tropicraft.entities.";
+	//public static String[] koaEnemyWhitelist = {"EntityVMonkey", "EntityTropicalFish", "EntityEIH", "EntityTropicraftWaterMob", "EntityTropiCreeper", "EntityAmphibian"};
+	public static String[] koaEnemyWhitelist = {""};
+	public static Item fishingRodTropical;
+	public static Item dagger;
+	public static Item leafBall;
+	
+	
 	public c_CoroAIUtil() {
-		
+		//wut
 	}
 	
     public static boolean koaEnemy(Entity ent) {
     	try {
     		if (hasTropicraft) {
-	    		for (String entStr : koaEnemyWhitelist) {
+	    		/*for (String entStr : koaEnemyWhitelist) {
 	    			if (Class.forName(tcE + entStr).isInstance(ent)) {
 	    				return false;
 	    			}
-	    		}
+	    		}*/
     		}
     	} catch (Exception ex) {
     		hasTropicraft = false;
-    		//ex.printStackTrace();
+    		ex.printStackTrace();
     	}
     	return true;
     }
@@ -97,16 +105,6 @@ public class c_CoroAIUtil {
 		}
     	return false;
     }
-	
-	@SideOnly(Side.CLIENT)
-	public static void watchWorldObj() {
-		if (mc != null) {
-			if (mc.theWorld != PFQueue.worldMap) {
-	    		System.out.print("PFQueue detecting new world, updating...");
-	    		PFQueue.worldMap = mc.theWorld;
-	    	}
-		} else mc = ModLoader.getMinecraftInstance();
-	}
 	
 	public static boolean isNoPathBlock(Entity ent, int id, int meta) {
 		if (ent instanceof EntityPlayer) {
@@ -153,7 +151,7 @@ public class c_CoroAIUtil {
 	public static Field tryGetField(Class theClass, String obf, String mcp) {
 		Field field = null;
 		try {
-			field = theClass.getDeclaredField(obf);
+			field = theClass.getDeclaredField(ObfuscationReflectionHelper.remapFieldNames(theClass.getName(), new String[] { obf })[0]);
 			field.setAccessible(true);
 		} catch (Exception ex) {
 			try {
@@ -164,25 +162,72 @@ public class c_CoroAIUtil {
 		return field;
 	}
 	
+	public static void check() {
+		checkforMCP = false;
+		try {
+			//runningMCP = Class.forName("net.minecraft.world.World") != null;
+			runningMCP = getPrivateValue(Vec3.class, Vec3.fakePool, "fakePool") != null;
+		} catch (Exception e) {
+			runningMCP = false;
+			System.out.println("CoroAI: 'fakePool' field not found, mcp mode disabled");
+		}
+	}
+	
 	public static void setPrivateValueBoth(Class var0, Object var1, String obf, String mcp, Object var3) {
+		if (checkforMCP) check();
     	try {
-            try {
-                setPrivateValue(var0, var1, obf, var3);
-            } catch (NoSuchFieldException ex) {
-                setPrivateValue(var0, var1, mcp, var3);
-            }
+    		
+    		if (!runningMCP) {
+                //setPrivateValue(var0, var1, obf, var3);
+            	ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
+    		} else {
+    			setPrivateValue(var0, var1, mcp, var3);
+    		}
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
-    
-    public static Object getPrivateValueBoth(Class var0, Object var1, String obf, String mcp) {
+	
+	public static Object getPrivateValueSRGMCP(Class var0, Object var1, String srg, String mcp) {
+    	if (checkforMCP) check();
     	try {
-            try {
+    		
+    		if (!runningMCP) {
+                //setPrivateValue(var0, var1, obf, var3);
+    			return getPrivateValue(var0, var1, srg);
+            	//ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
+    		} else {
+    			return getPrivateValue(var0, var1, mcp);
+    			//setPrivateValue(var0, var1, mcp, var3);
+    		}
+            /*try {
                 return getPrivateValue(var0, var1, obf);
             } catch (NoSuchFieldException ex) {
                 return getPrivateValue(var0, var1, mcp);
-            }
+            }*/
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static Object getPrivateValueBoth(Class var0, Object var1, String obf, String mcp) {
+    	if (checkforMCP) check();
+    	try {
+    		
+    		if (!runningMCP) {
+                //setPrivateValue(var0, var1, obf, var3);
+    			return ObfuscationReflectionHelper.getPrivateValue(var0, var1, obf);
+            	//ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
+    		} else {
+    			return getPrivateValue(var0, var1, mcp);
+    			//setPrivateValue(var0, var1, mcp, var3);
+    		}
+            /*try {
+                return getPrivateValue(var0, var1, obf);
+            } catch (NoSuchFieldException ex) {
+                return getPrivateValue(var0, var1, mcp);
+            }*/
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -317,8 +362,8 @@ public class c_CoroAIUtil {
     public static void setItems_JobHunt(c_PlayerProxy ent) {
     	//System.out.println("setItems_JobHunt broken");
     	//Melee slot
-    	getTropiItemRefl("swordZircon", swordZircon);
-    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+    	getTropiItemRefl("dagger", dagger);
+    	if (dagger != null) ent.inventory.addItemStackToInventory(new ItemStack(dagger, 1));
 		//Ranged slot
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
@@ -334,8 +379,8 @@ public class c_CoroAIUtil {
     public static void setItems_JobTrade(c_PlayerProxy ent) {
     	//System.out.println("setItems_JobHunt broken");
     	//Melee slot
-    	getTropiItemRefl("swordZircon", swordZircon);
-    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+    	getTropiItemRefl("dagger", dagger);
+    	if (dagger != null) ent.inventory.addItemStackToInventory(new ItemStack(dagger, 1));
 		//Ranged slot
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
@@ -348,11 +393,11 @@ public class c_CoroAIUtil {
 		ent.wantedItems.add(Item.chickenCooked.itemID);
     }
     
-    public static void setItems_JobHunt(AIInventory ent) {
+    public static void setItems_JobHunt(AIFakePlayer ent) {
     	//System.out.println("setItems_JobHunt broken");
     	//Melee slot
-    	getTropiItemRefl("swordZircon", swordZircon);
-    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+    	getTropiItemRefl("swordZircon", dagger);
+    	if (dagger != null) ent.inventory.addItemStackToInventory(new ItemStack(dagger, 1));
 		//Ranged slot
     	getTropiItemRefl("leafBall", leafBall);
     	if (leafBall != null) ent.inventory.addItemStackToInventory(new ItemStack(leafBall, 1));
@@ -370,7 +415,7 @@ public class c_CoroAIUtil {
     	try {
     		if (hasTropicraft) {
     			if (cache == null) {
-	    			Class clazz = Class.forName("net.tropicraft.mods.TropicraftMod");
+	    			Class clazz = Class.forName("tropicraft.items.TropicraftItems");
 	    			
 	    			if (clazz != null) {
 	    				cache = (Item)getPrivateValue(clazz, clazz, fieldName);
@@ -444,8 +489,8 @@ public class c_CoroAIUtil {
     }
     
     public static void setItems_JobFish(c_PlayerProxy ent) {
-    	getTropiItemRefl("swordZircon", swordZircon);
-    	if (swordZircon != null) ent.inventory.addItemStackToInventory(new ItemStack(swordZircon, 1));
+    	getTropiItemRefl("dagger", dagger);
+    	if (dagger != null) ent.inventory.addItemStackToInventory(new ItemStack(dagger, 1));
 		//Ranged slot
     	getTropiItemRefl("fishingRodTropical", fishingRodTropical);
     	if (fishingRodTropical != null) ent.inventory.addItemStackToInventory(new ItemStack(fishingRodTropical, 1));
@@ -481,13 +526,36 @@ public class c_CoroAIUtil {
     	newPath = true;
     }
     
+    public static c_EnhAI getEntByPersistantID(World world, int id) {
+		try {
+			for (int i = 0; i < world.loadedEntityList.size(); i++) {
+				Entity ent = (Entity)world.loadedEntityList.get(i);
+				if (ent instanceof c_EnhAI) {
+					if (((c_EnhAI) ent).entID == id) {
+						return (c_EnhAI)ent;
+					}
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+    
     public static int getAge(EntityLiving ent) { return ent.entityAge; }
     public static void addAge(EntityLiving ent, int offsetAge) { ent.entityAge += offsetAge; }
     public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
     public static float getMoveSpeed(EntityLiving ent) { return ent.moveSpeed; }
+    public static void setMoveSpeed(EntityLiving ent, float speed) { ent.moveSpeed = speed; }
     public static void setHealth(EntityLiving ent, int health) { ent.health = health; }
     public static void jump(EntityLiving ent) { ent.jump(); }
-    public static boolean chunkExists(World world, int x, int z) { return world.chunkExists(x, z); }
+    public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5
+    
     public static ChunkCoordinates entToCoord(Entity ent) { return new ChunkCoordinates((int)ent.posX, (int)ent.posY, (int)ent.posZ); }
+    public static double getDistance(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
+    public static double getDistanceXZ(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
+    public static double getDistanceXZ(ChunkCoordinates coords, ChunkCoordinates coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), ent.worldObj.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
+    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(world.getWorldVec3Pool().getVecFromPool(posX, posY, posZ), world.getWorldVec3Pool().getVecFromPool(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLiving ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

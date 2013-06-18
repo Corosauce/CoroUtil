@@ -11,7 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
@@ -28,6 +27,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import CoroAI.Behaviors;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
+import CoroAI.c_CoroAIUtil;
 import CoroAI.c_IEnhAI;
 
 public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
@@ -208,7 +208,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	@Override
 	public boolean interact(EntityPlayer var1) {
-    	return job.getPrimaryJobClass().interact(var1);
+    	return (job != null & job.getPrimaryJobClass() != null) ? job.getPrimaryJobClass().interact(var1) : false;
+		//return job.getPrimaryJobClass().interact(var1);
     }
 	
 	public void alertHunters(Entity target) {
@@ -1246,7 +1247,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	                if(!var5.isDead && var5 instanceof EntityItem) {
 	                	EntityItem ent = (EntityItem)var5;
-	                	if (wantedItems.contains(ent.func_92014_d().getItem().itemID)) {
+	                	if (wantedItems.contains(ent.getEntityItem().getItem().itemID)) {
 		                	if (this.canEntityBeSeen(var5)) {
 		                		//if (this.team == 1) {
 		                		if (!var5.isInsideOfMaterial(Material.water)) {
@@ -1325,7 +1326,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	        //var1.setInteger("occupation", job.getJob().ordinal());
 	        var1.setInteger("primaryOccupation", job.priJob.ordinal());
 	        
-	        var1.setInteger("tradeTimeout", job.getJobClass().tradeTimeout);
+	        if (job.getJobClass() != null) var1.setInteger("tradeTimeout", job.getJobClass().tradeTimeout);
 	        
 	        if (oldName != null && oldName != "") name = oldName;
 	        if (name != null) var1.setString("name", name);

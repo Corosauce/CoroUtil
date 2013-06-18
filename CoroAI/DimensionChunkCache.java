@@ -8,7 +8,6 @@ import net.minecraft.block.BlockHalfSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3Pool;
@@ -63,7 +62,19 @@ public class DimensionChunkCache implements IBlockAccess
 	    	int maxZ = 0;
 	    	
 	    	if (useLoadedChunks) {
-	    		ArrayList chunks = (ArrayList)c_CoroAIUtil.getPrivateValueBoth(ChunkProviderServer.class, world.getChunkProvider(), "g", "loadedChunks");
+	    		
+	    		ArrayList chunks = null;
+	    		
+	    		try {
+	    			chunks = (ArrayList)c_CoroAIUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "field_73245_g");
+	    		} catch (Exception ex) {
+	    			try {
+	    				chunks = (ArrayList)c_CoroAIUtil.getPrivateValueBoth(ChunkProviderServer.class, world.getChunkProvider(), c_CoroAIUtil.refl_loadedChunks_obf, c_CoroAIUtil.refl_loadedChunks_mcp);
+	    			} catch (Exception ex2) {
+	    				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
+	    			}
+	    		}
+	    		
 	    		
 	    		for (int i = 0; i < chunks.size(); i++) {
 	    			Chunk chunk = (Chunk) chunks.get(i);
@@ -283,7 +294,7 @@ public class DimensionChunkCache implements IBlockAccess
             {
                 var5 = this.getBlockId(par1, par2, par3);
 
-                if (var5 == Block.stoneSingleSlab.blockID || var5 == Block.woodSingleSlab.blockID || var5 == Block.tilledField.blockID || var5 == Block.stairCompactPlanks.blockID || var5 == Block.stairCompactCobblestone.blockID)
+                if (var5 == Block.stoneSingleSlab.blockID || var5 == Block.woodSingleSlab.blockID || var5 == Block.tilledField.blockID || var5 == Block.stairsWoodOak.blockID || var5 == Block.stairsCobblestone.blockID)
                 {
                     var6 = this.getLightValueExt(par1, par2 + 1, par3, false);
                     int var7 = this.getLightValueExt(par1 + 1, par2, par3, false);
@@ -553,10 +564,10 @@ public class DimensionChunkCache implements IBlockAccess
     /**
      * Is this block powering in the specified direction Args: x, y, z, direction
      */
-    public boolean isBlockProvidingPowerTo(int par1, int par2, int par3, int par4)
+    public int isBlockProvidingPowerTo(int par1, int par2, int par3, int par4)
     {
-        int var5 = this.getBlockId(par1, par2, par3);
-        return var5 == 0 ? false : Block.blocksList[var5].isProvidingStrongPower(this, par1, par2, par3, par4);
+        int i1 = this.getBlockId(par1, par2, par3);
+        return i1 == 0 ? 0 : Block.blocksList[i1].isProvidingStrongPower(this, par1, par2, par3, par4);
     }
 
 }

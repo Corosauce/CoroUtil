@@ -9,7 +9,7 @@ public abstract interface ICoroAI
 {
 	public AIAgent getAIAgent();
 	
-	public void setPathToEntity(PathEntity pathentity);
+	public void setPathResultToEntity(PathEntity pathentity); //named this way to prevent mcp obfuscating it (matched a method signature)
 	//public PathEntity getPath();
 	public boolean isBreaking();
 	public boolean isEnemy(Entity ent);

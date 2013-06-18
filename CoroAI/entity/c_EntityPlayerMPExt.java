@@ -5,10 +5,11 @@ import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
+
+import CoroAI.c_CoroAIUtil;
 
 public class c_EntityPlayerMPExt extends EntityPlayerMP
 {

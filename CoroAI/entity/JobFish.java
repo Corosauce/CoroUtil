@@ -1,9 +1,9 @@
 package CoroAI.entity;
 
 import net.minecraft.item.Item;
-import net.minecraft.src.c_CoroAIUtil;
 
 import CoroAI.PathEntityEx;
+import CoroAI.c_CoroAIUtil;
 
 public class JobFish extends JobBase {
 	

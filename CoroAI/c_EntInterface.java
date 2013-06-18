@@ -1,4 +1,4 @@
-package net.minecraft.src;
+package CoroAI;
 // Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
@@ -54,7 +54,7 @@ public class c_EntInterface extends EntityMob
 
         //System.out.println("DEBUG FIX 2: ");
         //player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_", new ItemInWorldManager(world));
-        if (worldObj.chunkExists((int)(posX / 16), (int)(posZ / 16))) {
+        if (worldObj.getChunkProvider().chunkExists((int)(posX / 16), (int)(posZ / 16))) {
         	player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_" + this.entityId, new ItemInWorldManager(world));
         	inventory = player.inventory;
         } else {
@@ -98,13 +98,13 @@ public class c_EntInterface extends EntityMob
 
     public boolean getSleeping()
     {
-        return this.fakePlayer.sleeping;
+        return this.fakePlayer.isPlayerSleeping();
     }
 
-    public void setSleeping(boolean h)
+    /*public void setSleeping(boolean h)
     {
         fakePlayer.sleeping = h;
-    }
+    }*/
 
     public void updateItemUse(ItemStack is, int val)
     {

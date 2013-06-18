@@ -17,13 +17,12 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.src.c_CoroAIUtil;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import CoroAI.componentAI.IAdvPF;
 import CoroAI.componentAI.ICoroAI;
 
 //import org.lwjgl.opengl.GL11;
@@ -49,8 +48,9 @@ public class PFQueue implements Runnable {
 
     public boolean foundEnd;
     public boolean canClimb = false;
-    public static boolean canUseLadder = false;
-    public static long dropSize = 4; //adjusted per queue request
+    public int maxClimbHeight = 30;
+    public boolean canUseLadder = true;
+    public long dropSize = 4; //adjusted per queue request
     
     //hmmmmmmm
     public EntityCreature entH = null;
@@ -60,9 +60,22 @@ public class PFQueue implements Runnable {
     
     //public boolean tryAgain = false;
     
-    public int lastQueueSize = 0;
+    public static int lastQueueSize = 0;
     public static long lastSuccessPFTime = 0;
     public static int lastChunkCacheCount = 0;
+    public long statsPerSecondLastReset = 0;
+    public int statsPerSecondPathSoFar = 0;
+    public int statsPerSecondPathSkippedSoFar = 0;
+    public int statsPerSecondNodeSoFar = 0;
+    public int statsPerSecondNodeMaxIterSoFar = 0;
+    public static int statsPerSecondPath = 0;
+    public static int statsPerSecondPathSkipped = 0;
+    public static int statsPerSecondNode = 0;
+    public static int statsPerSecondNodeMaxIter = 0;
+    
+    public static int pfDelayScale = 5;
+    public static int pfDelayMax = 500;
+    
     
     private static class PFQueueItem {
     	public int x;
@@ -147,9 +160,26 @@ public class PFQueue implements Runnable {
     	//System.out.print("!!");
     	//c_CoroAIUtil.watchWorldObj(); - depreciated, uses entity world obj for multi dimension use
     	maxRequestAge = 2000;
+    	
+    	boolean give1NodePathIfFail = false;
+    	
     	//l
     	
     	Random rand = new Random();
+    	
+    	//statsPerSecondLastReset = System.currentTimeMillis() / 10000;
+    	
+    	if (statsPerSecondLastReset < System.currentTimeMillis() / 10000) {
+    		statsPerSecondLastReset = System.currentTimeMillis() / 10000;
+    		statsPerSecondNode = statsPerSecondNodeSoFar;
+    		statsPerSecondPath = statsPerSecondPathSoFar;
+    		statsPerSecondPathSkipped = statsPerSecondPathSkippedSoFar;
+    		statsPerSecondNodeMaxIter = statsPerSecondNodeMaxIterSoFar;
+    		statsPerSecondNodeSoFar = 0;
+    		statsPerSecondNodeMaxIterSoFar = 0;
+    		statsPerSecondPathSoFar = 0;
+    		statsPerSecondPathSkippedSoFar = 0;
+    	}
     	
     	try {
 	    	Iterator it = pfDelays.entrySet().iterator();
@@ -158,6 +188,7 @@ public class PFQueue implements Runnable {
 	            //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	            long time = (Long)pairs.getValue();
 	            if (time < System.currentTimeMillis() - 30000) {
+	            	//System.out.println("ent " + pairs.getKey() + " removing, val: " + pairs.getValue());
 	    			pfDelays.remove(pairs.getKey());
 	    			
 	    		}
@@ -177,7 +208,7 @@ public class PFQueue implements Runnable {
 					//
 					lastQueueSize = queue.size();
 					//queue.clear();
-					if (queue.size() > 20 && System.currentTimeMillis() % 2000 == 0) {
+					if (queue.size() > 50 && System.currentTimeMillis() % 2000 == 0) {
 						System.out.println("PF Size: " + queue.size());
 					}
 					
@@ -189,6 +220,10 @@ public class PFQueue implements Runnable {
 			    			this.path.clearPath();
 			    	        this.pointMap.clearMap();
 			    	        foundEnd = false;
+			    	        canClimb = false;
+			    	        canUseLadder = true;
+			    	        
+			    	        statsPerSecondPathSoFar++;
 			    	        
 			    	        //System.out.println("PROCESS PF!");
 			    	        
@@ -210,6 +245,13 @@ public class PFQueue implements Runnable {
 					    	        	//Vanilla defaults
 					    	        	dropSize = 4;
 					    	        	canUseLadder = true;
+					    	        }
+					    	        
+					    	        
+					    	        if (queue.get(0).entSourceRef instanceof IAdvPF) {
+					    	        	canUseLadder = ((IAdvPF)queue.get(0).entSourceRef).canClimbLadders();
+					    	        	canClimb = ((IAdvPF)queue.get(0).entSourceRef).canClimbWalls();
+					    	        	dropSize = ((IAdvPF)queue.get(0).entSourceRef).getDropSize();
 					    	        }
 					    			
 					    	        cleanup(queue.get(0).entSourceRef);
@@ -300,10 +342,12 @@ public class PFQueue implements Runnable {
 						    				    	queue.add(job);*/
 						    			        }
 					    					} else {
-					    						PathPointEx points[] = new PathPointEx[1];
-				    					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-				    					        
-				    					        setPath(new PathEntityEx(points));
+					    						if (give1NodePathIfFail) {
+						    						PathPointEx points[] = new PathPointEx[1];
+					    					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+					    					        
+					    					        setPath(new PathEntityEx(points));
+					    						}
 				    					        
 					    						
 					    					}
@@ -317,13 +361,14 @@ public class PFQueue implements Runnable {
 				    	        }
 				    	       
 						} else {
-							
+							statsPerSecondPathSkippedSoFar++;
 							//System.out.println("PF Job aborted, too old: " + (System.currentTimeMillis() - queue.get(0).timeCreated));
-							
-							PathPointEx points[] = new PathPointEx[1];
-					        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
-							
-					        setPath(new PathEntityEx(points));
+							if (give1NodePathIfFail) {
+								PathPointEx points[] = new PathPointEx[1];
+						        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
+								
+						        setPath(new PathEntityEx(points));
+							}
 					        
 							/*if (queue.get(0).entSourceRef instanceof c_IEnhPF) {
 								
@@ -359,7 +404,10 @@ public class PFQueue implements Runnable {
 		if (processed || queue.size() == 0) {
 			try {
 				int sleep = 50-queue.size();
+				if (processed) sleep = 3;
 				if (sleep < 1) { sleep = 1; }
+				//System.out.println("sleep size: " + sleep);
+				
 				Thread.sleep(sleep);/*if (queue.size() < 20) { Thread.sleep(100); } else { Thread.sleep(10); }*/ } catch (Exception ex) {}
 		}
 		
@@ -378,7 +426,7 @@ public class PFQueue implements Runnable {
 			((c_IEnhPF)queue.get(0).entSourceRef).setPathExToEntity(pathEnt);
 		} else if (queue.get(0).entSourceRef instanceof ICoroAI) {
 			//
-			((ICoroAI)queue.get(0).entSourceRef).setPathToEntity(convertToPathEntity(pathEnt));
+			((ICoroAI)queue.get(0).entSourceRef).setPathResultToEntity(convertToPathEntity(pathEnt));
 		} else if (queue.get(0).entSourceRef instanceof EntityPlayer) {
 			c_CoroAIUtil.playerPathfindCallback(pathEnt);
 		} else if (queue.get(0).entSourceRef instanceof EntityCreeper) {
@@ -420,7 +468,8 @@ public class PFQueue implements Runnable {
     public static boolean getPath(Entity var1, Entity var2, float var3, int priority, IPFCallback parCallback) {
 		if(var1 != null && var2 != null) {
 			//(par2 - (double)(par1Entity.width / 2.0F)), MathHelper.floor_double(par4), MathHelper.floor_double(par6 - (double)(par1Entity.width / 2.0F))
-			return tryPath(var1, MathHelper.floor_double(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
+			//return tryPath(var1, MathHelper.floor_double(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
+			return tryPath(var1, (int)var2.posX, (int)(var2.boundingBox.minY), (int)(var2.posZ), var3, priority, parCallback);
 			
 		} else {
 			return false;
@@ -452,29 +501,9 @@ public class PFQueue implements Runnable {
 	
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority, IPFCallback parCallback, ChunkCoordinatesSize parCoordSize) {
     	
-    	//y += 10;
-    	
-    	//bugged? using source entity on ground check, then adjusting destination x y z? makes no sense
-    	if (false && !var1.onGround) {
-    		if (!var1.isInWater()) {
-    			while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { }    				
-    			y--;
-    			int id = var1.worldObj.getBlockId(x, y, z);
-    			if (id > 0 && Block.blocksList[id] != null && (Block.blocksList[id].blockMaterial == Material.water || Block.blocksList[id].blockMaterial == Material.circuits)) {
-    				y--;
-    			}
-    			//System.out.println("Y-1 ID: " + var1.worldObj.getBlockId(x, y-1, z));
-	    		/*if (var1 instanceof EntityTropicraftPlayerProxy) {
-	    			((EntityTropicraftPlayerProxy)var1).setPathExToEntity(null);
-	    		} else if (var1 instanceof EntityCreature) {
-	    			((EntityCreature)var1).setPathToEntity(null);
-	    		}
-	    		return false;*/
-    		} else {
-    			while (var1.worldObj.getBlockId(x, y, z) != 0) { y++; }
-    			y-=1;
-    			//System.out.println("water Y-1 ID: " + var1.worldObj.getBlockId(x, y-1, z));
-    		}
+    	//Adjust if in air, assumes they are gravity bound
+    	if (var1 != null && var1.worldObj.getBlockId(x, y-1, z) == 0) {
+    		while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { y--; }    				
     	}
     	
     	//Main instance check and initialization 
@@ -495,7 +524,11 @@ public class PFQueue implements Runnable {
     	
     	
     	if (pfDelays.containsKey(var1)) {
-    		long time = (Long)pfDelays.get(var1); 
+    		Object obj = pfDelays.get(var1);
+    		long time = 0;
+    		if (obj != null) {
+    			time = (Long)obj;
+    		}
     		//System.out.println(time);
     		if (time < System.currentTimeMillis()) {
     			pfDelays.put(var1, System.currentTimeMillis() + delay);
@@ -525,7 +558,7 @@ public class PFQueue implements Runnable {
 	    		job.dimensionID = parCoordSize.dimensionId;
 	    	}
 	    	try {
-		    	if (priority == 0) { queue.add(job); }
+		    	if (priority == 0) { queue.addLast(job); }
 		    	else if (priority == -1) { queue.addFirst(job); }
 		    	else {
 		    		//Basic fake
@@ -538,8 +571,9 @@ public class PFQueue implements Runnable {
 	    	} catch (Exception ex) { if (false/*mod_EntMover.masterDebug*/) System.out.println("pfqueue job aborted: " + ex); }
 	    	
 	    	//instance.manageQueue();
-	    	
-	    	//System.out.println("pathing, maxdist: " + var2);
+	    	if (var1 != null) {
+	    		//System.out.println("ent " + var1.entityId + " pathing, maxdist: " + var2);
+	    	}
 	    	
 	    	// IMPORTANT!!!!! //
 	    	// implement a per entity time delay, a hashmap of entity instance->int perhaps? clean it with isDead checks? its threaded!
@@ -684,7 +718,7 @@ public class PFQueue implements Runnable {
     		y++;
     	}
     	
-        return this.createEntityPathTo(var1, (double)((float)var2 + 0.5F), (double)((float)var3 + 0.5F), (double)((float)var4 + 0.5F), var5, y/*(int)(y - MathHelper.floor_double(var1.boundingBox.minY))*/);
+        return this.createEntityPathTo(var1, (double)((float)var2), (double)((float)var3), (double)((float)var4), var5, y/*(int)(y - MathHelper.floor_double(var1.boundingBox.minY))*/);
     }
 
     public PathEntityEx createEntityPathTo(Entity var1, double var2, double var4, double var6, float var8) {
@@ -716,7 +750,7 @@ public class PFQueue implements Runnable {
         }
         
         //simplify path is trimming out the node infront of the ladder, this is a temp fix, a proper fix might be an extra marker on a node that its a ladder node, and that it cant be 'simplified'
-        if (queue.get(0) == null || !queue.get(0).ladderInPath) var12 = simplifyPath(var12, var11);
+        //if (queue.get(0) == null || (!queue.get(0).ladderInPath && !queue.get(0).canClimb)) var12 = simplifyPath(var12, var11);
         //System.out.println("PF asasasSize: " + queue.size());
         return var12;
     }
@@ -733,6 +767,7 @@ public class PFQueue implements Runnable {
         int sleepCount = 0;
         
         while(!this.path.isPathEmpty() && lookCount++ < maxNodeIterations) {
+        	statsPerSecondNodeSoFar++;
         	try {
         		if (sleepCount++ > 100) {
         			Thread.sleep(1);
@@ -745,6 +780,7 @@ public class PFQueue implements Runnable {
             PathPointEx var7 = this.path.dequeue();
 
             if(var7.equals(var3)) {
+            	postPF(var1, var3, var7, lookCount);
                 return this.createEntityPath(var2, var3);
             }
 
@@ -773,18 +809,33 @@ public class PFQueue implements Runnable {
                 }
             }
         }
-
-        if (Math.abs(var3.xCoord - var6.xCoord) < 2 && Math.abs(var3.yCoord - var6.yCoord) < 2 && Math.abs(var3.zCoord - var6.zCoord) < 2) {
-            foundEnd = true;
-        }
         
-        //System.out.println("FE: " + foundEnd + " - LC: " + lookCount);
+        if (lookCount >= maxNodeIterations) {
+        	statsPerSecondNodeMaxIterSoFar++;
+        }
 
+        postPF(var1, var3, var6, lookCount);
+        
         if(var6 == var2) {
             return null;
         } else {
             return this.createEntityPath(var2, var6);
         }
+    }
+    
+    public void postPF(Entity ent, PathPointEx source, PathPointEx dest, int lookCount) {
+    	//MinecraftServer.getServer().getLogAgent().logInfo(info);
+    	//ClientTickHandler.displayMessage(info);
+    	
+        if (Math.abs(source.xCoord - dest.xCoord) < 2 && Math.abs(source.yCoord - dest.yCoord) < 2 && Math.abs(source.zCoord - dest.zCoord) < 2) {
+            foundEnd = true;
+        }
+        
+        //Dynamic delay depending on how much work previous path was
+        if (ent != null) pfDelays.put(ent, Math.min((long)(System.currentTimeMillis() + (lookCount * ((double)pfDelayScale / 10))), pfDelayMax));
+        
+        String info = String.valueOf(("FE: " + foundEnd + " - LC: " + lookCount));
+        //System.out.println(info);
     }
 
     private int findPathOptions(Entity var1, PathPointEx var2, PathPointEx var3, PathPointEx var4, float var5) {
@@ -840,7 +891,7 @@ public class PFQueue implements Runnable {
         }
 
         if (canUseLadder) {
-        	if (getBlockId(var2.xCoord, var2.yCoord, var2.zCoord) == Block.ladder.blockID) {
+        	if (getBlockId(var2.xCoord, var2.yCoord, var2.zCoord) != 0 && Block.blocksList[getBlockId(var2.xCoord, var2.yCoord, var2.zCoord)].isLadder(null, var2.xCoord, var2.yCoord, var2.zCoord)) {
         		if (queue.get(0) != null) queue.get(0).ladderInPath = true; //might conflict with non queue using requests
 		        PathPointEx vvar8 = this.getLadderPoint(var1, var2.xCoord, var2.yCoord, var2.zCoord + 1, var3, var7, var2.xCoord, var2.zCoord);
 		        PathPointEx vvar9 = this.getLadderPoint(var1, var2.xCoord - 1, var2.yCoord, var2.zCoord, var3, var7, var2.xCoord, var2.zCoord);
@@ -886,7 +937,7 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y + 1, z, var5)) == 0) && (getBlockId(origX, y + 1, origZ)) == Block.ladder.blockID) {
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y + 1, z, var5)) == 0) && (getBlockId(origX, y + 1, origZ) != 0 && Block.blocksList[getBlockId(origX, y + 1, origZ)].isLadder(var1.worldObj, origX, y, origZ))) {
                 var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5);
                 ++var8;
                 /*if(var8 >= 3) {
@@ -929,11 +980,11 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y, z, var5)) == 0) && (var10 = this.getVerticalOffset(var1, origX, y, origZ, var5)) == 1) {
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y, z, var5)) == 0) && (var10 = this.getVerticalOffset(var1, origX, y, origZ, var5)) == 1 && (var10 = this.getVerticalOffset(var1, origX, y+1, origZ, var5)) == 1) {
                 //;
                 ++var8;
 
-                if(var8 >= 30) {
+                if(var8 >= maxClimbHeight) {
                     return null;
                 }
 
@@ -962,6 +1013,16 @@ public class PFQueue implements Runnable {
         if(this.getVerticalOffset(var1, var2, var3, var4, var5) == 1) {
             var7 = this.openPoint(var2, var3, var4);
         }
+        
+        /*if (var7 != null && getBlockId(var7.xCoord, var7.yCoord, var7.zCoord) != 0 && Block.blocksList[getBlockId(var7.xCoord, var7.yCoord, var7.zCoord)].isLadder(null, var7.xCoord, var7.yCoord, var7.zCoord)) {
+        	System.out.println("hue");
+        	return var7;
+        }*/
+        
+        /*if (var7 != null && getBlockId(var7.xCoord, var7.yCoord+var6, var7.zCoord) != 0 && Block.blocksList[getBlockId(var7.xCoord, var7.yCoord+var6, var7.zCoord)].isLadder(null, var7.xCoord, var7.yCoord+var6, var7.zCoord)) {
+        	System.out.println("hue2");
+        	return var7;
+        }*/
 
         /*Block block = Block.blocksList[worldMap.getBlockId(var2, var3 + var6 - 1, var4)];
         if (var1 != null && block != null && block.isLadder(var1.worldObj, var2, var3 + var6 - 1, var4)) {
@@ -1030,10 +1091,14 @@ public class PFQueue implements Runnable {
                     int var9 = getBlockId(var6, var7, var8);
 
                     if(var9 > 0) {
-                        if(var9 != Block.doorSteel.blockID && var9 != Block.doorWood.blockID) {
+                        if(var9 != Block.doorIron.blockID && var9 != Block.doorWood.blockID) {
                             if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID || var9 == Block.cobblestoneWall.blockID) {
                                 return -2;
                             }
+                            
+                            /*if (var9 == Block.ladder.blockID) {
+                                System.out.println("ladder!");
+                            }*/
                             
                             Material var11 = Block.blocksList[var9].blockMaterial;
                             Block block = Block.blocksList[var9];
@@ -1060,15 +1125,13 @@ public class PFQueue implements Runnable {
                             	return -10;
                             }*/
                             
-                            /*if (var9 == Block.ladder.blockID) {
-                                return -1;
-                            }*/
+                            
                             
                             /*if (mod_PathingActivated.redMoonActive && entH != null && entH instanceof EntityZombie && entH.team != 1 && (var9 == Block.dirt.blockID || Block.blocksList[var9].blockMaterial == Material.wood || Block.blocksList[var9].blockMaterial == Material.glass)) {
                             	return 1;
                             }*/
                             
-                            if (var11 == Material.circuits) {
+                            if (var11 == Material.circuits || var11 == Material.snow || var11 == Material.plants) {
                             	return 1;
                             }
                             

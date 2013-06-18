@@ -1,11 +1,13 @@
 package CoroAI.entity;
 
+import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 
-import CoroAI.componentAI.AIInventory;
+import CoroAI.componentAI.AIFakePlayer;
 
 public class ItemTropicalFishingRod extends Item 
 {
@@ -15,6 +17,11 @@ public class ItemTropicalFishingRod extends Item
         this.setMaxDamage(64);
         this.setMaxStackSize(1);
     }
+    
+    @Override
+	public void registerIcons(IconRegister iconRegistry) {
+		this.itemIcon = Item.fishingRod.getIconFromDamage(0);
+	}
 
     public boolean isFull3D() {
         return true;
@@ -24,7 +31,7 @@ public class ItemTropicalFishingRod extends Item
         return true;
     }
     
-    public ItemStack onItemRightClick3(ItemStack var1, World var2, AIInventory var3, float speed) {
+    public ItemStack onItemRightClick3(ItemStack var1, World var2, AIFakePlayer var3, float speed) {
     	//System.out.println(System.currentTimeMillis() + " - try cast item, fishEntity:" + var3.fishEntity);
         if(var3.fishEntity != null) {
             int var4 = var3.fishEntity.catchFish();

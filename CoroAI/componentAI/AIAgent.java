@@ -1,31 +1,33 @@
 package CoroAI.componentAI;
 
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-
-import java.util.List;
-import java.util.Random;
-
 import CoroAI.PFQueue;
+import CoroAI.c_CoroAIUtil;
 import CoroAI.componentAI.jobSystem.JobManager;
 import CoroAI.entity.EnumActState;
 import CoroAI.entity.EnumJobState;
 import CoroAI.entity.EnumTeam;
+import CoroAI.formation.Formation;
 
 public class AIAgent {
 
 	//Main
 	public EntityLiving ent;
 	public ICoroAI entInt;
-	public AIInventory entInv;
+	public AIFakePlayer entInv;
 	public boolean useInv;
 	public JobManager jobMan;
+	public Formation activeFormation;
 	
 	//Path
 	public boolean pathAvailable; //marks that the callback fired
@@ -40,7 +42,7 @@ public class AIAgent {
 	//public int cooldown_Ranged;
 	public int curCooldown_Melee;
 	public int curCooldown_Ranged;
-	public float maxReach_Melee = 2;
+	public float maxReach_Melee = 1.5F;
 	public float maxReach_Ranged = 10;
 	
 	//Area scanning
@@ -56,13 +58,29 @@ public class AIAgent {
 	
 	//Other fields
 	public int maxPFRange = 64;
+	public int PFRangeClose = 12;
+	public int PFRangeFormation = 8;
+	public int PFRangePathing = 64;
+	
+	public float collideResistClose = 0.2F;
+	public float collideResistFormation = 0.5F;
+	public float collideResistPathing = 1F;
+	
 	public Random rand;
 	public int openedChest = 0;
 	public float oldMoveSpeed;
-	public float fleeSpeed;
+	public float fleeSpeed = 0.28F;
 	public float lungeFactor = 1.0F;
 	public int entID = -1;
 	public EnumActState currentAction;
+	public boolean shouldFixBadYPathing = true;
+	public boolean shouldPathfollow = true;
+	public boolean shouldHeal = true;
+	public int curCooldown_Heal;
+	public int cooldown_Heal = 60;
+	
+	public int moveLeadTicks = 10;
+	public float moveLeadFactorDist = 2F;
 	
 	//fields that should be moved to jobs?
 	public int homeX;
@@ -80,16 +98,28 @@ public class AIAgent {
 	public EnumTeam dipl_team = EnumTeam.HOSTILES;
 	public int dipl_spreadInfoDelay = 0;
 	
+	//NBT, Init and FakePlayer init helping fields
+	public boolean hasBeenSpawnedOrNBTInitialized = false; //true once first time spawn or nbt is loaded
+	public boolean waitingToMakeFakePlayer = false; //true once above is true, until successfull initialization of fake player is had
+	
+	public int lastMovementState = -1;
+	
 	public AIAgent(ICoroAI parEnt, boolean useInventory) {
 		ent = (EntityLiving)parEnt;
 		entInt = parEnt;
 		useInv = useInventory;
 		if (useInv) {
-			entInv = new AIInventory(this);
+			entInv = new AIFakePlayer(this);
 		}
 		jobMan = new JobManager(this);
 		rand = new Random();
 		setState(EnumActState.IDLE);
+	}
+	
+	public void spawnedOrNBTReloadedInit() {
+		dbg(ent.entityId + " - CALLED: spawnedOrNBTReloadedInit()"); 
+		hasBeenSpawnedOrNBTInitialized = true;
+		if (useInv) waitingToMakeFakePlayer = true;
 	}
 	
 	public boolean notPathing() {
@@ -107,12 +137,20 @@ public class AIAgent {
 	}
 	
 	public void setMoveSpeed(float var) {
-		ent.moveSpeed = var;
+		c_CoroAIUtil.setMoveSpeed(ent, var);
 		oldMoveSpeed = var;
 		/*if (!ent.worldObj.isRemote) {
 			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
 		}*/
 	}
+	
+	public void entityInit()
+    {
+        //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
+        //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
+        ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
+        //24 is used in baseentai
+    }
 	
 	public void updateAITasks() {
 		c_CoroAIUtil.addAge(ent, 1);
@@ -123,8 +161,37 @@ public class AIAgent {
         //this.func_48090_aM().func_48481_a();
         //this.targetTasks.onUpdateTasks();
         //this.tasks.onUpdateTasks();
-        checkPathfindLock();
-        ent.getNavigator().onUpdateNavigation();
+		lastMovementState = -1;
+        
+		if (useInv) entInv.updateTick();
+		
+        if (jobMan.getPrimaryJob() == null) return;
+        
+        if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickCloseCombat()) {
+        	lastMovementState = 0;
+        	maxPFRange = PFRangeClose;
+        	ent.entityCollisionReduction = collideResistClose;
+        	jobMan.getPrimaryJob().onTickCloseCombat();
+        } else if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leader != entInt) {
+        	lastMovementState = 1;
+        	maxPFRange = PFRangeFormation;
+        	ent.entityCollisionReduction = collideResistFormation;
+        	jobMan.getPrimaryJob().onTickFormation();
+        } else {
+        	lastMovementState = 2;
+        	maxPFRange = PFRangePathing;
+        	ent.entityCollisionReduction = collideResistPathing;
+        	if (shouldPathfollow) {
+        		checkPathfindLock();
+        		ent.getNavigator().onUpdateNavigation();
+        		
+        	}
+        }
+        
+        //System.out.println(ent.entityId + " state " + state);
+        
+        tickMovementHelp();
+        
         updateAI();
         //this.func_48097_s_();
         ent.getMoveHelper().onUpdateMoveHelper();
@@ -132,8 +199,9 @@ public class AIAgent {
         ent.getJumpHelper().doJump();
 	}
 	
-	public void doMovement() {
+	public void tickMovementHelp() {
 		
+		//if (true) return;
 		//fix for last node being too high
 		if (!ent.worldObj.isRemote) {
 			PathEntity pe = ent.getNavigator().getPath();
@@ -149,14 +217,8 @@ public class AIAgent {
 			}
 		}
 		
-		if (ent.isInWater()) {
-			//if (ent.jumpDelay == 0) {
-				if (entityToAttack != null) {
-					//faceEntity(entityToAttack,30F,30F);
-					//this.getMoveHelper().setMoveTo(entityToAttack.posX, entityToAttack.posY, entityToAttack.posZ, this.getMoveHelper().getSpeed());
-				}
-				//jump();
-				//this.jumpDelay = 30;
+		//this was breaking formations or something, see if we can live without it now?
+		if (ent.isInWater() && false) {
 				ent.motionY += 0.03D;
 				
 				//pathfollow fix
@@ -169,14 +231,8 @@ public class AIAgent {
 						if (index > pEnt.getCurrentPathLength()) index = pEnt.getCurrentPathLength()-1;
 						Vec3 var1 = null;
 						try {
-							//var1 = pEnt.getVectorFromIndex(this, index);
-							//var1 = pEnt.getVectorFromIndex(this, pEnt.getCurrentPathLength()-1);
-							//if (pEnt.getCurrentPathLength() > 2) {
-								var1 = pEnt.getVectorFromIndex(ent, pEnt.getCurrentPathIndex());
-							//}
+							var1 = pEnt.getVectorFromIndex(ent, pEnt.getCurrentPathIndex());
 						} catch (Exception ex) {
-							//System.out.println("c_EnhAI water pf err");
-							//ex.printStackTrace();
 							var1 = pEnt.getVectorFromIndex(ent, pEnt.getCurrentPathLength()-1);
 						}
 	
@@ -184,44 +240,83 @@ public class AIAgent {
 		                {
 		                	ent.getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, 0.53F);
 		                	double dist = ent.getDistance(var1.xCoord, var1.yCoord, var1.zCoord);
-		                	if (dist < 8) {
-		                		//System.out.println("dist to node: " + dist);
-		                		
-		                	}
-		                	if (dist < 2) {
+		                	if (dist < 3) {
 		                		ent.getNavigator().getPath().incrementPathIndex();
 		                	}
-		                    //
 		                }
 					}
 				}
 				
-				if (ent.isInWater()) {
-					if (!notPathing()) {
-						if (Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) > 0.001F && Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) < 0.5F) {
-							//ent.moveFlying(ent.moveStrafing, ent.moveForward, 0.04F);
-							//this.motionX *= 1.3F;
-							//this.motionZ *= 1.3F;
-						}
+				if (!ent.getNavigator().noPath()) {
+					if (Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) > 0.001F && Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) < 0.5F) {
+						//ent.moveFlying(ent.moveStrafing, ent.moveForward, 0.04F);
+						//this.motionX *= 1.3F;
+						//this.motionZ *= 1.3F;
 					}
-					
 				}
-			//}
 		}
+		
+		if (shouldFixBadYPathing) fixBadYPathing();
+	}
+	
+	public void fixBadYPathing() {
+		if (ent.getNavigator().getPath() != null) {
+			PathEntity pEnt = ent.getNavigator().getPath();
+			int index = pEnt.getCurrentPathIndex();
+			//index--;
+			if (index < 0) index = 0;
+			if (index >= pEnt.getCurrentPathLength()) index = pEnt.getCurrentPathLength()-1;
+			Vec3 var1 = null;
+			try {
+				var1 = pEnt.getVectorFromIndex(ent, index);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				System.out.println("errrrrrrrrrrrrrrr");
+				var1 = pEnt.getVectorFromIndex(ent, pEnt.getCurrentPathLength()-1);
+			}
+
+            if (var1 != null)
+            {
+            	//fast water pathing
+            	//this.getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, 0.53F);
+            	double dist = ent.getDistance(var1.xCoord, ent.boundingBox.minY, var1.zCoord);
+            	//System.out.println(dist);
+            	if (dist <= 0.5F) {
+            		ent.getNavigator().getPath().incrementPathIndex();
+            	}
+            }
+		}
+	}
+	
+	public void updateHealing() {
+		if (curCooldown_Heal > 0) curCooldown_Heal--;
+		if (curCooldown_Heal <= 0) {
+			curCooldown_Heal = cooldown_Heal;
+			heal(1);
+		}
+	}
+	
+	public void heal(int val) {
+		ent.heal(val);
+		if (useInv) entInv.sync();
 	}
 	
 	public void updateAI() {
 		
-		if (useInv) entInv.updateTick();
+		
+		
+		if (jobMan.getPrimaryJob() == null) return;
 		
 		if (curCooldown_Melee > 0) { curCooldown_Melee--; }
         if (curCooldown_Ranged > 0) { curCooldown_Ranged--; }
         //if (curCooldown_FireGun > 0) { curCooldown_FireGun--; }
         //if (curCooldown_Reload > 0) { curCooldown_Reload--; }
+		
+        //Formation cleanup
+        if (activeFormation != null && activeFormation.listEntities.size() == 0) {
+        	activeFormation = null;
+        }
         
-		
-		doMovement();
-		
 		if (entityToAttack != null && entityToAttack.isEntityAlive()) {
 			float var2 = this.entityToAttack.getDistanceToEntity(ent);
             if (ent.canEntityBeSeen(this.entityToAttack))
@@ -232,25 +327,25 @@ public class AIAgent {
 			entityToAttack = null;
 		}
 		
+		if (shouldHeal) updateHealing();
+		
 		dangerLevel = 0;
 		if (checkSurroundings() == 1) dangerLevel = 1;
 		if (checkHealth()) dangerLevel = 2;
 		jobMan.getPrimaryJob().checkHunger();
-		
-		
 		
 		//Safety overrides
 		fleeing = false;
 		//Safe
 		if (dangerLevel == 0) {
 			jobMan.tick();
-			ent.moveSpeed = oldMoveSpeed;
+			c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			
 		//Enemy detected? (by alert system?)
 		} else if (dangerLevel == 1) {
 			//no change for now
 			jobMan.tick();
-			ent.moveSpeed = oldMoveSpeed;
+			c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			
 		//Low health, avoid death
 		} else if (dangerLevel == 2) {
@@ -260,7 +355,7 @@ public class AIAgent {
 				fleeing = false;
 				//no danger in area, try to continue job
 				jobMan.tick();
-				ent.moveSpeed = oldMoveSpeed;
+				c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			} else {
 				fleeing = true;
 				jobMan.getPrimaryJob().onLowHealth();
@@ -278,8 +373,7 @@ public class AIAgent {
 				}*/
 				
 				
-				
-				ent.moveSpeed = fleeSpeed;
+				c_CoroAIUtil.setMoveSpeed(ent, fleeSpeed);
 			}
 		}
 		
@@ -334,7 +428,7 @@ public class AIAgent {
 	        for(int j = 0; j < list.size(); j++)
 	        {
 	            Entity entity1 = (Entity)list.get(j);
-	            if(entInt.isEnemy(entity1))
+	            if(jobMan.getPrimaryJob().isEnemy(entity1))
 	            {
 	            	if ((ent).canEntityBeSeen(entity1)) {
 	            		float dist = ent.getDistanceToEntity(entity1);
@@ -422,6 +516,8 @@ public class AIAgent {
 	
 	public void checkPathfindLock() {
 		if (pathAvailable) {
+			//ent.getMoveHelper().setMoveTo(0, 0, 0, 0);
+			ent.getNavigator().clearPathEntity();
 			ent.getNavigator().setPath(pathToEntity, c_CoroAIUtil.getMoveSpeed(ent));
 			pathAvailable = false;
 			pathRequested = false;
@@ -439,6 +535,10 @@ public class AIAgent {
         pathToEntity = pathentity;
         pathAvailable = true;
     }
+	
+	public void walkTo(Entity var1, ChunkCoordinates coords, float var2, int timeout) {
+		walkTo(var1, coords.posX, coords.posY, coords.posZ, var2, timeout, 0);
+	}
 	
 	public void walkTo(Entity var1, int x, int y, int z, float var2, int timeout) {
 		walkTo(var1, x, y, z, var2, timeout, 0);
@@ -472,12 +572,23 @@ public class AIAgent {
 		targZ = coords.posZ;
 	}
 	
-	public void huntTarget(Entity parEnt, int pri) {
-		pathRequested = true; //redundancy preventer
-		PFQueue.getPath(ent, parEnt, maxPFRange, pri);
-		//System.out.println("huntTarget call: " + ent);
+	public void setTarget(Entity parEnt) {
 		this.entityToAttack = parEnt;
+		if (jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leaderTarget == null && parEnt instanceof EntityLiving) activeFormation.leaderTarget = (EntityLiving)parEnt;
 		setState(EnumActState.FIGHTING);
+	}
+	
+	public void huntTarget(Entity parEnt, int pri) {
+		//if (ent.isInWater() || !jobMan.getPrimaryJob().isInFormation() || activeFormation.leader == entInt) {
+		boolean isLeader = (jobMan.getPrimaryJob().isInFormation() && activeFormation.leader == entInt);
+		//if (isLeader) System.out.println("@!@!@!@");
+		if (lastMovementState == 2 || isLeader) {
+			pathRequested = true; //redundancy preventer
+			PFQueue.getPath(ent, parEnt, maxPFRange, pri);
+		}
+		
+		//System.out.println("huntTarget call: " + ent);
+		setTarget(parEnt);
 	}
 	
 	public void huntTarget(Entity parEnt) {
@@ -518,13 +629,30 @@ public class AIAgent {
         return f + f3;
     }
 	
-	public MovingObjectPosition rayTrace(double reachDist, float yOffset)
+	public MovingObjectPosition rayTrace(double reachDist, float yOffset, Vec3 randLook)
     {
 		float partialTick = 1F;
 		
         Vec3 var4 = ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY+yOffset, ent.posZ);
         Vec3 var5 = ent.getLook(partialTick);
+        if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
         return ent.worldObj.rayTraceBlocks(var4, var6);
     }
+	
+	public boolean isInFormation() {
+		return jobMan.getPrimaryJob().isInFormation();
+	}
+	
+	public void readEntityFromNBT(NBTTagCompound var1) {
+		if (useInv) this.entInv.readEntityFromNBT(var1);
+	}
+	
+	public void writeEntityToNBT(NBTTagCompound var1) {
+		if (useInv) this.entInv.writeEntityToNBT(var1);
+	}
+	
+	public void dbg(Object obj) {
+		System.out.println(obj);
+	}
 }

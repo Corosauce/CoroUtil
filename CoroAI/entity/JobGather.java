@@ -2,7 +2,6 @@ package CoroAI.entity;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.tileentity.TileEntityChest;
 
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.List;
 
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
+import CoroAI.c_CoroAIUtil;
 
 public class JobGather extends JobBase {
 	
@@ -228,7 +228,7 @@ public class JobGather extends JobBase {
 		if (id != 0) {
 			Block.blocksList[id].harvestBlock(ent.worldObj, ent.fakePlayer, ent.targX, ent.targY, ent.targZ, meta);
 			ir.mine();
-			ent.worldObj.setBlockAndMetadataWithNotify(ent.targX, ent.targY, ent.targZ, 0, 0);
+			ent.worldObj.setBlock(ent.targX, ent.targY, ent.targZ, 0, 0, 2);
 			miningTimeout = 10;
 		} else {
 			ir.mine();

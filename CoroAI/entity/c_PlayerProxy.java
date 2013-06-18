@@ -32,8 +32,6 @@ import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.c_CoroAIUtil;
-import net.minecraft.src.c_EntInterface;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumMovingObjectType;
@@ -51,6 +49,8 @@ import java.util.List;
 import CoroAI.Behaviors;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
+import CoroAI.c_CoroAIUtil;
+import CoroAI.c_EntInterface;
 import CoroAI.c_IEnhPF;
 
 public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
@@ -150,7 +150,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         //inventory.addItemStackToInventory(new ItemStack(Item.swordDiamond, 1));
         //inventory.addItemStackToInventory(new ItemStack(Item.bow, 1));
         //inventory.addItemStackToInventory(new ItemStack(Item.arrow, 32));
-        //wantedItems.add(Item.arrow.shiftedIndex);
+        //wantedItems.add(Item.arrow.itemID);
         
         
         //use canClimb() instead
@@ -273,7 +273,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 							fakePlayer.getFoodStats().addStats(food);
 						}
 						
-						c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, "f", "itemInUseCount", inUseCount);
+						c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_c_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, inUseCount);
 						
 						isCharging = false;
 						//fakePlayer.stopUsingItem();
@@ -309,7 +309,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             if(inventory.mainInventory[j] != null && isFood(inventory.mainInventory[j]))
             {
             	//inventory.consumeInventoryItem(j);
-            	//setCurrentItem(mod_tropicraft.fishingRodTropical.shiftedIndex);
+            	//setCurrentItem(mod_tropicraft.fishingRodTropical.itemID);
             	this.setCurrentSlot(j);
         		rightClickItem();
             	//health = fakePlayer.health;
@@ -567,7 +567,8 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
                 {
                 	updateItemUse(itemstack, 5);
                 }
-                c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, "f", "itemInUseCount", fakePlayer.getItemInUseCount()-1);
+                c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_c_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, fakePlayer.getItemInUseCount()-1);
+                
                 if (fakePlayer.getItemInUseCount() == 0 && !worldObj.isRemote)
                 {
                 	onItemUseFinish();
@@ -918,10 +919,10 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
               return false;
            } else if(/*id != 0 && */id != Block.ladder.blockID/* || var3.canBlockBePlacedAt(this.blockID, var4, var5, var6, false, var7)*/) {
               Block var9 = Block.blocksList[this.blockID];
-              if(var3.setBlockAndMetadataWithNotify(var4, var5, var6, this.blockID, 5)) {
+              if(var3.setBlock(var4, var5, var6, this.blockID, 5, 2)) {
                  if(var3.getBlockId(var4, var5, var6) == this.blockID) {
                     //Block.blocksList[this.blockID].onBlockPlaced(var3, var4, var5, var6, var7);
-                    Block.blocksList[this.blockID].onBlockPlacedBy(var3, var4, var5, var6, var2);
+                    Block.blocksList[this.blockID].onBlockPlacedBy(var3, var4, var5, var6, var2, var1);
                  }
 
                  //var3.playSoundEffect((double)((float)var4 + 0.5F), (double)((float)var5 + 0.5F), (double)((float)var6 + 0.5F), var9.stepSound.stepSoundDir(), (var9.stepSound.getVolume() + 1.0F) / 2.0F, var9.stepSound.getPitch() * 0.8F);
@@ -989,7 +990,13 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	        ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
 			DataOutputStream dos = new DataOutputStream(bos);
 			
+			
+			
 			ItemStack is = this.getCurrentEquippedItem();
+			
+			if (inventory.currentItem == 0) {
+				int sdasdasd = 0;
+			}
 			
 			try {
 				dos.writeInt(this.entityId);
@@ -1540,7 +1547,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	        NBTTagList var2 = var1.getTagList("Inventory");
 	        this.inventory.readFromNBT(var2);
 	        fakePlayer.dimension = var1.getInteger("Dimension");
-	        setSleeping(var1.getBoolean("Sleeping"));
+	        //setSleeping(var1.getBoolean("Sleeping"));
 	        //fakePlayer.sleepTimer = var1.getShort("SleepTimer");
 	        fakePlayer.experience = var1.getFloat("XpP");
 	        fakePlayer.experienceLevel = var1.getInteger("XpLevel");

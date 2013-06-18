@@ -344,6 +344,8 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             this.motionY *= (double)var25;
             this.motionZ *= (double)var25;
             this.setPosition(this.posX, this.posY, this.posZ);
+            
+            //motionY = 0F;
          }
       }
    }

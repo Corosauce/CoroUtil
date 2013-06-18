@@ -1,7 +1,6 @@
 package CoroAI;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.src.c_CoroAIUtil;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
@@ -81,7 +80,9 @@ public class Persister {
 		            }
 		            for (int var2 = 0; var2 < list.size(); ++var2)
 		            {
-		                ((IWorldAccess)list.get(var2)).releaseEntitySkin(ent);
+		            	//OFF FOR MC 1.5 REFACTOR!!!
+		            	System.out.println("OFF FOR MC 1.5 REFACTOR!!!");
+		                //((IWorldAccess)list.get(var2)).releaseEntitySkin(ent);
 		            }
 		            //worldRef.releaseEntitySkin(ent);
 		            worldRef.loadedEntityList.remove(ent);

@@ -9,7 +9,6 @@ import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.src.c_CoroAIUtil;
 
 import java.util.HashMap;
 import java.util.List;
