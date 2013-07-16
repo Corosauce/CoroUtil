@@ -53,6 +53,11 @@ public class ServerTickHandler implements ITickHandler
     	
     	if (lastWorld != DimensionManager.getWorld(0)) {
     		lastWorld = DimensionManager.getWorld(0);
+    		
+    		World worlds[] = DimensionManager.getWorlds();
+    		for (int i = 0; i < worlds.length; i++) {
+    			worlds[i].addWorldAccess(new CoroAIWorldAccess());
+    		}
     	}
     	
     	if (formationManager != null) formationManager.tickUpdate();

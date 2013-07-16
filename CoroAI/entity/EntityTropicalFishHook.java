@@ -1,5 +1,7 @@
 package CoroAI.entity;
 
+import java.util.List;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -13,8 +15,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.List;
+import CoroAI.componentAI.ICoroAI;
 
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
@@ -32,7 +33,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    private int inTile = 0;
    public boolean inGround = false;
    public int shake = 0;
-   public EntityLiving angler;			//sexay
+   public EntityLiving angler;
    private int ticksInGround;
    private int ticksInAir = 0;
    public int ticksCatchable = 0;
@@ -67,6 +68,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    @Override
    public void setDead()
    {
+	   
 	   if (!inGround) {
 		   AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, this.boundingBox.minY, this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.maxY, this.boundingBox.maxZ);
            if(!this.worldObj.isAABBInMaterial(var18, Material.water)) {
@@ -84,6 +86,8 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
       this.angler = var2;
       if (var2 instanceof c_PlayerProxy) {
     	  ((c_PlayerProxy)this.angler).fishEntity = this;
+      } else if (var2 instanceof ICoroAI && ((ICoroAI)var2).getAIAgent().useInv) {
+    	  ((ICoroAI)var2).getAIAgent().entInv.fishEntity = this;
       }
       this.setSize(0.25F, 0.25F);
       this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.yOffset, var2.posZ, var2.rotationYaw, var2.rotationPitch);
@@ -127,17 +131,23 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    public void onUpdate() {
       super.onUpdate();
       
-      if (angler == null) { setDead(); return; }
+      if (!worldObj.isRemote && angler == null) { setDead(); return; }
+      
+      if (!worldObj.isRemote && this.angler != null && this.angler.isDead) {
+		  this.setDead();
+	  }
       
       if (angler instanceof c_PlayerProxy) {
-    	  if (this.angler.isDead) {
-    		  this.setDead();
-    	  }
+    	  
 	     	if (((c_PlayerProxy)this.angler).fishEntity != this) {
 	     		//System.out.println(System.currentTimeMillis() + " - no owner, fishEntity:" + ((c_PlayerProxy)this.angler).fishEntity);
 	     		this.setDead();
 	     	}
-      }
+      }/* else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent().useInv) {
+    	  ((ICoroAI)angler).getAIAgent().entInv.fishEntity = this;
+      }*/
+      
+      
       
       if(this.field_6149_an > 0) {
          double var21 = this.posX + (this.field_6148_ao - this.posX) / (double)this.field_6149_an;
@@ -159,16 +169,20 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          this.setPosition(var21, var22, var23);
          this.setRotation(this.rotationYaw, this.rotationPitch);
       } else {
-         if(this.worldObj.isRemote) {
+         if(!this.worldObj.isRemote) {
         	 
             ItemStack var1 = null;
             if (angler instanceof c_PlayerProxy) {
             	var1 = ((c_PlayerProxy)this.angler).getCurrentEquippedItem();
+            } else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+            	var1 = ((ICoroAI)angler).getAIAgent().entInv.getCurrentEquippedItem();
             }
             if(this.angler.isDead || !this.angler.isEntityAlive() || var1 == null/* || var1.getItem() != Item.fishingRod*/ || this.getDistanceSqToEntity(this.angler) > 1024.0D) {
                this.setDead();
                if (angler instanceof c_PlayerProxy) {
-               	((c_PlayerProxy)this.angler).fishEntity = null;
+            	   ((c_PlayerProxy)this.angler).fishEntity = null;
+               } else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+             	  ((ICoroAI)angler).getAIAgent().entInv.fishEntity = null;
                }
                //this.angler.fishEntity = null;
                return;
@@ -227,7 +241,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          double var13;
          for(int var8 = 0; var8 < var5.size(); ++var8) {
             Entity var9 = (Entity)var5.get(var8);
-            if(var9.canBeCollidedWith() && !(var9 instanceof c_PlayerProxy) && (var9 != this.angler || this.ticksInAir >= 10)) {
+            if(var9.canBeCollidedWith() && !(var9 instanceof c_PlayerProxy) && !(var9 instanceof ICoroAI) && (var9 != this.angler || this.ticksInAir >= 10)) {
                float var10 = 0.3F;
                AxisAlignedBB var11 = var9.boundingBox.expand((double)var10, (double)var10, (double)var10);
                MovingObjectPosition var12 = var11.calculateIntercept(var20, var2);
@@ -292,7 +306,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                double var16 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
                AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, var14, this.boundingBox.minZ, this.boundingBox.maxX, var16, this.boundingBox.maxZ);
                if(this.worldObj.isAABBInMaterial(var18, Material.water)) {
-                  var26 += 1.0D / (double)var27;
+                  var26 += 0.6D / (double)var27;
+               } else {
+            	   //if (ticksExisted > 20) var26 -= 0.5D;
                }
             }
 
@@ -369,6 +385,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    }
 
    public int catchFish() {
+	   
+	  //System.out.println("catchFish() called - " + angler);
+	   
       byte var1 = 0;
       if(this.bobber != null) {
          double var2 = this.angler.posX - this.posX;
@@ -402,7 +421,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
       this.setDead();
       if (angler instanceof c_PlayerProxy) {
       	((c_PlayerProxy)this.angler).fishEntity = null;
-      }
+      } else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+     	  ((ICoroAI)angler).getAIAgent().entInv.fishEntity = null;
+       }
       return var1;
    }
 
@@ -424,7 +445,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 			angler = (EntityLiving)ent;
 			if (angler instanceof c_PlayerProxy) {
 		    	  ((c_PlayerProxy)this.angler).fishEntity = this;
-		      }
+			} else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+				((ICoroAI)angler).getAIAgent().entInv.fishEntity = this;
+            }
 		}
 		// TODO Auto-generated method stub
 		

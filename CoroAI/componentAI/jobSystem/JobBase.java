@@ -11,6 +11,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -26,6 +27,7 @@ import CoroAI.componentAI.ICoroAI;
 import CoroAI.entity.EnumActState;
 import CoroAI.entity.EnumJob;
 import CoroAI.entity.EnumJobState;
+import CoroAI.util.CoroUtilInventory;
 
 public class JobBase {
 	
@@ -42,7 +44,8 @@ public class JobBase {
 	public int walkingTimeout;
 	
 	public int fleeDelay = 0;
-	public boolean dontStray = false;
+	public boolean dontStrayFromHome = false;
+	public boolean dontStrayFromOwner = true;
 	
 	public double targPrevPosX;
 	public double targPrevPosY;
@@ -64,6 +67,15 @@ public class JobBase {
 		setJobState(EnumJobState.IDLE);
 	}
 	
+	public void cleanup() {
+		tamable.cleanup();
+		tamable = null;
+		entInt = null;
+		ent = null;
+		ai = null;
+		jm = null;
+	}
+	
 	public void setJobState(EnumJobState ekos) {
 		state = ekos;
 		//System.out.println("jobState: " + occupationState);
@@ -83,7 +95,58 @@ public class JobBase {
 		return true;
 	}
 	
+	public void onTickChestScan() {
+		if (ai.scanForHomeChest && ent.worldObj.getWorldTime() % 100 == 0) {
+			if (!CoroUtilInventory.isChest(ent.worldObj.getBlockId(ai.homeX, ai.homeY, ai.homeZ))) {
+				//System.out.println("scanning for chests or allies - " + ent);
+				ChunkCoordinates tryCoords = getChestNearby();
+				if (tryCoords != null) {
+					//System.out.println("discovered a chest to call home! - " + ent);
+					ai.homeX = tryCoords.posX;
+					ai.homeY = tryCoords.posY;
+					ai.homeZ = tryCoords.posZ;
+				} else {
+					int range = 30;
+					List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+			        for(int j = 0; j < list.size(); j++)
+			        {
+			            Entity entity1 = (Entity)list.get(j);
+			            
+			            if (entity1 instanceof ICoroAI) {
+			            	if (CoroUtilInventory.isChest(ent.worldObj.getBlockId(((ICoroAI) entity1).getAIAgent().homeX, ((ICoroAI) entity1).getAIAgent().homeY, ((ICoroAI) entity1).getAIAgent().homeZ))) {
+			            		ai.homeX = ((ICoroAI) entity1).getAIAgent().homeX;
+			            		ai.homeY = ((ICoroAI) entity1).getAIAgent().homeY;
+			            		ai.homeZ = ((ICoroAI) entity1).getAIAgent().homeZ;
+			            		//System.out.println("discovered a friend with a chest to call home! - " + ent);
+			            		return;
+			            	}
+			            }
+			        }
+				}
+			}
+		}
+	}
+	
+	public ChunkCoordinates getChestNearby() {
+		
+		int range = 30;
+		
+		for (int xx = (int)Math.floor(ent.posX - range/2); xx < ent.posX + range/2; xx++) {
+			for (int yy = (int)Math.floor(ent.posY - 2); yy < ent.posY + 2; yy++) {
+				for (int zz = (int)Math.floor(-ent.posZ - range/2); zz < ent.posZ + range/2; zz++) {
+					int id = ent.worldObj.getBlockId(xx, yy, zz);
+					
+					if (CoroUtilInventory.isChest(id)) {
+						return new ChunkCoordinates(xx, yy, zz);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
 	public void onLowHealth() {
+		if (hitAndRunDelay > 0) hitAndRunDelay--;
 		PathEntity pe = ent.getNavigator().getPath();
 		
 		if (pe != null && !pe.isFinished()) {
@@ -120,14 +183,14 @@ public class JobBase {
 		
 		//System.out.println("TEMP OFF FOR REFACTOR");
 		
-		/*if (isInFormation() && ai.activeFormation.leader != entInt) {
+		if (isInFormation() && ai.activeFormation.leader != entInt) {
 			return;
-		}*/
+		}
 		
 		//slaughter entitycreature ai update function and put idle wander invoking code here
         if(((ent.getNavigator().noPath()) && ai.rand.nextInt(40) == 0))
         {
-        	if (!dontStray) {
+        	if (!dontStrayFromHome) {
         		ai.updateWanderPath();
         	} else {
         	//System.out.println("home dist: " + ent.getDistance(ent.homeX, ent.homeY, ent.homeZ));
@@ -145,7 +208,7 @@ public class JobBase {
         	}
         } else {
         	if (ent.getNavigator().noPath()) {
-    			if (ai.useInv) lookForItems();
+    			if (ai.useInv && ai.entInv.shouldLookForPickups) lookForItems();
         	}
         }
 	}
@@ -153,6 +216,7 @@ public class JobBase {
 	public long itemLookDelay;
 	public int itemSearchRange;
     public void lookForItems() {
+    	
     	itemSearchRange = 10;
     	if (itemLookDelay < System.currentTimeMillis()) {
     		itemLookDelay = System.currentTimeMillis() + 500;
@@ -206,11 +270,13 @@ public class JobBase {
 		return false;
 	}
 	
-	public void koaTrade(EntityPlayer ep) {
-		
+	/* return false to cancel processing */
+	public boolean hookHit(DamageSource ds, int damage) {
+		return true;
 	}
 	
-	public boolean hitHook(DamageSource ds, int damage) {
+	/* return false to cancel processing */
+	public boolean hookInteract(EntityPlayer par1EntityPlayer) {
 		return true;
 	}
 	
@@ -234,6 +300,17 @@ public class JobBase {
 				//}
 			}
 			//try heal
+		}
+		return false;
+	}
+	
+	public boolean checkDangers() {
+		return checkHealth();
+	}
+	
+	public boolean checkHealth() {
+		if (ent.getHealth() < ent.getMaxHealth() * 0.75) {
+			return true;
 		}
 		return false;
 	}
@@ -412,7 +489,7 @@ public class JobBase {
 		int scanSize = 64;
 		
 		int tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
-		int tryY = ((int)ent.posY) - 1;
+		int tryY = ((int)ent.posY) + 5;
 		int tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
 		
 		//System.out.println(this.worldObj.getBlockId(tryX, tryY, tryZ));
@@ -701,7 +778,7 @@ public class JobBase {
 		vecZ = ent.posZ - (ai.entityToAttack.posZ + ((ai.entityToAttack.posZ - targPrevPosZ) * leadTicks));*/
 		//ent.getMoveHelper().setMoveTo(vecX, vecY, vecZ, speed);
 		
-		if (isMovementSafe()) {
+		if (ent.getDistanceToEntity(ai.entityToAttack) <= 3D || isMovementSafe()) {
 			
 			//ent.getNavigator().clearPathEntity();
 			ent.getMoveHelper().setMoveTo(ai.entityToAttack.posX + vecX, ai.entityToAttack.posY, ai.entityToAttack.posZ + vecZ, speed);
@@ -742,18 +819,23 @@ public class JobBase {
 	}
 	
 	public boolean isMovementSafe() {
-		boolean safe = true;
-		
-		Entity center = ent;
-		double adjAngle = 0D;
-		double dist = 1D;
-		
+
 		double distStart = 0.5D;
 		double distEnd = 2D;
 		double distStep = 0.5D;
 		
 		double lookStartStop = 90D;
 		double lookStep = 90D;
+		
+		return isMovementSafe(true, true, true, distStart, distEnd, distStep, lookStartStop, lookStep);
+	}
+	
+	public boolean isMovementSafe(boolean checkThreats, boolean checkDrops, boolean checkWalls, double distStart, double distEnd, double distStep, double lookStartStop, double lookStep) {
+		boolean safe = true;
+		
+		Entity center = ent;
+		double adjAngle;
+		double dist;
 		
 		for (double lookAheadDist = distStart; lookAheadDist <= distEnd; lookAheadDist += distStep) {
 			for (adjAngle = -lookStartStop - lookStep; adjAngle <= lookStartStop; adjAngle += lookStep) {
@@ -771,26 +853,32 @@ public class JobBase {
 				yy = (int)(posY - 0.5D);
 				int zz = (int)posZ;
 				
-				int lookAheadIDDrop0 = ent.worldObj.getBlockId(xx, yy+1, zz);
-				int lookAheadIDDrop = ent.worldObj.getBlockId(xx, yy, zz);
-				int lookAheadIDCollide = ent.worldObj.getBlockId(xx, legsAheadY, zz);
-				int lookAheadIDCollideTooHigh = ent.worldObj.getBlockId(xx, headAheadY, zz);
-				
-				
-				
-				if (ent.onGround && ((lookAheadIDDrop == 0 || Block.blocksList[lookAheadIDDrop].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop].blockMaterial == Material.water || */Block.blocksList[lookAheadIDDrop].blockMaterial == Material.cactus) || 
-						(lookAheadIDDrop0 != 0 && (Block.blocksList[lookAheadIDDrop0].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop0].blockMaterial == Material.water || */Block.blocksList[lookAheadIDDrop0].blockMaterial == Material.cactus)))) {
-					safe = false;
-					//System.out.println("drop alert!");
-					break;
-				} else if (ent.onGround && (lookAheadIDCollide != 0 && (Block.blocksList[lookAheadIDCollide].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDCollide].blockMaterial == Material.water || */Block.blocksList[lookAheadIDCollide].blockMaterial == Material.cactus))) {
-					safe = false;
-					//System.out.println("front alert!");
-					break;
+				if (checkThreats) {
+					int lookAheadIDDrop = ent.worldObj.getBlockId(xx, yy, zz);
+					int lookAheadIDCollide = ent.worldObj.getBlockId(xx, legsAheadY, zz);
+					if (ent.onGround && ((lookAheadIDDrop == 0 || Block.blocksList[lookAheadIDDrop].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop].blockMaterial == Material.water || */Block.blocksList[lookAheadIDDrop].blockMaterial == Material.cactus) || 
+							(lookAheadIDCollide != 0 && (Block.blocksList[lookAheadIDCollide].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop0].blockMaterial == Material.water || */Block.blocksList[lookAheadIDCollide].blockMaterial == Material.cactus)))) {
+						safe = false;
+						//System.out.println("drop alert!");
+						break;
+					} else if (ent.onGround && (lookAheadIDCollide != 0 && (Block.blocksList[lookAheadIDCollide].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDCollide].blockMaterial == Material.water || */Block.blocksList[lookAheadIDCollide].blockMaterial == Material.cactus))) {
+						safe = false;
+						//System.out.println("front alert!");
+						break;
+					}
 				}
 				
-				if (adjAngle == 0 && lookAheadDist == 0.5D) {
-					
+				if (checkDrops) {
+					int lookAheadIDDrop0 = ent.worldObj.getBlockId(xx, yy, zz);
+					int lookAheadIDDrop1 = ent.worldObj.getBlockId(xx, yy-1, zz);
+					if (lookAheadIDDrop0 == 0 && lookAheadIDDrop1 == 0) {
+						safe = false;
+						break;
+					}
+				}
+				
+				if (checkWalls/* && adjAngle == 0 && lookAheadDist == 0.5D*/) {
+					int lookAheadIDCollideTooHigh = ent.worldObj.getBlockId(xx, headAheadY, zz);
 					//System.out.println("id " + lookAheadIDCollideTooHigh + " - " + xx + ", " + headAheadY + ", " + zz);
 					//System.out.println(center.rotationYaw);
 					//System.out.println("X-: " + Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
@@ -822,6 +910,54 @@ public class JobBase {
 		return safe;
 	}
 	
+	public boolean isFacingWater(double distStart, double distEnd, double distStep, double lookStartStop, double lookStep) {
+		Entity center = ent;
+		double adjAngle;
+		double dist;
+		
+		for (double lookAheadDist = distStart; lookAheadDist <= distEnd; lookAheadDist += distStep) {
+			for (adjAngle = -lookStartStop - lookStep; adjAngle <= lookStartStop; adjAngle += lookStep) {
+				dist = lookAheadDist;
+				
+				double posX = (center.posX - Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
+				double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+				double posZ = (center.posZ + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
+				
+				int xx = (int)posX;
+				int yy = (int)(posY - 0.5D);
+				int groundAheadY = yy;
+				int legsAheadY = yy+1;
+				int headAheadY = yy+2;
+				yy = (int)(posY - 0.5D);
+				int zz = (int)posZ;
+				
+				int lookAheadIDDrop0 = ent.worldObj.getBlockId(xx, yy, zz);
+				
+				if (isWater(lookAheadIDDrop0)) return true;
+				
+				if (lookAheadIDDrop0 == 0) {
+					int scanDownY = yy - 1;
+					for (int tries = 0; tries < 8; tries++) {
+						int tryID = ent.worldObj.getBlockId(xx, scanDownY--, zz);
+						if (tryID != 0) {
+							if (isWater(tryID)) {
+								return true;
+							} else {
+								return false;
+							}
+						}
+					}
+				}
+				
+			}
+		}
+		return false;
+	}
+	
+	public boolean isWater(int id) {
+		return id != 0 && Block.blocksList[id].blockMaterial == Material.water;
+	}
+	
 	// Job shared functions //
 	
 	public void setPathToEntity(PathEntity pathentity)
@@ -834,6 +970,6 @@ public class JobBase {
 	}
 	
 	public boolean canJoinFormations() {
-		return true;
+		return ai.canJoinFormations;
 	}
 }

@@ -21,4 +21,7 @@ public abstract interface ICoroAI
 	public void attackMelee(Entity ent, float dist);
 	public void attackRanged(Entity ent, float dist);
 	
+	/* Required to cleanup memory usage, set your agent reference to null */
+	public void cleanup();
+	
 }

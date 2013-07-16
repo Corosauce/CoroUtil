@@ -5,18 +5,23 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import CoroAI.PFQueue;
 import CoroAI.c_CoroAIUtil;
 import CoroAI.componentAI.jobSystem.JobManager;
+import CoroAI.diplomacy.TeamInstance;
+import CoroAI.diplomacy.TeamTypes;
 import CoroAI.entity.EnumActState;
 import CoroAI.entity.EnumJobState;
-import CoroAI.entity.EnumTeam;
 import CoroAI.formation.Formation;
 
 public class AIAgent {
@@ -38,12 +43,21 @@ public class AIAgent {
 	
 	//Attack
 	public Entity entityToAttack;
+	public Entity retaliateEntity;
+	public boolean retaliateEnable = true;
+	public int retaliateTicks = 0;
+	public int retaliateTicksMax = 400;
 	//public int cooldown_Melee;
 	//public int cooldown_Ranged;
 	public int curCooldown_Melee;
 	public int curCooldown_Ranged;
-	public float maxReach_Melee = 1.5F;
+	public float maxReach_Melee = 1.8F;
 	public float maxReach_Ranged = 10;
+	public boolean rangedInUse = false;
+	public boolean rangedAimWhileInUse = false;
+	public boolean meleeOverridesRangedInUse = true;
+	public boolean meleeUseRightClick = false;
+	public boolean canJoinFormations = false; //JobFormation sets this to true on its init when its used in the job list
 	
 	//Area scanning
 	public long checkAreaDelay;
@@ -51,25 +65,27 @@ public class AIAgent {
 	public int dangerLevel = 0;
 	public boolean fleeing = false;
 	public Entity lastFleeEnt;
+	public Vec3 lastSafeSpot;
+	public boolean wasInLava = false;
 	
 	//Proximity based vanilla AI enhancing
 	public boolean enhanceAIEnemies = false;
 	public int enhancedAIDelay = 100;
 	
 	//Other fields
-	public int maxPFRange = 64;
-	public int PFRangeClose = 12;
-	public int PFRangeFormation = 8;
-	public int PFRangePathing = 64;
+	public int maxPFRange = 32;
+	public int PFRangeClose = 22;
+	public int PFRangeFormation = 22;
+	public int PFRangePathing = 32;
 	
 	public float collideResistClose = 0.2F;
 	public float collideResistFormation = 0.5F;
-	public float collideResistPathing = 1F;
+	public float collideResistPathing = 0.8F;
 	
 	public Random rand;
 	public int openedChest = 0;
 	public float oldMoveSpeed;
-	public float fleeSpeed = 0.28F;
+	public float fleeSpeed = 0.33F;
 	public float lungeFactor = 1.0F;
 	public int entID = -1;
 	public EnumActState currentAction;
@@ -79,13 +95,17 @@ public class AIAgent {
 	public int curCooldown_Heal;
 	public int cooldown_Heal = 60;
 	
+	public int noMoveTicks = 0;
+	public Vec3 prevPos = null;
 	public int moveLeadTicks = 10;
 	public float moveLeadFactorDist = 2F;
+	public boolean shouldAvoid = true;
 	
 	//fields that should be moved to jobs?
 	public int homeX;
 	public int homeY;
 	public int homeZ;
+	public boolean scanForHomeChest = false;
 	public int targX;
 	public int targY;
 	public int targZ;
@@ -95,7 +115,7 @@ public class AIAgent {
 	
 	//Diplomatic fields
 	public boolean dipl_hostilePlayer = false;
-	public EnumTeam dipl_team = EnumTeam.HOSTILES;
+	public TeamInstance dipl_info = TeamTypes.getType("neutral");
 	public int dipl_spreadInfoDelay = 0;
 	
 	//NBT, Init and FakePlayer init helping fields
@@ -114,12 +134,28 @@ public class AIAgent {
 		jobMan = new JobManager(this);
 		rand = new Random();
 		setState(EnumActState.IDLE);
+
+		if (entID == -1) entID = rand.nextInt(999999999);
+	}
+	
+	public void setTeam(String parTeam) {
+		dipl_info = TeamTypes.getType(parTeam);
 	}
 	
 	public void spawnedOrNBTReloadedInit() {
 		dbg(ent.entityId + " - CALLED: spawnedOrNBTReloadedInit()"); 
 		hasBeenSpawnedOrNBTInitialized = true;
-		if (useInv) waitingToMakeFakePlayer = true;
+		if (useInv) {
+			waitingToMakeFakePlayer = true;
+		} else {
+			postFullInit();
+		}
+	}
+	
+	public void postFullInit() {
+		homeX = (int)Math.floor(ent.posX);
+		homeY = (int)Math.floor(ent.posY);
+		homeZ = (int)Math.floor(ent.posZ);
 	}
 	
 	public boolean notPathing() {
@@ -129,7 +165,6 @@ public class AIAgent {
 	
 	public void initJobs() {
 		if (useInv) entInv.initJobs();
-		if (entID == -1) entID = rand.nextInt(999999999);
 	}
 	
 	public void setState(EnumActState eka) {
@@ -148,9 +183,42 @@ public class AIAgent {
     {
         //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
+		
         ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
+        ent.getDataWatcher().addObject(23, new Integer(ent.getMaxHealth()));
+        ent.getDataWatcher().addObject(24, Integer.valueOf(0)); //AI state, used for stuff like sitting animation, etc
         //24 is used in baseentai
     }
+	
+	public int getDWonGround() {
+		return ent.getDataWatcher().getWatchableObjectInt(22);
+	}
+	
+	public int getDWHealth() {
+		return ent.getDataWatcher().getWatchableObjectInt(23);
+	}
+	
+	public EnumActState getDWStateAI() {
+		return EnumActState.get(ent.getDataWatcher().getWatchableObjectInt(24));
+	}
+	
+	public void onLivingUpdateTick() {
+		if (ent.worldObj.isRemote) {
+			if (ent.getDataWatcher().getWatchableObjectInt(22) == 1) {
+				ent.motionY = 0F;
+				ent.onGround = true;
+			} else {
+				ent.motionY = 0F;
+				ent.onGround = false;
+			}
+			ent.health = ent.getDataWatcher().getWatchableObjectInt(23);
+		} else {
+			ent.getDataWatcher().updateObject(22, Integer.valueOf(ent.onGround ? 1 : 0));
+			ent.getDataWatcher().updateObject(23, Integer.valueOf(ent.health));
+			ent.getDataWatcher().updateObject(24, Integer.valueOf(this.currentAction.ordinal()));
+		}
+		if (useInv) entInv.onLivingUpdateTick();
+	}
 	
 	public void updateAITasks() {
 		c_CoroAIUtil.addAge(ent, 1);
@@ -172,7 +240,7 @@ public class AIAgent {
         	maxPFRange = PFRangeClose;
         	ent.entityCollisionReduction = collideResistClose;
         	jobMan.getPrimaryJob().onTickCloseCombat();
-        } else if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leader != entInt) {
+        } else if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leader != entInt && !((EntityLiving)activeFormation.leader).isInWater()) {
         	lastMovementState = 1;
         	maxPFRange = PFRangeFormation;
         	ent.entityCollisionReduction = collideResistFormation;
@@ -188,7 +256,12 @@ public class AIAgent {
         	}
         }
         
-        //System.out.println(ent.entityId + " state " + state);
+        /*if (ent instanceof EntityKoaShaman) {
+        	System.out.println(ent.entityId + " state " + lastMovementState);
+        }*/
+        //
+        
+        if (lastMovementState != 1) tickPathFollowHelp();
         
         tickMovementHelp();
         
@@ -199,27 +272,11 @@ public class AIAgent {
         ent.getJumpHelper().doJump();
 	}
 	
-	public void tickMovementHelp() {
-		
-		//if (true) return;
-		//fix for last node being too high
-		if (!ent.worldObj.isRemote) {
-			PathEntity pe = ent.getNavigator().getPath();
-			if (pe != null) {
-				if (pe.getCurrentPathLength() == 1) {
-					//if (job.priJob == EnumJob.TRADING) {
-						if (pe.getFinalPathPoint().yCoord - ent.posY > 0.01F) {
-							//System.out.println(pe.getFinalPathPoint().yCoord - ent.posY);
-							ent.getNavigator().clearPathEntity();
-						}
-					//}
-				}
-			}
-		}
+	public void tickPathFollowHelp() {
 		
 		//this was breaking formations or something, see if we can live without it now?
-		if (ent.isInWater() && false) {
-				ent.motionY += 0.03D;
+		//- moved to its own method, only run when path following, might help? might bring back endless water loop, find out
+		if (ent.isInWater()) {
 				
 				//pathfollow fix
 				if (true) {
@@ -248,18 +305,89 @@ public class AIAgent {
 				}
 				
 				if (!ent.getNavigator().noPath()) {
-					if (Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) > 0.001F && Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) < 0.5F) {
-						//ent.moveFlying(ent.moveStrafing, ent.moveForward, 0.04F);
-						//this.motionX *= 1.3F;
-						//this.motionZ *= 1.3F;
-					}
+					
 				}
 		}
+		
+		//No movement on x z
+		if (!ent.getNavigator().noPath()) {
+			Vec3 curPos = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+			if (prevPos == null) {
+				prevPos = curPos;
+			} else {
+				//make y not count
+				prevPos = Vec3.createVectorHelper(prevPos.xCoord, ent.posY, prevPos.zCoord);
+			}
+			
+			if (curPos.distanceTo(prevPos) < 0.01) {
+				noMoveTicks++;
+			} else {
+				noMoveTicks = 0;
+			}
+			
+			if (noMoveTicks > 60) {
+				//System.out.println("noMoveTicks path reset!");
+				ent.getNavigator().clearPathEntity();
+				noMoveTicks = 0;
+			}
+		
+			prevPos = curPos;
+		}
+		
+	}
+	
+	public void tickMovementHelp() {
+
+		if (ent.isInWater()) {
+			ent.motionY += 0.03D;
+			
+			if (Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) > 0.001F && Math.sqrt(ent.motionX * ent.motionX + ent.motionZ * ent.motionZ) < 0.2F) {
+				//ent.moveFlying(ent.moveStrafing, ent.moveForward, 0.04F);
+				ent.motionX *= 1.2F;
+				ent.motionZ *= 1.2F;
+			}
+			
+		} else if (ent.handleLavaMovement()) {
+			ent.motionY += 0.07D;
+			float speed = 1.2F;
+			if (lastSafeSpot != null) {
+				ent.getMoveHelper().setMoveTo(lastSafeSpot.xCoord, lastSafeSpot.yCoord, lastSafeSpot.zCoord, speed);
+			} else {
+				if (jobMan.getPrimaryJob().tamable.isTame() && jobMan.getPrimaryJob().tamable.ownerCachedInstance != null) {
+					ent.getMoveHelper().setMoveTo(jobMan.getPrimaryJob().tamable.ownerCachedInstance.posX, jobMan.getPrimaryJob().tamable.ownerCachedInstance.posY, jobMan.getPrimaryJob().tamable.ownerCachedInstance.posZ, speed);
+				}
+			}
+			wasInLava = true;
+		}
+		
+		if (wasInLava && !ent.handleLavaMovement()) {
+			wasInLava = false;
+			ent.extinguish();
+		}
+		
+		//if (true) return;
+		//fix for last node being too high
+		if (!ent.worldObj.isRemote) {
+			PathEntity pe = ent.getNavigator().getPath();
+			if (pe != null) {
+				if (pe.getCurrentPathLength() == 1) {
+					//if (job.priJob == EnumJob.TRADING) {
+						if (pe.getFinalPathPoint().yCoord - ent.posY > 0.01F) {
+							//System.out.println("tickMovementHelp:" + (pe.getFinalPathPoint().yCoord - ent.posY));
+							ent.getNavigator().clearPathEntity();
+						}
+					//}
+				}
+			}
+		}
+		
+		if (ent.onGround && ent.getNavigator().noPath()) lastSafeSpot = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
 		
 		if (shouldFixBadYPathing) fixBadYPathing();
 	}
 	
 	public void fixBadYPathing() {
+		
 		if (ent.getNavigator().getPath() != null) {
 			PathEntity pEnt = ent.getNavigator().getPath();
 			int index = pEnt.getCurrentPathIndex();
@@ -298,6 +426,7 @@ public class AIAgent {
 	
 	public void heal(int val) {
 		ent.heal(val);
+		//dbg("healing, new health: " + ent.getHealth());
 		if (useInv) entInv.sync();
 	}
 	
@@ -307,31 +436,59 @@ public class AIAgent {
 		
 		if (jobMan.getPrimaryJob() == null) return;
 		
-		if (curCooldown_Melee > 0) { curCooldown_Melee--; }
-        if (curCooldown_Ranged > 0) { curCooldown_Ranged--; }
+		if (curCooldown_Melee > 0) curCooldown_Melee--;
+        if (curCooldown_Ranged > 0) curCooldown_Ranged--;
+        
         //if (curCooldown_FireGun > 0) { curCooldown_FireGun--; }
         //if (curCooldown_Reload > 0) { curCooldown_Reload--; }
 		
+        jobMan.getPrimaryJob().onTickChestScan();
+        
         //Formation cleanup
         if (activeFormation != null && activeFormation.listEntities.size() == 0) {
         	activeFormation = null;
         }
         
-		if (entityToAttack != null && entityToAttack.isEntityAlive()) {
+        //Remove retaliate target on tick 0 if it is not a natural enemy
+        if (retaliateTicks > 0) {
+        	retaliateTicks--;
+        	if (retaliateTicks == 0 && retaliateEntity != null) {
+        		if (retaliateEntity == entityToAttack && !entInt.isEnemy(retaliateEntity)) {
+        			entityToAttack = null;
+        			retaliateEntity = null;
+        		}
+        	}
+        }
+        
+        if (entityToAttack != null && entityToAttack.isEntityAlive()) {
 			float var2 = this.entityToAttack.getDistanceToEntity(ent);
             if (ent.canEntityBeSeen(this.entityToAttack))
             {
             	attackEntity(this.entityToAttack, var2);
             }
+            
+            if (rangedInUse) {
+    			if (dangerLevel == 0 &&/* lastMovementState == 0 && */rangedAimWhileInUse) {
+    				ent.faceEntity(entityToAttack, 180, 180);
+    			}
+    			if (useInv) {
+    				entInv.rangedUsageUpdate(entityToAttack, var2);
+    			} else {
+    				rangedUsageUpdate(entityToAttack, var2);
+    			}
+    		}
+            
 		} else {
 			entityToAttack = null;
+			//if (rangedInUse) rangedUsageCancelCharge();
 		}
 		
 		if (shouldHeal) updateHealing();
 		
 		dangerLevel = 0;
 		if (checkSurroundings() == 1) dangerLevel = 1;
-		if (checkHealth()) dangerLevel = 2;
+		//if (checkHealth()) dangerLevel = 2;
+		if (jobMan.getPrimaryJob().checkDangers()) dangerLevel = 2;
 		jobMan.getPrimaryJob().checkHunger();
 		
 		//Safety overrides
@@ -351,7 +508,7 @@ public class AIAgent {
 		} else if (dangerLevel == 2) {
 			
 			//If nothing to avoid
-			if (!jobMan.getPrimaryJob().avoid(true)) {
+			if (!jobMan.getPrimaryJob().avoid(true) || !shouldAvoid) {
 				fleeing = false;
 				//no danger in area, try to continue job
 				jobMan.tick();
@@ -359,21 +516,7 @@ public class AIAgent {
 			} else {
 				fleeing = true;
 				jobMan.getPrimaryJob().onLowHealth();
-				
-				//this.pathToEntity = this.getNavigator().getPath();
-				
-				//code to look ahead 1 node to speed up the pathfollow escape
-				/*if (this.pathToEntity != null && this.pathToEntity.points != null) {
-					int pIndex = this.pathToEntity.pathIndex+1;
-					if (pIndex < this.pathToEntity.points.length) {
-						if (this.worldObj.rayTraceBlocks(Vec3.createVectorHelper((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
-							this.pathToEntity.pathIndex++;
-						}
-					}
-				}*/
-				
-				
-				c_CoroAIUtil.setMoveSpeed(ent, fleeSpeed);
+				c_CoroAIUtil.setMoveSpeed(ent, Math.max(oldMoveSpeed, fleeSpeed));
 			}
 		}
 		
@@ -388,7 +531,7 @@ public class AIAgent {
 	
 	public void actFight() {
 		//a range check maybe, but why, strafing/dodging techniques or something, lunging forward while using dagger etc...
-		if (entityToAttack == null || entityToAttack.isDead) {
+		if (entityToAttack == null || entityToAttack.isDead || entityToAttack == ent || (entityToAttack instanceof EntityLiving && ((EntityLiving)entityToAttack).deathTime > 0)) {
 			entityToAttack = null;
 			setState(EnumActState.IDLE);
 		}
@@ -460,30 +603,66 @@ public class AIAgent {
 	}
 	
 	protected void attackEntity(Entity var1, float var2) {
-		if (useInv) entInv.sync();
+		if (useInv) {
+			//Cancel if outsourced management says no
+			if (entInv.inventoryOutsourced != null && !entInv.inventoryOutsourced.canAttack()) return;
+			entInv.sync();
+		}
     	
-    	if (var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
+    	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
     		if (curCooldown_Melee <= 0) {
+    			if (rangedInUse) rangedUsageCancelCharge();
     			ent.faceEntity(var1, 180, 180);
-    			if (useInv) {
-    				entInv.attackMelee(var1, var2);
+    			if (!meleeUseRightClick) {
+	    			if (useInv) {
+	    				entInv.attackMelee(var1, var2);
+	    			} else {
+	    				entInt.attackMelee(var1, var2);
+	    			}
     			} else {
-    				entInt.attackMelee(var1, var2);
+    				if (useInv) {
+        				//entInv.attackRanged(var1, var2);
+    					if (entInv.inventory == null) return;
+    					entInv.fakePlayer.faceEntity(ent, 180, 180);
+    					entInv.setCurrentSlot(entInv.slot_Melee);
+    					//this.setCurrentSlot(entInv.slot_Ranged);
+    					entInv.rightClickItem();
+        			} else {
+        				entInt.attackRanged(var1, var2);
+        			}
     			}
         		this.curCooldown_Melee = entInt.getCooldownMelee();
         	}
+    	} else if (rangedInUse) {
+    		//updates elsewhere so doesnt need this method to get called
     	} else if (var2 < maxReach_Ranged) {
-    		if (curCooldown_Ranged <= 0) {
+    		if (curCooldown_Ranged <= 0 && curCooldown_Melee < maxReach_Melee - (maxReach_Melee / 4)) {
     			ent.faceEntity(var1, 180, 180);
     			if (useInv) {
     				entInv.attackRanged(var1, var2);
     			} else {
     				entInt.attackRanged(var1, var2);
     			}
-        		this.curCooldown_Ranged = entInt.getCooldownRanged();
+        		this.curCooldown_Ranged = entInt.getCooldownRanged(); //keep here for fallback when charging items not used
     		}
     	}
     }
+	
+	//placeholder
+	public void rangedUsageUpdate(Entity ent, float dist) {
+		rangedUsageCancelCharge();
+	}
+	
+	public void rangedUsageStartCharge() {
+		rangedInUse = true;
+	}
+	
+	public void rangedUsageCancelCharge() {
+		//dbg(ent.entityId + " - rangedUsageCancelCharge() stopped using item!");
+		rangedInUse = false;
+		this.curCooldown_Ranged = entInt.getCooldownRanged();
+		if (useInv) entInv.rangedUsageCancelCharge();
+	}
 	
     public void updateWanderPath()
     {
@@ -572,9 +751,15 @@ public class AIAgent {
 		targZ = coords.posZ;
 	}
 	
+	public void setTargetRetaliate(Entity targ) {
+		setTarget(targ);
+		retaliateEntity = targ;
+		retaliateTicks = retaliateTicksMax;
+	}
+	
 	public void setTarget(Entity parEnt) {
 		this.entityToAttack = parEnt;
-		if (jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leaderTarget == null && parEnt instanceof EntityLiving) activeFormation.leaderTarget = (EntityLiving)parEnt;
+		if (jobMan.getPrimaryJob().isInFormation() && activeFormation.leaderTarget == null && parEnt instanceof EntityLiving) activeFormation.leaderTarget = (EntityLiving)parEnt;
 		setState(EnumActState.FIGHTING);
 	}
 	
@@ -646,13 +831,58 @@ public class AIAgent {
 	
 	public void readEntityFromNBT(NBTTagCompound var1) {
 		if (useInv) this.entInv.readEntityFromNBT(var1);
+		spawnedOrNBTReloadedInit();
+		entID = var1.getInteger("ICoroAI_entID");
+		homeX = var1.getInteger("homeX");
+		homeY = var1.getInteger("homeY");
+		homeZ = var1.getInteger("homeZ");
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound var1) {
 		if (useInv) this.entInv.writeEntityToNBT(var1);
+		var1.setInteger("ICoroAI_entID", entID);
+		var1.setInteger("homeX", homeX);
+		var1.setInteger("homeY", homeY);
+		var1.setInteger("homeZ", homeZ);
+		
+	}
+	
+	public boolean hookHit(DamageSource par1DamageSource, int par2) {
+		if (!ent.worldObj.isRemote) {
+			return jobMan.hookHit(par1DamageSource, par2);
+		} else return true;
+	}
+	
+	public boolean hookInteract(EntityPlayer par1EntityPlayer) {
+		if (!ent.worldObj.isRemote) {
+			return jobMan.hookInteract(par1EntityPlayer);
+		} else return false;
+	}
+	
+	public boolean isThreat(Entity ent) {
+		if (ent instanceof EntityCreeper || ent instanceof EntityEnderman) {
+			return true;
+		}
+		return false;
 	}
 	
 	public void dbg(Object obj) {
-		System.out.println(obj);
+		//System.out.println(obj);
+	}
+	
+	public void cleanup() {
+		if (useInv) entInv.cleanup();
+		//kill cyclical references
+		//System.out.println("cleaning up entity " + ent.entityId);
+		PFQueue.pfDelays.remove(ent);
+		jobMan.cleanup();
+		ent = null;
+		entInt.cleanup();
+		entInt = null;
+		entInv = null;
+		jobMan = null;
+		activeFormation = null;
+		retaliateEntity = null;
+		entityToAttack = null;
 	}
 }

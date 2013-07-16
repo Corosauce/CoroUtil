@@ -1,12 +1,11 @@
 package CoroAI.componentAI.jobSystem;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.DamageSource;
-
 import java.util.List;
 
-import CoroAI.PFQueue;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import CoroAI.c_CoroAIUtil;
 import CoroAI.entity.EnumJobState;
 
@@ -39,10 +38,6 @@ public class JobHunt extends JobBase {
 	@Override
 	public void onLowHealth() {
 		super.onLowHealth();
-		//if (this.name.equals("Makani")) {
-		
-		//}
-		//System.out.println("hitAndRunDelay: " + hitAndRunDelay);
 		if (hitAndRunDelay == 0 && ent.getDistanceToEntity(ai.lastFleeEnt) > 3F) {
 			hitAndRunDelay = entInt.getCooldownRanged()+1;
 			ai.entityToAttack = ai.lastFleeEnt;
@@ -53,22 +48,22 @@ public class JobHunt extends JobBase {
     			} else {
     				entInt.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
     			}
-				//ent.attackEntity(ent.entityToAttack, ent.getDistanceToEntity(ent.entityToAttack));
-				//System.out.println("H&R " + ent.name + " health: " + ent.getHealth());
 			}
-		} else {
-			ai.entityToAttack = null;
 		}
 	}
 	
 	@Override
-	public boolean hitHook(DamageSource ds, int damage) {
-		if (isEnemy(ds.getEntity())) {
+	public boolean hookHit(DamageSource ds, int damage) {
+		/*if (isEnemy(ds.getEntity())) {
 			ai.entityToAttack = ds.getEntity();
-		}
+		}*/
 		
-		if (ent.getHealth() < ent.getMaxHealth() / 2 && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()) {
-			System.out.println("TEMP OFF FOR REFACTOR");
+		if (ai.retaliateEnable) {
+        	ai.setTargetRetaliate(ds.getEntity());
+        }
+		
+		if (ent.getHealth() < ent.getMaxHealth() / 2/* && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()*/) {
+			//System.out.println("TEMP OFF FOR REFACTOR");
 			/*ai.dipl_hostilePlayer = true;
 			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
 		}
@@ -83,14 +78,19 @@ public class JobHunt extends JobBase {
 	@Override
 	public void setJobItems() {
 		
-		c_CoroAIUtil.setItems_JobHunt(ai.entInv);
+		//c_CoroAIUtil.setItems_JobHunt(ai.entInv);
 		
 		
 	}
 	
 	protected void jobHunter() {
 	
-		dontStray = false;
+		//crappy fix - behavior tree generic locking would solve this reset issue
+		if (ai.entInv != null && ai.entInv.fishEntity != null) {
+			ai.entInv.fishEntity.setDead();
+			ai.entInv.fishEntity.catchFish();
+			ai.entInv.fishEntity = null;
+		}
 		
 		//this whole function is crap, redo it bitch
 		
@@ -116,19 +116,25 @@ public class JobHunt extends JobBase {
 		} else {*/
 			setJobState(EnumJobState.IDLE);
 			
-			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
+			EntityLiving protectEnt = ent;
+			if (tamable.isTame()) {
+				EntityPlayer entP = ent.worldObj.getPlayerEntityByName(tamable.owner);
+				if (entP != null) protectEnt = entP; 
+			}
+			
+			if (/*ent.getHealth() > ent.getMaxHealth() * 0.90F &&*/ (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
 				boolean found = false;
 				Entity clEnt = null;
 				float closest = 9999F;
-		    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.boundingBox.expand(huntRange, huntRange/2, huntRange));
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
 		            if(isEnemy(entity1))
 		            {
-		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
+		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(protectEnt)) {
 		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
-		            			float dist = ent.getDistanceToEntity(entity1);
+		            			float dist = protectEnt.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
 		            				closest = dist;
 		            				clEnt = entity1;
@@ -175,26 +181,12 @@ public class JobHunt extends JobBase {
 		ent.prevHealth = ent.getHealth();
 	}
 	
-	
-	
-	public void hunterHitHook(DamageSource ds, int damage) {
-		
-		/*if (health < getMaxHealth() / 4 * 3) {
-			if (ds.getEntity() != null) {
-				lastFleeEnt = ds.getEntity();
-				tryingToFlee = true;
-				//fleeFrom(ds.getEntity());
-			}
-		}
-		prevKoaHealth = health;*/
-	}
-	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ent.getHealth() < 10) {
+		if (ai.shouldAvoid && ent.getHealth() < 10) {
 			return false;
 		}
 		
-		if (dontStray) {
+		if (dontStrayFromHome) {
 			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome * 1.5) {
 				return false;
 			}
@@ -206,15 +198,25 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ent.getHealth() < 6) {
+		if (ai.shouldAvoid && ent.getHealth() < 6) {
 			return false;
 		}
 		
-		if (dontStray) {
+		if (dontStrayFromHome) {
 			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome) {
 				return false;
 			}
 		}
+		
+		if (dontStrayFromOwner && this.tamable.isTame()) {
+			EntityPlayer entP = ai.ent.worldObj.getPlayerEntityByName(tamable.owner);
+			if (entP != null) {
+				if (entP.getDistanceToEntity(target) > tamable.strayDistMax) {
+					return false;
+				}
+			}
+		}
+		
 		return true;
 	}
 	

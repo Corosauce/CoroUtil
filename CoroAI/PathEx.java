@@ -53,7 +53,12 @@ public class PathEx
         pathpoint.distanceToTarget = f;
         if (f < f1)
         {
-            sortBack(pathpoint.index);
+        	try {
+        		sortBack(pathpoint.index);
+        	} catch (Exception ex) {
+        		ex.printStackTrace();
+        		int sdfsdf = 0;
+        	}
         }
         else
         {
@@ -64,6 +69,10 @@ public class PathEx
     private void sortBack(int i)
     {
         PathPointEx pathpoint = pathPoints[i];
+        if (pathpoint == null) {
+        	System.out.println("pathpoint is null, wtf area scanner");
+        	return;
+        }
         float f = pathpoint.distanceToTarget;
         do
         {
@@ -73,6 +82,10 @@ public class PathEx
             }
             int j = i - 1 >> 1;
             PathPointEx pathpoint1 = pathPoints[j];
+            if (pathpoint1 == null) {
+            	System.out.println("pathpoint is null, wtf area scanner");
+            	return;
+            }
             if (f >= pathpoint1.distanceToTarget)
             {
                 break;

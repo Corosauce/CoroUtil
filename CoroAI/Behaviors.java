@@ -1,18 +1,21 @@
 package CoroAI;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-
 import java.util.HashMap;
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.ai.EntityAIArrowAttack;
+import net.minecraft.entity.ai.EntityAIAttackOnCollide;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import CoroAI.entity.c_EnhAI;
 
 
@@ -93,6 +96,24 @@ public class Behaviors {
 		entHit.setAttackTarget(koa);
 	}
 	
+	public static void checkOrFixTargetTasks(EntityLiving ent, Class targetClass) {
+		if (!aiEnhanced.containsKey(ent)) {
+			EntityAIBase newTask = new EntityAIAttackOnCollide(ent, targetClass, 0.23F/*entC.getAIMoveSpeed()*/, true);
+			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, 16.0F, 0, true);
+			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIArrowAttack((IRangedAttackMob)ent, 0.25F, 20, 60, 15.0F);
+			
+			ent.tasks.addTask(3, newTask);
+			EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLiving.class, ent, "field_70715_bh", "targetTasks");
+			if (targetTasks != null) {
+				targetTasks.addTask(2, newTargetTask);
+				//System.out.println("Adding targetting!");
+			} else {
+				System.out.println("update targetTasks reflection");
+			}
+			aiEnhanced.put(ent, true);
+		}
+	}
+	
 	public static void enhanceMonsterAI(EntityLiving ent) {
 		
 		c_EnhAI koa = null;
@@ -145,7 +166,7 @@ public class Behaviors {
 		                			PFQueue.getPath(entC, ent, 16F);
 		                			if (!aiEnhanced.containsKey(entC)) {
 		                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, 0.23F/*entC.getAIMoveSpeed()*/, true));
-		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, entC, "bn", "targetTasks");
+		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLiving.class, entC, "field_70715_bh", "targetTasks");
 		                				if (targetTasks != null) {
 		                					targetTasks.addTask(2, new EntityAINearestAttackableTarget(entC, c_EnhAI.class, 16.0F, 0, true));
 		                				} else System.out.println("update targetTasks reflection");

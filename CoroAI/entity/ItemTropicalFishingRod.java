@@ -42,6 +42,7 @@ public class ItemTropicalFishingRod extends Item
 
             if(!var2.isRemote) {
                 var2.spawnEntityInWorld(new EntityTropicalFishHook(var2, var3.ai.ent, speed));
+                
             }
 
             var3.ai.ent.swingItem();

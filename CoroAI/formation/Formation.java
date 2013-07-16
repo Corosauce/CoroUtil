@@ -16,7 +16,7 @@ import CoroAI.forge.CoroAI;
 
 public class Formation {
 
-	public double distMax = 48D;
+	public double distMax = 96D;
 	public List<ICoroAI> listEntities = new ArrayList<ICoroAI>();
 	//Used for updating where the formation wants to go
 	public ICoroAI leader;
@@ -212,7 +212,7 @@ public class Formation {
 	
 	public void leave(ICoroAI ent) {
 		listEntities.remove(ent);
-		ent.getAIAgent().activeFormation = null;
+		if (ent.getAIAgent() != null) ent.getAIAgent().activeFormation = null;
 		checkLeader(ent);
 		//System.out.println("listEntities.size(): " + listEntities.size());
 	}

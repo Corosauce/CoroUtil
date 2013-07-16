@@ -44,7 +44,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	//Diplomatic fields
 	public boolean dipl_hostilePlayer = false;
-	public EnumTeam dipl_team = EnumTeam.HOSTILES;
+	public EnumDiploType dipl_team = EnumDiploType.HOSTILES;
 	public int dipl_spreadInfoDelay = 0;
 	
 	//walking target
@@ -143,9 +143,11 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		if (job == EnumJob.HUNTER) {
 			addJob(EnumJob.FINDFOOD);
 	        addJob(EnumJob.HUNTER);
+	        addJob(EnumJob.MUSIC);
 		} else if (job == EnumJob.FISHERMAN) {
 			addJob(EnumJob.FINDFOOD);
 	        addJob(EnumJob.FISHERMAN);
+	        addJob(EnumJob.MUSIC);
 		} else if (job == EnumJob.TRADING) {
 			addJob(EnumJob.FINDFOOD);
 			addJob(EnumJob.TRADING);
@@ -1385,7 +1387,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	public void checkPathfindLock() {
 		if (waitingForNewPath) {
-			getNavigator().setPath(PFQueue.convertToPathEntity(pathToEntity), getMoveSpeed());
+			getNavigator().setPath(PFQueue.instance.convertToPathEntity(pathToEntity), getMoveSpeed());
 			waitingForNewPath = false;
 		}
 	}

@@ -3,6 +3,7 @@ package CoroAI.componentAI.jobSystem;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Vec3;
 
 import java.util.List;
 
@@ -13,11 +14,17 @@ import CoroAI.entity.EnumJobState;
 public class JobHuntRanged extends JobBase {
 	
 	public long huntRange = 24;
-	public long keepDistantRange = 10;
+	public long keepDistantRange = 14;
 	
 	public boolean xRay = false;
 	
 	public boolean useMelee = false;
+	public int useMeleeCountdown = 0;
+	public int useMeleeCountdownMax = 80;
+	
+	public Vec3 targetLastPos = null;
+	public int targetNoMoveTicks = 0;
+	public int targetNoMoveTicksMax = 4;
 	
 	public JobHuntRanged(JobManager jm) {
 		super(jm);
@@ -74,35 +81,33 @@ public class JobHuntRanged extends JobBase {
 	}
 	
 	@Override
-	public boolean hitHook(DamageSource ds, int damage) {
+	public boolean hookHit(DamageSource ds, int damage) {
 		if (isEnemy(ds.getEntity())) {
 			ai.entityToAttack = ds.getEntity();
 		}
-		
-		if (ent.getHealth() < ent.getMaxHealth() / 2 && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()) {
-			System.out.println("TEMP OFF FOR REFACTOR");
-			/*ai.dipl_hostilePlayer = true;
-			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
-		}
-		 
 		return true;
-		//temp fun code
-		/*if (ds.getEntity() instanceof ZCSdkEntitySentry) {
-			ent.entityToAttack = ds.getEntity();
-		}*/
 	}
 	
 	@Override
 	public void setJobItems() {
 		
-		c_CoroAIUtil.setItems_JobHunt(ai.entInv);
+		//c_CoroAIUtil.setItems_JobHunt(ai.entInv);
 		
 		
 	}
 	
+	@Override
+	public boolean checkDangers() {
+		if (!useMelee && ai.entityToAttack != null && ai.entityToAttack.getDistanceToEntity(ai.ent) < keepDistantRange - 2) {
+			//System.out.println("too close!");
+			return true; 
+		}
+		return checkHealth();
+	}
+	
 	protected void jobHunter() {
 	
-		dontStray = false;
+		dontStrayFromHome = false;
 		
 		//this whole function is crap, redo it bitch
 		
@@ -118,96 +123,96 @@ public class JobHuntRanged extends JobBase {
 		//huntRange = 24;
 		ai.maxDistanceFromHome = 48F;
 		
-		
-		
-		//if (true) return;
-		
-		//health = 8;
-		/*if (health < getMaxHealth() * 0.75F) {
-			avoid();
-			if (rand.nextInt(5) == 0) entityToAttack = null;
-		} else {*/
-			setJobState(EnumJobState.IDLE);
+		if (ai.entityToAttack != null && targetLastPos != null) {
+			if (ent.worldObj.getWorldTime() % 10 == 0) {
+				//System.out.println(ai.entityToAttack.getDistance(targetLastPos.xCoord, targetLastPos.yCoord, targetLastPos.zCoord));
+				if (ai.entityToAttack.getDistance(targetLastPos.xCoord, targetLastPos.yCoord, targetLastPos.zCoord) < 0.5D) {
+					targetNoMoveTicks++;
+				} else {
+					targetNoMoveTicks = 0;
+				}
+			}
 			
-			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
-				boolean found = false;
-				Entity clEnt = null;
-				float closest = 9999F;
-		    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
-		        for(int j = 0; j < list.size(); j++)
-		        {
-		            Entity entity1 = (Entity)list.get(j);
-		            if(isEnemy(entity1))
-		            {
-		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
-		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
-		            			float dist = ent.getDistanceToEntity(entity1);
-		            			if (dist < closest) {
-		            				closest = dist;
-		            				clEnt = entity1;
-		            			}
-			            		
-			            		//found = true;
-			            		//break;
-		            		}
-		            		//this.hasAttacked = true;
-		            		//getPathOrWalkableBlock(entity1, 16F);
-		            	}
-		            }
-		        }
-		        if (clEnt != null) {
-		        	if (ai.entityToAttack != clEnt) {
-		        		ai.setTarget(clEnt);
-		        	} else {
-		        		//if (ent.getNavigator().noPath()) {
-		        			ai.setTarget(clEnt);
-		        		//}
-		        	}
-		        	
-		        }
-		        /*if (!found) {
-		        	setState(EnumKoaActivity.IDLE);
-		        }*/
-			} else {
-				
-				if (ai.entityToAttack != null) {
-					if (!useMelee) {
-						if (ai.entityToAttack.getDistanceToEntity(ent) < keepDistantRange) {
-							ent.getNavigator().clearPathEntity();
-						}
-					}
-					if (ent.getNavigator().noPath() && ent.getDistanceToEntity(ai.entityToAttack) > keepDistantRange + 1) {
-						PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange);
-					} else if (!useMelee && !ai.fleeing) {
-						if (ai.entityToAttack.getDistanceToEntity(ent) < keepDistantRange) {
-							ent.getNavigator().clearPathEntity();
-						}
+			if (targetNoMoveTicks >= targetNoMoveTicksMax) {
+				useMeleeCountdown = useMeleeCountdownMax;
+				//System.out.println("attack! " + targetNoMoveTicks + " - " + useMelee);
+			}
+		} else {
+			useMeleeCountdown = 0;
+		}
+		
+		if (useMeleeCountdown > 0) {
+			useMeleeCountdown--;
+			useMelee = true;
+		} else {
+			useMelee = false;
+		}
+		
+		setJobState(EnumJobState.IDLE);
+		
+		if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
+			boolean found = false;
+			Entity clEnt = null;
+			float closest = 9999F;
+	    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+	        for(int j = 0; j < list.size(); j++)
+	        {
+	            Entity entity1 = (Entity)list.get(j);
+	            if(isEnemy(entity1))
+	            {
+	            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
+	            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
+	            			float dist = ent.getDistanceToEntity(entity1);
+	            			if (dist < closest) {
+	            				closest = dist;
+	            				clEnt = entity1;
+	            			}
+		            		
+		            		//found = true;
+		            		//break;
+	            		}
+	            		//this.hasAttacked = true;
+	            		//getPathOrWalkableBlock(entity1, 16F);
+	            	}
+	            }
+	        }
+	        if (clEnt != null) {
+	        	if (ai.entityToAttack != clEnt) {
+	        		ai.setTarget(clEnt);
+	        	} else {
+	        		//if (ent.getNavigator().noPath()) {
+	        			ai.setTarget(clEnt);
+	        		//}
+	        	}
+	        	
+	        }
+	        /*if (!found) {
+	        	setState(EnumKoaActivity.IDLE);
+	        }*/
+		} else {
+			
+			if (ai.entityToAttack != null) {
+				if (!useMelee) {
+					if (ai.entityToAttack.getDistanceToEntity(ent) < keepDistantRange) {
+						ent.getNavigator().clearPathEntity();
 					}
 				}
-				
+				if (ent.getNavigator().noPath() && (ent.getDistanceToEntity(ai.entityToAttack) > keepDistantRange + 1 || useMelee)) {
+					PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange);
+				} else if (!useMelee && !ai.fleeing) {
+					if (ai.entityToAttack.getDistanceToEntity(ent) < keepDistantRange) {
+						ent.getNavigator().clearPathEntity();
+					}
+				}
 			}
 			
-			//derp
-			/*if (ent.entityToAttack == null && ent.rand.nextInt(6000) == 0) {
-				ent.walkTo(ent, ent.homeX, ent.homeY, ent.homeZ, ent.maxPFRange, 600);
-			}*/
-			
-		//}
-		ent.prevHealth = ent.getHealth();
-	}
-	
-	
-	
-	public void hunterHitHook(DamageSource ds, int damage) {
-		
-		/*if (health < getMaxHealth() / 4 * 3) {
-			if (ds.getEntity() != null) {
-				lastFleeEnt = ds.getEntity();
-				tryingToFlee = true;
-				//fleeFrom(ds.getEntity());
+		}
+		if (ent.worldObj.getWorldTime() % 10 == 0) {
+			if (ai.entityToAttack != null) {
+				targetLastPos = Vec3.createVectorHelper(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ);
 			}
 		}
-		prevKoaHealth = health;*/
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
@@ -215,7 +220,7 @@ public class JobHuntRanged extends JobBase {
 			return false;
 		}
 		
-		if (dontStray) {
+		if (dontStrayFromHome) {
 			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome * 1.5) {
 				return false;
 			}
@@ -231,7 +236,7 @@ public class JobHuntRanged extends JobBase {
 			return false;
 		}
 		
-		if (dontStray) {
+		if (dontStrayFromHome) {
 			if (target.getDistance(ai.homeX, ai.homeY, ai.homeZ) > ai.maxDistanceFromHome) {
 				return false;
 			}

@@ -7,15 +7,19 @@ import net.minecraft.util.ChunkCoordinates;
 import scala.util.Random;
 import CoroAI.c_CoroAIUtil;
 import CoroAI.componentAI.jobSystem.JobBase;
+import CoroAI.diplomacy.DiplomacyHelper;
 
 public class AITamable {
 
 	public JobBase job;
 	public String owner = "";
 	public int ownerEntityID = -1; //for non players, should use UUID
+	public EntityLiving ownerCachedInstance = null;
 	public ChunkCoordinates occupyCoord;
 	public double followDistMin = 2D;
 	public double followDistMax = 8D;
+	public double strayDistMax = 32D;
+	public double teleportFromFarDist = 48D;
 	public boolean overrideNonPlayerTargetting = true;
 	
 	public AITamable(JobBase parJob) {
@@ -26,23 +30,54 @@ public class AITamable {
 		return !owner.equals("");
 	}
 	
+	public void tameBy(String user) {
+		owner = user;
+		updateCache();
+	}
+	
+	public void tameClear() {
+		owner = "";
+		ownerCachedInstance = null;
+	}
+	
+	public void updateCache() {
+		ownerCachedInstance = job.ent.worldObj.getPlayerEntityByName(owner);
+	}
+	
+	public EntityLiving getPlayerCached() {
+		return ownerCachedInstance;
+	}
+	
 	public boolean isEnemy(Entity ent) {
-		if (ent instanceof EntityPlayer) return false;
+		if (ent instanceof EntityPlayer) {
+			if (((EntityPlayer)ent).username.equals(owner)) {
+				return false;
+			}
+		}
 		
 		//use a cached list of class types here to compare against, this list a player can add to for mod entities to not attack
-		return DiplomacyHelper.shouldTargetEnt(job.ent, ent, true);
+		return DiplomacyHelper.shouldTameTargetEnt(job.ent, ent, this);
 		
 		//return job.entInt.isEnemy(ent);
 	}
 	
 	public void tick() {
 		if (isTame()) {
-			EntityLiving ent = job.ent.worldObj.getPlayerEntityByName(owner);
+			updateCache();
+			EntityLiving ent = getPlayerCached();
 			if (ent != null) {
 				occupyCoord = c_CoroAIUtil.entToCoord(ent);
 				
+				if ((ent.onGround || ent.isInWater()) && teleportFromFarDist != -1 && job.ai.ent.getDistanceToEntity(ent) > teleportFromFarDist) {
+					double range = 2D;
+					Random rand = new Random();
+					job.ai.ent.setPosition(ent.posX + (rand.nextDouble() * range) - (rand.nextDouble() * range), ent.posY, ent.posZ + (rand.nextDouble() * range) - (rand.nextDouble() * range));
+					job.ai.ent.getNavigator().clearPathEntity();
+				}
+				
+				//Target fixing
 				if (job.ai.entityToAttack != null) {
-					if (job.ai.entityToAttack.entityId == ent.entityId || !DiplomacyHelper.shouldTargetEnt(job.ent, job.ai.entityToAttack, true)) {
+					if (job.ai.entityToAttack.entityId == ent.entityId || !DiplomacyHelper.shouldTameTargetEnt(job.ent, job.ai.entityToAttack, this)) {
 						job.ai.entityToAttack = null;
 					}
 				}
@@ -63,8 +98,13 @@ public class AITamable {
 			}
 		} else {
         	if (job.ent.getNavigator().noPath()) {
-    			if (job.ai.useInv) job.lookForItems();
+        		if (job.ai.useInv && job.ai.entInv.shouldLookForPickups) job.lookForItems();
         	}
         }
+	}
+	
+	public void cleanup() {
+		job = null;
+		ownerCachedInstance = null;
 	}
 }

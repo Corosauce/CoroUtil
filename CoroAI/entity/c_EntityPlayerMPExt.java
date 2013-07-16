@@ -1,15 +1,16 @@
 package CoroAI.entity;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-
-import java.lang.reflect.Field;
-
 import CoroAI.c_CoroAIUtil;
+import CoroAI.componentAI.ICoroAI;
+import CoroAI.componentAI.IInvUser;
 
 public class c_EntityPlayerMPExt extends EntityPlayerMP
 {
@@ -86,6 +87,13 @@ public class c_EntityPlayerMPExt extends EntityPlayerMP
     {
         super.writeEntityToNBT(par1NBTTagCompound);
         
+    }
+    
+    @Override
+    public String getTranslatedEntityName() {
+    	ICoroAI ai = c_CoroAIUtil.playerToCompAILookup.get(username);
+    	if (ai instanceof IInvUser) return ((IInvUser) ai).getLocalizedName();
+    	return "something horrible";
     }
     
     

@@ -210,6 +210,20 @@ public class c_CoroAIUtil {
         }
         return null;
     }
+	
+	public static void setPrivateValueSRGMCP(Class var0, Object var1, String obf, String mcp, Object var3) {
+		if (checkforMCP) check();
+		try {
+    		
+    		if (!runningMCP) {
+    			setPrivateValue(var0, var1, obf, var3);
+    		} else {
+    			setPrivateValue(var0, var1, mcp, var3);
+    		}
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+	}
     
     public static Object getPrivateValueBoth(Class var0, Object var1, String obf, String mcp) {
     	if (checkforMCP) check();
@@ -526,13 +540,13 @@ public class c_CoroAIUtil {
     	newPath = true;
     }
     
-    public static c_EnhAI getEntByPersistantID(World world, int id) {
+    public static Entity getEntByPersistantID(World world, int id) {
 		try {
 			for (int i = 0; i < world.loadedEntityList.size(); i++) {
 				Entity ent = (Entity)world.loadedEntityList.get(i);
-				if (ent instanceof c_EnhAI) {
-					if (((c_EnhAI) ent).entID == id) {
-						return (c_EnhAI)ent;
+				if (ent instanceof ICoroAI) {
+					if (((ICoroAI) ent).getAIAgent().entID == id && id != -1) {
+						return (Entity)ent;
 					}
 				}
 			}

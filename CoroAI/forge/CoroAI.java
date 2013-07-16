@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.List;
 
+import CoroAI.diplomacy.TeamTypes;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -30,11 +32,13 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
 public class CoroAI {
 	
@@ -55,7 +59,9 @@ public class CoroAI {
     public void load(FMLInitializationEvent event)
     {
     	TickRegistry.registerTickHandler(new ServerTickHandler(this), Side.SERVER);
+    	//MinecraftForge.EVENT_BUS.register(new EventHandler());
     	proxy.init(this);
+    	TeamTypes.initTypes();
     }
     
     @PostInit

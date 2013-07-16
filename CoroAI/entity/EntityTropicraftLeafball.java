@@ -97,7 +97,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
 
 					}
 				} else if (movingobjectposition.entityHit instanceof ICoroAI && getThrower() instanceof ICoroAI) {
-					if (((ICoroAI) getThrower()).getAIAgent().dipl_team != ((ICoroAI) movingobjectposition.entityHit).getAIAgent().dipl_team) {
+					if (getThrower() != null && ((ICoroAI) getThrower()).getAIAgent().dipl_info.isEnemy(((ICoroAI) movingobjectposition.entityHit).getAIAgent().dipl_info)) {
 						movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), byte0);
 					} else {
 

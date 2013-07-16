@@ -2,6 +2,8 @@ package CoroAI.componentAI.jobSystem;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import CoroAI.componentAI.AIAgent;
 
 public class JobManager {
@@ -26,6 +28,31 @@ public class JobManager {
 		//setPrimaryJob(JobIdle());
 		
 		//swapJob(priJob);
+	}
+	
+	//Process hit across all jobs, cancels chain if job returns false
+	public boolean hookHit(DamageSource par1DamageSource, int par2) {
+		boolean result = true;
+		for (int i = 0; i < curJobs.size(); i++) {
+			JobBase job = curJobs.get(i);
+			if (!job.hookHit(par1DamageSource, par2)) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public boolean hookInteract(EntityPlayer par1EntityPlayer) {
+		boolean result = true;
+		for (int i = 0; i < curJobs.size(); i++) {
+			JobBase job = curJobs.get(i);
+			if (!job.hookInteract(par1EntityPlayer)) {
+				result = false;
+				break;
+			}
+		}
+		return result;
 	}
 	
 	public void tick() {
@@ -54,6 +81,16 @@ public class JobManager {
 		return priJob;
 	}
 	
+	public JobBase getFirstJobByClass(Class clazz) {
+		for (int i = 0; i < curJobs.size(); i++) {
+			JobBase job = curJobs.get(i);
+			if (clazz.isAssignableFrom(job.getClass())) {
+				return job;
+			}
+		}
+		return null;
+	}
+	
 	public void addJob(JobBase newJob) {
 		addJob(newJob, -1);
 	}
@@ -68,6 +105,15 @@ public class JobManager {
 	
 	public void clearJobs() {
 		curJobs.clear();
+	}
+	
+	public void cleanup() {
+		for (int i = 0; i < curJobs.size(); i++) {
+			JobBase job = curJobs.get(i);
+			job.cleanup();
+		}
+		clearJobs();
+		ai = null;
 	}
 	
 }
