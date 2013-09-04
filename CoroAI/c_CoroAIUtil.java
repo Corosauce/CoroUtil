@@ -8,9 +8,10 @@ import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.passive.EntityWaterMob;
@@ -95,7 +96,7 @@ public class c_CoroAIUtil {
     }
     
     public static boolean isEnemy(c_PlayerProxy ent, Entity enemy) {
-    	if (enemy instanceof EntityLiving && !(enemy == ent)
+    	if (enemy instanceof EntityLivingBase && !(enemy == ent)
     			&& !(enemy instanceof EntityCreeper
     			|| enemy instanceof EntityWaterMob
     			|| enemy instanceof EntityEnderman
@@ -165,7 +166,6 @@ public class c_CoroAIUtil {
 	public static void check() {
 		checkforMCP = false;
 		try {
-			//runningMCP = Class.forName("net.minecraft.world.World") != null;
 			runningMCP = getPrivateValue(Vec3.class, Vec3.fakePool, "fakePool") != null;
 		} catch (Exception e) {
 			runningMCP = false;
@@ -193,18 +193,10 @@ public class c_CoroAIUtil {
     	try {
     		
     		if (!runningMCP) {
-                //setPrivateValue(var0, var1, obf, var3);
     			return getPrivateValue(var0, var1, srg);
-            	//ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
     		} else {
     			return getPrivateValue(var0, var1, mcp);
-    			//setPrivateValue(var0, var1, mcp, var3);
     		}
-            /*try {
-                return getPrivateValue(var0, var1, obf);
-            } catch (NoSuchFieldException ex) {
-                return getPrivateValue(var0, var1, mcp);
-            }*/
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -230,18 +222,10 @@ public class c_CoroAIUtil {
     	try {
     		
     		if (!runningMCP) {
-                //setPrivateValue(var0, var1, obf, var3);
     			return ObfuscationReflectionHelper.getPrivateValue(var0, var1, obf);
-            	//ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
     		} else {
     			return getPrivateValue(var0, var1, mcp);
-    			//setPrivateValue(var0, var1, mcp, var3);
     		}
-            /*try {
-                return getPrivateValue(var0, var1, obf);
-            } catch (NoSuchFieldException ex) {
-                return getPrivateValue(var0, var1, mcp);
-            }*/
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -556,20 +540,20 @@ public class c_CoroAIUtil {
 		return null;
 	}
     
-    public static int getAge(EntityLiving ent) { return ent.entityAge; }
-    public static void addAge(EntityLiving ent, int offsetAge) { ent.entityAge += offsetAge; }
+    public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
+    public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
     public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
-    public static float getMoveSpeed(EntityLiving ent) { return ent.moveSpeed; }
-    public static void setMoveSpeed(EntityLiving ent, float speed) { ent.moveSpeed = speed; }
-    public static void setHealth(EntityLiving ent, int health) { ent.health = health; }
-    public static void jump(EntityLiving ent) { ent.jump(); }
+    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e(); }
+    //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(speed); }
+    //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
+    public static void jump(EntityLivingBase ent) { ent.jump(); }
     public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5
     
     public static ChunkCoordinates entToCoord(Entity ent) { return new ChunkCoordinates((int)ent.posX, (int)ent.posY, (int)ent.posZ); }
     public static double getDistance(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(ChunkCoordinates coords, ChunkCoordinates coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }
-    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), ent.worldObj.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
-    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(world.getWorldVec3Pool().getVecFromPool(posX, posY, posZ), world.getWorldVec3Pool().getVecFromPool(posX2, posY2, posZ2)) == null; }
-    //public static void dropItems(EntityLiving ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.clip(ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), ent.worldObj.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
+    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.clip(world.getWorldVec3Pool().getVecFromPool(posX, posY, posZ), world.getWorldVec3Pool().getVecFromPool(posX2, posY2, posZ2)) == null; }
+    //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

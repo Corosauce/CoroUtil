@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,7 +33,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    private int inTile = 0;
    public boolean inGround = false;
    public int shake = 0;
-   public EntityLiving angler;
+   public EntityLivingBase angler;
    private int ticksInGround;
    private int ticksInAir = 0;
    public int ticksCatchable = 0;
@@ -79,7 +79,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
        isDead = true;
    }
 
-   public EntityTropicalFishHook(World var1, EntityLiving var2, float speed) {
+   public EntityTropicalFishHook(World var1, EntityLivingBase var2, float speed) {
       super(var1);
       this.renderDistanceWeight = 10D;
       this.ignoreFrustumCheck = true;
@@ -227,7 +227,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 
          Vec3 var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
          Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-         MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var20, var2);
+         MovingObjectPosition var3 = this.worldObj.clip(var20, var2);
          var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
          var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          if(var3 != null) {
@@ -441,8 +441,8 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 	@Override
 	public void readSpawnData(ByteArrayDataInput data) {
 		Entity ent = getEntByID(data.readInt());
-		if (ent instanceof EntityLiving) {
-			angler = (EntityLiving)ent;
+		if (ent instanceof EntityLivingBase) {
+			angler = (EntityLivingBase)ent;
 			if (angler instanceof c_PlayerProxy) {
 		    	  ((c_PlayerProxy)this.angler).fishEntity = this;
 			} else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {

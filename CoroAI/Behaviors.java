@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.EntityAIArrowAttack;
 import net.minecraft.entity.ai.EntityAIAttackOnCollide;
@@ -96,14 +96,14 @@ public class Behaviors {
 		entHit.setAttackTarget(koa);
 	}
 	
-	public static void checkOrFixTargetTasks(EntityLiving ent, Class targetClass) {
+	public static void checkOrFixTargetTasks(EntityCreature ent, Class targetClass) {
 		if (!aiEnhanced.containsKey(ent)) {
-			EntityAIBase newTask = new EntityAIAttackOnCollide(ent, targetClass, 0.23F/*entC.getAIMoveSpeed()*/, true);
-			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, 16.0F, 0, true);
+			EntityAIBase newTask = new EntityAIAttackOnCollide(ent, targetClass, 0.23D/*entC.getAIMoveSpeed()*/, true);
+			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, 0, true);
 			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIArrowAttack((IRangedAttackMob)ent, 0.25F, 20, 60, 15.0F);
 			
 			ent.tasks.addTask(3, newTask);
-			EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLiving.class, ent, "field_70715_bh", "targetTasks");
+			EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, ent, "field_70715_bh", "targetTasks");
 			if (targetTasks != null) {
 				targetTasks.addTask(2, newTargetTask);
 				//System.out.println("Adding targetting!");
@@ -114,7 +114,7 @@ public class Behaviors {
 		}
 	}
 	
-	public static void enhanceMonsterAI(EntityLiving ent) {
+	public static void enhanceMonsterAI(EntityLivingBase ent) {
 		
 		c_EnhAI koa = null;
 		if (ent instanceof c_EnhAI) {
@@ -142,7 +142,7 @@ public class Behaviors {
             	
             	//if(entC.getEntityToAttack() == null/* || entC.worldObj.rand.nextInt(5) == 0*/) {
             		if (koa.isEnemy(entity1)) {
-	                	if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
+	                	if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
 	                		//if (sanityCheck(entity1)) 
 	                		/*if (entC.getNavigator().getPath() == null || entC.getNavigator().getPath().isFinished()) {
 	                			PathPoint points[] = new PathPoint[1];
@@ -162,13 +162,13 @@ public class Behaviors {
 	                				entC.setAttackTarget(ent);
 		                			entC.setTarget(ent);
 		                			
-		                			//entC.getNavigator().setPath(entC.getNavigator().getPathToEntityLiving(ent), 0.3F);
+		                			//entC.getNavigator().setPath(entC.getNavigator().getPathToEntityLivingBase(ent), 0.3F);
 		                			PFQueue.getPath(entC, ent, 16F);
 		                			if (!aiEnhanced.containsKey(entC)) {
 		                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, 0.23F/*entC.getAIMoveSpeed()*/, true));
-		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLiving.class, entC, "field_70715_bh", "targetTasks");
+		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, entC, "field_70715_bh", "targetTasks");
 		                				if (targetTasks != null) {
-		                					targetTasks.addTask(2, new EntityAINearestAttackableTarget(entC, c_EnhAI.class, 16.0F, 0, true));
+		                					targetTasks.addTask(2, new EntityAINearestAttackableTarget(entC, c_EnhAI.class, 0, true));
 		                				} else System.out.println("update targetTasks reflection");
 		                				aiEnhanced.put(entC, true);
 		                			}
@@ -268,8 +268,8 @@ public class Behaviors {
     		
     		//entFields.put(me, targ);
     	//}
-    		if (targ instanceof EntityLiving) {
-    			me.setAttackTarget((EntityLiving)targ);
+    		if (targ instanceof EntityLivingBase) {
+    			me.setAttackTarget((EntityLivingBase)targ);
     		}
 	}
 	
@@ -280,7 +280,7 @@ public class Behaviors {
 	}
 	
 	//Generic functions
-	public static boolean notMoving(EntityLiving var0, float var1) {
+	public static boolean notMoving(EntityLivingBase var0, float var1) {
         double var2 = var0.prevPosX - var0.posX;
         double var4 = var0.prevPosZ - var0.posZ;
         float var6 = (float)Math.sqrt(var2 * var2 + var4 * var4);

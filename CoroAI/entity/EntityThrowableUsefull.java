@@ -1,11 +1,10 @@
 package CoroAI.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,8 +14,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import weather.system.wind.WindHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class EntityThrowableUsefull extends Entity implements IProjectile
+public abstract class EntityThrowableUsefull extends Entity implements IProjectile, WindHandler
 {
      int xTile = -1;
     private int yTile = -1;
@@ -28,7 +30,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     /**
      * Is the entity that throws this 'thing' (snowball, ender pearl, eye of ender or potion)
      */
-    public EntityLiving thrower;
+    public EntityLivingBase thrower;
     private String throwerName = null;
     private int ticksInGround;
     private int ticksInAir = 0;
@@ -54,12 +56,12 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         return par1 < d1 * d1;
     }
 
-    public EntityThrowableUsefull(World par1World, EntityLiving par2EntityLiving)
+    public EntityThrowableUsefull(World par1World, EntityLivingBase par2EntityLivingBase)
     {
         super(par1World);
-        this.thrower = par2EntityLiving;
+        this.thrower = par2EntityLivingBase;
         this.setSize(0.25F, 0.25F);
-        this.setLocationAndAngles(par2EntityLiving.posX, par2EntityLiving.posY + (double)par2EntityLiving.getEyeHeight(), par2EntityLiving.posZ, par2EntityLiving.rotationYaw, par2EntityLiving.rotationPitch);
+        this.setLocationAndAngles(par2EntityLivingBase.posX, par2EntityLivingBase.posY + (double)par2EntityLivingBase.getEyeHeight(), par2EntityLivingBase.posZ, par2EntityLivingBase.rotationYaw, par2EntityLivingBase.rotationPitch);
         this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
         this.posY -= 0.10000000149011612D;
         this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
@@ -179,7 +181,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         Vec3 vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
         Vec3 vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
+        MovingObjectPosition movingobjectposition = this.worldObj.clip(vec3, vec31);
         vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
         vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -259,7 +261,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     	Entity entity = null;
         List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
-        EntityLiving entityliving = this.getThrower();
+        EntityLivingBase entityliving = this.getThrower();
 
         for (int j = 0; j < list.size(); ++j)
         {
@@ -349,7 +351,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         return 0.0F;
     }
 
-    public EntityLiving getThrower()
+    public EntityLivingBase getThrower()
     {
         if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0)
         {
@@ -358,4 +360,16 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         return this.thrower;
     }
+
+	@Override
+	public float getWindWeight() {
+		// TODO Auto-generated method stub
+		return 999;
+	}
+
+	@Override
+	public int getParticleDecayExtra() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

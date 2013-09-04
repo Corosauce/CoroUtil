@@ -29,6 +29,8 @@ public class SelectorPriority extends Selector {
 		
 		boolean foundPriority = false;
 		
+		//iterates left to right assuming the children are in priority based order
+		//finds leftmost node that needs running state, checks rest of nodes if running and resets since they are lower priority
 		for (int i = 0; i < children.size(); i++) {
 			Behavior bh = children.get(i);
 			

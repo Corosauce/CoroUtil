@@ -2,7 +2,6 @@ package CoroAI.bt;
 
 import CoroAI.bt.actions.Delay;
 import CoroAI.bt.actions.RandomChance;
-import CoroAI.bt.selector.SelectorConcurrent;
 import CoroAI.bt.selector.SelectorPriority;
 import CoroAI.bt.selector.SelectorSequence;
 

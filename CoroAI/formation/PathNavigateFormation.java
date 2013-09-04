@@ -4,14 +4,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 public class PathNavigateFormation
 {
-    //private EntityLiving theEntity;
+    //private EntityLivingBase theEntity;
 	public float width = 1;
 	public float height = 2;
     private World worldObj;
@@ -59,9 +58,9 @@ public class PathNavigateFormation
      */
     private boolean canSwim = false;
 
-    public PathNavigateFormation(/*EntityLiving par1EntityLiving, */float parWidth, float parHeight, World par2World, float par3)
+    public PathNavigateFormation(/*EntityLivingBase par1EntityLivingBase, */float parWidth, float parHeight, World par2World, float par3)
     {
-        //this.theEntity = par1EntityLiving;
+        //this.theEntity = par1EntityLivingBase;
     	width = parWidth;
     	height = parHeight;
         this.worldObj = par2World;
@@ -141,19 +140,19 @@ public class PathNavigateFormation
     }*/
 
     /**
-     * Returns the path to the given EntityLiving
+     * Returns the path to the given EntityLivingBase
      */
-    /*public PathEntity getPathToEntityLiving(EntityLiving par1EntityLiving)
+    /*public PathEntity getPathToEntityLivingBase(EntityLivingBase par1EntityLivingBase)
     {
-        return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1EntityLiving, this.pathSearchRange, this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwim);
+        return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1EntityLivingBase, this.pathSearchRange, this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwim);
     }*/
 
     /**
-     * Try to find and set a path to EntityLiving. Returns true if successful.
+     * Try to find and set a path to EntityLivingBase. Returns true if successful.
      */
-    /*public boolean tryMoveToEntityLiving(EntityLiving par1EntityLiving, float par2)
+    /*public boolean tryMoveToEntityLivingBase(EntityLivingBase par1EntityLivingBase, float par2)
     {
-        PathEntity pathentity = this.getPathToEntityLiving(par1EntityLiving);
+        PathEntity pathentity = this.getPathToEntityLivingBase(par1EntityLivingBase);
         return pathentity != null ? this.setPath(pathentity, par2) : false;
     }*/
 

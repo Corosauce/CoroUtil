@@ -3,13 +3,11 @@ package CoroAI.entity;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
-
 import CoroAI.componentAI.ICoroAI;
 
 public class EntityTropicraftLeafball extends EntityThrowable
@@ -21,7 +19,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
 		super(world);
 	}
 
-	public EntityTropicraftLeafball(World world, EntityLiving entityliving)
+	public EntityTropicraftLeafball(World world, EntityLivingBase entityliving)
 	{
 		super(world, entityliving);
 	}
@@ -46,7 +44,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
             Entity entity = null;
             List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
-            EntityLiving entityliving = this.getThrower();
+            EntityLivingBase entityliving = this.getThrower();
 
             for (int j = 0; j < list.size(); ++j)
             {

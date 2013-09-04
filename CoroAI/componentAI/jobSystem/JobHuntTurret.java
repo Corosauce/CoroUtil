@@ -1,13 +1,10 @@
 package CoroAI.componentAI.jobSystem;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.DamageSource;
-
 import java.util.List;
 
-import CoroAI.PFQueue;
-import CoroAI.c_CoroAIUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
 import CoroAI.entity.EnumJobState;
 
 public class JobHuntTurret extends JobBase {
@@ -88,7 +85,7 @@ public class JobHuntTurret extends JobBase {
 	            Entity entity1 = (Entity)list.get(j);
 	            if(isEnemy(entity1))
 	            {
-	            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(ent)) {
+	            	if (xRay || ((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
 	            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
 	            			float dist = ent.getDistanceToEntity(entity1);
 	            			if (dist < closest) {
@@ -110,7 +107,7 @@ public class JobHuntTurret extends JobBase {
 		} else {
 			
 		}
-		ent.prevHealth = ent.getHealth();
+		ent.prevHealth = ent.func_110143_aJ();
 	}
 	
 	

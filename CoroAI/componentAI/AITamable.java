@@ -1,10 +1,13 @@
 package CoroAI.componentAI;
 
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChunkCoordinates;
-import scala.util.Random;
 import CoroAI.c_CoroAIUtil;
 import CoroAI.componentAI.jobSystem.JobBase;
 import CoroAI.diplomacy.DiplomacyHelper;
@@ -14,7 +17,7 @@ public class AITamable {
 	public JobBase job;
 	public String owner = "";
 	public int ownerEntityID = -1; //for non players, should use UUID
-	public EntityLiving ownerCachedInstance = null;
+	public EntityLivingBase ownerCachedInstance = null;
 	public ChunkCoordinates occupyCoord;
 	public double followDistMin = 2D;
 	public double followDistMax = 8D;
@@ -44,7 +47,7 @@ public class AITamable {
 		ownerCachedInstance = job.ent.worldObj.getPlayerEntityByName(owner);
 	}
 	
-	public EntityLiving getPlayerCached() {
+	public EntityLivingBase getPlayerCached() {
 		return ownerCachedInstance;
 	}
 	
@@ -64,7 +67,7 @@ public class AITamable {
 	public void tick() {
 		if (isTame()) {
 			updateCache();
-			EntityLiving ent = getPlayerCached();
+			EntityLivingBase ent = getPlayerCached();
 			if (ent != null) {
 				occupyCoord = c_CoroAIUtil.entToCoord(ent);
 				
@@ -81,6 +84,8 @@ public class AITamable {
 						job.ai.entityToAttack = null;
 					}
 				}
+				
+				if (!job.ai.ent.isPotionActive(Potion.confusion.id)) job.ai.ent.addPotionEffect(new PotionEffect(Potion.confusion.id, 5, 0));
 			}
 		}
 	}

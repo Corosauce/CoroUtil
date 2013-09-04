@@ -1,9 +1,9 @@
 package CoroAI.entity;
 
-import net.minecraft.block.Block;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.block.Block;
 
 public class GroupInfo 
 {

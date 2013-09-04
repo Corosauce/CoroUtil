@@ -1,7 +1,5 @@
 package CoroAI.util;
 
-import CoroAI.componentAI.ICoroAI;
-import CoroAI.entity.c_EnhAI;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.inventory.IInventory;
@@ -9,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
+import CoroAI.componentAI.ICoroAI;
 
 public class CoroUtilInventory {
 

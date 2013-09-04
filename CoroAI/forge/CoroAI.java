@@ -1,27 +1,15 @@
 package CoroAI.forge;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.List;
 
-import CoroAI.diplomacy.TeamTypes;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import modconfig.ConfigMod;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.MinecraftForge;
-
+import CoroAI.config.ConfigCoroAI;
+import CoroAI.diplomacy.TeamTypes;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.PostInit;
@@ -33,12 +21,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
+@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
 public class CoroAI {
 	
@@ -52,7 +39,7 @@ public class CoroAI {
     @PreInit
     public void preInit(FMLPreInitializationEvent event)
     {
-    	//ConfigMod.addConfigFile(event, "enhancedcombat", new ModConfigFields());
+    	ConfigMod.addConfigFile(event, "coroai", new ConfigCoroAI());
     }
     
     @Init
@@ -116,7 +103,7 @@ public class CoroAI {
     
     @SideOnly(Side.CLIENT)
 	public static String getClientSidePath() {
-		return FMLClientHandler.instance().getClient().getMinecraftDir().getPath();
+		return FMLClientHandler.instance().getClient().mcDataDir.getPath();
 	}
     
 	public static void dbg(Object obj) {

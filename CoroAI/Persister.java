@@ -1,11 +1,10 @@
 package CoroAI;
 
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.IWorldAccess;
 import net.minecraft.world.World;
-
-import java.util.List;
 
 public class Persister {
 

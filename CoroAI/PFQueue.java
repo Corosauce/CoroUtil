@@ -20,7 +20,6 @@ import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import CoroAI.componentAI.IAdvPF;
 import CoroAI.componentAI.ICoroAI;
 
@@ -153,7 +152,7 @@ public class PFQueue implements Runnable {
     			//Thread.sleep(50);
     		} catch (Exception ex) {
     			System.out.println("Serious PFQueue crash, reinitializing");
-    			ex.printStackTrace();
+    			//ex.printStackTrace();
     			instance = null;
     		}
     		
@@ -429,7 +428,7 @@ public class PFQueue implements Runnable {
 			    		try {
 			    			queue.clear();
 			    		} catch (Exception ex2) {
-			    			ex2.printStackTrace();
+			    			//ex2.printStackTrace();
 			    			queue.clear();
 			    		}
 			    	}
@@ -468,23 +467,23 @@ public class PFQueue implements Runnable {
 			c_CoroAIUtil.playerPathfindCallback(pathEnt);
 		} else if (queue.get(0).entSourceRef instanceof EntityCreeper) {
 			if (queue.get(0).callback != null) {
-				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), (EntityLiving)queue.get(0).entSourceRef, 0.23F));
+				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), (EntityLiving)queue.get(0).entSourceRef, 1F));
 			} else {
-				((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 0.23F);
+				((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), 1F);
 			}
 			
 		} else if (queue.get(0).entSourceRef instanceof EntityLiving) {
 			//System.out.println("setting path on living ent: " + pathEnt.pathLength + " - " + (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, c_CoroAIUtil.refl_obf_Item_moveSpeed, c_CoroAIUtil.refl_mcp_Item_moveSpeed));
 			//System.out.println("?!?!?!?");
 			if (queue.get(0).callback != null) {
-				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), (EntityLiving)queue.get(0).entSourceRef, c_CoroAIUtil.getMoveSpeed((EntityLiving)queue.get(0).entSourceRef)));
+				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), (EntityLiving)queue.get(0).entSourceRef, 1F));
 			} else {
-				((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).entSourceRef, c_CoroAIUtil.refl_obf_Item_moveSpeed, c_CoroAIUtil.refl_mcp_Item_moveSpeed));
+				((EntityLiving)queue.get(0).entSourceRef).getNavigator().setPath(convertToPathEntity(pathEnt), (Float) 1F);
 			}
 			
 		} else {
 			if (queue.get(0).callback != null) {
-				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), null, 0.23F));
+				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), null, 1F));
 			}
 		}
     }
@@ -576,6 +575,24 @@ public class PFQueue implements Runnable {
     	} else {
     		//System.out.println("new unique pfdelay entry, count: " + pfDelays.size());
     		pfDelays.put(var1, System.currentTimeMillis() + delay);
+    	}
+    	
+    	//new anti queue overload, checks if entity has existing job in queue, cancels new request if does
+    	//possible side solution, if existing job and isnt close to front of queue, bail on existing, add new one to queue
+    	try {
+    		//this might be a stupid idea, perhaps make a second maintained list for job lookups via entity
+    		//or just use this as a method to see what ai is overtrying, to fix with path every 10 ticks thing
+    		for (int i = queue.size()-1; i >= 0; i--) {
+    			PFQueueItem job = queue.get(i);
+    			if (var1 == job.entSourceRef) {
+    				queue.remove(job);
+    				//System.out.println("preventing redundant pathing attempt, queue size was " + queue.size());
+    				//tryPath = false;
+    				break;
+    			}
+    		}
+    	} catch (Exception ex) {
+    		//ex.printStackTrace();
     	}
     	
     	//temp
@@ -812,7 +829,7 @@ public class PFQueue implements Runnable {
         			sleepCount = 0;
         		}
         	} catch (Exception ex) {
-        		ex.printStackTrace();
+        		//ex.printStackTrace();
         	}
             PathPointEx var7 = this.path.dequeue();
 
@@ -928,7 +945,7 @@ public class PFQueue implements Runnable {
         }
 
         if (var1 != null && canUseLadder) {
-        	if (getBlockId(var2.xCoord, var2.yCoord, var2.zCoord) != 0 && Block.blocksList[getBlockId(var2.xCoord, var2.yCoord, var2.zCoord)].isLadder(null, var2.xCoord, var2.yCoord, var2.zCoord)) {
+        	if (getBlockId(var2.xCoord, var2.yCoord, var2.zCoord) != 0 && Block.blocksList[getBlockId(var2.xCoord, var2.yCoord, var2.zCoord)].isLadder(null, var2.xCoord, var2.yCoord, var2.zCoord, null)) {
         		if (queue.get(0) != null) queue.get(0).ladderInPath = true; //might conflict with non queue using requests
 		        PathPointEx vvar8 = this.getLadderPoint(var1, var2.xCoord, var2.yCoord, var2.zCoord + 1, var3, var7, var2.xCoord, var2.zCoord);
 		        PathPointEx vvar9 = this.getLadderPoint(var1, var2.xCoord - 1, var2.yCoord, var2.zCoord, var3, var7, var2.xCoord, var2.zCoord);
@@ -974,7 +991,7 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y + 1, z, var5)) == 0) && (getBlockId(origX, y + 1, origZ) != 0 && Block.blocksList[getBlockId(origX, y + 1, origZ)].isLadder(var1.worldObj, origX, y, origZ))) {
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y + 1, z, var5)) == 0) && (getBlockId(origX, y + 1, origZ) != 0 && Block.blocksList[getBlockId(origX, y + 1, origZ)].isLadder(var1.worldObj, origX, y, origZ, null))) {
                 var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5);
                 ++var8;
                 /*if(var8 >= 3) {
@@ -1263,7 +1280,7 @@ public class PFQueue implements Runnable {
         			sleepCount = 0;
         		}
         	} catch (Exception ex) {
-        		ex.printStackTrace();
+        		//ex.printStackTrace();
         	}
             PathPointEx pathpoint4 = apathpoint[k];
             if(pathpoint1 == null)

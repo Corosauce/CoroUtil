@@ -19,6 +19,8 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.ForgeDirection;
+import CoroAI.config.ConfigCoroAI;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -46,8 +48,10 @@ public class DimensionChunkCache implements IBlockAccess
     		
     		
     		//world.chunkExists(par1, par2)
-    		
-    		dimCacheLookup.put(world.provider.dimensionId, new DimensionChunkCache(world, true));
+    		//if (i == 0) {
+    		if (!ConfigCoroAI.chunkCacheOverworldOnly || i == 0) {
+    			dimCacheLookup.put(world.provider.dimensionId, new DimensionChunkCache(world, true));
+    		}
     	}
     }
     
@@ -568,6 +572,10 @@ public class DimensionChunkCache implements IBlockAccess
     {
         int i1 = this.getBlockId(par1, par2, par3);
         return i1 == 0 ? 0 : Block.blocksList[i1].isProvidingStrongPower(this, par1, par2, par3, par4);
+    }
+    
+    public boolean isBlockSolidOnSide(int x, int y, int z, ForgeDirection fd, boolean bool) {
+    	return true;
     }
 
 }

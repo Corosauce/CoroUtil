@@ -18,7 +18,7 @@ public class Delay extends LeafAction {
 	
 	@Override
 	public EnumBehaviorState tick() {
-		System.out.println("Leaf Delay Tick id: " + id + " - " + countCur + "/" + countMax);
+		//dbg("Leaf Delay Tick id: " + id + " - " + countCur + "/" + countMax);
 		if (countCur++ > countMax) {
 			reset();
 			return EnumBehaviorState.SUCCESS;
@@ -29,7 +29,7 @@ public class Delay extends LeafAction {
 	
 	@Override
 	public void reset() {
-		System.out.println("Leaf Delay Reset id: " + id);
+		//dbg("Leaf Delay Reset id: " + id);
 		countCur = 0;
 		super.reset();
 	}

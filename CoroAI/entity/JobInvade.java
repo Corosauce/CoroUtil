@@ -1,12 +1,11 @@
 package CoroAI.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
-
 import java.util.List;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.DamageSource;
 import CoroAI.PFQueue;
 
 /* JobInvade: For Omnipotent focused invasions */
@@ -130,8 +129,8 @@ public class JobInvade extends JobBase {
 		            Entity entity1 = (Entity)list.get(j);
 		            if(ent.isEnemy(entity1))
 		            {
-		            	//if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
-		            		if (sanityCheck(entity1) && entity1 instanceof EntityLiving && ((EntityLiving)entity1).getHealth() > 0) {
+		            	//if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
+		            		if (sanityCheck(entity1) && entity1 instanceof EntityLivingBase && ((EntityLivingBase)entity1).func_110143_aJ() > 0) {
 		            			float dist = ent.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
 		            				closest = dist;
@@ -160,7 +159,7 @@ public class JobInvade extends JobBase {
 		        		if (retargetDelayCount == 0 && ((dist < retargetDist && dist > 2F) || ent.entityToAttack == null)) {
 		        			//Only retarget if they can be seen, to prevent weird long distance pf derps?
 		        			
-		        			if (ent.getNavigator().noPath() || ((EntityLiving) clEnt).canEntityBeSeen(ent)) {
+		        			if (ent.getNavigator().noPath() || ((EntityLivingBase) clEnt).canEntityBeSeen(ent)) {
 		        				retargetDelayCount = retargetDelay;
 		        				if (!ent.isBreaking()) {
 		        					ent.huntTarget(clEnt);
@@ -197,7 +196,7 @@ public class JobInvade extends JobBase {
 			if (clEnt == null && ent.entityToAttack == null) {
 				//GET PLAYER SINCE NO CLOSE TARGETS!!!!!
 	        	EntityPlayer entP = getClosestPlayerToEntity(ent, -1F, false);
-	        	if (entP != null && entP.getHealth() > 0) {
+	        	if (entP != null && entP.func_110143_aJ() > 0) {
 		        	if (ent.getNavigator().noPath()) {
 		        		//System.out.println("huntTarget far");
 	        			ent.huntTarget(entP);
@@ -211,7 +210,7 @@ public class JobInvade extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		ent.prevHealth = ent.func_110143_aJ();
 	}
 	
 	
@@ -219,7 +218,7 @@ public class JobInvade extends JobBase {
 		
 		if (true) return true;
 		
-		if (ent.getHealth() < 10) {
+		if (ent.func_110143_aJ() < 10) {
 			return false;
 		}
 		

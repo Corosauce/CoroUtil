@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroAI.componentAI.ICoroAI;
-import CoroAI.forge.CoroAI;
 
 public class Formation {
 
@@ -28,7 +27,7 @@ public class Formation {
 	public Vec3 pos = null;
 	public double yaw;
 	//rename this to shared target, other entities can set it if its null
-	public EntityLiving leaderTarget;
+	public EntityLivingBase leaderTarget;
 	public double smoothYaw;
 	
 	public double speedSlowest = 0.28D;
@@ -105,7 +104,7 @@ public class Formation {
 					ICoroAI ent = listEntities.get(i);
 					
 					if (ent != null) {
-						if (((EntityLiving)ent).isDead || ((EntityLiving)ent).getDistance(pos.xCoord, pos.yCoord, pos.zCoord) > distMax) {
+						if (((EntityLivingBase)ent).isDead || ((EntityLivingBase)ent).getDistance(pos.xCoord, pos.yCoord, pos.zCoord) > distMax) {
 							leave(ent);
 						}
 					}

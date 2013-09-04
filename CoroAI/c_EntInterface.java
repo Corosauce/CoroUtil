@@ -3,7 +3,7 @@ package CoroAI;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,7 +12,6 @@ import net.minecraft.item.ItemInWorldManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-
 import CoroAI.entity.c_EntityPlayerMPExt;
 
 public class c_EntInterface extends EntityMob
@@ -72,25 +71,15 @@ public class c_EntInterface extends EntityMob
         return player;
     }
 
-    public int getMaxHealth()
-    {
-        return 20;
-    }
-
-    public int getHealth()
-    {
-        return this.health;
-    }
-
     public int getPlHealth()
     {
-        return this.fakePlayer.health;
+        return (int)this.fakePlayer.func_110143_aJ();
     }
 
     public void setPlHealth(int h)
     {
     	try {
-    		if (fakePlayer != null) fakePlayer.health = h;
+    		if (fakePlayer != null) fakePlayer.setEntityHealth(h);
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}
@@ -119,7 +108,7 @@ public class c_EntInterface extends EntityMob
         }
     }
 
-    public void setThrower(EntityThrowable prj, EntityLiving ent)
+    public void setThrower(EntityThrowable prj, EntityLivingBase ent)
     {
     	c_CoroAIUtil.setPrivateValueBoth(EntityThrowable.class, prj, c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ent);
         //prj.thrower = ent;

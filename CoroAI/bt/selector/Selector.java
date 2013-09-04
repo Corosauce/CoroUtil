@@ -20,6 +20,7 @@ public class Selector extends Behavior {
 	
 	protected void addImpl(int parPri, Behavior child) {
 		
+		//not actually used this way yet, depends on order of adding child nodes for now
 		//might wanna add some proper priority using code here, hashmap or maintained list?
 		
 		children.add(child);
@@ -38,7 +39,7 @@ public class Selector extends Behavior {
 	public void reset() {
 		super.reset();
 		resetActiveBehavior();
-		System.out.println("Selector Reset - " + debug);
+		//dbg(" Reset - " + debug);
 		for (int i = 0; i < children.size(); i++) {
 			Behavior bh = children.get(i);
 			if (bh.state == EnumBehaviorState.RUNNING) {

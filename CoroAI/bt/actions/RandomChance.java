@@ -17,7 +17,7 @@ public class RandomChance extends LeafAction {
 		Random rand = new Random();
 		Boolean bool = rand.nextBoolean();
 		//bool = false;
-		System.out.println("Leaf Rand Tick - " + bool);
+		dbg("Leaf Rand Tick - " + bool);
 		return bool ? EnumBehaviorState.SUCCESS : EnumBehaviorState.FAILURE;
 	}
 	

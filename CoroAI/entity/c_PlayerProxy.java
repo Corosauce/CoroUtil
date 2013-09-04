@@ -3,11 +3,17 @@ package CoroAI.entity;
 // Jad home page: http://www.kpdus.com/jad.html
 // Decompiler options: packimports(3) braces deadcode
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -40,12 +46,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.util.LinkedList;
-import java.util.List;
-
 import CoroAI.Behaviors;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
@@ -127,7 +127,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         
         //System.out.println("DEBUG FIX: ");
         //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
-        if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
+        //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
 
         if (fakePlayer != null) {
         	inventory = fakePlayer.inventory;
@@ -501,10 +501,10 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             if(mineDelay < 1 && noMoveTicks > 10) {
                 mineDelay = 3;
                 mining = true;
-                if (entityToAttack instanceof EntityLiving) {
+                if (entityToAttack instanceof EntityLivingBase) {
                 	ItemStack itemToUse = inventory.mainInventory[0];
                 	//if (itemToUse.getItem() instanceof ItemBlock) {
-                	//mod_MinerZombie.tryDig(this, (EntityLiving)entityToAttack);
+                	//mod_MinerZombie.tryDig(this, (EntityLivingBase)entityToAttack);
 	                	if (aimHit != null && aimHit.typeOfHit == EnumMovingObjectType.TILE) {
 	                		if (worldObj.getBlockId(aimHit.blockX, aimHit.blockY, aimHit.blockZ) != 0 && worldObj.getBlockId(aimHit.blockX, aimHit.blockY, aimHit.blockZ) != Block.ladder.blockID) {
 	                			//sync();
@@ -578,13 +578,13 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         
         fakePlayer.getFoodStats().onUpdate(fakePlayer);
         
-        int healthDiff = getPlHealth() - health;
+        float healthDiff = getPlHealth() - func_110143_aJ();
         if (healthDiff > 0) {
         	//System.out.println("player proxy health: " + health + " | " + healthDiff);
         	fakePlayer.addExhaustion(0.18F * healthDiff);
         }
         
-        health = getPlHealth();
+        this.setEntityHealth(getPlHealth());
         
         
         if (moveForward > 0) {
@@ -599,7 +599,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         List var3;
         
         try {
-	        if(this.health > 0) {
+	        if(this.func_110143_aJ() > 0) {
 	        	var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.0D, 1.0D, 2.0D));
 	
 	            if(var3 != null) {
@@ -625,7 +625,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     }
     
     public boolean isEnemy(Entity entity1) {
-		if(entity1 instanceof EntityLiving && !(entity1 instanceof EntityCreeper || entity1 instanceof EntityEnderman) && !(entity1 instanceof EntityPlayer) && !(entity1 == this) && (entity1 instanceof EntityAnimal || entity1 instanceof EntityMob) && !(entity1 instanceof c_EnhAI) ) {
+		if(entity1 instanceof EntityLivingBase && !(entity1 instanceof EntityCreeper || entity1 instanceof EntityEnderman) && !(entity1 instanceof EntityPlayer) && !(entity1 == this) && (entity1 instanceof EntityAnimal || entity1 instanceof EntityMob) && !(entity1 instanceof c_EnhAI) ) {
 			return true;
 		}
 		return false;
@@ -700,7 +700,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	fakePlayer.prevRotationPitch = prevRotationPitch;
     	fakePlayer.prevRotationYaw = prevRotationYaw;
     	
-    	setPlHealth(health);
+    	setPlHealth((int)func_110143_aJ());
     }
     
     public boolean attackEntityFrom(DamageSource par1DamageSource, int par2)
@@ -740,7 +740,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	
     	//if (true) return null;
     	try {
-	    	EntityLiving entityliving = this;
+	    	EntityLivingBase entityliving = this;
 	    	float f = 1.0F;
 	        float f1 = entityliving.prevRotationPitch + (entityliving.rotationPitch - entityliving.prevRotationPitch) * f;
 	    	float f3 = entityliving.prevRotationYaw + (entityliving.rotationYaw - entityliving.prevRotationYaw) * f;
@@ -761,7 +761,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	        //entityliving.info = f3;
 	        double d3 = 2.0D;
 	        Vec3 vec3d1 = vec3d.addVector((double)f8 * d3, (double)f9 * d3, (double)f10 * d3);              // \/ water collide check
-	        MovingObjectPosition movingobjectposition = entityliving.worldObj.rayTraceBlocks_do(vec3d, vec3d1, true);
+	        MovingObjectPosition movingobjectposition = entityliving.worldObj.clip(vec3d, vec3d1, true);
 	
 	        int id = -1;
 	        
@@ -806,7 +806,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         double d4 = 1.8D;
         double d5 = 0.050000000000000003D;
         Vec3 vec3d1 = vec3d.addVector((double)f8 * d3, (double)f9 * d3, (double)f10 * d3);
-        MovingObjectPosition movingobjectposition = entityliving.worldObj.rayTraceBlocks_do(vec3d, vec3d1, true);
+        MovingObjectPosition movingobjectposition = entityliving.worldObj.clip(vec3d, vec3d1, true);
 
         if(movingobjectposition == null) {
             return;
@@ -879,7 +879,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         }
     }
     
-    public boolean onItemUse(ItemStack var1, EntityLiving var2, World var3, int var4, int var5, int var6, int var7) {
+    public boolean onItemUse(ItemStack var1, EntityLivingBase var2, World var3, int var4, int var5, int var6, int var7) {
         int var8 = var3.getBlockId(var4, var5, var6);
         if(var8 == Block.snow.blockID) {
            var7 = 0;
@@ -1169,7 +1169,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             double d3 = vec3d.yCoord - (double)i;
             float f2 = (float)((Math.atan2(d2, d1) * 180D) / 3.1415927410125732D) - 90F;
             float f3 = f2 - rotationYaw;
-            moveForward = moveSpeed;
+            moveForward = getMoveSpeed();
             for(; f3 < -180F; f3 += 360F) { }
             for(; f3 >= 180F; f3 -= 360F) { }
             if(f3 > 30F)
@@ -1201,7 +1201,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             }
         } else {
         	if(this.shouldFaceTarget()) {
-                this.moveForward = this.moveSpeed;
+                this.moveForward = this.getMoveSpeed();
                 this.faceEntity(this.entityToAttack, 60F, 60F);
             } else {
             	//super.updateEntityActionState();
@@ -1233,7 +1233,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         if(getEntityToAttack() != null) {
 
             if (getEntityToAttack() != null && (isSolidPath(getEntityToAttack()) || this.getPath() == null)) {
-                this.moveForward = this.moveSpeed;
+                this.moveForward = this.getMoveSpeed();
                 faceEntity(getEntityToAttack(), 30.0F, 30.0F);
                 //setPathExToEntity(null);
                 return true;
@@ -1295,7 +1295,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 	            	
 	            	//System.out.println("DEBUG FIX 3: ");
 	                //if (fakePlayer != null) ((EntityPlayer)fakePlayer).username = "fakePlayer_";
-	                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
+	                ///*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakePlayer_" + this.entityId;
 	                
 	                //if (fakePlayer != null) {
 	                if (cachedNBT != null) loadInPlayerData(cachedNBT);
@@ -1314,7 +1314,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	
     	if (fakePlayer != null) {
 	    	if (fakePlayer.isDead) { 
-	    		health = 0;
+	    		setHealth(0);
 	    	} else {
 	    		if (getPlHealth() > 0) {
 	    			deathTime = 0;
@@ -1325,12 +1325,8 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	super.onEntityUpdate();
     }
     
-    public int getHealth() {
-    	return this.health;
-    }
-    
     public void setHealth(int val) {
-    	this.health = val;
+    	this.setEntityHealth(val);
     	if (fakePlayer != null) this.setPlHealth(val);
     }
         
@@ -1391,7 +1387,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             //EntityPlayer entityplayer1 = worldObj.getClosestPlayerToEntity(this, f);
         	if (this.fishEntity != null) {
         		currentTarget = this.fishEntity;
-        		c_CoroAIUtil.setPrivateValueBoth(EntityLiving.class, this, "bF", "currentTarget", currentTarget);
+        		c_CoroAIUtil.setPrivateValueBoth(EntityLivingBase.class, this, "bF", "currentTarget", currentTarget);
         	}
             /*if(entityplayer1 != null)
             {
@@ -1507,30 +1503,15 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     {
         entityToAttack = entity;
     }
-
-    public float getSpeedModifier()
-    {
-        float f = super.getSpeedModifier();
-        if(fleeingTick > 0)
-        {
-            f *= 2.0F;
-        }
-        return f;
-    }
     
     public boolean canCoordBeSeen(int x, int y, int z)
     {
-        return worldObj.rayTraceBlocks(Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ), Vec3.createVectorHelper(x, y, z)) == null;
+        return worldObj.clip(Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ), Vec3.createVectorHelper(x, y, z)) == null;
     }
     
     public boolean canCoordBeSeenFromFeet(int x, int y, int z)
     {
-        return worldObj.rayTraceBlocks(Vec3.createVectorHelper(posX, this.boundingBox.minY+0.15, posZ), Vec3.createVectorHelper(x, y, z)) == null;
-    }
-    
-    //For mc 1.0
-    public int getMaxHealth() {
-    	return 20;
+        return worldObj.clip(Vec3.createVectorHelper(posX, this.boundingBox.minY+0.15, posZ), Vec3.createVectorHelper(x, y, z)) == null;
     }
     
     public void readEntityFromNBT(NBTTagCompound var1) {
@@ -1617,7 +1598,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         Vec3 var4 = this.getPosition(par3);
         Vec3 var5 = this.getLook(par3);
         Vec3 var6 = var4.addVector(var5.xCoord * par1, var5.yCoord * par1, var5.zCoord * par1);
-        return this.worldObj.rayTraceBlocks(var4, var6);
+        return this.worldObj.clip(var4, var6);
     }
     
     public Vec3 getPosition(float par1)
@@ -1634,4 +1615,16 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             return Vec3.createVectorHelper(var2, var4, var6);
         }
     }
+
+	public float getMoveSpeed() {
+		return (float) this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e();
+	}
+	
+	public void setMoveSpeed(float var) {
+		//moveSpeed = var;
+		this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
+		if (!worldObj.isRemote) {
+			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
+		}
+	}
 }

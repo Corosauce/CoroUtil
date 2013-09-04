@@ -1,9 +1,12 @@
 package CoroAI.componentAI.jobSystem;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,16 +19,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.List;
-
 import CoroAI.PFQueue;
 import CoroAI.c_CoroAIUtil;
 import CoroAI.componentAI.AIAgent;
 import CoroAI.componentAI.AITamable;
 import CoroAI.componentAI.ICoroAI;
 import CoroAI.entity.EnumActState;
-import CoroAI.entity.EnumJob;
 import CoroAI.entity.EnumJobState;
 import CoroAI.util.CoroUtilInventory;
 
@@ -54,6 +53,9 @@ public class JobBase {
 	public int ticksBeforeCloseCombatRetry = 0;
 	public int ticksBeforeFormationRetry = 0;
 	
+	public long itemLookDelay;
+	public int itemSearchRange = 10;
+	
 	//Taming fields
 	public AITamable tamable;
 	
@@ -63,7 +65,7 @@ public class JobBase {
 		this.ent = jm.ai.ent;
 		this.entInt = jm.ai.entInt;
 		this.tamable = new AITamable(this);
-		//this.ent = (EntityLiving)jm.ent;
+		//this.ent = (EntityLivingBase)jm.ent;
 		setJobState(EnumJobState.IDLE);
 	}
 	
@@ -132,8 +134,8 @@ public class JobBase {
 		int range = 30;
 		
 		for (int xx = (int)Math.floor(ent.posX - range/2); xx < ent.posX + range/2; xx++) {
-			for (int yy = (int)Math.floor(ent.posY - 2); yy < ent.posY + 2; yy++) {
-				for (int zz = (int)Math.floor(-ent.posZ - range/2); zz < ent.posZ + range/2; zz++) {
+			for (int yy = (int)Math.max(1, Math.floor(ent.posY - 2)); yy < ent.posY + 2; yy++) {
+				for (int zz = (int)Math.floor(ent.posZ - range/2); zz < ent.posZ + range/2; zz++) {
 					int id = ent.worldObj.getBlockId(xx, yy, zz);
 					
 					if (CoroUtilInventory.isChest(id)) {
@@ -151,7 +153,7 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+			if (ent.worldObj.clip(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
 				if (pe.getPosition(ent).distanceTo(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
@@ -181,14 +183,11 @@ public class JobBase {
 	
 	public void onIdleTickAct() {
 		
-		//System.out.println("TEMP OFF FOR REFACTOR");
-		
 		if (isInFormation() && ai.activeFormation.leader != entInt) {
 			return;
 		}
 		
-		//slaughter entitycreature ai update function and put idle wander invoking code here
-        if(((ent.getNavigator().noPath()) && ai.rand.nextInt(40) == 0))
+        if(((ent.getNavigator().noPath()) && ai.rand.nextInt(120) == 0))
         {
         	if (!dontStrayFromHome) {
         		ai.updateWanderPath();
@@ -213,8 +212,6 @@ public class JobBase {
         }
 	}
 	
-	public long itemLookDelay;
-	public int itemSearchRange;
     public void lookForItems() {
     	
     	itemSearchRange = 10;
@@ -309,7 +306,7 @@ public class JobBase {
 	}
 	
 	public boolean checkHealth() {
-		if (ent.getHealth() < ent.getMaxHealth() * 0.75) {
+		if (ent.func_110143_aJ() < ent.func_110138_aP() * 0.75) {
 			return true;
 		}
 		return false;
@@ -324,13 +321,13 @@ public class JobBase {
 		
 		float range = 15F;
 		
-    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
-        for(int j = 0; j < list.size(); j++)
-        {
-            Entity entity1 = (Entity)list.get(j);
-            if(!entity1.isDead && isEnemy(entity1))
             {
-            	if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
+            	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+            	for(int j = 0; j < list.size(); j++)
+            	{
+            		Entity entity1 = (Entity)list.get(j);
+            		if(!entity1.isDead && isEnemy(entity1))
+            	if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
             		//if (sanityCheck(entity1)) {
             			float dist = ent.getDistanceToEntity(entity1);
             			if (dist < closest) {
@@ -538,7 +535,7 @@ public class JobBase {
         {
             EntityPlayer var13 = (EntityPlayer)world.playerEntities.get(var12);
 
-            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.getHealth() > 0)
+            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.func_110143_aJ() > 0)
             {
                 double var14 = var13.getDistanceSq(par1, par3, par5);
 
@@ -713,9 +710,9 @@ public class JobBase {
 			ticksBeforeFormationRetry = 60;
 			if (vec != null) {
 				ent.getNavigator().clearPathEntity();
-				//if (ent.getNavigator().noPath()) {
+				if (ent.getNavigator().noPath() || ent.worldObj.getWorldTime() % 10 == 0) {
 					PFQueue.getPath(ent, (int)vec.xCoord, (int)vec.yCoord, (int)vec.zCoord, ai.maxPFRange);
-				//}
+				}
 				
 			} else {
 				//System.out.println("CRITICAL ERROR IN FORMATION PATH AROUND!");

@@ -1,7 +1,5 @@
 package CoroAI.componentAI;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.pathfinding.PathEntity;
 
 
 

@@ -1,12 +1,11 @@
 package CoroAI.entity;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityChest;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntityChest;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
 import CoroAI.c_CoroAIUtil;

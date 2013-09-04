@@ -14,7 +14,7 @@ public class SelectorSequence extends Selector {
 		//this.activeBehaviorIndex = -1;
 		
 		if (this.state == EnumBehaviorState.RUNNING) {
-			System.out.println("SEQ RUNNING");
+			//dbg("SEQ RUNNING");
 			if (activeBehaviorIndex != -1) {
 				setState(children.get(activeBehaviorIndex).tick());
 			} else {
@@ -36,7 +36,7 @@ public class SelectorSequence extends Selector {
 				
 				this.state = children.get(activeBehaviorIndex).tick();
 			}
-		} else if (this.state == EnumBehaviorState.FAILURE) {
+		} else if (this.state == EnumBehaviorState.FAILURE || this.state == EnumBehaviorState.INVALID) {
 			reset();
 		}
 		

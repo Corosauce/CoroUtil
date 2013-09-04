@@ -1,8 +1,6 @@
 package CoroAI.diplomacy;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class TeamTypes {
 
@@ -17,11 +15,12 @@ public class TeamTypes {
 		//typesList.clear();
 		addType("neutral", new String[] {}, new String[] {}, new String[] {});
 		addType("player", new String[] {}, new String[] {}, new String[] {}); //even needed? depends on how non ICoroAI things are handled, and where?
-		addType("koa", new String[] {"ashen", "hostile" }, new String[] {}, new String[] {});
+		addType("koa", new String[] {"ashen", "hostile", "undead" }, new String[] {}, new String[] {});
 		addType("ashen", new String[] {"koa", "player", "comrade" }, new String[] {}, new String[] {});
 		addType("hostile", new String[] {"koa", "player", "comrade" }, new String[] {}, new String[] {});
 		addType("animal", new String[] {}, new String[] {}, new String[] {});
-		addType("comrade", new String[] {"ashen", "hostile"}, new String[] {}, new String[] {});
+		addType("comrade", new String[] {"ashen", "hostile", "undead"}, new String[] {}, new String[] {});
+		addType("undead", new String[] {"comrade", "koa", "player"}, new String[] {}, new String[] {});
 	}
 	
 	public static void addType(String parType, String[] enemies, String[] threats, String[] allies) {

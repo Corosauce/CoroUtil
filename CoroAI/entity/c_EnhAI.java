@@ -1,9 +1,13 @@
 package CoroAI.entity;
 
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,13 +21,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.List;
-import java.util.Random;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-
 import CoroAI.Behaviors;
 import CoroAI.PFQueue;
 import CoroAI.PathEntityEx;
@@ -84,7 +81,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	public int enhancedAIDelay = 100;
 	
 	//flee based stuff
-	public int prevHealth;
+	public float prevHealth;
 	public Entity lastFleeEnt;
 	public boolean tryingToFlee;
 	
@@ -261,7 +258,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			job.jobTypes.clear();
 			job.ent = null;
 		}
-		setLastAttackingEntity((EntityLiving)null);
+		func_130011_c((EntityLivingBase)null);
 	}
 	
 	public double getDistanceXZ(double par1, double par5)
@@ -357,7 +354,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	            Entity entity1 = (Entity)list.get(j);
 	            if(isEnemy(entity1))
 	            {
-	            	if (((EntityLiving) entity1).canEntityBeSeen(this)) {
+	            	if (((EntityLivingBase) entity1).canEntityBeSeen(this)) {
 	            		float dist = this.getDistanceToEntity(entity1);
             			if (dist < closest) {
             				closest = dist;
@@ -387,7 +384,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	public boolean checkHealth() {
-		if (health < getMaxHealth() * 0.75) {
+		if (func_110143_aJ() < func_110138_aP() * 0.75) {
 			return true;
 		}
 		return false;
@@ -416,11 +413,12 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	public float getMoveSpeed() {
-		return moveSpeed;
+		return (float) this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e();
 	}
 	
 	public void setMoveSpeed(float var) {
-		moveSpeed = var;
+		//moveSpeed = var;
+		this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
 		oldMoveSpeed = var;
 		if (!worldObj.isRemote) {
 			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
@@ -464,7 +462,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	            float var14 = (float)(Math.atan2(var10, var8) * 180.0D / Math.PI) - 90.0F;
 	            float var15 = var14 - (float)this.newRotationYaw;
 	
-	            for (this.moveForward = this.moveSpeed; var15 < -180.0F; var15 += 360.0F)
+	            for (this.moveForward = this.getMoveSpeed(); var15 < -180.0F; var15 += 360.0F)
 	            {
 	                ;
 	            }
@@ -530,7 +528,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		if (worldObj.isRemote) {
 			float speed = this.dataWatcher.getWatchableObjectInt(23) / 1000;
 			
-			if (this.moveSpeed != speed) {
+			if (this.getMoveSpeed() != speed) {
 				this.setMoveSpeed(speed);
 			}
 		}
@@ -805,7 +803,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
     }
 	
 	public boolean canSeeBlock(int x, int y, int z) {
-		MovingObjectPosition mop = this.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.posX, this.posY + (double)this.getEyeHeight(), this.posZ), Vec3.createVectorHelper(x, y, z));
+		MovingObjectPosition mop = this.worldObj.clip(Vec3.createVectorHelper(this.posX, this.posY + (double)this.getEyeHeight(), this.posZ), Vec3.createVectorHelper(x, y, z));
 		if (mop == null) return true;
 		if (mop.blockX == x && mop.blockY == y && mop.blockZ == z) return true;
 		return false;
@@ -944,7 +942,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		}*/
 		
 		
-		debugInfo = new StringBuilder().append(oldName + ": " + health + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
+		debugInfo = new StringBuilder().append(oldName + ": " + func_110143_aJ() + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
 		//name = debugInfo;
 		//System.out.println(debugInfo);
 		
@@ -975,13 +973,13 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		//Safe
 		if (dangerLevel == 0) {
 			updateJob();
-			this.moveSpeed = oldMoveSpeed;
+			setMoveSpeed(oldMoveSpeed);
 			
 		//Enemy detected? (by alert system?)
 		} else if (dangerLevel == 1) {
 			//no change for now
 			updateJob();
-			this.moveSpeed = oldMoveSpeed;
+			setMoveSpeed(oldMoveSpeed);
 			
 		//Low health, avoid death
 		} else if (dangerLevel == 2) {
@@ -991,7 +989,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				fleeing = false;
 				//no danger in area, try to continue job
 				updateJob();
-				this.moveSpeed = oldMoveSpeed;
+				setMoveSpeed(oldMoveSpeed);
 			} else {
 				fleeing = true;
 				job.getJobClass().onLowHealth();
@@ -1010,7 +1008,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				
 				
 				
-				this.moveSpeed = fleeSpeed;
+				setMoveSpeed(fleeSpeed);
 			}
 		}
 		
@@ -1219,7 +1217,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	//old code, remake entirely
 	public void actFollow() {
 		//temp
-		EntityLiving entityplayer = null;
+		EntityLivingBase entityplayer = null;
 		followTarget = entityplayer;
 		
 		if (followTarget != null) {			

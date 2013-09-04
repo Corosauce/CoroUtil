@@ -1,7 +1,6 @@
 package CoroAI.entity;
 
 import net.minecraft.item.Item;
-
 import CoroAI.PathEntityEx;
 import CoroAI.c_CoroAIUtil;
 

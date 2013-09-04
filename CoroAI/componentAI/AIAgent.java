@@ -2,9 +2,14 @@ package CoroAI.componentAI;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeInstance;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -85,9 +90,10 @@ public class AIAgent {
 	public Random rand;
 	public int openedChest = 0;
 	public float oldMoveSpeed;
-	public float fleeSpeed = 0.33F;
+	private float fleeSpeed = 0.33F; //set via setter that also sets attribute modifier now
+	private float moveSpeed = 0.28F;
 	public float lungeFactor = 1.0F;
-	public int entID = -1;
+	public int entID = -1; //created with random number generator range 999999999, overlap is possible
 	public EnumActState currentAction;
 	public boolean shouldFixBadYPathing = true;
 	public boolean shouldPathfollow = true;
@@ -103,7 +109,7 @@ public class AIAgent {
 	
 	//fields that should be moved to jobs?
 	public int homeX;
-	public int homeY;
+	public int homeY = -1;
 	public int homeZ;
 	public boolean scanForHomeChest = false;
 	public int targX;
@@ -124,6 +130,11 @@ public class AIAgent {
 	
 	public int lastMovementState = -1;
 	
+	//new 1.6.2 stuff
+	public static final UUID uuid = UUID.randomUUID();
+	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.45D, 0)).func_111168_a(false);
+	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.45D, 0)).func_111168_a(false);
+	
 	public AIAgent(ICoroAI parEnt, boolean useInventory) {
 		ent = (EntityLiving)parEnt;
 		entInt = parEnt;
@@ -136,6 +147,59 @@ public class AIAgent {
 		setState(EnumActState.IDLE);
 
 		if (entID == -1) entID = rand.nextInt(999999999);
+	}
+	
+	/*public void setSpeedMove(float speed) {
+		fleeSpeed = speed;
+	}*/
+	
+	public void applyEntityAttributes() {
+		//baseline movespeed
+		ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(moveSpeed);
+	}
+	
+	public void attrRemoveSpeeds() {
+		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
+        attributeinstance.func_111124_b(speedBoostAttack);
+        attributeinstance.func_111124_b(speedBoostFlee);
+	}
+
+	public void attrSetSpeedFlee() {
+		attrRemoveSpeeds();
+		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
+		attributeinstance.func_111121_a(speedBoostFlee);
+	}
+	
+	public void attrSetSpeedAttack() {
+		attrRemoveSpeeds();
+		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
+		attributeinstance.func_111121_a(speedBoostAttack);
+	}
+	
+	public void attrSetSpeedNormal() {
+		attrRemoveSpeeds();
+	}
+	
+	public void setSpeedFleeAdditive(float speed) {
+		fleeSpeed = speed;
+		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).func_111168_a(false);
+	}
+	
+	//if needed
+	public void setSpeedAttackAdditive(float speed) {
+		//fleeSpeed = speed;
+		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).func_111168_a(false);
+	}
+	
+	public void setSpeedNormalBase(float var) {
+		moveSpeed = var;
+		
+		//System.out.println("temp disable");
+		//c_CoroAIUtil.setMoveSpeed(ent, var);
+		//oldMoveSpeed = var;
+		/*if (!ent.worldObj.isRemote) {
+			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
+		}*/
 	}
 	
 	public void setTeam(String parTeam) {
@@ -153,9 +217,11 @@ public class AIAgent {
 	}
 	
 	public void postFullInit() {
-		homeX = (int)Math.floor(ent.posX);
-		homeY = (int)Math.floor(ent.posY);
-		homeZ = (int)Math.floor(ent.posZ);
+		if (homeY == -1) {
+			homeX = (int)Math.floor(ent.posX);
+			homeY = (int)Math.floor(ent.posY);
+			homeZ = (int)Math.floor(ent.posZ);
+		}
 	}
 	
 	public boolean notPathing() {
@@ -171,31 +237,19 @@ public class AIAgent {
 		currentAction = eka;
 	}
 	
-	public void setMoveSpeed(float var) {
-		c_CoroAIUtil.setMoveSpeed(ent, var);
-		oldMoveSpeed = var;
-		/*if (!ent.worldObj.isRemote) {
-			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
-		}*/
-	}
-	
 	public void entityInit()
     {
         //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
 		
         ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
-        ent.getDataWatcher().addObject(23, new Integer(ent.getMaxHealth()));
+        //ent.getDataWatcher().addObject(23, new Integer(ent.getMaxHealth()));
         ent.getDataWatcher().addObject(24, Integer.valueOf(0)); //AI state, used for stuff like sitting animation, etc
         //24 is used in baseentai
     }
 	
 	public int getDWonGround() {
 		return ent.getDataWatcher().getWatchableObjectInt(22);
-	}
-	
-	public int getDWHealth() {
-		return ent.getDataWatcher().getWatchableObjectInt(23);
 	}
 	
 	public EnumActState getDWStateAI() {
@@ -211,10 +265,10 @@ public class AIAgent {
 				ent.motionY = 0F;
 				ent.onGround = false;
 			}
-			ent.health = ent.getDataWatcher().getWatchableObjectInt(23);
+			//ent.health = ent.getDataWatcher().getWatchableObjectInt(23);
 		} else {
 			ent.getDataWatcher().updateObject(22, Integer.valueOf(ent.onGround ? 1 : 0));
-			ent.getDataWatcher().updateObject(23, Integer.valueOf(ent.health));
+			//ent.getDataWatcher().updateObject(23, Integer.valueOf(ent.health));
 			ent.getDataWatcher().updateObject(24, Integer.valueOf(this.currentAction.ordinal()));
 		}
 		if (useInv) entInv.onLivingUpdateTick();
@@ -240,7 +294,7 @@ public class AIAgent {
         	maxPFRange = PFRangeClose;
         	ent.entityCollisionReduction = collideResistClose;
         	jobMan.getPrimaryJob().onTickCloseCombat();
-        } else if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leader != entInt && !((EntityLiving)activeFormation.leader).isInWater()) {
+        } else if (dangerLevel != 2 && jobMan.getPrimaryJob().shouldTickFormation() && activeFormation.leader != entInt && !((EntityLivingBase)activeFormation.leader).isInWater()) {
         	lastMovementState = 1;
         	maxPFRange = PFRangeFormation;
         	ent.entityCollisionReduction = collideResistFormation;
@@ -496,13 +550,15 @@ public class AIAgent {
 		//Safe
 		if (dangerLevel == 0) {
 			jobMan.tick();
-			c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
+			attrSetSpeedNormal();
+			//c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			
 		//Enemy detected? (by alert system?)
 		} else if (dangerLevel == 1) {
 			//no change for now
 			jobMan.tick();
-			c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
+			attrSetSpeedNormal();
+			//c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			
 		//Low health, avoid death
 		} else if (dangerLevel == 2) {
@@ -512,11 +568,13 @@ public class AIAgent {
 				fleeing = false;
 				//no danger in area, try to continue job
 				jobMan.tick();
-				c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
+				attrSetSpeedNormal();
+				//c_CoroAIUtil.setMoveSpeed(ent, oldMoveSpeed);
 			} else {
 				fleeing = true;
 				jobMan.getPrimaryJob().onLowHealth();
-				c_CoroAIUtil.setMoveSpeed(ent, Math.max(oldMoveSpeed, fleeSpeed));
+				attrSetSpeedFlee();
+				//c_CoroAIUtil.setMoveSpeed(ent, Math.max(oldMoveSpeed, fleeSpeed));
 			}
 		}
 		
@@ -531,7 +589,7 @@ public class AIAgent {
 	
 	public void actFight() {
 		//a range check maybe, but why, strafing/dodging techniques or something, lunging forward while using dagger etc...
-		if (entityToAttack == null || entityToAttack.isDead || entityToAttack == ent || (entityToAttack instanceof EntityLiving && ((EntityLiving)entityToAttack).deathTime > 0)) {
+		if (entityToAttack == null || entityToAttack.isDead || entityToAttack == ent || (entityToAttack instanceof EntityLivingBase && ((EntityLivingBase)entityToAttack).deathTime > 0)) {
 			entityToAttack = null;
 			setState(EnumActState.IDLE);
 		}
@@ -550,7 +608,7 @@ public class AIAgent {
 	}
 	
 	public boolean checkHealth() {
-		if (ent.getHealth() < ent.getMaxHealth() * 0.75) {
+		if (ent.func_110143_aJ() < ent.func_110138_aP() * 0.75) {
 			return true;
 		}
 		return false;
@@ -602,6 +660,29 @@ public class AIAgent {
 		//if threat - setstate moving -> village
 	}
 	
+	public void faceEntity(Entity par1Entity, float par2, float par3)
+    {
+        double d0 = par1Entity.posX - ent.posX;
+        double d1 = par1Entity.posZ - ent.posZ;
+        double d2;
+
+        if (par1Entity instanceof EntityLivingBase)
+        {
+            EntityLivingBase entitylivingbase = (EntityLivingBase)par1Entity;
+            d2 = entitylivingbase.posY + (double)entitylivingbase.getEyeHeight() - (ent.posY + (double)ent.getEyeHeight());
+        }
+        else
+        {
+            d2 = (par1Entity.boundingBox.minY + par1Entity.boundingBox.maxY) / 2.0D - (ent.posY + (double)ent.getEyeHeight());
+        }
+
+        double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
+        float f2 = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
+        float f3 = (float)(-(Math.atan2(d2, d3) * 180.0D / Math.PI));
+        ent.rotationPitch = this.updateRotation(ent.rotationPitch, f3, par3);
+        ent.rotationYaw = this.updateRotation(ent.rotationYaw, f2, par2);
+    }
+	
 	protected void attackEntity(Entity var1, float var2) {
 		if (useInv) {
 			//Cancel if outsourced management says no
@@ -623,7 +704,7 @@ public class AIAgent {
     				if (useInv) {
         				//entInv.attackRanged(var1, var2);
     					if (entInv.inventory == null) return;
-    					entInv.fakePlayer.faceEntity(ent, 180, 180);
+    					faceEntity(ent, 180, 180);
     					entInv.setCurrentSlot(entInv.slot_Melee);
     					//this.setCurrentSlot(entInv.slot_Ranged);
     					entInv.rightClickItem();
@@ -759,7 +840,7 @@ public class AIAgent {
 	
 	public void setTarget(Entity parEnt) {
 		this.entityToAttack = parEnt;
-		if (jobMan.getPrimaryJob().isInFormation() && activeFormation.leaderTarget == null && parEnt instanceof EntityLiving) activeFormation.leaderTarget = (EntityLiving)parEnt;
+		if (jobMan.getPrimaryJob().isInFormation() && activeFormation.leaderTarget == null && parEnt instanceof EntityLivingBase) activeFormation.leaderTarget = (EntityLivingBase)parEnt;
 		setState(EnumActState.FIGHTING);
 	}
 	
@@ -778,6 +859,11 @@ public class AIAgent {
 	
 	public void huntTarget(Entity parEnt) {
 		huntTarget(parEnt, 0);
+	}
+	
+	public void moveTo(ChunkCoordinates coords) {
+		PFQueue.getPath(ent, coords.posX, coords.posY, coords.posZ, maxPFRange, 0);
+		walkToMark(null, coords, 600);
 	}
 	
 	public void faceCoord(ChunkCoordinates coord, float f, float f1) {
@@ -822,7 +908,7 @@ public class AIAgent {
         Vec3 var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
-        return ent.worldObj.rayTraceBlocks(var4, var6);
+        return ent.worldObj.clip(var4, var6);
     }
 	
 	public boolean isInFormation() {
@@ -836,6 +922,10 @@ public class AIAgent {
 		homeX = var1.getInteger("homeX");
 		homeY = var1.getInteger("homeY");
 		homeZ = var1.getInteger("homeZ");
+		String tameName = var1.getString("tamedByUser");
+		if (!tameName.equals("")) {
+			jobMan.getPrimaryJob().tamable.tameBy(tameName);
+		}
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound var1) {
@@ -844,7 +934,7 @@ public class AIAgent {
 		var1.setInteger("homeX", homeX);
 		var1.setInteger("homeY", homeY);
 		var1.setInteger("homeZ", homeZ);
-		
+		var1.setString("tamedByUser", jobMan.getPrimaryJob().tamable.owner);
 	}
 	
 	public boolean hookHit(DamageSource par1DamageSource, int par2) {

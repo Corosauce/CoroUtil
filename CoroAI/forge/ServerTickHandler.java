@@ -2,12 +2,9 @@ package CoroAI.forge;
 
 import java.util.EnumSet;
 
-import CoroAI.formation.Manager;
-
-import net.minecraft.command.ServerCommandManager;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import cpw.mods.fml.common.FMLCommonHandler;
+import CoroAI.formation.Manager;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 

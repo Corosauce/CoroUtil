@@ -1,17 +1,29 @@
 package CoroAI.bt.selector;
 
-import java.util.Iterator;
-
-import net.minecraft.entity.ai.EntityAITaskEntry;
-
 import CoroAI.bt.Behavior;
 import CoroAI.bt.EnumBehaviorState;
 
-/* Until I can find a specific design purpose for this class, this classes purpose can be fulfulled using SelectorSequence with proper conditions */
+/* This class will run all the children on the same tick, or should it bail on the chain if one fails? need to give a return value, SUCCESS be default */
 public class SelectorConcurrent extends Selector {
 
 	public SelectorConcurrent(Behavior parParent) {
 		super(parParent);
+	}
+	
+	@Override
+	public EnumBehaviorState tick() {
+		if (activeBehaviorIndex != -1) {
+			activeBehaviorIndex = 0;
+		}
+		
+		//chain breaks if one returns failure
+		for (int i = 0; i < children.size(); i++) {
+			EnumBehaviorState returnState = children.get(i).tick();
+			if (returnState == EnumBehaviorState.FAILURE) return returnState; //bail
+		}
+		
+		return EnumBehaviorState.SUCCESS;
+		
 	}
 	
 }

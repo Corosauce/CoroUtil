@@ -5,12 +5,9 @@ import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import tropicraft.entities.projectiles.EntityTropicraftLeafballNew;
-
-import cpw.mods.fml.common.registry.LanguageRegistry;
-
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +25,6 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.src.ModLoader;
 import net.minecraft.world.World;
 import CoroAI.Behaviors;
 import CoroAI.c_CoroAIUtil;
@@ -37,6 +33,7 @@ import CoroAI.entity.EntityTropicalFishHook;
 import CoroAI.entity.ItemTropicalFishingRod;
 import CoroAI.entity.ItemTropicraftLeafball;
 import CoroAI.entity.c_EntityPlayerMPExt;
+import CoroAI.util.CoroUtil;
 
 public class AIFakePlayer {
 
@@ -127,7 +124,7 @@ public class AIFakePlayer {
     	}
     	
     	//Prevent AI processing if entity is initializing or dying
-    	if (fakePlayer == null || ai.ent.getHealth() <= 0) return;
+    	if (fakePlayer == null || ai.ent.func_110143_aJ() <= 0) return;
     	
     	tickCooldowns();
     	tickTargetFixing();
@@ -180,7 +177,8 @@ public class AIFakePlayer {
 		    	                
 		    	                success = true;
 		    	                
-		    	                /*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakerPlayer_" + ai.ent.entityId;
+		    	                System.out.println("USERNAME SETTING REMOVED, verify proper username with proper entID");
+		    	                ///*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakerPlayer_" + ai.ent.entityId;
 				                
 				                //if (fakePlayer != null) {
 			                	
@@ -211,9 +209,9 @@ public class AIFakePlayer {
     	
     	if (fakePlayer != null) {
 	    	if (fakePlayer.isDead) { 
-	    		c_CoroAIUtil.setHealth(ai.ent, 0);
+	    		ai.ent.setEntityHealth(0F);
 	    	} else {
-	    		if (fakePlayer.getHealth() > 0) {
+	    		if (fakePlayer.func_110143_aJ() > 0) {
 	    			ai.ent.deathTime = 0;
 	    			sync();
 	    		}
@@ -231,7 +229,7 @@ public class AIFakePlayer {
 
 	public void attackRanged(Entity ent, float dist) {
 		if (inventory == null) return;
-    	fakePlayer.faceEntity(ent, 180, 180);
+    	CoroUtil.faceEntity(fakePlayer, ent, 180, 180);
 		this.setCurrentSlot(slot_Ranged);
 		rightClickItem();
 	}
@@ -308,8 +306,8 @@ public class AIFakePlayer {
 		syncPreInvUsed();
     	try {
     		fakePlayer.attackTargetEntityWithCurrentItem(var1);
-    		if (var1 instanceof EntityLiving) {
-    			if (((EntityLiving) var1).getAITarget() == fakePlayer) {
+    		if (var1 instanceof EntityLivingBase) {
+    			if (((EntityLivingBase) var1).getAITarget() == fakePlayer) {
     				
     			}
     			
@@ -336,10 +334,10 @@ public class AIFakePlayer {
     	
 		int huntRange = 8;
 		
-		List list = ai.ent.worldObj.getEntitiesWithinAABB(EntityLiving.class, ai.ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		List list = ai.ent.worldObj.getEntitiesWithinAABB(EntityCreature.class, ai.ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
         for(int j = 0; j < list.size(); j++)
         {
-        	EntityLiving ent = (EntityLiving)list.get(j);
+        	EntityCreature ent = (EntityCreature)list.get(j);
             
         	if (ent != null && !ent.isDead && ai.entInt.isEnemy(ent)) {
     			Behaviors.checkOrFixTargetTasks(ent, ICoroAI.class);
@@ -347,7 +345,7 @@ public class AIFakePlayer {
         			//ai.dbg("fix area melee revenge targetting on:" + ent);
     				ent.setRevengeTarget(ai.ent);
     				//ent.setAttackTarget(ai.ent);
-    				ent.setLastAttackingEntity(ai.ent);
+    				//ent.setLastAttackingEntity((EntityLivingBase)ai.ent);
         		}
         	}
         }
@@ -355,7 +353,7 @@ public class AIFakePlayer {
 	
 	public void rangedUsageCancelCharge() {
 		if (ai.entityToAttack != null) {
-			fakePlayer.faceEntity(ai.entityToAttack, 180, 180);
+			CoroUtil.faceEntity(fakePlayer, ai.entityToAttack, 180, 180);
 			ItemStack itemToUse = inventory.mainInventory[inventory.currentItem];
 			if (itemToUse != null && itemToUse.getItem() instanceof ItemBow) {
 				double adj = ai.entityToAttack.getDistanceToEntity(fakePlayer) / 5D;
@@ -372,6 +370,8 @@ public class AIFakePlayer {
 	
 	public void rightClickItem() {
     	
+		if (inventory == null) return;
+		
     	boolean wasFired = true;
 		sync();
 		syncPreInvUsed();
@@ -582,7 +582,7 @@ public class AIFakePlayer {
     		ex.printStackTrace();
     	}
     	
-    	c_CoroAIUtil.setHealth(ai.ent, ai.ent.getHealth());
+    	ai.ent.setEntityHealth(ai.ent.func_110143_aJ());
     }
 	
 	public void syncPreInvUsed() {

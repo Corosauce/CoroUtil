@@ -3,10 +3,9 @@ package CoroAI.componentAI.jobSystem;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
-import CoroAI.c_CoroAIUtil;
 import CoroAI.entity.EnumJobState;
 
 public class JobHunt extends JobBase {
@@ -42,7 +41,7 @@ public class JobHunt extends JobBase {
 			hitAndRunDelay = entInt.getCooldownRanged()+1;
 			ai.entityToAttack = ai.lastFleeEnt;
 			if (ai.entityToAttack != null) {
-				ent.faceEntity(ai.entityToAttack, 180F, 180F);
+				ai.faceEntity(ai.entityToAttack, 180F, 180F);
 				if (ai.useInv) {
 					ai.entInv.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
     			} else {
@@ -62,7 +61,7 @@ public class JobHunt extends JobBase {
         	ai.setTargetRetaliate(ds.getEntity());
         }
 		
-		if (ent.getHealth() < ent.getMaxHealth() / 2/* && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()*/) {
+		if (ent.func_110143_aJ() < ent.func_110138_aP() / 2/* && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()*/) {
 			//System.out.println("TEMP OFF FOR REFACTOR");
 			/*ai.dipl_hostilePlayer = true;
 			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
@@ -116,7 +115,7 @@ public class JobHunt extends JobBase {
 		} else {*/
 			setJobState(EnumJobState.IDLE);
 			
-			EntityLiving protectEnt = ent;
+			EntityLivingBase protectEnt = ent;
 			if (tamable.isTame()) {
 				EntityPlayer entP = ent.worldObj.getPlayerEntityByName(tamable.owner);
 				if (entP != null) protectEnt = entP; 
@@ -132,7 +131,7 @@ public class JobHunt extends JobBase {
 		            Entity entity1 = (Entity)list.get(j);
 		            if(isEnemy(entity1))
 		            {
-		            	if (xRay || ((EntityLiving) entity1).canEntityBeSeen(protectEnt)) {
+		            	if (xRay || ((EntityLivingBase) entity1).canEntityBeSeen(protectEnt)) {
 		            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
 		            			float dist = protectEnt.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
@@ -164,7 +163,7 @@ public class JobHunt extends JobBase {
 			} else {
 				
 				if (ai.entityToAttack != null) {
-					if (ent.getNavigator().noPath()/* && ent.getDistanceToEntity(ai.entityToAttack) > 5F*/) {
+					if (ent.getNavigator().noPath() && ent.worldObj.getWorldTime() % 10 == 0/* && ent.getDistanceToEntity(ai.entityToAttack) > 5F*/) {
 						ai.huntTarget(ai.entityToAttack);
 						/*if (ent.isInWater() || !isInFormation() || ai.activeFormation.leader == entInt) */
 					}
@@ -178,11 +177,11 @@ public class JobHunt extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		ent.prevHealth = ent.func_110143_aJ();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ai.shouldAvoid && ent.getHealth() < 10) {
+		if (ai.shouldAvoid && ent.func_110143_aJ() < 10) {
 			return false;
 		}
 		
@@ -198,7 +197,7 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ai.shouldAvoid && ent.getHealth() < 6) {
+		if (ai.shouldAvoid && ent.func_110143_aJ() < 6) {
 			return false;
 		}
 		

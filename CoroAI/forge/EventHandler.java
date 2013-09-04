@@ -2,7 +2,6 @@ package CoroAI.forge;
 
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import CoroAI.componentAI.ICoroAI;
 
 public class EventHandler {
 

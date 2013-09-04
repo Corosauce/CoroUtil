@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import CoroAI.entity.EnumDiploType;
-
 public class TeamInstance {
 
 	//public int id;

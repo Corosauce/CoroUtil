@@ -1,10 +1,8 @@
 package CoroAI.componentAI.jobSystem;
 
-import CoroAI.componentAI.AITamable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import CoroAI.componentAI.AITamable;
 
 
 public class JobTamable extends JobBase {
@@ -21,7 +19,7 @@ public class JobTamable extends JobBase {
 	
 	public void tick() {
 		if (tameTimeCur > 0) {
-			if (!ai.ent.isPotionActive(Potion.confusion.id)) ai.ent.addPotionEffect(new PotionEffect(Potion.confusion.id, 5, 0));
+			//if (!ai.ent.isPotionActive(Potion.confusion.id)) ai.ent.addPotionEffect(new PotionEffect(Potion.confusion.id, 5, 0)); //moved to generic taming
 			tameTimeCur--;
 		}
 		
@@ -40,12 +38,17 @@ public class JobTamable extends JobBase {
 					AITamable tamable = entInt.getAIAgent().jobMan.getPrimaryJob().tamable;
 					if (!tamable.isTame()) tamable.tameBy(par1EntityPlayer.username);
 					incTameTime();
-		    		ai.entInv.inventory.setInventorySlotContents(0, par1EntityPlayer.getCurrentEquippedItem().copy());
-		    		par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = null;
-		    		ai.entInv.sync();
-		    		ai.entInv.setCurrentSlot(0);
-		    		ai.entInv.rightClickItem();
-		    		ai.entInv.inventory.setInventorySlotContents(0, null);
+					if (ai.useInv) {
+						ai.entInv.inventory.setInventorySlotContents(0, par1EntityPlayer.getCurrentEquippedItem().copy());
+			    		par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = null;
+			    		ai.entInv.sync();
+			    		ai.entInv.setCurrentSlot(0);
+			    		ai.entInv.rightClickItem();
+			    		ai.entInv.inventory.setInventorySlotContents(0, null);
+					} else {
+						par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = par1EntityPlayer.getCurrentEquippedItem().copy();
+					}
+		    		
 		    		
 				}
 			}

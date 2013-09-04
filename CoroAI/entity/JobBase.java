@@ -1,9 +1,11 @@
 package CoroAI.entity;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
@@ -15,9 +17,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.List;
-
 import CoroAI.PFQueue;
 
 public class JobBase {
@@ -75,7 +74,7 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+			if (ent.worldObj.clip(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
 				if (pe.getPosition(ent).distanceTo(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
@@ -187,7 +186,7 @@ public class JobBase {
             Entity entity1 = (Entity)list.get(j);
             if(!entity1.isDead && ent.isEnemy(entity1))
             {
-            	if (((EntityLiving) entity1).canEntityBeSeen(ent)) {
+            	if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
             		//if (sanityCheck(entity1)) {
             			float dist = ent.getDistanceToEntity(entity1);
             			if (dist < closest) {
@@ -413,7 +412,7 @@ public class JobBase {
         {
             EntityPlayer var13 = (EntityPlayer)world.playerEntities.get(var12);
 
-            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.getHealth() > 0)
+            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.func_110143_aJ() > 0)
             {
                 double var14 = var13.getDistanceSq(par1, par3, par5);
 
