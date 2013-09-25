@@ -1,7 +1,7 @@
 CoroAI
 ======
 
-Originally based off of the Minecraft pathfinding code.
+Main Uses: Entity AI implementations and threaded pathfinding, originally based off of the Minecraft pathfinding code.
 
 Features:
 ---------
@@ -13,10 +13,11 @@ Features:
 - Designed to run on a thread
 - Uses a queue system to manage pathfind requests
 
+- Has a system for adding a tile datawatcher to tile entities, as well as an NBT based packet system for client->server
+- Also has some WIP behavior tree stuff, not to be used
+
 Some Details:
 -------------
-
-- Latest compiled against MCP/MinecraftForge build #332
 
 Usage:
 ------
