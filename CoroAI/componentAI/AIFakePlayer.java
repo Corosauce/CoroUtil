@@ -633,7 +633,7 @@ public class AIFakePlayer {
         //System.out.println("DEBUG FIX 2: ");
         //player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_", new ItemInWorldManager(world));
         if (c_CoroAIUtil.chunkExists(world, (int)(ai.ent.posX / 16), (int)(ai.ent.posZ / 16))) {
-        	player = new c_EntityPlayerMPExt(mc, world, "fakerPlayer_" + ai.ent.entityId, new ItemInWorldManager(world));
+        	player = new c_EntityPlayerMPExt(mc, world, "fakePlayer_" + ai.ent.entityId, new ItemInWorldManager(world));
         	//inventory = player.inventory;
         } else {
         	//System.out.println("Chunk doesnt exist, cant create fake player, posX: " + posX + " | posZ: " + posZ);

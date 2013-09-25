@@ -10,6 +10,8 @@ public class TeamTypes {
 	//public static List<TeamInstance> typesList = new ArrayList<TeamInstance>();
 	public static HashMap<String, TeamInstance> typesLookup = new HashMap<String, TeamInstance>();
 	
+	
+	
 	public static void initTypes() {
 		typesLookup.clear();
 		//typesList.clear();

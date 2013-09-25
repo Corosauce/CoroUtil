@@ -34,4 +34,15 @@ public class CoroUtilEntity {
         double d5 = ent.posZ - tEnt.zCoord;
         return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
     }
+	
+	public static void moveTowards(Entity ent, Entity targ, float speed) {
+		double vecX = targ.posX - ent.posX;
+		double vecY = targ.posY - ent.posY;
+		double vecZ = targ.posZ - ent.posZ;
+
+		double dist2 = (double)Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
+		ent.motionX += vecX / dist2 * speed;
+		ent.motionY += vecY / dist2 * speed;
+		ent.motionZ += vecZ / dist2 * speed;
+	}
 }

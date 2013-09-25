@@ -135,6 +135,10 @@ public class AIAgent {
 	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.45D, 0)).func_111168_a(false);
 	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.45D, 0)).func_111168_a(false);
 	
+	//arm swingin
+	public boolean swingArm;
+    public int swingTick;
+	
 	public AIAgent(ICoroAI parEnt, boolean useInventory) {
 		ent = (EntityLiving)parEnt;
 		entInt = parEnt;
@@ -239,13 +243,17 @@ public class AIAgent {
 	
 	public void entityInit()
     {
+		//IDS USED ELSEWHERE:
+		//27 is used in baseentai
+		
         //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
 		
         ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
         //ent.getDataWatcher().addObject(23, new Integer(ent.getMaxHealth()));
         ent.getDataWatcher().addObject(24, Integer.valueOf(0)); //AI state, used for stuff like sitting animation, etc
-        //24 is used in baseentai
+        ent.getDataWatcher().addObject(25, Integer.valueOf(0)); //swing arm state
+        
     }
 	
 	public int getDWonGround() {
@@ -256,8 +264,15 @@ public class AIAgent {
 		return EnumActState.get(ent.getDataWatcher().getWatchableObjectInt(24));
 	}
 	
+	public void swingArm() {
+		swingArm = true;
+	}
+	
 	public void onLivingUpdateTick() {
 		if (ent.worldObj.isRemote) {
+			if (ent.getDataWatcher().getWatchableObjectInt(25) == 1) {
+				swingArm = true;
+			}
 			if (ent.getDataWatcher().getWatchableObjectInt(22) == 1) {
 				ent.motionY = 0F;
 				ent.onGround = true;
@@ -270,6 +285,8 @@ public class AIAgent {
 			ent.getDataWatcher().updateObject(22, Integer.valueOf(ent.onGround ? 1 : 0));
 			//ent.getDataWatcher().updateObject(23, Integer.valueOf(ent.health));
 			ent.getDataWatcher().updateObject(24, Integer.valueOf(this.currentAction.ordinal()));
+			ent.getDataWatcher().updateObject(25, Integer.valueOf(swingArm ? 1 : 0));
+			if (swingArm) swingArm = false; //to reset the state so client doesnt get extra swing arm state?
 		}
 		if (useInv) entInv.onLivingUpdateTick();
 	}
@@ -518,11 +535,11 @@ public class AIAgent {
 			float var2 = this.entityToAttack.getDistanceToEntity(ent);
             if (ent.canEntityBeSeen(this.entityToAttack))
             {
-            	attackEntity(this.entityToAttack, var2);
+            	attackEntity(this.entityToAttack, var2);            	
             }
             
-            if (rangedInUse) {
-    			if (dangerLevel == 0 &&/* lastMovementState == 0 && */rangedAimWhileInUse) {
+            /*if (rangedInUse) {
+    			if (dangerLevel == 0 && lastMovementState == 0 && rangedAimWhileInUse) {
     				ent.faceEntity(entityToAttack, 180, 180);
     			}
     			if (useInv) {
@@ -530,7 +547,7 @@ public class AIAgent {
     			} else {
     				rangedUsageUpdate(entityToAttack, var2);
     			}
-    		}
+    		}*/
             
 		} else {
 			entityToAttack = null;
@@ -690,6 +707,9 @@ public class AIAgent {
 			entInv.sync();
 		}
     	
+		//no charge fix
+		if (useInv && entInv.rangedInUseTicksMax == 0) rangedInUse = false;
+		
     	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
     		if (curCooldown_Melee <= 0) {
     			if (rangedInUse) rangedUsageCancelCharge();
@@ -715,7 +735,7 @@ public class AIAgent {
         		this.curCooldown_Melee = entInt.getCooldownMelee();
         	}
     	} else if (rangedInUse) {
-    		//updates elsewhere so doesnt need this method to get called
+    		//updates elsewhere so doesnt need this method to get called (DIRTY LIES)
     	} else if (var2 < maxReach_Ranged) {
     		if (curCooldown_Ranged <= 0 && curCooldown_Melee < maxReach_Melee - (maxReach_Melee / 4)) {
     			ent.faceEntity(var1, 180, 180);

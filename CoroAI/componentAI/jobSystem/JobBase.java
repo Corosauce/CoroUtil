@@ -630,6 +630,7 @@ public class JobBase {
 	}
 	
 	public boolean shouldTickCloseCombat() {
+		if (entInt.getAIAgent() == null) return false;
 		Entity targ = entInt.getAIAgent().entityToAttack;
 		if (targ == null) return false;
 		
@@ -774,11 +775,15 @@ public class JobBase {
 		vecY = ent.posY - (ai.entityToAttack.posY + ((targ.posY - targPrevPosY) * leadTicks));
 		vecZ = ent.posZ - (ai.entityToAttack.posZ + ((ai.entityToAttack.posZ - targPrevPosZ) * leadTicks));*/
 		//ent.getMoveHelper().setMoveTo(vecX, vecY, vecZ, speed);
-		
-		if (ent.getDistanceToEntity(ai.entityToAttack) <= 3D || isMovementSafe()) {
+		double dist = ent.getDistanceToEntity(ai.entityToAttack);
+		if (dist <= 3D || isMovementSafe()) {
 			
 			//ent.getNavigator().clearPathEntity();
-			ent.getMoveHelper().setMoveTo(ai.entityToAttack.posX + vecX, ai.entityToAttack.posY, ai.entityToAttack.posZ + vecZ, speed);
+			if (dist > 1D) {
+				ent.getMoveHelper().setMoveTo(ai.entityToAttack.posX + vecX, ai.entityToAttack.posY, ai.entityToAttack.posZ + vecZ, speed);
+			} else {
+				//nadda?
+			}
 		} else {
 			//System.out.println("not safe!");
 			//ent.motionY = 0.5D;

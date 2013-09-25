@@ -8,6 +8,7 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
+import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.BlockFlowing;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -505,7 +506,9 @@ public class PFQueue implements Runnable {
 		if(var1 != null && var2 != null) {
 			//(par2 - (double)(par1Entity.width / 2.0F)), MathHelper.floor_double(par4), MathHelper.floor_double(par6 - (double)(par1Entity.width / 2.0F))
 			//return tryPath(var1, MathHelper.floor_double(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
-			return tryPath(var1, (int)Math.floor(var2.posX), (int)Math.floor(var2.boundingBox.minY), (int)Math.floor(var2.posZ), var3, priority, parCallback);
+			
+			//ok, we're adding 0.5 here to try to fix an issue when target ent is standing on half slab, might fix stairs issues too?
+			return tryPath(var1, (int)Math.floor(var2.posX), (int)Math.floor(var2.boundingBox.minY + 0.5), (int)Math.floor(var2.posZ), var3, priority, parCallback);
 			
 		} else {
 			return false;
@@ -1178,8 +1181,12 @@ public class PFQueue implements Runnable {
                             	if (override != noOverrideID) {
                             		return override;
                             	}
-                            } else {
+                            } else if (var1 instanceof ICoroAI && var1 instanceof IAdvPF) {
+                            	int override = ((IAdvPF)var1).overrideBlockPathOffset((ICoroAI)var1, var9, meta, var2, var3, var4);
                             	
+                            	if (override != noOverrideID) {
+                            		return override;
+                            	}
                             }
                             
                             if (c_CoroAIUtil.isNoPathBlock(var1, var9, meta)) {
@@ -1209,8 +1216,8 @@ public class PFQueue implements Runnable {
                             if(var11.isSolid()) {
                                 return 0;
                             }
-
-                            if (block != null && block instanceof BlockFlowing) {
+                            
+                            if (block instanceof BlockEnchantmentTable || block instanceof BlockFlowing) {
                             	return -2;
                             }
                             

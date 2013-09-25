@@ -20,8 +20,8 @@ import CoroAI.tile.TileHandler;
 public interface ITilePacket {
 
 	public TileHandler getTileHandler();
-	public void handleClientSentNBT(NBTTagCompound par1NBTTagCompound);
+	public void handleClientSentNBT(String parUsername, NBTTagCompound par1NBTTagCompound);
     public void handleServerSentDataWatcherList(List parList);
-    public void handleClientSentDataWatcherList(List parList);
+    public void handleClientSentDataWatcherList(String parUsername, List parList);
 	
 }

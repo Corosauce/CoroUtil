@@ -3,6 +3,7 @@ package CoroAI;
 
 public abstract interface c_IEnhAI
 {
+	@Deprecated
 	public float getMoveSpeed();
 	//public int health = 0;
 	public boolean canUseLadders();

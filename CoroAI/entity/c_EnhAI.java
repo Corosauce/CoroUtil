@@ -2,12 +2,15 @@ package CoroAI.entity;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeInstance;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
@@ -89,6 +92,12 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 
 	private int jumpDelay;
 	
+	//new 1.6.2 stuff
+	private float moveSpeed = 0.28F;
+	public static final UUID uuid = UUID.randomUUID();
+	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.35D, 0)).func_111168_a(false);
+	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.35D, 0)).func_111168_a(false);
+	
 	public c_EnhAI(World world) 
 	{
 		super(world);		
@@ -168,6 +177,64 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			setOccupationItems();
 			if (entID == -1) entID = rand.nextInt(999999999);
 		}
+	}
+	
+	public void applyEntityAttributes() {
+		//baseline movespeed
+		func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(moveSpeed);
+	}
+	
+	public void attrRemoveSpeeds() {
+		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
+        attributeinstance.func_111124_b(speedBoostAttack);
+        attributeinstance.func_111124_b(speedBoostFlee);
+	}
+
+	public void attrSetSpeedFlee() {
+		attrRemoveSpeeds();
+		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
+		attributeinstance.func_111121_a(speedBoostFlee);
+	}
+	
+	public void attrSetSpeedAttack() {
+		attrRemoveSpeeds();
+		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
+		attributeinstance.func_111121_a(speedBoostAttack);
+	}
+	
+	public void attrSetSpeedNormal() {
+		attrRemoveSpeeds();
+	}
+	
+	public void setSpeedFleeAdditive(float speed) {
+		fleeSpeed = speed;
+		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).func_111168_a(false);
+	}
+	
+	//if needed
+	public void setSpeedAttackAdditive(float speed) {
+		//fleeSpeed = speed;
+		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).func_111168_a(false);
+	}
+	
+	public void setSpeedNormalBase(float var) {
+		moveSpeed = var;
+		
+		//System.out.println("temp disable");
+		//c_CoroAIUtil.setMoveSpeed(ent, var);
+		//oldMoveSpeed = var;
+		/*if (!ent.worldObj.isRemote) {
+			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
+		}*/
+	}
+	
+	@Override
+	protected void func_110147_ax() {
+		super.func_110147_ax();
+		setSpeedFleeAdditive(0.1F);
+		setSpeedNormalBase(0.5F);
+		applyEntityAttributes();
+        this.func_110148_a(SharedMonsterAttributes.field_111267_a).func_111128_a(20.0D);
 	}
 	
 	public void swapJob(EnumJob job) {
@@ -418,7 +485,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	public void setMoveSpeed(float var) {
 		//moveSpeed = var;
-		this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
+		//this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
 		oldMoveSpeed = var;
 		if (!worldObj.isRemote) {
 			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
@@ -973,13 +1040,15 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		//Safe
 		if (dangerLevel == 0) {
 			updateJob();
-			setMoveSpeed(oldMoveSpeed);
+			//setMoveSpeed(oldMoveSpeed);
+			attrSetSpeedNormal();
 			
 		//Enemy detected? (by alert system?)
 		} else if (dangerLevel == 1) {
 			//no change for now
 			updateJob();
-			setMoveSpeed(oldMoveSpeed);
+			//setMoveSpeed(oldMoveSpeed);
+			attrSetSpeedNormal();
 			
 		//Low health, avoid death
 		} else if (dangerLevel == 2) {
@@ -989,7 +1058,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				fleeing = false;
 				//no danger in area, try to continue job
 				updateJob();
-				setMoveSpeed(oldMoveSpeed);
+				//setMoveSpeed(oldMoveSpeed);
+				attrSetSpeedNormal();
 			} else {
 				fleeing = true;
 				job.getJobClass().onLowHealth();
@@ -1007,8 +1077,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 				}*/
 				
 				
-				
-				setMoveSpeed(fleeSpeed);
+				attrSetSpeedFlee();
+				//setMoveSpeed(fleeSpeed);
 			}
 		}
 		

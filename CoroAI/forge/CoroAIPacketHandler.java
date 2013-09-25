@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetworkManager;
@@ -63,7 +64,7 @@ public class CoroAIPacketHandler implements IPacketHandler {
 				if (world != null) {
 					TileEntity tEnt = world.getBlockTileEntity(xCoord, yCoord, zCoord);
 					if (tEnt instanceof ITilePacket) {
-						((ITilePacket) tEnt).handleClientSentNBT(nbt);
+						((ITilePacket) tEnt).handleClientSentNBT(((EntityPlayer)player).username, nbt);
 					}
 				}
 			} else if (packet.channel.equals("CoroAI_TEntDW")) {
@@ -85,7 +86,7 @@ public class CoroAIPacketHandler implements IPacketHandler {
 					if (world != null) {
 						TileEntity tEnt = world.getBlockTileEntity(xCoord, yCoord, zCoord);
 						if (tEnt instanceof ITilePacket) {
-							((ITilePacket) tEnt).handleClientSentDataWatcherList(dwList);
+							((ITilePacket) tEnt).handleClientSentDataWatcherList(((EntityPlayer)player).username, dwList);
 						}
 					}
 				}
