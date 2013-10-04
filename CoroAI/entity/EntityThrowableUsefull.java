@@ -14,11 +14,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import weather.system.wind.WindHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class EntityThrowableUsefull extends Entity implements IProjectile, WindHandler
+public abstract class EntityThrowableUsefull extends Entity implements IProjectile
 {
      int xTile = -1;
     private int yTile = -1;
@@ -360,16 +359,4 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         return this.thrower;
     }
-
-	@Override
-	public float getWindWeight() {
-		// TODO Auto-generated method stub
-		return 999;
-	}
-
-	@Override
-	public int getParticleDecayExtra() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }
