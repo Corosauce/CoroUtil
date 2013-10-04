@@ -130,10 +130,10 @@ public class AIAgent {
 	
 	public int lastMovementState = -1;
 	
-	//new 1.6.2 stuff
+	//new 1.6.2 stuff - 0.45 values here are pointless and overridden
 	public static final UUID uuid = UUID.randomUUID();
-	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.45D, 0)).func_111168_a(false);
-	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.45D, 0)).func_111168_a(false);
+	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.45D, 0)).setSaved(false);
+	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.45D, 0)).setSaved(false);
 	
 	//arm swingin
 	public boolean swingArm;
@@ -159,25 +159,25 @@ public class AIAgent {
 	
 	public void applyEntityAttributes() {
 		//baseline movespeed
-		ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(moveSpeed);
+		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(moveSpeed);
 	}
 	
 	public void attrRemoveSpeeds() {
-		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
-        attributeinstance.func_111124_b(speedBoostAttack);
-        attributeinstance.func_111124_b(speedBoostFlee);
+		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+        attributeinstance.removeModifier(speedBoostAttack);
+        attributeinstance.removeModifier(speedBoostFlee);
 	}
 
 	public void attrSetSpeedFlee() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
-		attributeinstance.func_111121_a(speedBoostFlee);
+		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		attributeinstance.applyModifier(speedBoostFlee);
 	}
 	
 	public void attrSetSpeedAttack() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = ent.func_110148_a(SharedMonsterAttributes.field_111263_d);
-		attributeinstance.func_111121_a(speedBoostAttack);
+		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		attributeinstance.applyModifier(speedBoostAttack);
 	}
 	
 	public void attrSetSpeedNormal() {
@@ -186,13 +186,13 @@ public class AIAgent {
 	
 	public void setSpeedFleeAdditive(float speed) {
 		fleeSpeed = speed;
-		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).func_111168_a(false);
+		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).setSaved(false);
 	}
 	
 	//if needed
 	public void setSpeedAttackAdditive(float speed) {
 		//fleeSpeed = speed;
-		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).func_111168_a(false);
+		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).setSaved(false);
 	}
 	
 	public void setSpeedNormalBase(float var) {
@@ -625,7 +625,7 @@ public class AIAgent {
 	}
 	
 	public boolean checkHealth() {
-		if (ent.func_110143_aJ() < ent.func_110138_aP() * 0.75) {
+		if (ent.getHealth() < ent.getMaxHealth() * 0.75) {
 			return true;
 		}
 		return false;

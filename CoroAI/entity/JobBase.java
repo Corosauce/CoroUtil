@@ -412,7 +412,7 @@ public class JobBase {
         {
             EntityPlayer var13 = (EntityPlayer)world.playerEntities.get(var12);
 
-            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.func_110143_aJ() > 0)
+            if ((!var13.capabilities.disableDamage || !survivalOnly) && var13.getHealth() > 0)
             {
                 double var14 = var13.getDistanceSq(par1, par3, par5);
 

@@ -73,13 +73,13 @@ public class c_EntInterface extends EntityMob
 
     public int getPlHealth()
     {
-        return (int)this.fakePlayer.func_110143_aJ();
+        return (int)this.fakePlayer.getHealth();
     }
 
     public void setPlHealth(int h)
     {
     	try {
-    		if (fakePlayer != null) fakePlayer.setEntityHealth(h);
+    		if (fakePlayer != null) fakePlayer.setHealth(h);
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}

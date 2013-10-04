@@ -57,7 +57,7 @@ public class CoroUtilNBT {
 			
 			
 			//nbttagcompound = new NBTTagCompound(this.getName());
-			Map tagMap = (Map)c_CoroAIUtil.getPrivateValueSRGMCP(NBTTagCompound.class, nbtSource, "field_74784_a", "tagMap");
+			Map tagMap = (Map)c_CoroAIUtil.getPrivateValueSRGMCP(NBTTagCompound.class, nbtSource, "tagMap", "tagMap");
 	        Iterator iterator = tagMap.entrySet().iterator();
 	
 	        while (iterator.hasNext())

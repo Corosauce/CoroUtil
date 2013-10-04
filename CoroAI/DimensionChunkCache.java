@@ -70,7 +70,7 @@ public class DimensionChunkCache implements IBlockAccess
 	    		ArrayList chunks = null;
 	    		
 	    		try {
-	    			chunks = (ArrayList)c_CoroAIUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "field_73245_g");
+	    			chunks = (ArrayList)c_CoroAIUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
 	    		} catch (Exception ex) {
 	    			try {
 	    				chunks = (ArrayList)c_CoroAIUtil.getPrivateValueBoth(ChunkProviderServer.class, world.getChunkProvider(), c_CoroAIUtil.refl_loadedChunks_obf, c_CoroAIUtil.refl_loadedChunks_mcp);

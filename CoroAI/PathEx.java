@@ -70,7 +70,7 @@ public class PathEx
     {
         PathPointEx pathpoint = pathPoints[i];
         if (pathpoint == null) {
-        	System.out.println("pathpoint is null, wtf area scanner");
+        	//System.out.println("pathpoint is null, wtf area scanner");
         	return;
         }
         float f = pathpoint.distanceToTarget;
@@ -83,7 +83,7 @@ public class PathEx
             int j = i - 1 >> 1;
             PathPointEx pathpoint1 = pathPoints[j];
             if (pathpoint1 == null) {
-            	System.out.println("pathpoint is null, wtf area scanner");
+            	//System.out.println("pathpoint is null, wtf area scanner");
             	return;
             }
             if (f >= pathpoint1.distanceToTarget)

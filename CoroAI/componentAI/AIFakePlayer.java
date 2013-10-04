@@ -124,7 +124,7 @@ public class AIFakePlayer {
     	}
     	
     	//Prevent AI processing if entity is initializing or dying
-    	if (fakePlayer == null || ai.ent.func_110143_aJ() <= 0) return;
+    	if (fakePlayer == null || ai.ent.getHealth() <= 0) return;
     	
     	tickCooldowns();
     	tickTargetFixing();
@@ -177,7 +177,7 @@ public class AIFakePlayer {
 		    	                
 		    	                success = true;
 		    	                
-		    	                System.out.println("USERNAME SETTING REMOVED, verify proper username with proper entID");
+		    	                //System.out.println("USERNAME SETTING REMOVED, verify proper username with proper entID");
 		    	                ///*if (fakePlayer != null) */((EntityPlayer)fakePlayer).username = "fakerPlayer_" + ai.ent.entityId;
 				                
 				                //if (fakePlayer != null) {
@@ -209,9 +209,9 @@ public class AIFakePlayer {
     	
     	if (fakePlayer != null) {
 	    	if (fakePlayer.isDead) { 
-	    		ai.ent.setEntityHealth(0F);
+	    		ai.ent.setHealth(0F);
 	    	} else {
-	    		if (fakePlayer.func_110143_aJ() > 0) {
+	    		if (fakePlayer.getHealth() > 0) {
 	    			ai.ent.deathTime = 0;
 	    			sync();
 	    		}
@@ -428,7 +428,7 @@ public class AIFakePlayer {
 								item.onUsingItemTick(itemstack, fakePlayer, --inUseCount);
 							}
 							inUseCount = 1;
-							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "field_71072_f", "itemInUseCount", inUseCount);*/
+							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "itemInUseCount", "itemInUseCount", inUseCount);*/
 							
 							//fakePlayer.stopUsingItem();
 							
@@ -463,7 +463,7 @@ public class AIFakePlayer {
 								fakePlayer.getFoodStats().addStats(food);
 							}
 							
-							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "field_71072_f", "itemInUseCount", inUseCount);
+							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "itemInUseCount", "itemInUseCount", inUseCount);
 							
 							isCharging = false;
 							fakePlayer.stopUsingItem();
@@ -582,7 +582,7 @@ public class AIFakePlayer {
     		ex.printStackTrace();
     	}
     	
-    	ai.ent.setEntityHealth(ai.ent.func_110143_aJ());
+    	ai.ent.setHealth(ai.ent.getHealth());
     }
 	
 	public void syncPreInvUsed() {

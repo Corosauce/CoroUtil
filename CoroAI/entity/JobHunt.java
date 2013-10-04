@@ -66,7 +66,7 @@ public class JobHunt extends JobBase {
 			ent.entityToAttack = ds.getEntity();
 		}
 		
-		if (ent.func_110143_aJ() < ent.func_110138_aP() / 2 && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()) {
+		if (ent.getHealth() < ent.getMaxHealth() / 2 && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()) {
 			ent.dipl_hostilePlayer = true;
 			ent.getGroupInfo(EnumInfo.DIPL_WARN);
 		}
@@ -120,7 +120,7 @@ public class JobHunt extends JobBase {
 		} else {*/
 			setJobState(EnumJobState.IDLE);
 			
-			if (ent.func_110143_aJ() > ent.func_110138_aP() * 0.90F && (ent.entityToAttack == null || ent.rand.nextInt(20) == 0)) {
+			if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ent.entityToAttack == null || ent.rand.nextInt(20) == 0)) {
 				boolean found = false;
 				Entity clEnt = null;
 				float closest = 9999F;
@@ -168,7 +168,7 @@ public class JobHunt extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	
@@ -186,7 +186,7 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ent.func_110143_aJ() < 10) {
+		if (ent.getHealth() < 10) {
 			return false;
 		}
 		
@@ -202,7 +202,7 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ent.func_110143_aJ() < 6) {
+		if (ent.getHealth() < 6) {
 			return false;
 		}
 		

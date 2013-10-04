@@ -130,7 +130,7 @@ public class JobInvade extends JobBase {
 		            if(ent.isEnemy(entity1))
 		            {
 		            	//if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
-		            		if (sanityCheck(entity1) && entity1 instanceof EntityLivingBase && ((EntityLivingBase)entity1).func_110143_aJ() > 0) {
+		            		if (sanityCheck(entity1) && entity1 instanceof EntityLivingBase && ((EntityLivingBase)entity1).getHealth() > 0) {
 		            			float dist = ent.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
 		            				closest = dist;
@@ -196,7 +196,7 @@ public class JobInvade extends JobBase {
 			if (clEnt == null && ent.entityToAttack == null) {
 				//GET PLAYER SINCE NO CLOSE TARGETS!!!!!
 	        	EntityPlayer entP = getClosestPlayerToEntity(ent, -1F, false);
-	        	if (entP != null && entP.func_110143_aJ() > 0) {
+	        	if (entP != null && entP.getHealth() > 0) {
 		        	if (ent.getNavigator().noPath()) {
 		        		//System.out.println("huntTarget far");
 	        			ent.huntTarget(entP);
@@ -210,7 +210,7 @@ public class JobInvade extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	
@@ -218,7 +218,7 @@ public class JobInvade extends JobBase {
 		
 		if (true) return true;
 		
-		if (ent.func_110143_aJ() < 10) {
+		if (ent.getHealth() < 10) {
 			return false;
 		}
 		

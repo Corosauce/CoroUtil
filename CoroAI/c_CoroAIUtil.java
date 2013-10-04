@@ -543,8 +543,8 @@ public class c_CoroAIUtil {
     public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
     public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
     public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
-    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e(); }
-    //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(speed); }
+    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue(); }
+    //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
     public static void jump(EntityLivingBase ent) { ent.jump(); }
     public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5

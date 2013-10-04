@@ -578,13 +578,13 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         
         fakePlayer.getFoodStats().onUpdate(fakePlayer);
         
-        float healthDiff = getPlHealth() - func_110143_aJ();
+        float healthDiff = getPlHealth() - getHealth();
         if (healthDiff > 0) {
         	//System.out.println("player proxy health: " + health + " | " + healthDiff);
         	fakePlayer.addExhaustion(0.18F * healthDiff);
         }
         
-        this.setEntityHealth(getPlHealth());
+        this.setHealth(getPlHealth());
         
         
         if (moveForward > 0) {
@@ -599,7 +599,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
         List var3;
         
         try {
-	        if(this.func_110143_aJ() > 0) {
+	        if(this.getHealth() > 0) {
 	        	var3 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(2.0D, 1.0D, 2.0D));
 	
 	            if(var3 != null) {
@@ -700,7 +700,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     	fakePlayer.prevRotationPitch = prevRotationPitch;
     	fakePlayer.prevRotationYaw = prevRotationYaw;
     	
-    	setPlHealth((int)func_110143_aJ());
+    	setPlHealth((int)getHealth());
     }
     
     public boolean attackEntityFrom(DamageSource par1DamageSource, int par2)
@@ -1326,7 +1326,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     }
     
     public void setHealth(int val) {
-    	this.setEntityHealth(val);
+    	this.setHealth(val);
     	if (fakePlayer != null) this.setPlHealth(val);
     }
         
@@ -1617,12 +1617,12 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
     }
 
 	public float getMoveSpeed() {
-		return (float) this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e();
+		return (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
 	}
 	
 	public void setMoveSpeed(float var) {
 		//moveSpeed = var;
-		this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
+		this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(var);
 		if (!worldObj.isRemote) {
 			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
 		}

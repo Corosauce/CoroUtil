@@ -103,7 +103,7 @@ public class Behaviors {
 			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIArrowAttack((IRangedAttackMob)ent, 0.25F, 20, 60, 15.0F);
 			
 			ent.tasks.addTask(3, newTask);
-			EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, ent, "field_70715_bh", "targetTasks");
+			EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, ent, "targetTasks", "targetTasks");
 			if (targetTasks != null) {
 				targetTasks.addTask(2, newTargetTask);
 				//System.out.println("Adding targetting!");
@@ -166,7 +166,7 @@ public class Behaviors {
 		                			PFQueue.getPath(entC, ent, 16F);
 		                			if (!aiEnhanced.containsKey(entC)) {
 		                				entC.tasks.addTask(3, new EntityAIAttackOnCollide(entC, c_EnhAI.class, 0.23F/*entC.getAIMoveSpeed()*/, true));
-		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, entC, "field_70715_bh", "targetTasks");
+		                				EntityAITasks targetTasks = (EntityAITasks)c_CoroAIUtil.getPrivateValueSRGMCP(EntityLivingBase.class, entC, "targetTasks", "targetTasks");
 		                				if (targetTasks != null) {
 		                					targetTasks.addTask(2, new EntityAINearestAttackableTarget(entC, c_EnhAI.class, 0, true));
 		                				} else System.out.println("update targetTasks reflection");

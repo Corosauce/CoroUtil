@@ -95,8 +95,8 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	//new 1.6.2 stuff
 	private float moveSpeed = 0.28F;
 	public static final UUID uuid = UUID.randomUUID();
-	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.35D, 0)).func_111168_a(false);
-	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.35D, 0)).func_111168_a(false);
+	public static AttributeModifier speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", 0.35D, 0)).setSaved(false);
+	public static AttributeModifier speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", 0.35D, 0)).setSaved(false);
 	
 	public c_EnhAI(World world) 
 	{
@@ -179,27 +179,27 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		}
 	}
 	
-	public void applyEntityAttributes() {
+	public void applyEntityAttributesMine() {
 		//baseline movespeed
-		func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(moveSpeed);
+		getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(moveSpeed);
 	}
 	
 	public void attrRemoveSpeeds() {
-		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
-        attributeinstance.func_111124_b(speedBoostAttack);
-        attributeinstance.func_111124_b(speedBoostFlee);
+		AttributeInstance attributeinstance = getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+        attributeinstance.removeModifier(speedBoostAttack);
+        attributeinstance.removeModifier(speedBoostFlee);
 	}
 
 	public void attrSetSpeedFlee() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
-		attributeinstance.func_111121_a(speedBoostFlee);
+		AttributeInstance attributeinstance = getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		attributeinstance.applyModifier(speedBoostFlee);
 	}
 	
 	public void attrSetSpeedAttack() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = func_110148_a(SharedMonsterAttributes.field_111263_d);
-		attributeinstance.func_111121_a(speedBoostAttack);
+		AttributeInstance attributeinstance = getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		attributeinstance.applyModifier(speedBoostAttack);
 	}
 	
 	public void attrSetSpeedNormal() {
@@ -208,13 +208,13 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	
 	public void setSpeedFleeAdditive(float speed) {
 		fleeSpeed = speed;
-		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).func_111168_a(false);
+		speedBoostFlee = (new AttributeModifier(uuid, "Speed boost flee", fleeSpeed, 0)).setSaved(false);
 	}
 	
 	//if needed
 	public void setSpeedAttackAdditive(float speed) {
 		//fleeSpeed = speed;
-		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).func_111168_a(false);
+		speedBoostAttack = (new AttributeModifier(uuid, "Speed boost attack", speed, 0)).setSaved(false);
 	}
 	
 	public void setSpeedNormalBase(float var) {
@@ -229,12 +229,12 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	@Override
-	protected void func_110147_ax() {
-		super.func_110147_ax();
+	protected void applyEntityAttributes() {
+		super.applyEntityAttributes();
 		setSpeedFleeAdditive(0.1F);
 		setSpeedNormalBase(0.5F);
-		applyEntityAttributes();
-        this.func_110148_a(SharedMonsterAttributes.field_111267_a).func_111128_a(20.0D);
+		applyEntityAttributesMine();
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setAttribute(20.0D);
 	}
 	
 	public void swapJob(EnumJob job) {
@@ -325,7 +325,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 			job.jobTypes.clear();
 			job.ent = null;
 		}
-		func_130011_c((EntityLivingBase)null);
+		setLastAttacker((EntityLivingBase)null);
 	}
 	
 	public double getDistanceXZ(double par1, double par5)
@@ -451,7 +451,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	public boolean checkHealth() {
-		if (func_110143_aJ() < func_110138_aP() * 0.75) {
+		if (getHealth() < getMaxHealth() * 0.75) {
 			return true;
 		}
 		return false;
@@ -480,12 +480,12 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 	}
 	
 	public float getMoveSpeed() {
-		return (float) this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111126_e();
+		return (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
 	}
 	
 	public void setMoveSpeed(float var) {
 		//moveSpeed = var;
-		//this.func_110148_a(SharedMonsterAttributes.field_111263_d).func_111128_a(var);
+		//this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(var);
 		oldMoveSpeed = var;
 		if (!worldObj.isRemote) {
 			this.dataWatcher.updateObject(23, Integer.valueOf((int)(var * 1000)));
@@ -1009,7 +1009,7 @@ public class c_EnhAI extends c_PlayerProxy implements c_IEnhAI
 		}*/
 		
 		
-		debugInfo = new StringBuilder().append(oldName + ": " + func_110143_aJ() + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
+		debugInfo = new StringBuilder().append(oldName + ": " + getHealth() + "|" + getFoodLevel() + " | " + job.priJob + " -> " + job.getJobState() + "|" + currentAction + "|" + pfNodes + "|").toString();
 		//name = debugInfo;
 		//System.out.println(debugInfo);
 		

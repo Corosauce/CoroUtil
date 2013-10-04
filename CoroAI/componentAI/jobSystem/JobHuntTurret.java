@@ -107,7 +107,7 @@ public class JobHuntTurret extends JobBase {
 		} else {
 			
 		}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	

@@ -2,13 +2,12 @@ package CoroAI.componentAI.jobSystem;
 
 import java.util.List;
 
-import zombiecraft.Core.Entities.BaseEntAI;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import CoroAI.PFQueue;
+import CoroAI.componentAI.ICoroAI;
 
 /* JobInvade: For Omnipotent focused invasions */
 
@@ -128,7 +127,7 @@ public class JobInvade extends JobBase {
 		            if(isEnemy(entity1))
 		            {
 		            	//if (((EntityLivingBase) entity1).canEntityBeSeen(ent)) {
-		            		if (sanityCheck(entity1) && entity1 instanceof EntityLivingBase && ((EntityLivingBase)entity1).func_110143_aJ() > 0) {
+		            		if (sanityCheck(entity1) && entity1 instanceof EntityLivingBase && ((EntityLivingBase)entity1).getHealth() > 0) {
 		            			float dist = ent.getDistanceToEntity(entity1);
 		            			if (dist < closest) {
 		            				closest = dist;
@@ -148,7 +147,7 @@ public class JobInvade extends JobBase {
 		        	
 		        	if (isSolidPath(clEnt)) {
 		        		
-		        		if (!((BaseEntAI)ent).isBreaking()) {
+		        		if (!((ICoroAI)ent).isBreaking()) {
 		        			ai.huntTarget(clEnt, -1);
 		        		}
 		        		//System.out.println("huntTarget instant");
@@ -159,7 +158,7 @@ public class JobInvade extends JobBase {
 		        			
 		        			if (ent.getNavigator().noPath() || ((EntityLivingBase) clEnt).canEntityBeSeen(ent)) {
 		        				retargetDelayCount = retargetDelay;
-		        				if (!((BaseEntAI)ent).isBreaking()) {
+		        				if (!((ICoroAI)ent).isBreaking()) {
 		        					ai.huntTarget(clEnt);
 		        				}
 		        			}
@@ -181,7 +180,7 @@ public class JobInvade extends JobBase {
 					
 					if (((ent.getNavigator().noPath()) && (retargetDelayCount == 0 && dist > 2F/* && ent.entityToAttack.getDistanceToEntity(ent) < retargetDist*/))/* && ent.getDistanceToEntity(ent.entityToAttack) > 5F*/) {
 						retargetDelayCount = retargetDelay;
-						if (!((BaseEntAI)ent).isBreaking()) {
+						if (!((ICoroAI)ent).isBreaking()) {
 							if (PFQueue.getPath(ent, ai.entityToAttack, ai.maxPFRange)) {
 								//System.out.println("huntTarget repath");
 							}
@@ -194,7 +193,7 @@ public class JobInvade extends JobBase {
 			if (clEnt == null && ai.entityToAttack == null) {
 				//GET PLAYER SINCE NO CLOSE TARGETS!!!!!
 	        	EntityPlayer entP = getClosestPlayerToEntity(ent, -1F, false);
-	        	if (entP != null && entP.func_110143_aJ() > 0) {
+	        	if (entP != null && entP.getHealth() > 0) {
 		        	if (ent.getNavigator().noPath()) {
 		        		//System.out.println("huntTarget far");
 	        			ai.huntTarget(entP);
@@ -208,7 +207,7 @@ public class JobInvade extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	//copied from c_EnhAI, might be replacable with new isMovementSafe stuff

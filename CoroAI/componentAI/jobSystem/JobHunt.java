@@ -61,7 +61,7 @@ public class JobHunt extends JobBase {
         	ai.setTargetRetaliate(ds.getEntity());
         }
 		
-		if (ent.func_110143_aJ() < ent.func_110138_aP() / 2/* && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()*/) {
+		if (ent.getHealth() < ent.getMaxHealth() / 2/* && ds.getEntity() == c_CoroAIUtil.getFirstPlayer()*/) {
 			//System.out.println("TEMP OFF FOR REFACTOR");
 			/*ai.dipl_hostilePlayer = true;
 			ai.getGroupInfo(EnumInfo.DIPL_WARN);*/
@@ -177,11 +177,11 @@ public class JobHunt extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ai.shouldAvoid && ent.func_110143_aJ() < 10) {
+		if (ai.shouldAvoid && ent.getHealth() < 10) {
 			return false;
 		}
 		
@@ -197,7 +197,7 @@ public class JobHunt extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ai.shouldAvoid && ent.func_110143_aJ() < 6) {
+		if (ai.shouldAvoid && ent.getHealth() < 6) {
 			return false;
 		}
 		

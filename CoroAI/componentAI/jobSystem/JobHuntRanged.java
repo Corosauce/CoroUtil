@@ -148,7 +148,7 @@ public class JobHuntRanged extends JobBase {
 		
 		setJobState(EnumJobState.IDLE);
 		
-		if (ent.func_110143_aJ() > ent.func_110138_aP() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
+		if (ent.getHealth() > ent.getMaxHealth() * 0.90F && (ai.entityToAttack == null || ai.rand.nextInt(20) == 0)) {
 			boolean found = false;
 			Entity clEnt = null;
 			float closest = 9999F;
@@ -210,11 +210,11 @@ public class JobHuntRanged extends JobBase {
 				targetLastPos = Vec3.createVectorHelper(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ);
 			}
 		}
-		ent.prevHealth = ent.func_110143_aJ();
+		ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {
-		if (ent.func_110143_aJ() < 10) {
+		if (ent.getHealth() < 10) {
 			return false;
 		}
 		
@@ -230,7 +230,7 @@ public class JobHuntRanged extends JobBase {
 	}
 	
 	public boolean sanityCheck(Entity target) {
-		if (ent.func_110143_aJ() < 6) {
+		if (ent.getHealth() < 6) {
 			return false;
 		}
 		
