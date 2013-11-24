@@ -33,29 +33,26 @@ import cpw.mods.fml.common.ObfuscationReflectionHelper;
 public class c_CoroAIUtil {
 	
 	public static String refl_mcp_Item_maxStackSize = "maxStackSize";
-	public static String refl_c_Item_maxStackSize = "cq";
     public static String refl_s_Item_maxStackSize = "cq";
-	public static String refl_mcp_Item_moveSpeed = "moveSpeed";
-	public static String refl_obf_Item_moveSpeed = "bI";
+	//public static String refl_mcp_Item_moveSpeed = "moveSpeed";
+	//public static String refl_obf_Item_moveSpeed = "bI";
 	
 	public static String refl_mcp_EntityPlayer_itemInUse = "itemInUse";
-	public static String refl_c_EntityPlayer_itemInUse = "f";
-	public static String refl_s_EntityPlayer_itemInUse = "f";
+	public static String refl_s_EntityPlayer_itemInUse = "field_71074_e";
 	public static String refl_mcp_EntityPlayer_itemInUseCount = "itemInUseCount";
-	public static String refl_c_EntityPlayer_itemInUseCount = "g";
-	public static String refl_s_EntityPlayer_itemInUseCount = "g";
+	public static String refl_s_EntityPlayer_itemInUseCount = "field_71072_f";
 	public static String refl_mcp_FoodStats_foodLevel = "foodLevel";
-	public static String refl_c_FoodStats_foodLevel = "a";
-	public static String refl_s_FoodStats_foodLevel = "a";
+	//public static String refl_c_FoodStats_foodLevel = "a";
+	public static String refl_s_FoodStats_foodLevel = "field_75127_a";
 	
 	public static String refl_thrower_mcp = "thrower";
-	public static String refl_thrower_obf = "g";
+	public static String refl_thrower_obf = "field_70192_c";
 	
 	public static String refl_loadedChunks_mcp = "loadedChunks";
-	public static String refl_loadedChunks_obf = "g";
+	public static String refl_loadedChunks_obf = "field_73245_g";
 	
 	public static String refl_curBlockDamageMP_mcp = "curBlockDamageMP";
-	public static String refl_curBlockDamageMP_obf = "g";
+	public static String refl_curBlockDamageMP_obf = "field_78770_f";
 	
 	
 	
@@ -152,7 +149,7 @@ public class c_CoroAIUtil {
 	public static Field tryGetField(Class theClass, String obf, String mcp) {
 		Field field = null;
 		try {
-			field = theClass.getDeclaredField(ObfuscationReflectionHelper.remapFieldNames(theClass.getName(), new String[] { obf })[0]);
+			field = theClass.getDeclaredField(obf);//field = theClass.getDeclaredField(ObfuscationReflectionHelper.remapFieldNames(theClass.getName(), new String[] { obf })[0]);
 			field.setAccessible(true);
 		} catch (Exception ex) {
 			try {

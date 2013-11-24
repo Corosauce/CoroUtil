@@ -73,7 +73,7 @@ public class DimensionChunkCache implements IBlockAccess
 	    			chunks = (ArrayList)c_CoroAIUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
 	    		} catch (Exception ex) {
 	    			try {
-	    				chunks = (ArrayList)c_CoroAIUtil.getPrivateValueBoth(ChunkProviderServer.class, world.getChunkProvider(), c_CoroAIUtil.refl_loadedChunks_obf, c_CoroAIUtil.refl_loadedChunks_mcp);
+	    				chunks = (ArrayList)c_CoroAIUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), c_CoroAIUtil.refl_loadedChunks_obf, c_CoroAIUtil.refl_loadedChunks_mcp);
 	    			} catch (Exception ex2) {
 	    				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
 	    			}

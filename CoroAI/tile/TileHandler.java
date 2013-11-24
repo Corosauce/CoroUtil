@@ -3,6 +3,8 @@ package CoroAI.tile;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroAI.packet.PacketHelper;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -62,7 +64,7 @@ public class TileHandler {
 	
 	public void tickUpdate() {
 		if (tileDataWatcher.hasChanges()) {
-			System.out.println("server side detects changes! packets go go go!");
+			//System.out.println("server side detects changes! packets go go go!");
 			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayersInDimension(PacketHelper.createPacketForTEntDWServer(tEnt), tEnt.worldObj.provider.dimensionId);
 		}
 	}
@@ -90,7 +92,7 @@ public class TileHandler {
 	}
 	
 	public void handleServerSentDataWatcherList(List parList) {
-		System.out.println(this + " client received DW data, updating");
+		//System.out.println(this + " client received DW data, updating");
 		tileDataWatcher.updateWatchedObjectsFromList(parList);
 	}
 }

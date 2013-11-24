@@ -56,7 +56,7 @@ public class CoroAIWorldAccess implements IWorldAccess {
 	@Override
 	public void onEntityDestroy(Entity entity) {
 		// TODO Auto-generated method stub
-		if (entity instanceof ICoroAI) ((ICoroAI)entity).getAIAgent().cleanup();
+		if (entity instanceof ICoroAI && ((ICoroAI)entity).getAIAgent() != null) ((ICoroAI)entity).getAIAgent().cleanup();
 	}
 
 	@Override

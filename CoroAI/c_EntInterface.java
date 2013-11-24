@@ -110,7 +110,7 @@ public class c_EntInterface extends EntityMob
 
     public void setThrower(EntityThrowable prj, EntityLivingBase ent)
     {
-    	c_CoroAIUtil.setPrivateValueBoth(EntityThrowable.class, prj, c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ent);
+    	c_CoroAIUtil.setPrivateValueSRGMCP(EntityThrowable.class, prj, c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ent);
         //prj.thrower = ent;
     }
 }

@@ -25,7 +25,7 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
+@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW", "NBTData_CONT", "NBTData_GUI" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
 public class CoroAI {
 	

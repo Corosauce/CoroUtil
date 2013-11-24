@@ -96,5 +96,5 @@ public class c_EntityPlayerMPExt extends EntityPlayerMP
     	return "something horrible";
     }
     
-    
+    public void sendChatToPlayer(String s){}
 }

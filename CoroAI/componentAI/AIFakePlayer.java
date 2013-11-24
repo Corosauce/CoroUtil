@@ -63,7 +63,7 @@ public class AIFakePlayer {
     public int slot_Melee = 0;
 	public int slot_Ranged = 1;
 	public int slot_Tool = 2;
-	public int rangedInUseTicksMax = 15;
+	public int rangedInUseTicksMax = 15; //changed from 15 since everything is breaking apparently
 	public boolean shouldLookForPickups = false;
 	public boolean grabXP = false;
     public boolean grabItems = false;
@@ -463,7 +463,7 @@ public class AIFakePlayer {
 								fakePlayer.getFoodStats().addStats(food);
 							}
 							
-							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "itemInUseCount", "itemInUseCount", inUseCount);
+							c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, "field_71072_f", "itemInUseCount", inUseCount);
 							
 							isCharging = false;
 							fakePlayer.stopUsingItem();
@@ -491,7 +491,7 @@ public class AIFakePlayer {
     	if (ent instanceof EntityThrowable) {
     		//((EntityThrowable) ent).posY += 1.5F;
     		//setThrower(((EntityThrowable) ent), this);
-    		c_CoroAIUtil.setPrivateValueBoth(EntityThrowable.class, ((EntityThrowable) ent), c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ai.ent);
+    		c_CoroAIUtil.setPrivateValueSRGMCP(EntityThrowable.class, ((EntityThrowable) ent), c_CoroAIUtil.refl_thrower_obf, c_CoroAIUtil.refl_thrower_mcp, ai.ent);
 			//((EntityThrowable) ent).doesArrowBelongToPlayer = false;
 			/*try { 
 				//FIX ME

@@ -19,6 +19,8 @@ import net.minecraftforge.common.DimensionManager;
 import CoroAI.ITilePacket;
 import CoroAI.componentAI.ICoroAI;
 import CoroAI.entity.c_EnhAI;
+import CoroAI.packet.INBTPacketHandler;
+import CoroAI.packet.NBTDataManager;
 import CoroAI.tile.TileDataWatcher;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.IPacketHandler;
@@ -34,6 +36,19 @@ public class CoroAIPacketHandler implements IPacketHandler {
 	@SideOnly(Side.CLIENT)
 	public World getClientWorld() {
 		return Minecraft.getMinecraft().theWorld;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public EntityPlayer getClientPlayer() {
+		return Minecraft.getMinecraft().thePlayer;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public INBTPacketHandler getClientDataInterface() {
+		if (Minecraft.getMinecraft().currentScreen instanceof INBTPacketHandler) {
+			return (INBTPacketHandler)Minecraft.getMinecraft().currentScreen;
+		}
+		return null;
 	}
 	
 	@Override
@@ -88,6 +103,43 @@ public class CoroAIPacketHandler implements IPacketHandler {
 						if (tEnt instanceof ITilePacket) {
 							((ITilePacket) tEnt).handleClientSentDataWatcherList(((EntityPlayer)player).username, dwList);
 						}
+					}
+				}
+			} else if (packet.channel.equals("NBTData_GUI")) {
+				//interface locations:
+				//client: open gui, server: ???
+				
+				//given the fact of saving data to disk..... perhaps a managed data system for this is also needed
+				
+				//a global server side handler, gets username still just in case for future
+				//if client needs more consistant cache it should also use this data storage, a client side version
+				
+				//should still run through whatever implements the interfaces i guess so they can get callbacks still?
+				
+				if (side == Side.CLIENT) {
+					NBTDataManager.nbtDataFromServer(Packet.readNBTTagCompound(dis));
+				} else {
+					EntityPlayer entP = (EntityPlayer)player;
+					NBTDataManager.nbtDataFromClient(entP.username, Packet.readNBTTagCompound(dis));
+				}
+				
+			} else if (packet.channel.equals("NBTData_CONT")) {
+				//interface locations:
+				//client: open gui, server: open container
+				
+				//for client to server, use the username, get instance, then you can lookup the players openContainer and require an interface to give the container the callback
+				//both client and server use same interface, different methods to receive, determined here
+				
+				//to use INBTPacketHandler with stuff other than containers/guis, add another channel and more rules in that code block to get those interfaces
+				if (side == Side.CLIENT) {
+					INBTPacketHandler nbtHandler = getClientDataInterface();
+					if (nbtHandler != null) {
+						nbtHandler.nbtDataFromServer(Packet.readNBTTagCompound(dis));
+					}
+				} else {
+					EntityPlayer entP = (EntityPlayer)player;
+					if (entP.openContainer instanceof INBTPacketHandler) {
+						((INBTPacketHandler)entP.openContainer).nbtDataFromClient(entP.username, Packet.readNBTTagCompound(dis));
 					}
 				}
 			}

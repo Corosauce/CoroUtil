@@ -273,7 +273,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
 							fakePlayer.getFoodStats().addStats(food);
 						}
 						
-						c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_c_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, inUseCount);
+						c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_s_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, inUseCount);
 						
 						isCharging = false;
 						//fakePlayer.stopUsingItem();
@@ -567,7 +567,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
                 {
                 	updateItemUse(itemstack, 5);
                 }
-                c_CoroAIUtil.setPrivateValueBoth(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_c_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, fakePlayer.getItemInUseCount()-1);
+                c_CoroAIUtil.setPrivateValueSRGMCP(EntityPlayer.class, fakePlayer, c_CoroAIUtil.refl_s_EntityPlayer_itemInUseCount, c_CoroAIUtil.refl_mcp_EntityPlayer_itemInUseCount, fakePlayer.getItemInUseCount()-1);
                 
                 if (fakePlayer.getItemInUseCount() == 0 && !worldObj.isRemote)
                 {
@@ -1387,7 +1387,7 @@ public class c_PlayerProxy extends c_EntInterface implements c_IEnhPF {
             //EntityPlayer entityplayer1 = worldObj.getClosestPlayerToEntity(this, f);
         	if (this.fishEntity != null) {
         		currentTarget = this.fishEntity;
-        		c_CoroAIUtil.setPrivateValueBoth(EntityLivingBase.class, this, "bF", "currentTarget", currentTarget);
+        		//c_CoroAIUtil.setPrivateValueBoth(EntityLivingBase.class, this, "bF", "currentTarget", currentTarget);
         	}
             /*if(entityplayer1 != null)
             {

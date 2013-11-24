@@ -1,4 +1,4 @@
-package CoroAI.tile;
+package CoroAI.packet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -11,6 +11,8 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import CoroAI.ITilePacket;
+import CoroAI.tile.TileDataWatcher;
+import CoroAI.tile.TileHandler;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -58,6 +60,24 @@ public class PacketHelper {
 		//pkt.channel = "CoroAI_TEntDW";
 		//pkt.data = bos.toByteArray();
 		//pkt.length = bos.size();
+		return pkt;
+	}
+	
+	public static Packet250CustomPayload createPacketForNBTHandler(String parChannel, NBTTagCompound parNBT) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		
+		try {
+			writeNBTTagCompound(parNBT, dos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		Packet250CustomPayload pkt = new Packet250CustomPayload();
+		pkt.channel = parChannel;
+		pkt.data = bos.toByteArray();
+		pkt.length = bos.size();
+		pkt.isChunkDataPacket = false;
 		return pkt;
 	}
 	
