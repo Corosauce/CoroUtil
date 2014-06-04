@@ -40,7 +40,7 @@ public class SelectorMoveToPathClose extends Selector {
 	
 	@Override
 	public EnumBehaviorState tick() {
-		
+
 		int pathfindRange = blackboard.distMed.getValue() + 8;
 		
 		if (blackboard.posMoveTo != null) {
@@ -105,7 +105,7 @@ public class SelectorMoveToPathClose extends Selector {
 						}
 					}
 				}
-				entInt.getAIBTAgent().pathNav.setCanSwim(true);
+				//entInt.getAIBTAgent().pathNav.setCanSwim(true);
 				entInt.getAIBTAgent().pathNav.onUpdateNavigation();
 			}
 		}

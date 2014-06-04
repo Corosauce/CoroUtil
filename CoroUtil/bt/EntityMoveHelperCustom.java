@@ -1,13 +1,14 @@
 package CoroUtil.bt;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.MathHelper;
 
 public class EntityMoveHelperCustom
 {
     /** The EntityLiving that is being moved */
-    private EntityLiving entity;
+    private EntityLivingBase entity;
     private double posX;
     private double posY;
     private double posZ;
@@ -16,7 +17,7 @@ public class EntityMoveHelperCustom
     private double speed;
     private boolean update;
 
-    public EntityMoveHelperCustom(EntityLiving par1EntityLiving)
+    public EntityMoveHelperCustom(EntityLivingBase par1EntityLiving)
     {
         this.entity = par1EntityLiving;
         this.posX = par1EntityLiving.posX;
@@ -48,7 +49,12 @@ public class EntityMoveHelperCustom
 
     public void onUpdateMoveHelper()
     {
-        this.entity.setMoveForward(0.0F);
+    	if (entity instanceof EntityLiving) {
+    		((EntityLiving)this.entity).setMoveForward(0.0F);
+    	} else {
+    		System.out.println("EntityMoveHelperCustom being used on non EntityLiving entity, needs code patch");
+    	}
+        
 
         if (this.update)
         {
@@ -67,7 +73,11 @@ public class EntityMoveHelperCustom
 
                 if (d2 > 0.0D && d0 * d0 + d1 * d1 < 1.0D)
                 {
-                    this.entity.getJumpHelper().setJumping();
+                	if (entity instanceof EntityLiving) {
+                		((EntityLiving)this.entity).getJumpHelper().setJumping();
+                	} else {
+                		System.out.println("EntityMoveHelperCustom being used on non EntityLiving entity, needs code patch");
+                	}
                 }
             }
         }

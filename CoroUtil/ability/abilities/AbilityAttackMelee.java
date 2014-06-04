@@ -16,6 +16,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class AbilityAttackMelee extends Ability {
 	
+	//a generic / example class
+	
 	public EntityLivingBase target;
 	
 	public AbilityAttackMelee() {

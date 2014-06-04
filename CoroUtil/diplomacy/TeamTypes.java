@@ -21,6 +21,7 @@ public class TeamTypes {
 		addType("animal", new String[] {}, new String[] {}, new String[] {}); //stuff that extends EntityAnimal
 		addType("undead", new String[] {"comrade", "koa", "player"}, new String[] {}, new String[] {}); //stuff that extends EntityMob and extra rules like slimes (and maybe also implements IMob?)/
 		
+		addType("pet", new String[] {"undead"}, new String[] {}, new String[] {"animal"});
 		
 		//Custom AI category entries
 		addType("neutral", new String[] {}, new String[] {}, new String[] {});

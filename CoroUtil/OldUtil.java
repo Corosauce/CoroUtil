@@ -412,6 +412,7 @@ public class OldUtil {
     public static double getDistance(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(ChunkCoordinates coords, ChunkCoordinates coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }
+    public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.clip(parWorld.getWorldVec3Pool().getVecFromPool(parVec.xCoord, parVec.yCoord, parVec.zCoord), parWorld.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
     public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.clip(ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), ent.worldObj.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
     public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.clip(world.getWorldVec3Pool().getVecFromPool(posX, posY, posZ), world.getWorldVec3Pool().getVecFromPool(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,13 +14,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import CoroUtil.bt.actions.Delay;
 import CoroUtil.bt.actions.OrdersUser;
-import CoroUtil.bt.nodes.AttackMelee;
-import CoroUtil.bt.nodes.Flee;
 import CoroUtil.bt.nodes.SelectorMoveToPathBest;
 import CoroUtil.bt.nodes.SelectorMoveToPathClose;
 import CoroUtil.bt.nodes.SelectorMoveToPosVec;
 import CoroUtil.bt.nodes.SenseEnvironment;
-import CoroUtil.bt.nodes.TrackTarget;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.bt.selector.SelectorBoolean;
 import CoroUtil.bt.selector.SelectorConcurrent;
@@ -45,10 +43,12 @@ public class AIBTAgent {
 	public TeamInstance dipl_info = TeamTypes.getType("neutral");
 	public BlackboardBase blackboard;
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public EntityLivingBase ent;
 
   	public OrdersHandler ordersHandler;
 	
+  	public AIBTTamable tamable;
+  	
 	public Selector btSenses;
 	public Selector btAI;
 	public Selector btMovement;
@@ -70,17 +70,20 @@ public class AIBTAgent {
   	
   	//animation help, needs refactor
   	public long lastAnimateUpdateTime = 0;
+  	
+  	public static boolean DEBUGTREES = false;
 	
 	public AIBTAgent(IBTAgent parEnt) {
-		ent = (EntityLiving)parEnt;
+		ent = parEnt.getEntityLiving();
 		entInt = parEnt;
 		ordersHandler = new OrdersHandler(parEnt);
 		blackboard = new BlackboardBase(this);
 		eventHandler = new AIEventHandler(this);
+		tamable = new AIBTTamable(this);
 		profile = new PersonalityProfile(this);
 		profile.init();
 		pathNav = new PathNavigateCustom(ent, ent.worldObj);
-		pathNav.setAvoidsWater(true);
+		pathNav.setAvoidsWater(false);
 		pathNav.setCanSwim(true);
 		moveHelper = new EntityMoveHelperCustom(ent);
 		
@@ -91,6 +94,10 @@ public class AIBTAgent {
     {
 		//IDS USED ELSEWHERE:
 		//27 is used in baseentai
+		
+		//Checked for 1.6.4:
+		//Living ends at 10
+		//Agable uses 12
 		
         //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
@@ -108,7 +115,6 @@ public class AIBTAgent {
         this.btSenses.add(new SenseEnvironment(this.btSenses, this.blackboard));
         
         
-		
 		//General AI template
         
         //doSurvive and doIdle are profiled
@@ -128,6 +134,7 @@ public class AIBTAgent {
         selSurvivalPerform.add(new Flee(selSurvivalPerform, entInt, blackboard));*/
         
         Selector isFighting = new SelectorBoolean(null, blackboard.isFighting);
+        isFighting.debug = "isFighting";
         isFighting.add(profile.btIdling);
         isFighting.add(delay);
         //isFighting.add(new TrackTarget(null, entInt, blackboard));
@@ -135,6 +142,7 @@ public class AIBTAgent {
         //this.btMovement.add(isFighting);
         
 		Selector selOrdersPerform = new SelectorSequence(null);
+		selOrdersPerform.debug = "selOrdersPerform";
 		selOrdersPerform.add(new OrdersUser(selOrdersPerform, ordersHandler, getAcceptableOrders()));
 
 		Selector shouldFollowOrders = new SelectorBoolean(null, blackboard.shouldFollowOrders);
@@ -212,6 +220,9 @@ public class AIBTAgent {
 		if (btMovement != null) btMovement.tick();
 		if (btAttack != null) btAttack.tick();
 		
+		//THIS IS TEMP AND TO BE MOVED/USED DIFFERENTLY, AKA MOVE THE TELEPORTER CODE TO A NODE
+		tamable.tick();
+		
 		tickMovement();
 		tickAgeEntity();
 		
@@ -266,8 +277,12 @@ public class AIBTAgent {
 		
 		//main mc movement class calls
 		moveHelper.onUpdateMoveHelper();
-        ent.getLookHelper().onUpdateLook();
-        ent.getJumpHelper().doJump();
+		
+		//only runs on true AI entities, patched for potential client player usage
+		if (ent instanceof EntityLiving) {
+			((EntityLiving)ent).getLookHelper().onUpdateLook();
+			((EntityLiving)ent).getJumpHelper().doJump();
+		}
 	}
 	
 	public void setMoveTo(double par1, double par3, double par5)
@@ -317,6 +332,7 @@ public class AIBTAgent {
 		canDespawn = par1nbtTagCompound.getBoolean("canDespawn");
     	
     	profile.nbtRead(par1nbtTagCompound);
+    	tamable.setTamedByOwner(par1nbtTagCompound.getString("owner"));
     	initPost(true);
 	}
 	
@@ -325,6 +341,7 @@ public class AIBTAgent {
     	par1nbtTagCompound.setBoolean("canDespawn", canDespawn);
     	
     	profile.nbtWrite(par1nbtTagCompound);
+    	par1nbtTagCompound.setString("owner", tamable.owner);
 	}
     
     public void nbtDataFromServer(NBTTagCompound nbt) {

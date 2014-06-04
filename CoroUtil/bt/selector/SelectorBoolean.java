@@ -26,14 +26,14 @@ public class SelectorBoolean extends Selector {
 	public EnumBehaviorState tick() {
 		//== false required apparently
 		if (valRef.getValue() == false) {
-			//dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 0");
+			dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 0");
 			setState(children.get(0).tick());
 		} else {
-			//dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 1");
+			dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 1");
 			setState(children.get(1).tick());
 		}
 		if (valRef.getValue() != lastVal) {
-			//dbg("switch to " + valRef.getValue());
+			dbg("switch to " + valRef.getValue());
 			lastVal = valRef.getValue();
 		}
 		if (shouldPrintDebug()) dbg(valRef.getValue());

@@ -69,7 +69,7 @@ public class PFJobData {
 	
 	//set this up to get called after pathfind, unless just calling IPFCallback is enough
 	public void pfComplete() {
-		System.out.println("listConnectablePoints size: " + listConnectablePoints.size());
+		//System.out.println("listConnectablePoints size: " + listConnectablePoints.size());
 	}
 	
 	public void addMapOutPoint(ChunkCoordinates parCoords) {

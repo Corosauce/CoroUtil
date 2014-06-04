@@ -54,6 +54,9 @@ public class Ability {
 	}
 
 	public void tick() {
+		
+		//System.out.println("Ability.tick(), isRemote: " + owner.worldObj.isRemote + " - name: " + name + " - charge: " + curTickCharge + " - perform: " + curTickPerform + " - cooldown: " + curTickCooldown);
+		
 		if (curTickCharge < ticksToCharge) {
 			curTickCharge++;
 			tickChargeUp();
@@ -115,6 +118,9 @@ public class Ability {
 	}
 	
 	public void setFinishedEntirely() {
+		
+		//System.out.println("finished ability!");
+		
 		//prevent multiple callback firings
 		if (isActive) {
 			isActive = false; //make sure its set to false for sync info
@@ -158,7 +164,9 @@ public class Ability {
 	public void nbtSyncRead(NBTTagCompound nbt) {
 		name = nbt.getString("name");
 		usageCount = nbt.getInteger("usageCount");
+		boolean wasActive = isActive;
 		isActive = nbt.getBoolean("isActive");
+		if (!isActive && wasActive) setFinishedEntirely();
 		curTickCharge = nbt.getInteger("curTickCharge");
 		curTickPerform = nbt.getInteger("curTickPerform");
 		curTickCooldown = nbt.getInteger("curTickCooldown");

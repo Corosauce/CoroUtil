@@ -6,6 +6,7 @@ import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.leaf.LeafAction;
+import CoroUtil.pathfinding.PFQueue;
 
 public class SenseEnvironment extends LeafAction {
 
@@ -85,6 +86,13 @@ public class SenseEnvironment extends LeafAction {
 			blackboard.isMoving.setValue(true);
 		} else {
 			blackboard.isMoving.setValue(false);
+		}
+		
+		//there is a potential bug here of an old job in PFQueue.queue still coming back after this timeout has occured, potentially interfering with movement routines...
+		if (blackboard.isWaitingForPath.booleanValue()) {
+			if (blackboard.lastTimeRequestedPFThreaded + blackboard.PFThreadedTimeout > System.currentTimeMillis()) {
+				blackboard.resetReceived();
+			}
 		}
 		
 		//temp - force fight

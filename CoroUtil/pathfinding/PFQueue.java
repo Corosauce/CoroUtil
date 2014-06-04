@@ -285,9 +285,16 @@ public class PFQueue implements Runnable {
 					    	        	} else {
 					    	        		dbg("run path");
 					    	        	}
-					    	        	pathEnt = createEntityPathTo(queue.get(0).sourceEntity, queue.get(0).dest.posX, queue.get(0).dest.posY, queue.get(0).dest.posZ, queue.get(0).distMax);
+					    	        	
+					    	        	//PATHFIND!
+					    	        	pathEnt = createPathTo(queue.get(0));
+					    	        	//pathEnt = createEntityPathTo(queue.get(0).sourceEntity, queue.get(0).dest.posX, queue.get(0).dest.posY, queue.get(0).dest.posZ, queue.get(0).distMax);
+					    	        	
 					    	        } else {
+					    	        	
+					    	        	//PATHFIND!
 					    	        	pathEnt = createPathTo(queue.get(0).source, queue.get(0).dest.posX, queue.get(0).dest.posY, queue.get(0).dest.posZ, queue.get(0).distMax, 0);
+					    	        	
 					    	        }
 					    			//PathEntity pathEnt = createEntityPathTo(queue.get(0).sourceEntity, queue.get(0).x, queue.get(0).y, queue.get(0).z, queue.get(0).dist);
 					    			//System.out.println(pathEnt.pathLength);
@@ -484,6 +491,10 @@ public class PFQueue implements Runnable {
 		} else if (queue.get(0).sourceEntity instanceof EntityLiving) {
 			//System.out.println("setting path on living ent: " + pathEnt.pathLength + " - " + (Float) c_CoroAIUtil.getPrivateValueBoth(EntityLiving.class, (EntityLiving)queue.get(0).sourceEntity, c_CoroAIUtil.refl_obf_Item_moveSpeed, c_CoroAIUtil.refl_mcp_Item_moveSpeed));
 			//System.out.println("?!?!?!?");
+			
+			//TODO: issue here with recent changes breaking behavior tree callback, needs fix! check for callback before source entity!!!
+			//mostly resolved in tryPath method, there are scenarios where it never gets the callback though... need external wait timeout maybe
+			
 			if (queue.get(0).callback != null) {
 				queue.get(0).callback.pfComplete(new PFCallbackItem(convertToPathEntity(pathEnt), (EntityLiving)queue.get(0).sourceEntity, 1F));
 			} else {
@@ -731,9 +742,11 @@ public class PFQueue implements Runnable {
     		
     		if (var1 != null) {
     			job = new PFJobData(var1, x, y, z, var2);
+    			job.callback = parCallback;
     			job.canUseLadder = true;
     		} else if (parCoordSize != null) {
     			job = new PFJobData(parCoordSize, x, y, z, var2);
+    			job.callback = parCallback;
     			job.canUseLadder = true;
     		} else {
     			System.out.println("invalid use of PFQueue");
@@ -875,6 +888,60 @@ public class PFQueue implements Runnable {
     }*/
     
     public PathEntityEx createPathTo(PFJobData parJob) {
+    	
+    	//SOURCE FIX - fence, iron bars, glass panes
+    	//difficult to fix, if too high, has to find CLOSEST air spot to back up to when pathing, this requires the source entity so only those types of paths will be supported
+    	//solution might be hacky, but its seldom used in the runtime
+    	//for some reason adding in the air check to each direction check broke it entirely, without the check this mostly works, they strafe to side sometimes as distance check isnt perfect
+    	
+    	//ZC zombies are resisting the fix, they backtrack but then give up on path following quickly, why? lets add in random for now
+    	int id = getBlockId(parJob.source.posX, parJob.source.posY, parJob.source.posZ);
+    	
+    	if (id == Block.fence.blockID || id == Block.fence.blockID || id == Block.fenceIron.blockID || id == Block.fenceGate.blockID) {
+    		if (parJob.sourceEntity != null) {
+    			double bestDist = 99999;
+    			ChunkCoordinatesSize bestCoords = null;
+    			
+    			Random rand = new Random();
+    			
+    			double dist = parJob.sourceEntity.getDistance(parJob.source.posX+1.5D, parJob.source.posY, parJob.source.posZ+0.5D);
+    			ChunkCoordinatesSize coords = new ChunkCoordinatesSize(parJob.source.posX+1, parJob.source.posY, parJob.source.posZ, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
+    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    				bestDist = dist;
+    				bestCoords = coords;
+    			}
+    			
+    			dist = parJob.sourceEntity.getDistance(parJob.source.posX+0.5D, parJob.source.posY, parJob.source.posZ+1.5D);
+    			coords = new ChunkCoordinatesSize(parJob.source.posX, parJob.source.posY, parJob.source.posZ+1, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
+    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    				bestDist = dist;
+    				bestCoords = coords;
+    			}
+    			
+    			dist = parJob.sourceEntity.getDistance(parJob.source.posX-1.5D, parJob.source.posY, parJob.source.posZ+0.5D);
+    			coords = new ChunkCoordinatesSize(parJob.source.posX-1, parJob.source.posY, parJob.source.posZ, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
+    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    				bestDist = dist;
+    				bestCoords = coords;
+    			}
+    			
+    			dist = parJob.sourceEntity.getDistance(parJob.source.posX+0.5D, parJob.source.posY, parJob.source.posZ-1.5D);
+    			coords = new ChunkCoordinatesSize(parJob.source.posX, parJob.source.posY, parJob.source.posZ-1, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
+    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    				bestDist = dist;
+    				bestCoords = coords;
+    			}
+    			
+    			//int id2 = getBlockId(parJob.source.posX+1, parJob.source.posY, parJob.source.posZ);
+    			
+    			if (bestCoords != null) {
+    				parJob.source = bestCoords;
+    			}
+    		} else {
+    			parJob.source.posY++;
+    		}
+    	}
+    	
     	PathPointEx startPoint = this.openPoint(MathHelper.floor_double(parJob.source.posX), MathHelper.floor_double(parJob.source.posY), MathHelper.floor_double(parJob.source.posZ));
         PathPointEx endPoint = this.openPoint(MathHelper.floor_double(parJob.dest.posX - (double)(parJob.source.width / 2.0F)), MathHelper.floor_double(parJob.dest.posY), MathHelper.floor_double(parJob.dest.posZ - (double)(parJob.source.width / 2.0F)));
         
@@ -882,8 +949,8 @@ public class PFQueue implements Runnable {
         PathPointEx size = new PathPointEx((int)Math.ceil(parJob.source.width), (int)Math.ceil(parJob.source.height), (int)Math.ceil(parJob.source.width));
         PathEntityEx var12 = this.addToPath(parJob, startPoint, endPoint, size, parJob.distMax);
         
-        if (parJob != null) {
-        	System.out.println("post pf entityID: " + parJob.sourceEntity.entityId + " - path length: " + var12.pathLength);
+        if (parJob != null && parJob.sourceEntity != null) {
+        	//System.out.println("post pf entityID: " + parJob.sourceEntity.entityId + " - path length: " + var12.pathLength);
         }
         
         return var12;
@@ -1009,7 +1076,7 @@ public class PFQueue implements Runnable {
             }
 
             nextBestPoint.isFirst = true;
-            //NEEDS NON NULL ENTITY, FIX
+            
             int var8 = this.findPathOptions(parJob, nextBestPoint, size, endPoint, parMaxDistPF);
 
             for(int var9 = 0; var9 < var8; ++var9) {
@@ -1364,6 +1431,10 @@ public class PFQueue implements Runnable {
                                 return -2;
                             }
                             
+                            /*if (var9 == Block.fenceIron.blockID) {
+                            	return 0;
+                            }*/
+                            
                             /*if (var9 == Block.ladder.blockID) {
                                 System.out.println("ladder!");
                             }*/
@@ -1404,8 +1475,6 @@ public class PFQueue implements Runnable {
                             if (var9 == Block.pressurePlatePlanks.blockID || var9 == Block.pressurePlateStone.blockID) {
                                 return 1;
                             }
-
-                            
 
                             if(var11.isSolid()) {
                                 return 0;

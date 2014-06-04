@@ -1,20 +1,19 @@
 package CoroUtil.entity.render;
 
+import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED;
+import static net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.MinecraftForgeClient;
-
-import static net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED;
-import static net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D;
 
 import org.lwjgl.opengl.GL11;
 
@@ -38,7 +37,7 @@ public class RenderEntityCoroAI extends RenderLiving {
 		return null;
 	}
 	
-	public static void renderEquipment(EntityLiving par1EntityLiving, float par2) {
+	public static void renderEquipment(EntityLivingBase par1EntityLiving, float par2) {
     	
     	float f1 = 1.0F;
         GL11.glColor3f(f1, f1, f1);

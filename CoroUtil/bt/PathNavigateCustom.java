@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeInstance;
 import net.minecraft.pathfinding.PathEntity;
@@ -14,7 +15,7 @@ import net.minecraft.world.World;
 
 public class PathNavigateCustom
 {
-    private EntityLiving theEntity;
+    private EntityLivingBase theEntity;
     private World worldObj;
 
     /** The PathEntity being followed. */
@@ -57,7 +58,7 @@ public class PathNavigateCustom
      */
     private boolean canSwim;
 
-    public PathNavigateCustom(EntityLiving par1EntityLiving, World par2World)
+    public PathNavigateCustom(EntityLivingBase par1EntityLiving, World par2World)
     {
         this.theEntity = par1EntityLiving;
         this.worldObj = par2World;

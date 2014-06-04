@@ -30,7 +30,9 @@ public abstract class Behavior {
 	}
 	
 	public void dbg(Object obj) {
-		System.out.println((debug.length() > 0 ? debug : dbgName) + " debug: " + obj);
+		if (AIBTAgent.DEBUGTREES) {
+			System.out.println((debug.length() > 0 ? debug : dbgName) + " debug: " + obj);
+		}
 	}
 	
 }

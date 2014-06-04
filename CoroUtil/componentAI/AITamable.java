@@ -23,7 +23,7 @@ public class AITamable {
 	public double followDistMax = 8D;
 	public double strayDistMax = 32D;
 	public double teleportFromFarDist = 48D;
-	public boolean overrideNonPlayerTargetting = true;
+	//public boolean overrideNonPlayerTargetting = true;
 	
 	public AITamable(JobBase parJob) {
 		job = parJob;

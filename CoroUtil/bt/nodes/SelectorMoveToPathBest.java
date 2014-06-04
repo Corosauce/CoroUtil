@@ -90,7 +90,7 @@ public class SelectorMoveToPathBest extends Selector {
 				
 				
 			}
-			entInt.getAIBTAgent().pathNav.setCanSwim(true);
+			//entInt.getAIBTAgent().pathNav.setCanSwim(true);
 			entInt.getAIBTAgent().pathNav.onUpdateNavigation();
 		}
 		

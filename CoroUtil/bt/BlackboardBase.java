@@ -67,6 +67,10 @@ public class BlackboardBase implements IPFCallback {
 	
 	public Entity lastFleeTarget;
 	
+	//Tracking timeouts
+	public long lastTimeRequestedPFThreaded = 0;
+	public long PFThreadedTimeout = 5000;
+	
 	public BlackboardBase(AIBTAgent parAgent) {
 		agent = parAgent;
 	}
@@ -122,14 +126,16 @@ public class BlackboardBase implements IPFCallback {
 	}
 	
 	public void setMoveTo(Vec3 parMoveTo, boolean resetPathData) {
-		posMoveTo = parMoveTo;
-		if (resetPathData) {
-			//System.out.println("reset path data");
-			pathMoveToPath = null;
-			pathMoveToPathFar = null;
-			isWaitingForPath.setValue(false);
-			isPathReceived.setValue(false);
-			//agent.pathNav.clearPathEntity();
+		if (!agent.tamable.shouldStayStill()) {
+			posMoveTo = parMoveTo;
+			if (resetPathData) {
+				//System.out.println("reset path data");
+				pathMoveToPath = null;
+				pathMoveToPathFar = null;
+				isWaitingForPath.setValue(false);
+				isPathReceived.setValue(false);
+				//agent.pathNav.clearPathEntity();
+			}
 		}
 	}
 	
@@ -141,10 +147,11 @@ public class BlackboardBase implements IPFCallback {
 	}
 	
 	public void requestPathFar(Vec3 parPos, int pathRange) {
-		//System.out.println("request pf set: " + parPos);
+		System.out.println("request pf set: " + parPos);
 		PFQueue.tryPath(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange, 0, this);
 		isWaitingForPath.setValue(true);
 		isPathReceived.setValue(false);
+		lastTimeRequestedPFThreaded = System.currentTimeMillis();
 	}
 	
 	public void resetReceived() {

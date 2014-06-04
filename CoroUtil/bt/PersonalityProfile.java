@@ -115,6 +115,9 @@ public class PersonalityProfile {
 	}
 	
 	public void addAbilityMelee(String name, Ability parAbility) {
+		if (abilities.contains(name)) {
+			System.out.println("AI warning, adding ability " + name + " overtop preexisting one");
+		}
 		abilities.put(name, parAbility);
 		parAbility.type = Ability.TYPE_MELEE;
 		
@@ -122,7 +125,7 @@ public class PersonalityProfile {
 	}
 	
 	public void addAbilityRanged(Ability parAbility) {
-		addAbilityMelee(parAbility.name, parAbility);
+		addAbilityRanged(parAbility.name, parAbility);
 	}
 	
 	public void addAbilityRanged(String name, Ability parAbility) {
@@ -203,7 +206,7 @@ public class PersonalityProfile {
 	
 	public void initDefaultProfile() {
 		btSurviving.add(new Flee(btSurviving, agent.entInt, agent.blackboard));
-		//btIdling.add(new Wander(btIdling, agent.entInt, agent.blackboard, 8));
+		btIdling.add(new Wander(btIdling, agent.entInt, agent.blackboard, 8));
 		
 		//temp combat movement
 		btAttacking.add(new TrackTarget(null, agent.entInt, agent.blackboard));
