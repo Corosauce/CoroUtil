@@ -11,7 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
-import razzlepets.ability.AbilityMapping;
 import CoroUtil.ability.Ability;
 import CoroUtil.ability.IAbilityUser;
 import CoroUtil.bt.AIBTAgent;
@@ -92,9 +91,6 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
     public void initAIProfile() {
         agent.profile.init();
         agent.profile.initDefaultProfile();
-        
-        //temp
-        getAIBTAgent().profile.addAbilityMelee(AbilityMapping.newAbility("AttackMelee").init(this));
     }
     
     @Override

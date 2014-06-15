@@ -77,11 +77,15 @@ public class PersonalityProfile {
 	public float abilitySyncRange = 64F;
 	
 	@SideOnly(Side.CLIENT)
-	public ConcurrentHashMap<String, AnimationStateObject> animationData = new ConcurrentHashMap<String, AnimationStateObject>();
+	public ConcurrentHashMap<String, AnimationStateObject> animationData;
 	
 	public PersonalityProfile(AIBTAgent parAgent) {
 		agent = parAgent;
 		abilities = new ConcurrentHashMap<String, Ability>();
+		
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
+		}
 	}
 	
 	//DOES THIS METHOD WORK FOR RELOADING? i bet it doesnt

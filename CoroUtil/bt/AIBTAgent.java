@@ -215,6 +215,9 @@ public class AIBTAgent {
 	}
 	
 	public void tickAI() {
+		
+		if (ent.worldObj == null || ent.worldObj.provider == null) return;
+		
 		if (btSenses != null) btSenses.tick();
 		if (btAI != null) btAI.tick();
 		if (btMovement != null) btMovement.tick();

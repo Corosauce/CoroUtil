@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.formation.Manager;
+import CoroUtil.quest.PlayerQuestManager;
 import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.TickType;
 
@@ -20,10 +21,15 @@ public class ServerTickHandler implements ITickHandler
     	
 	}
 
-	@Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData) {
-    	
-    }
+    @Override
+	public void tickStart(EnumSet<TickType> type, Object... tickData) {
+		if (type.equals(EnumSet.of(TickType.WORLDLOAD))) {
+        	World world = (World)tickData[0];
+        	if (world.provider.dimensionId == 0) {
+        		CoroAI.initTry();
+        	}
+        }
+	}
 
     @Override
     public void tickEnd(EnumSet<TickType> type, Object... tickData)
@@ -37,7 +43,7 @@ public class ServerTickHandler implements ITickHandler
     @Override
     public EnumSet<TickType> ticks()
     {
-        return EnumSet.of(TickType.SERVER);
+        return EnumSet.of(TickType.SERVER, TickType.WORLDLOAD);
     }
 
     @Override
@@ -59,5 +65,12 @@ public class ServerTickHandler implements ITickHandler
     	}
     	
     	if (formationManager != null) formationManager.tickUpdate();
+    	
+    	//Quest system
+    	World worlds[] = DimensionManager.getWorlds();
+		for (int i = 0; i < worlds.length; i++) {
+			PlayerQuestManager.i().tick(worlds[i]);
+		}
+    	
     }
 }

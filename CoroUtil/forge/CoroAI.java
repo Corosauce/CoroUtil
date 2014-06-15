@@ -1,31 +1,24 @@
 package CoroUtil.forge;
 
-import java.io.File;
-
 import modconfig.ConfigMod;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.diplomacy.TeamTypes;
-import cpw.mods.fml.client.FMLClientHandler;
+import CoroUtil.quest.PlayerQuestManager;
+import CoroUtil.util.CoroUtilFile;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.Init;
-import cpw.mods.fml.common.Mod.PostInit;
-import cpw.mods.fml.common.Mod.PreInit;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-@NetworkMod(channels = { "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW", "CoroAI_Ent", "NBTData_CONT", "NBTData_GUI" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
+@NetworkMod(channels = { "CoroUtilQuest", "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW", "CoroAI_Ent", "NBTData_CONT", "NBTData_GUI" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
 public class CoroAI {
 	
@@ -36,22 +29,25 @@ public class CoroAI {
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
     
-    @PreInit
+    public static boolean initProperNeededForInstance = true;
+    
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
     	ConfigMod.addConfigFile(event, "coroai", new ConfigCoroAI());
     }
     
-    @Init
+    @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
     	TickRegistry.registerTickHandler(new ServerTickHandler(this), Side.SERVER);
+    	MinecraftForge.EVENT_BUS.register(new CoroUtilEventHandler());
     	//MinecraftForge.EVENT_BUS.register(new EventHandler());
     	proxy.init(this);
     	TeamTypes.initTypes();
     }
     
-    @PostInit
+    @Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
     	
 	}
@@ -60,51 +56,34 @@ public class CoroAI {
     	
     }
     
-    @Mod.ServerStarted
+    @Mod.EventHandler
     public void serverStart(FMLServerStartedEvent event) {
     	
     }
     
-    @Mod.ServerStopped
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+    	event.registerServerCommand(new CommandCoroUtil());
+    }
+    
+    @Mod.EventHandler
     public void serverStop(FMLServerStoppedEvent event) {
+    	writeOutData(true);
     	
+    	initProperNeededForInstance = true;
     }
     
-    public static String lastWorldFolder = "";
-    
-    public static String getWorldFolderName() {
-		World world = DimensionManager.getWorld(0);
-		
-		if (world != null) {
-			lastWorldFolder = ((WorldServer)world).getChunkSaveLocation().getName();
-			return lastWorldFolder + File.separator;
-		}
-		
-		return lastWorldFolder + File.separator;
-	}
-	
-	public static String getSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
-    		return getClientSidePath() + File.separator;
-    	} else {
-    		return new File(".").getAbsolutePath() + File.separator;
+    public static void initTry() {
+    	if (initProperNeededForInstance) {
+    		System.out.println("CoroUtil being reinitialized");
+    		initProperNeededForInstance = false;
+	    	CoroUtilFile.getWorldFolderName();
     	}
-    	
-    }
-	
-	public static String getWorldSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
-    		return getClientSidePath() + File.separator + "saves" + File.separator;
-    	} else {
-    		return new File(".").getAbsolutePath() + File.separator;
-    	}
-    	
     }
     
-    @SideOnly(Side.CLIENT)
-	public static String getClientSidePath() {
-		return FMLClientHandler.instance().getClient().mcDataDir.getPath();
-	}
+    public static void writeOutData(boolean unloadInstances) {
+    	PlayerQuestManager.i().saveData(false, unloadInstances);
+    }
     
 	public static void dbg(Object obj) {
 		if (true) {
