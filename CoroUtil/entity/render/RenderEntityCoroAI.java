@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -66,7 +67,7 @@ public class RenderEntityCoroAI extends RenderLiving {
             IItemRenderer customRenderer = MinecraftForgeClient.getItemRenderer(itemstack, EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(EQUIPPED, itemstack, BLOCK_3D));
 
-            if (itemstack.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.blocksList[itemstack.itemID].getRenderType())))
+            if (itemstack.getItem() instanceof ItemBlock && (is3D || RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType())))
             {
                 f2 = 0.5F;
                 GL11.glTranslatef(0.0F, 0.1875F, -0.3125F);
@@ -75,7 +76,7 @@ public class RenderEntityCoroAI extends RenderLiving {
                 GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
                 GL11.glScalef(-f2, -f2, f2);
             }
-            else if (itemstack.itemID == Item.bow.itemID)
+            else if (itemstack.getItem() == Items.bow)
             {
                 f2 = 0.625F;
                 GL11.glTranslatef(0.0F, 0.125F, 0.3125F);
@@ -84,11 +85,11 @@ public class RenderEntityCoroAI extends RenderLiving {
                 GL11.glRotatef(-100.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
             }
-            else if (Item.itemsList[itemstack.itemID].isFull3D())
+            else if (itemstack.getItem().isFull3D())
             {
                 f2 = 0.625F;
 
-                if (Item.itemsList[itemstack.itemID].shouldRotateAroundWhenRendering())
+                if (itemstack.getItem().shouldRotateAroundWhenRendering())
                 {
                     GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
                     GL11.glTranslatef(0.0F, -0.125F, 0.0F);

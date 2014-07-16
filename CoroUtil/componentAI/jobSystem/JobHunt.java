@@ -42,11 +42,11 @@ public class JobHunt extends JobBase {
 			ai.entityToAttack = ai.lastFleeEnt;
 			if (ai.entityToAttack != null) {
 				ai.faceEntity(ai.entityToAttack, 180F, 180F);
-				if (ai.useInv) {
+				/*if (ai.useInv) {
 					ai.entInv.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
-    			} else {
+    			} else {*/
     				entInt.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
-    			}
+    			//}
 			}
 		}
 	}
@@ -85,11 +85,11 @@ public class JobHunt extends JobBase {
 	protected void jobHunter() {
 	
 		//crappy fix - behavior tree generic locking would solve this reset issue
-		if (ai.entInv != null && ai.entInv.fishEntity != null) {
+		/*if (ai.entInv != null && ai.entInv.fishEntity != null) {
 			ai.entInv.fishEntity.setDead();
 			ai.entInv.fishEntity.catchFish();
 			ai.entInv.fishEntity = null;
-		}
+		}*/
 		
 		//this whole function is crap, redo it bitch
 		

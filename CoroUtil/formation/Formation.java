@@ -174,10 +174,10 @@ public class Formation {
 				
 				Vec3 tryPos = Vec3.createVectorHelper(posX, posY, posZ);
 				
-				int tryID = ent.worldObj.getBlockId((int)tryPos.xCoord, (int)tryPos.yCoord + 1, (int)tryPos.zCoord);
+				Block tryID = ent.worldObj.getBlock((int)tryPos.xCoord, (int)tryPos.yCoord + 1, (int)tryPos.zCoord);
 				
 				//if clear (check ent height too), if not return center formation for safety
-				if (tryID == 0 || !Block.blocksList[tryID].blockMaterial.isSolid()) {
+				if (!tryID.getMaterial().isSolid()) {
 					
 				} else {
 					Random rand = new Random();

@@ -2,6 +2,7 @@ package CoroUtil.bt.nodes;
 
 import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.util.MathHelper;
@@ -11,6 +12,7 @@ import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import CoroUtil.util.CoroUtilBlock;
 
 public class SelectorMoveToPathClose extends Selector {
 
@@ -66,12 +68,12 @@ public class SelectorMoveToPathClose extends Selector {
 								int coordX = MathHelper.floor_double(ent.posX+(vec.xCoord*dist));
 								int coordY = MathHelper.floor_double(ent.posY+((vec.yCoord*dist) + randY));
 								int coordZ = MathHelper.floor_double(ent.posZ+(vec.zCoord*dist));
-		    			        int id = ent.worldObj.getBlockId(coordX, coordY, coordZ);
+		    			        Block id = ent.worldObj.getBlock(coordX, coordY, coordZ);
 		    			        int tries = 0;
-		    			        if (id != 0) {
-		    			        	int idUp = ent.worldObj.getBlockId(coordX, coordY+1, coordZ);
-		    			        	int idDown = ent.worldObj.getBlockId(coordX, coordY-1, coordZ);
-		    			        	if (idDown != 0 && idUp == 0) {
+		    			        if (CoroUtilBlock.isAir(id)) {
+		    			        	Block idUp = ent.worldObj.getBlock(coordX, coordY+1, coordZ);
+		    			        	Block idDown = ent.worldObj.getBlock(coordX, coordY-1, coordZ);
+		    			        	if (CoroUtilBlock.isAir(idDown) && CoroUtilBlock.isAir(idUp)) {
 		    			        		//System.out.println("trying partial");
 		    			        		PathEntity result = ent.worldObj.getEntityPathToXYZ(ent, coordX, coordY, coordZ, pathfindRange, false, false, true, true);
 		    							if (result == null || result.isFinished() || result.getCurrentPathLength() <= 2) {

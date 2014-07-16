@@ -1,6 +1,6 @@
 package CoroUtil.util;
 
-import net.minecraft.util.EnumOS;
+import net.minecraft.util.Util.EnumOS;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 

@@ -11,12 +11,12 @@ public class CoroUtilEntity {
 
 	public static boolean canCoordBeSeen(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.clip(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
     }
     
     public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.clip(Vec3.createVectorHelper(ent.posX, ent.boundingBox.minY+0.15, ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(ent.posX, ent.boundingBox.minY+0.15, ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
     }
     
     public static double getDistance(Entity ent, ChunkCoordinates coords)
@@ -44,5 +44,9 @@ public class CoroUtilEntity {
 		ent.motionX += vecX / dist2 * speed;
 		ent.motionY += vecY / dist2 * speed;
 		ent.motionZ += vecZ / dist2 * speed;
+	}
+	
+	public static String getName(Entity ent) {
+		return ent.getCommandSenderName();
 	}
 }

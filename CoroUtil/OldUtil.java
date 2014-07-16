@@ -10,22 +10,18 @@ import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockWall;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.src.ModLoader;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import CoroUtil.componentAI.AIFakePlayer;
 import CoroUtil.componentAI.ICoroAI;
-import CoroUtil.entity.c_EntInterface;
 import CoroUtil.pathfinding.PathEntityEx;
+import CoroUtil.util.CoroUtilBlock;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
 public class OldUtil {
@@ -57,7 +53,7 @@ public class OldUtil {
 	public static boolean checkforMCP = true;
 	public static boolean runningMCP = true;
 	
-	public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
+	//public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
 	public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();
 	
 	//Tropicraft reflection
@@ -90,14 +86,15 @@ public class OldUtil {
     	return true;
     }
 	
-	public static boolean isNoPathBlock(Entity ent, int id, int meta) {
+	public static boolean isNoPathBlock(Entity ent, Block parBlock, int meta) {
 		if (ent instanceof EntityPlayer) {
 			//barricades
-			if (id >= 192 && id <= 197) {
+			System.out.println("FIX BARRICADES SPECIAL RULE HERE!");
+			/*if (id >= 192 && id <= 197) {
 				return true;
-			}
+			}*/
 			
-			Block block = Block.blocksList[id];
+			Block block = parBlock;//Block.blocksList[id];
 			
 			if (block != null && block instanceof BlockFence) {
 				return true;
@@ -161,8 +158,9 @@ public class OldUtil {
     	try {
     		
     		if (!runningMCP) {
-                //setPrivateValue(var0, var1, obf, var3);
-            	ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
+    			//CHANGED FOR 1.7!!
+                setPrivateValue(var0, var1, obf, var3);
+            	//ObfuscationReflectionHelper.setPrivateValue(var0, var1, obf, var3);
     		} else {
     			setPrivateValue(var0, var1, mcp, var3);
     		}
@@ -215,7 +213,7 @@ public class OldUtil {
         return null;
     }
     
-    public static Object getPrivateValue(Class var0, Object var1, String var2) throws IllegalArgumentException, SecurityException, NoSuchFieldException
+    public static Object getPrivateValue(Class var0, Object var1, String var2)/* throws IllegalArgumentException, SecurityException, NoSuchFieldException*/
     {
         try
         {
@@ -223,9 +221,11 @@ public class OldUtil {
             var3.setAccessible(true);
             return var3.get(var1);
         }
-        catch (IllegalAccessException var4)
+        catch (Exception var4)
         {
-            ModLoader.throwException("An impossible error has occured!", var4);
+        	//var4.printStackTrace();
+        	//FMLCommonHandler.instance().raiseException(var4, "An impossible error has occured!", true);
+            //ModLoader.throwException("An impossible error has occured!", var4);
             return null;
         }
     }
@@ -366,11 +366,12 @@ public class OldUtil {
     	return null;
     }
     
-    public static boolean isChest(int id) {
-    	if (id == 0) return false;
-    	Block block = Block.blocksList[id];
-    	if (block != null) {
-    		if (block instanceof BlockChest) return true;
+    public static boolean isChest(Block parBlock) {
+    	if (CoroUtilBlock.isAir(parBlock)) return false;
+    	//if (id == 0) return false;
+    	//Block block = Block.blocksList[id];
+    	if (parBlock != null) {
+    		if (parBlock instanceof BlockChest) return true;
     	}
 		return false;
 	}
@@ -399,21 +400,21 @@ public class OldUtil {
 		return null;
 	}
     
-    public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
-    public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
-    public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
+    //public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
+    //public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
+    //public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
     public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue(); }
     //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
-    public static void jump(EntityLivingBase ent) { ent.jump(); }
+    public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
     public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5
     
     public static ChunkCoordinates entToCoord(Entity ent) { return new ChunkCoordinates((int)ent.posX, (int)ent.posY, (int)ent.posZ); }
     public static double getDistance(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, ChunkCoordinates coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(ChunkCoordinates coords, ChunkCoordinates coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }
-    public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.clip(parWorld.getWorldVec3Pool().getVecFromPool(parVec.xCoord, parVec.yCoord, parVec.zCoord), parWorld.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
-    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.clip(ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), ent.worldObj.getWorldVec3Pool().getVecFromPool(posX, posY, posZ)) == null; }
-    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.clip(world.getWorldVec3Pool().getVecFromPool(posX, posY, posZ), world.getWorldVec3Pool().getVecFromPool(posX2, posY2, posZ2)) == null; }
+    public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(Vec3.createVectorHelper(parVec.xCoord, parVec.yCoord, parVec.zCoord), Vec3.createVectorHelper(posX, posY, posZ)) == null; }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(ent.posX, ent.boundingBox.minY + (double)ent.getEyeHeight(), ent.posZ), Vec3.createVectorHelper(posX, posY, posZ)) == null; }
+    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(Vec3.createVectorHelper(posX, posY, posZ), Vec3.createVectorHelper(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

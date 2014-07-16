@@ -3,10 +3,13 @@ package CoroUtil.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 
 public class GroupInfo 
 {
+	
+	//unused class, partially commented out due to block ID removals
+	
 	public static GroupInfo i = new GroupInfo();
 	
 	public static List<InfoResource> resources;
@@ -18,14 +21,14 @@ public class GroupInfo
 		
 	}
 	
-	public static InfoResource addResource(int x, int y, int z, EnumResource parType) {
+	/*public static InfoResource addResource(int x, int y, int z, EnumResource parType) {
 		int id = 0;
-		if (parType == EnumResource.WOOD) id = Block.wood.blockID;
+		if (parType == EnumResource.WOOD) id = Blocks.log.blockID;
 		
 		InfoResource ia = new InfoResource(x, y, z, id, parType);
 		resources.add(ia);
 		return ia;
-	}
+	}*/
 	
 	public static InfoArea getFirstResource(EnumResource type) {
 		for (int i = 0; i < resources.size(); i++) {

@@ -4,8 +4,10 @@ import modconfig.ConfigMod;
 import net.minecraftforge.common.MinecraftForge;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.diplomacy.TeamTypes;
+import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -14,11 +16,10 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import cpw.mods.fml.common.network.NetworkMod;
-import cpw.mods.fml.common.registry.TickRegistry;
+import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@NetworkMod(channels = { "CoroUtilQuest", "CoroAI_Inv", "CoroAI_TEntCmd", "CoroAI_TEntDW", "CoroAI_Ent", "NBTData_CONT", "NBTData_GUI" }, clientSideRequired = true, serverSideRequired = false, packetHandler = CoroAIPacketHandler.class)
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
 public class CoroAI {
 	
@@ -31,20 +32,30 @@ public class CoroAI {
     
     public static boolean initProperNeededForInstance = true;
     
+    public static String eventChannelName = "coroutil";
+	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
+    
+    public static PetsManager petsManager;
+    
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
     	ConfigMod.addConfigFile(event, "coroai", new ConfigCoroAI());
+    	
+    	eventChannel.register(new EventHandlerPacket());
     }
     
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
-    	TickRegistry.registerTickHandler(new ServerTickHandler(this), Side.SERVER);
-    	MinecraftForge.EVENT_BUS.register(new CoroUtilEventHandler());
+    	//TickRegistry.registerTickHandler(new ServerTickHandler(this), Side.SERVER);
+    	FMLCommonHandler.instance().bus().register(new EventHandlerFML());
+    	MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
     	//MinecraftForge.EVENT_BUS.register(new EventHandler());
     	proxy.init(this);
     	TeamTypes.initTypes();
+
+    	petsManager = new PetsManager();
     }
     
     @Mod.EventHandler
@@ -78,10 +89,13 @@ public class CoroAI {
     		System.out.println("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
+	    	petsManager.nbtReadFromDisk();
     	}
     }
     
     public static void writeOutData(boolean unloadInstances) {
+    	petsManager.nbtWriteToDisk();
+    	if (unloadInstances) petsManager.reset();
     	PlayerQuestManager.i().saveData(false, unloadInstances);
     }
     

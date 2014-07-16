@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.nodes.AttackMeleeBest;
 import CoroUtil.bt.nodes.AttackRangedBest;
@@ -21,10 +19,12 @@ import CoroUtil.bt.selector.Selector;
 import CoroUtil.bt.selector.SelectorConcurrent;
 import CoroUtil.entity.render.AnimationStateObject;
 import CoroUtil.entity.render.TechneModelCoroAI;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilAbility;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -231,23 +231,27 @@ public class PersonalityProfile {
 		System.out.println("full sync abilities - " + agent.ent);
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("command", "syncAbilities");
-		nbt.setInteger("entityID", agent.ent.entityId);
-		nbt.setCompoundTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
-		Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
+		nbt.setInteger("entityID", agent.ent.getEntityId());
+		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
+		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		if (rangeOverride) {
-			PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.worldObj.provider.dimensionId);
+			CoroAI.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.dimensionId);
+			//PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.worldObj.provider.dimensionId);
 		} else {
-			PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
+			CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.dimensionId, agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+			//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 		}
 	}
 	
 	public void syncAbility(Ability ability) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("command", "syncAbilities");
-		nbt.setInteger("entityID", agent.ent.entityId);
-		nbt.setCompoundTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
-		Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
-		PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
+		nbt.setInteger("entityID", agent.ent.getEntityId());
+		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
+		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
+		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);
+		CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.dimensionId, agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 	}
 	
 	public void nbtSyncRead(NBTTagCompound par1nbtTagCompound) {
@@ -259,7 +263,7 @@ public class PersonalityProfile {
 	}
 	
     public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
-    	par1nbtTagCompound.setCompoundTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
+    	par1nbtTagCompound.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 	}
 	
 	public boolean shouldFollowOrders() {

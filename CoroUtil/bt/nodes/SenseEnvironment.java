@@ -2,6 +2,7 @@ package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
@@ -42,7 +43,7 @@ public class SenseEnvironment extends LeafAction {
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
 			
-			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.clip(this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
+			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.rayTraceBlocks(this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
 			
 			if (!canSeeCoord || (target != null && !this.blackboard.agent.ent.canEntityBeSeen(target)) || distToPos > blackboard.distMed.getValue()) {
 				distLevel = 2;
@@ -67,9 +68,26 @@ public class SenseEnvironment extends LeafAction {
 		boolean isSafe = false;
 		
 		blackboard.isPathSafe.setValue(isSafe);
+		
 		blackboard.isLongPath.setValue(distLevel == 2);
 		blackboard.isClosePath.setValue(distLevel == 0);
 		blackboard.isSafeOrClosePath.setValue(isSafe || distLevel == 0);
+		
+		//flying overrides
+		if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+			if (blackboard.posMoveTo != null) {
+				if (canPosBeSeen(blackboard.posMoveTo)) {
+					blackboard.isLongPath.setValue(false);
+					blackboard.isSafeOrClosePath.setValue(true);
+					blackboard.isClosePath.setValue(true);
+					blackboard.isPathSafe.setValue(true);
+				} else {
+					blackboard.isLongPath.setValue(true);
+					
+				}
+			}
+		}
+		
 		blackboard.moveCondition.setValue(distLevel);
 		blackboard.isFighting.setValue(/*blackboard.shouldFollowOrders.getValue() && */!blackboard.shouldTrySurvival.getValue() && blackboard.getTarget() != null);
 		
@@ -105,5 +123,18 @@ public class SenseEnvironment extends LeafAction {
 	public boolean safetyCheck() {
 		return !blackboard.agent.profile.shouldTrySurvival();
 	}
+	
+	public boolean canPosBeSeen(Vec3 parPos)
+    {
+		boolean entCheck = this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+		//boolean topCheck = this.blackboard.agent.ent.worldObj.clip(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.maxY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+		//boolean bottomCheck = this.blackboard.agent.ent.worldObj.clip(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.minY + 0.3, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+        return entCheck;
+    }
+	
+	public boolean canEntityBeSeen(Entity par1Entity)
+    {
+        return this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
+    }
 
 }

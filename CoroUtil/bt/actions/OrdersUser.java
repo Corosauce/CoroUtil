@@ -28,12 +28,6 @@ public class OrdersUser extends LeafAction {
 	@Override
 	public EnumBehaviorState tick() {
 		
-		if (((EntityLivingBase)orders.ent).entityId == 21730) {
-			//dbg(orders.activeOrders != null ? "orders name: " + orders.activeOrders.activeOrdersName : "orders null");
-		}
-		
-		
-		
 		if (orders != null) {
 			/*if (ordersAcceptable.equals("build")) {
 				System.out.println("!!!!!!!");

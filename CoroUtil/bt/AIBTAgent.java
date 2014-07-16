@@ -3,11 +3,10 @@ package CoroUtil.bt;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityLivingData;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -211,7 +210,7 @@ public class AIBTAgent {
 	
 	public void applyEntityAttributes() {
 		//baseline movespeed
-		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(moveSpeed);
+		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(moveSpeed);
 	}
 	
 	public void tickAI() {
@@ -239,8 +238,13 @@ public class AIBTAgent {
 		//ent.getNavigator().onUpdateNavigation();
 		double entSpeed = Math.sqrt(ent.motionX + ent.motionX * ent.motionY + ent.motionY * ent.motionZ + ent.motionZ);
 		
+		//dont let them suffocate if they're marked to allow swimming underwater
+		if (blackboard.canSwimPath.getValue()) {
+			ent.setAir(300);
+		}
+		
 		//help!
-		if (ent.isInWater()) {
+		if (ent.isInWater() && !blackboard.canFlyPath.getValue() && !blackboard.canSwimPath.getValue()) {
 			//bah!
 			//ent.setDead();
 			Random rand = new Random();
@@ -255,16 +259,16 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		int id = ent.worldObj.getBlockId(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY, MathHelper.floor_double(ent.posZ));
-		if (id != 0 && Block.blocksList[id] instanceof BlockFence) {
+		Block block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY, MathHelper.floor_double(ent.posZ));
+		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			ent.motionY = 0.2F;
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			id = ent.worldObj.getBlockId(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY-1, MathHelper.floor_double(ent.posZ));
-			if (id != 0 && Block.blocksList[id] instanceof BlockFence) {
+			block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY-1, MathHelper.floor_double(ent.posZ));
+			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
 				ent.motionY = 0.2F;
@@ -276,6 +280,15 @@ public class AIBTAgent {
 		//help pathing, fix this move it or something
 		if (ent.onGround && ent.isCollidedHorizontally) {
 			//if (ent.motionY < 0.5F) ent.motionY += 0.5F;
+		}
+		
+		if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+			this.ent.fallDistance = 0;
+			
+			//hacky fall fix for flying
+			/*if (ent.motionY < 0.0) {
+				ent.motionY += 0.08D;
+			}*/
 		}
 		
 		//main mc movement class calls
@@ -303,6 +316,23 @@ public class AIBTAgent {
         	}*/
 			profile.tickAbilities();
 		}
+        
+        if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+			this.ent.fallDistance = 0;
+			
+			//ent.onGround = false;
+			
+			//hacky fall fix for flying
+			if (ent.worldObj.isRemote) {
+				//if (ent.motionY < 0.00) {
+					ent.motionY = 0D;
+				//}
+			}
+			
+			/*if (ent.motionY < 0.00) {
+				ent.motionY *= 0.5D;
+			}*/
+		}
 	}
 	
 	public boolean isEnemy(Entity ent) {
@@ -325,7 +355,7 @@ public class AIBTAgent {
 		profile.syncAbilitiesFull(true); //calling this here does not work for entities outside tracker range on client, see SkillMapping errors for more detail
 	}
 	
-	public EntityLivingData onSpawnEvent(EntityLivingData par1EntityLivingData) {
+	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
 		initPost(false);
 		return par1EntityLivingData;
 	}

@@ -63,7 +63,7 @@ public class SelectorMoveToPathBest extends Selector {
 			//if (ent.getNavigator().noPath()/*blackboard.pathMoveToPathFar == null || blackboard.pathMoveToPathFar.isFinished()*/) {
 			//test for stalling movement
 			if ((entInt.getAIBTAgent().pathNav.noPath()/* && !lastAttemptFailed*/)/* || lastPathTime + repathDelay < ent.worldObj.getTotalWorldTime()*/) {
-				if (ent.onGround || ent.isInWater()) {
+				if (ent.onGround || ent.isInWater() || blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
 					if (!blackboard.isWaitingForPath.getValue()) {
 						//System.out.println("request out - " + ent.entityId);
 						

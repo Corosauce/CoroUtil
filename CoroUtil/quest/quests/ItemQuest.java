@@ -5,10 +5,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import CoroUtil.quest.EnumQuestState;
+import CoroUtil.util.CoroUtilItem;
 
 public class ItemQuest extends ActiveQuest {
 	
-	public int neededItemID;
+	public String neededItemID;
 	public int neededItemCount;
 	public boolean returnToQuestGiver;
 	
@@ -18,7 +19,7 @@ public class ItemQuest extends ActiveQuest {
 		questType = "getItem";
 	}
 	
-	public void initCustomData(int itemID, int count, boolean parReturnToQuestGiver) {
+	public void initCustomData(String itemID, int count, boolean parReturnToQuestGiver) {
 		super.initCustomData();
 		
 		neededItemID = itemID;
@@ -45,7 +46,7 @@ public class ItemQuest extends ActiveQuest {
 	}
 	
 	public void pickupEvent(EntityItemPickupEvent event) {
-		if (event.entityPlayer.equals(playerQuests.getPlayer()) && event.item.getEntityItem().getItem().itemID == neededItemID) {
+		if (event.entityPlayer.equals(playerQuests.getPlayer()) && CoroUtilItem.getNameByItem(event.item.getEntityItem().getItem()).equals(neededItemID)) {
 			curItemCount++;
 			saveAndSync();
 			System.out.println("quest item inc");
@@ -60,7 +61,7 @@ public class ItemQuest extends ActiveQuest {
 	@Override
 	public void load(NBTTagCompound parNBT) {
 		super.load(parNBT);
-		neededItemID = parNBT.getInteger("neededItemID");
+		neededItemID = parNBT.getString("neededItemID");
 		neededItemCount = parNBT.getInteger("neededItemCount");
 		returnToQuestGiver = parNBT.getBoolean("returnToQuestGiver");
 	}
@@ -68,7 +69,7 @@ public class ItemQuest extends ActiveQuest {
 	@Override
 	public void save(NBTTagCompound parNBT) {
 		super.save(parNBT);
-		parNBT.setInteger("neededItemID", neededItemID);
+		parNBT.setString("neededItemID", neededItemID);
 		parNBT.setInteger("neededItemCount", neededItemCount);
 		parNBT.setBoolean("returnToQuestGiver", returnToQuestGiver);
 	}

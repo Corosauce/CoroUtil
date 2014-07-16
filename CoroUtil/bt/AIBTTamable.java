@@ -9,8 +9,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChunkCoordinates;
 import CoroUtil.OldUtil;
-import CoroUtil.componentAI.jobSystem.JobBase;
-import CoroUtil.diplomacy.DiplomacyHelper;
+import CoroUtil.util.CoroUtilEntity;
 
 public class AIBTTamable {
 
@@ -62,7 +61,7 @@ public class AIBTTamable {
 	
 	public boolean isEnemy(Entity ent) {
 		if (ent instanceof EntityPlayer) {
-			if (((EntityPlayer)ent).username.equals(owner)) {
+			if (CoroUtilEntity.getName(ent).equals(owner)) {
 				return false;
 			}
 		}

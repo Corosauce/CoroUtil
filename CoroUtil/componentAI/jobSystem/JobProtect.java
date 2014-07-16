@@ -1,6 +1,7 @@
 package CoroUtil.componentAI.jobSystem;
 
 import CoroUtil.entity.EnumJobState;
+import CoroUtil.util.CoroUtilEntity;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class JobProtect extends JobBase {
@@ -38,7 +39,7 @@ public class JobProtect extends JobBase {
 		if (playerName == "") {
 			entP = ent.worldObj.getClosestPlayerToEntity(ent, 16F);
 			if (entP != null) {
-				playerName = entP.username;
+				playerName = CoroUtilEntity.getName(entP);
 			}
 		}
 	}

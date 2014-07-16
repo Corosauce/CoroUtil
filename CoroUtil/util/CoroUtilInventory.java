@@ -11,12 +11,12 @@ import CoroUtil.componentAI.ICoroAI;
 
 public class CoroUtilInventory {
 
-	public static int getItemCount(IInventory inv, int id) {
+	public static int getItemCount(IInventory inv, String id) {
 		int count = 0;
 		for(int j = 0; j < inv.getSizeInventory(); j++)
         {
 			ItemStack is = inv.getStackInSlot(j);
-            if(is != null && is.itemID == id)
+            if(is != null && CoroUtilItem.getNameByItem(is.getItem()).equals(id))
             {
             	count += is.stackSize;
             }
@@ -25,8 +25,8 @@ public class CoroUtilInventory {
 		return count;
 	}
 	
-	public static boolean isChest(int id) {
-		if (id != 0 && Block.blocksList[id] instanceof BlockChest) {
+	public static boolean isChest(Block block) {
+		if (block instanceof BlockChest) {
 			return true;
 		} else {
 			return false;
@@ -43,28 +43,28 @@ public class CoroUtilInventory {
 	}
 	
 	public static void chestStateSend(World world, int x, int y, int z, boolean close) {
-		if (isChest(world.getBlockId(x, y, z))) {
-			TileEntity chest = (TileEntity)world.getBlockTileEntity(x, y, z);
+		if (isChest(world.getBlock(x, y, z))) {
+			TileEntity chest = (TileEntity)world.getTileEntity(x, y, z);
 			if (chest instanceof TileEntityChest) {
 				if (close) {
-					((TileEntityChest)chest).closeChest();
+					((TileEntityChest)chest).closeInventory();
 				} else {
-					((TileEntityChest)chest).openChest();
+					((TileEntityChest)chest).openInventory();
 				}
 			}
 		}
 	}
 	
-	public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
+	/*public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
     	
-    	TileEntity tEnt = (TileEntityChest)world.getBlockTileEntity(x, y, z);
+    	TileEntity tEnt = (TileEntityChest)world.getTileEntity(x, y, z);
 		if (tEnt instanceof TileEntityChest) {
 			TileEntityChest chest = (TileEntityChest)tEnt;
 			chestOpen(world, x, y, z);
-			ai.getAIAgent().jobMan.getPrimaryJob().transferItems(ai.getAIAgent().entInv.inventory, chest, -1, -1, true);
+			ai.getAIAgent().jobMan.getPrimaryJob().transferItems(ai.getAIAgent().entInv.inventory, chest, "-1", -1, true);
 			return true;
 		}
 		return false;
-    }
+    }*/
 	
 }

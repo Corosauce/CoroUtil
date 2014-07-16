@@ -86,4 +86,10 @@ public class CoroAIWorldAccess implements IWorldAccess {
 
 	}
 
+	@Override
+	public void onStaticEntitiesChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

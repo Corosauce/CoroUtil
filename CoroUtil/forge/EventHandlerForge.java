@@ -1,25 +1,25 @@
 package CoroUtil.forge;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import CoroUtil.quest.PlayerQuestManager;
 
-public class CoroUtilEventHandler {
+public class EventHandlerForge {
 
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void deathEvent(LivingDeathEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 	}
 	
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void pickupEvent(EntityItemPickupEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 	}
 	
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void worldSave(Save event) {
 		
 		//this is called for every dimension
@@ -28,5 +28,4 @@ public class CoroUtilEventHandler {
 			CoroAI.writeOutData(false);
 		}
 	}
-
 }

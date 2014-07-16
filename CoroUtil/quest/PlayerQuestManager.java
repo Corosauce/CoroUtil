@@ -1,14 +1,14 @@
 package CoroUtil.quest;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraftforge.event.Event;
 import CoroUtil.quest.quests.ActiveQuest;
+import CoroUtil.util.CoroUtilEntity;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 
 public class PlayerQuestManager {
@@ -56,16 +56,16 @@ public class PlayerQuestManager {
 	}
 	
 	public PlayerQuests getPlayerQuests(EntityPlayer entP) {
-		check(entP.username);
-		return playerQuests.get(entP.username);
+		check(CoroUtilEntity.getName(entP));
+		return playerQuests.get(CoroUtilEntity.getName(entP));
 	}
 	
 	public void tick(World parWorld) {
 		//tick style that auto creates quest object for every player and ticks it
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
 			EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
-			check(entP.username);
-			playerQuests.get(entP.username).tick(parWorld);
+			check(CoroUtilEntity.getName(entP));
+			playerQuests.get(CoroUtilEntity.getName(entP)).tick(parWorld);
 		}
 	}
 	
@@ -92,8 +92,8 @@ public class PlayerQuestManager {
 		if (username == null || username.equals("")) {
 			for (int i = 0; i < parWorld.playerEntities.size(); i++) {
 				EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
-				if (playerQuests.containsKey(entP.username)) {
-					playerQuests.get(entP.username).questsClearAll();
+				if (playerQuests.containsKey(CoroUtilEntity.getName(entP))) {
+					playerQuests.get(CoroUtilEntity.getName(entP)).questsClearAll();
 				}
 			}
 		} else {
@@ -110,8 +110,8 @@ public class PlayerQuestManager {
 	public void markQuestCompleteForAll(World parWorld, ActiveQuest quest) {
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
 			EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
-			check(entP.username);
-			playerQuests.get(entP.username).questRemove(quest);
+			check(CoroUtilEntity.getName(entP));
+			playerQuests.get(CoroUtilEntity.getName(entP)).questRemove(quest);
 		}
 	}
 	
@@ -135,8 +135,8 @@ public class PlayerQuestManager {
 		}/*
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
 			EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
-			check(entP.username);
-			playerQuests.get(entP.username).saveAndSyncImpl();
+			check(CoroUtilEntity.getName(entP));
+			playerQuests.get(CoroUtilEntity.getName(entP)).saveAndSyncImpl();
 		}*/
 	}
 	

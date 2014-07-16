@@ -22,9 +22,9 @@ public class CoroUtilAbility {
 	public static NBTTagCompound nbtSyncWriteAbility(Ability ability, boolean fullSync) {
 		NBTTagCompound nbt = new NBTTagCompound();
 		if (fullSync) {
-			nbt.setCompoundTag(ability.name, ability.nbtSave());
+			nbt.setTag(ability.name, ability.nbtSave());
 		} else {
-			nbt.setCompoundTag(ability.name, ability.nbtSyncWrite());
+			nbt.setTag(ability.name, ability.nbtSyncWrite());
 		}
 		return nbt;
 	}
@@ -42,9 +42,9 @@ public class CoroUtilAbility {
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			if (syncOnly) {
-				nbt.setCompoundTag(entry.getValue().name, entry.getValue().nbtSyncWrite());
+				nbt.setTag(entry.getValue().name, entry.getValue().nbtSyncWrite());
 			} else {
-				nbt.setCompoundTag(entry.getValue().name, entry.getValue().nbtSave());
+				nbt.setTag(entry.getValue().name, entry.getValue().nbtSave());
 			}
 		}
 		return nbt;

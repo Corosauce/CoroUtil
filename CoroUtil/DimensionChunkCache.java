@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockHalfSlab;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3Pool;
@@ -20,7 +20,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.pathfinding.PFQueue;
 import cpw.mods.fml.relauncher.Side;
@@ -198,12 +198,11 @@ public class DimensionChunkCache implements IBlockAccess
     	}
         //System.out.println("Total Cached Chunks for Dim " + world.provider.dimensionId + ": " + chunkCount);
     }
-	
-	@SideOnly(Side.CLIENT)
 
     /**
      * set by !chunk.getAreLevelsEmpty
      */
+    @Override
     public boolean extendedLevelsInChunkCache()
     {
         return this.hasExtendedLevels;
@@ -212,53 +211,45 @@ public class DimensionChunkCache implements IBlockAccess
     /**
      * Returns the block ID at coords x,y,z
      */
-    public int getBlockId(int par1, int par2, int par3)
+    @Override
+    public Block getBlock(int p_147439_1_, int p_147439_2_, int p_147439_3_)
     {
-        if (par2 < 0)
-        {
-            return 0;
-        }
-        else if (par2 >= 256)
-        {
-            return 0;
-        }
-        else
-        {
-            int var4 = (par1 >> 4) - this.chunkX;
-            int var5 = (par3 >> 4) - this.chunkZ;
+    	Block block = Blocks.air;
 
-            if (var4 >= 0 && var4 < this.chunkArray.length && var5 >= 0 && var5 < this.chunkArray[var4].length)
+        if (p_147439_2_ >= 0 && p_147439_2_ < 256)
+        {
+            int l = (p_147439_1_ >> 4) - this.chunkX;
+            int i1 = (p_147439_3_ >> 4) - this.chunkZ;
+
+            if (l >= 0 && l < this.chunkArray.length && i1 >= 0 && i1 < this.chunkArray[l].length)
             {
-                Chunk var6 = this.chunkArray[var4][var5];
-                return var6 == null ? 0 : var6.getBlockID(par1 & 15, par2, par3 & 15);
-            }
-            else
-            {
-                return 0;
+                Chunk chunk = this.chunkArray[l][i1];
+
+                if (chunk != null)
+                {
+                    block = chunk.getBlock(p_147439_1_ & 15, p_147439_2_, p_147439_3_ & 15);
+                }
             }
         }
+
+        return block;
     }
 
     /**
      * Returns the TileEntity associated with a given block in X,Y,Z coordinates, or null if no TileEntity exists
      */
-    public TileEntity getBlockTileEntity(int par1, int par2, int par3)
+    @Override
+    public TileEntity getTileEntity(int p_147438_1_, int p_147438_2_, int p_147438_3_)
     {
-        int var4 = (par1 >> 4) - this.chunkX;
-        int var5 = (par3 >> 4) - this.chunkZ;
-        if (var4 >= 0 && var4 < this.chunkArray.length && var5 >= 0 && var5 < this.chunkArray[var4].length)
-        {
-            Chunk var6 = this.chunkArray[var4][var5];
-            return var6 == null ? null : var6.getChunkBlockTileEntity(par1 & 15, par2, par3 & 15);
-        }
-        else
-        {
-            return null;
-        }
+        int l = (p_147438_1_ >> 4) - this.chunkX;
+        int i1 = (p_147438_3_ >> 4) - this.chunkZ;
+        if (l < 0 || l >= chunkArray.length || i1 < 0 || i1 >= chunkArray[l].length) return null;
+        if (chunkArray[l][i1] == null) return null;
+        return this.chunkArray[l][i1].func_150806_e(p_147438_1_ & 15, p_147438_2_, p_147438_3_ & 15);
     }
 
-    @SideOnly(Side.CLIENT)
-    public float getBrightness(int par1, int par2, int par3, int par4)
+    
+    /*public float getBrightness(int par1, int par2, int par3, int par4)
     {
         int var5 = this.getLightValue(par1, par2, par3);
 
@@ -268,13 +259,12 @@ public class DimensionChunkCache implements IBlockAccess
         }
 
         return this.worldObj.provider.lightBrightnessTable[var5];
-    }
-
-    @SideOnly(Side.CLIENT)
+    }*/
 
     /**
      * Any Light rendered on a 1.8 Block goes through here
      */
+    
     public int getLightBrightnessForSkyBlocks(int par1, int par2, int par3, int par4)
     {
         int var5 = this.getSkyBlockTypeBrightness(EnumSkyBlock.Sky, par1, par2, par3);
@@ -288,32 +278,26 @@ public class DimensionChunkCache implements IBlockAccess
         return var5 << 20 | var6 << 4;
     }
 
-    @SideOnly(Side.CLIENT)
-
     /**
      * Returns how bright the block is shown as which is the block's light value looked up in a lookup table (light
      * values aren't linear for brightness). Args: x, y, z
      */
-    public float getLightBrightness(int par1, int par2, int par3)
+    /*public float getLightBrightness(int par1, int par2, int par3)
     {
         return this.worldObj.provider.lightBrightnessTable[this.getLightValue(par1, par2, par3)];
     }
 
-    @SideOnly(Side.CLIENT)
-
-    /**
+    *//**
      * Gets the light value of the specified block coords. Args: x, y, z
-     */
+     *//*
     public int getLightValue(int par1, int par2, int par3)
     {
         return this.getLightValueExt(par1, par2, par3, true);
     }
 
-    @SideOnly(Side.CLIENT)
-
-    /**
+    *//**
      * Get light value with flag
-     */
+     *//*
     public int getLightValueExt(int par1, int par2, int par3, boolean par4)
     {
         if (par1 >= -30000000 && par3 >= -30000000 && par1 < 30000000 && par3 <= 30000000)
@@ -390,11 +374,12 @@ public class DimensionChunkCache implements IBlockAccess
         {
             return 15;
         }
-    }
+    }*/
 
     /**
      * Returns the block metadata at coords x,y,z
      */
+    @Override
     public int getBlockMetadata(int par1, int par2, int par3)
     {
         if (par2 < 0)
@@ -421,73 +406,69 @@ public class DimensionChunkCache implements IBlockAccess
     /**
      * Returns the block's material.
      */
+    /*@Override
     public Material getBlockMaterial(int par1, int par2, int par3)
     {
         int var4 = this.getBlockId(par1, par2, par3);
         return var4 == 0 ? Material.air : Block.blocksList[var4].blockMaterial;
-    }
-
-    @SideOnly(Side.CLIENT)
+    }*/
 
     /**
      * Gets the biome for a given set of x/z coordinates
      */
+    @Override
     public BiomeGenBase getBiomeGenForCoords(int par1, int par2)
     {
         return this.worldObj.getBiomeGenForCoords(par1, par2);
     }
 
-    @SideOnly(Side.CLIENT)
-
     /**
      * Returns true if the block at the specified coordinates is an opaque cube. Args: x, y, z
      */
+    /*@Override
     public boolean isBlockOpaqueCube(int par1, int par2, int par3)
     {
         Block var4 = Block.blocksList[this.getBlockId(par1, par2, par3)];
         return var4 == null ? false : var4.isOpaqueCube();
     }
 
-    /**
+    *//**
      * Indicate if a material is a normal solid opaque cube.
-     */
+     *//*
+    @Override
     public boolean isBlockNormalCube(int par1, int par2, int par3)
     {
         Block var4 = Block.blocksList[this.getBlockId(par1, par2, par3)];
         return var4 == null ? false : var4.blockMaterial.blocksMovement() && var4.renderAsNormalBlock();
     }
 
-    @SideOnly(Side.CLIENT)
-
-    /**
+    *//**
      * Returns true if the block at the given coordinate has a solid (buildable) top surface.
-     */
+     *//*
+    @Override
     public boolean doesBlockHaveSolidTopSurface(int par1, int par2, int par3)
     {
         Block var4 = Block.blocksList[this.getBlockId(par1, par2, par3)];
         return var4 == null ? false : (var4.blockMaterial.isOpaque() && var4.renderAsNormalBlock() ? true : (var4 instanceof BlockStairs ? (this.getBlockMetadata(par1, par2, par3) & 4) == 4 : (var4 instanceof BlockHalfSlab ? (this.getBlockMetadata(par1, par2, par3) & 8) == 8 : false)));
-    }
+    }*/
 
     /**
      * Return the Vec3Pool object for this world.
      */
+    @Override
     public Vec3Pool getWorldVec3Pool()
     {
         return this.worldObj.getWorldVec3Pool();
     }
 
-    @SideOnly(Side.CLIENT)
-
     /**
      * Returns true if the block at the specified coordinates is empty
      */
-    public boolean isAirBlock(int par1, int par2, int par3)
+    @Override
+    public boolean isAirBlock(int p_147437_1_, int p_147437_2_, int p_147437_3_)
     {
-        Block var4 = Block.blocksList[this.getBlockId(par1, par2, par3)];
-        return var4 == null;
+        return this.getBlock(p_147437_1_, p_147437_2_, p_147437_3_).isAir(this, p_147437_1_, p_147437_2_, p_147437_3_);
     }
-
-    @SideOnly(Side.CLIENT)
 
     /**
      * Brightness for SkyBlock.Sky is clear white and (through color computing it is assumed) DEPENDENT ON DAYTIME.
@@ -513,44 +494,44 @@ public class DimensionChunkCache implements IBlockAccess
             }
             else
             {
-                int var5;
-                int var6;
+                int l;
+                int i1;
 
-                if (Block.useNeighborBrightness[this.getBlockId(par2, par3, par4)])
+                if (this.getBlock(par2, par3, par4).getUseNeighborBrightness())
                 {
-                    var5 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3 + 1, par4);
-                    var6 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2 + 1, par3, par4);
-                    int var7 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2 - 1, par3, par4);
-                    int var8 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3, par4 + 1);
-                    int var9 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3, par4 - 1);
+                    l = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3 + 1, par4);
+                    i1 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2 + 1, par3, par4);
+                    int j1 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2 - 1, par3, par4);
+                    int k1 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3, par4 + 1);
+                    int l1 = this.getSpecialBlockBrightness(par1EnumSkyBlock, par2, par3, par4 - 1);
 
-                    if (var6 > var5)
+                    if (i1 > l)
                     {
-                        var5 = var6;
+                        l = i1;
                     }
 
-                    if (var7 > var5)
+                    if (j1 > l)
                     {
-                        var5 = var7;
+                        l = j1;
                     }
 
-                    if (var8 > var5)
+                    if (k1 > l)
                     {
-                        var5 = var8;
+                        l = k1;
                     }
 
-                    if (var9 > var5)
+                    if (l1 > l)
                     {
-                        var5 = var9;
+                        l = l1;
                     }
 
-                    return var5;
+                    return l;
                 }
                 else
                 {
-                    var5 = (par2 >> 4) - this.chunkX;
-                    var6 = (par4 >> 4) - this.chunkZ;
-                    return this.chunkArray[var5][var6].getSavedLightValue(par1EnumSkyBlock, par2 & 15, par3, par4 & 15);
+                    l = (par2 >> 4) - this.chunkX;
+                    i1 = (par4 >> 4) - this.chunkZ;
+                    return this.chunkArray[l][i1].getSavedLightValue(par1EnumSkyBlock, par2 & 15, par3, par4 & 15);
                 }
             }
         }
@@ -559,8 +540,6 @@ public class DimensionChunkCache implements IBlockAccess
             return par1EnumSkyBlock.defaultLightValue;
         }
     }
-
-    @SideOnly(Side.CLIENT)
 
     /**
      * is only used on stairs and tilled fields
@@ -589,11 +568,10 @@ public class DimensionChunkCache implements IBlockAccess
         }
     }
 
-    @SideOnly(Side.CLIENT)
-
     /**
      * Returns current world height.
      */
+    @Override
     public int getHeight()
     {
         return 256;
@@ -602,14 +580,21 @@ public class DimensionChunkCache implements IBlockAccess
     /**
      * Is this block powering in the specified direction Args: x, y, z, direction
      */
+    @Override
     public int isBlockProvidingPowerTo(int par1, int par2, int par3, int par4)
     {
-        int i1 = this.getBlockId(par1, par2, par3);
-        return i1 == 0 ? 0 : Block.blocksList[i1].isProvidingStrongPower(this, par1, par2, par3, par4);
+        return this.getBlock(par1, par2, par3).isProvidingStrongPower(this, par1, par2, par3, par4);
     }
     
-    public boolean isBlockSolidOnSide(int x, int y, int z, ForgeDirection fd, boolean bool) {
-    	return true;
+    @Override
+    public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default)
+    {
+        if (x < -30000000 || z < -30000000 || x >= 30000000 || z >= 30000000)
+        {
+            return _default;
+        }
+
+        return getBlock(x, y, z).isSideSolid(this, x, y, z, side);
     }
     
     public Chunk getChunkFromBlockCoords(int par1, int par2)

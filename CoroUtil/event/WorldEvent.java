@@ -18,6 +18,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.entity.EnumJobState;
+import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilFile;
 
 public class WorldEvent {
@@ -244,8 +245,8 @@ public class WorldEvent {
 		for (int i = 0; i < worldObj.playerEntities.size(); i++) {
 			EntityPlayer entP = (EntityPlayer)worldObj.playerEntities.get(i);
 			
-			if (!cursedPlayers.contains(entP.username) && entP.getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ) < maxDist) {
-				cursedPlayers.add(entP.username);
+			if (!cursedPlayers.contains(CoroUtilEntity.getName(entP)) && entP.getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ) < maxDist) {
+				cursedPlayers.add(CoroUtilEntity.getName(entP));
 			}
 		}
     }

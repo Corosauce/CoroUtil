@@ -1,5 +1,7 @@
 package CoroUtil.entity.block;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -7,18 +9,12 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet34EntityTeleport;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -107,7 +103,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
 
     @Override
-    public void writeSpawnData(ByteArrayDataOutput data)
+    public void writeSpawnData(ByteBuf data)
     {
         data.writeInt(blockID);
         data.writeInt(blockMeta);
@@ -116,7 +112,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
 
     @Override
-    public void readSpawnData(ByteArrayDataInput data)
+    public void readSpawnData(ByteBuf data)
     {
     	blockID = data.readInt();
     	blockMeta = data.readInt();
@@ -135,11 +131,11 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     {
         return 0.0F;
     }
-
+    
     @Override
-    public boolean isInRangeToRenderVec3D(Vec3 asd)
-    {
-        return true;
+    public boolean isInRangeToRender3d(double p_145770_1_, double p_145770_3_,
+    		double p_145770_5_) {
+    	return true;
     }
 
     @Override
@@ -204,7 +200,8 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     		
     		if (firstTick) {
     			firstTick = false;
-    			PacketDispatcher.sendPacketToAllInDimension(new Packet34EntityTeleport(entityId, this.myEntitySize.multiplyBy32AndRound(posX), this.myEntitySize.multiplyBy32AndRound(posY), this.myEntitySize.multiplyBy32AndRound(posZ), (byte)0, (byte)0), worldObj.provider.dimensionId);
+    			System.out.println("commenting out PacketDispatcher.sendPacketToAllInDimension call in MovingBlock");
+    			//PacketDispatcher.sendPacketToAllInDimension(new Packet34EntityTeleport(getEntityId(), this.myEntitySize.multiplyBy32AndRound(posX), this.myEntitySize.multiplyBy32AndRound(posY), this.myEntitySize.multiplyBy32AndRound(posZ), (byte)0, (byte)0), worldObj.provider.dimensionId);
     		}
     	}
     	
@@ -233,7 +230,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         	int curX = MathHelper.floor_double(posX);
 	    	int curY = MathHelper.floor_double(posY);
 	    	int curZ = MathHelper.floor_double(posZ);
-	    	int idCurPos = worldObj.getBlockId(curX, curY, curZ);
+	    	Block idCurPos = worldObj.getBlock(curX, curY, curZ);
         	
 	        if (blockifyDelay != -1 && age > blockifyDelay) {
 		    	
@@ -243,7 +240,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	int aheadEndY = MathHelper.floor_double(posY + (motionY));
 		    	int aheadEndZ = MathHelper.floor_double(posZ + (motionZ));
 		    	
-		    	int id = worldObj.getBlockId(aheadEndX, aheadEndY, aheadEndZ);
+		    	Block id = worldObj.getBlock(aheadEndX, aheadEndY, aheadEndZ);
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
@@ -255,7 +252,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    		int aheadX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 				    	int aheadY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 				    	int aheadZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-			    		int idCheck = worldObj.getBlockId(aheadX, aheadY, aheadZ);
+				    	Block idCheck = worldObj.getBlock(aheadX, aheadY, aheadZ);
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -271,7 +268,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			int tryX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 					    	int tryY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 					    	int tryZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    		int idTry = worldObj.getBlockId(tryX, tryY, tryZ);
+				    		Block idTry = worldObj.getBlock(tryX, tryY, tryZ);
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);
@@ -359,8 +356,8 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         
     }
     
-    public boolean isSolid(int id) {
-    	return (id != 0 && Block.blocksList[id].blockMaterial != Material.water && Block.blocksList[id].blockMaterial != Material.circuits && Block.blocksList[id].blockMaterial != Material.snow && Block.blocksList[id].blockMaterial != Material.plants && Block.blocksList[id].blockMaterial.isSolid());
+    public boolean isSolid(Block id) {
+    	return (id.getMaterial() != Material.water && id.getMaterial() != Material.circuits && id.getMaterial() != Material.snow && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
     }
     
     public void setPositionAndRotation(double par1, double par3, double par5, float par7, float par8, float parRoll)
@@ -445,7 +442,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public void blockify(int x, int y, int z) {
-    	worldObj.setBlock(x, y, z, blockID);
+    	worldObj.setBlock(x, y, z, Block.getBlockById(blockID));
     	setDead();
     }
     

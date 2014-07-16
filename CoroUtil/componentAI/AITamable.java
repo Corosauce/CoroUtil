@@ -11,6 +11,7 @@ import net.minecraft.util.ChunkCoordinates;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.jobSystem.JobBase;
 import CoroUtil.diplomacy.DiplomacyHelper;
+import CoroUtil.util.CoroUtilEntity;
 
 public class AITamable {
 
@@ -53,7 +54,7 @@ public class AITamable {
 	
 	public boolean isEnemy(Entity ent) {
 		if (ent instanceof EntityPlayer) {
-			if (((EntityPlayer)ent).username.equals(owner)) {
+			if (CoroUtilEntity.getName(ent).equals(owner)) {
 				return false;
 			}
 		}
@@ -80,7 +81,7 @@ public class AITamable {
 				
 				//Target fixing
 				if (job.ai.entityToAttack != null) {
-					if (job.ai.entityToAttack.entityId == ent.entityId || !DiplomacyHelper.shouldTameTargetEnt(job.ent, job.ai.entityToAttack, this)) {
+					if (job.ai.entityToAttack.getEntityId() == ent.getEntityId() || !DiplomacyHelper.shouldTameTargetEnt(job.ent, job.ai.entityToAttack, this)) {
 						job.ai.entityToAttack = null;
 					}
 				}
@@ -103,7 +104,7 @@ public class AITamable {
 			}
 		} else {
         	if (job.ent.getNavigator().noPath()) {
-        		if (job.ai.useInv && job.ai.entInv.shouldLookForPickups) job.lookForItems();
+        		//if (job.ai.useInv && job.ai.entInv.shouldLookForPickups) job.lookForItems();
         	}
         }
 	}

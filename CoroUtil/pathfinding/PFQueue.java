@@ -9,13 +9,14 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockEnchantmentTable;
-import net.minecraft.block.BlockFlowing;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.ChunkCoordinates;
@@ -27,6 +28,7 @@ import CoroUtil.DimensionChunkCache;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.util.CoroUtilBlock;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -344,25 +346,25 @@ public class PFQueue implements Runnable {
 						    			        int gatherY = (int)center.posY;//Math.floor(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
 						    			        int gatherZ = (int)Math.floor(center.posZ + ((double)(Math.cos((center.rotationYaw+look) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
 						    			        
-						    			        int id = getBlockId(gatherX, gatherY, gatherZ);
+						    			        Block block = getBlock(gatherX, gatherY, gatherZ);
 						    			        int tries = 0;
-						    			        if (id != 0) {
+						    			        if (!CoroUtilBlock.isAir(block)) {
 						    			        	int offset = -5;
 							    			        
 							    			        while (tries < 30) {
-							    			        	if (id == 0) {
+							    			        	if (CoroUtilBlock.isAir(block)) {
 							    			        		break;
 							    			        	}
 							    			        	gatherY += offset++;
-							    			        	id = getBlockId(gatherX, gatherY, gatherZ);
+							    			        	block = getBlock(gatherX, gatherY, gatherZ);
 							    			        	tries++;
 							    			        }
 						    			        } else {
 						    			        	int offset = 0;
 						    			        	while (tries < 30) {
-						    			        		if (id != 0) break;
+						    			        		if (!CoroUtilBlock.isAir(block)) break;
 						    			        		gatherY -= offset++;
-						    			        		id = getBlockId(gatherX, gatherY, gatherZ);
+						    			        		block = getBlock(gatherX, gatherY, gatherZ);
 							    			        	tries++;
 						    			        	}
 						    			        }
@@ -600,7 +602,7 @@ public class PFQueue implements Runnable {
 	    	try {
 	    		//this might be a stupid idea, perhaps make a second maintained list for job lookups via entity
 	    		//or just use this as a method to see what ai is overtrying, to fix with path every 10 ticks thing
-	    		for (int i = queue.size()-1; i >= 0; i--) {
+	    		/*for (int i = queue.size()-1; i >= 0; i--) {
 	    			PFJobData job = queue.get(i);
 	    			if (var1 == job.sourceEntity) {
 	    				queue.remove(job);
@@ -608,7 +610,7 @@ public class PFQueue implements Runnable {
 	    				//tryPath = false;
 	    				break;
 	    			}
-	    		}
+	    		}*/
 	    	} catch (Exception ex) {
 	    		//ex.printStackTrace();
 	    	}
@@ -661,8 +663,8 @@ public class PFQueue implements Runnable {
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority, IPFCallback parCallback, ChunkCoordinatesSize parCoordSize) {
     	
     	//DESTINATION - Adjust if in air, assumes they are gravity bound
-    	if (var1 != null && var1.worldObj.getBlockId(x, y-1, z) == 0) {
-    		while (var1.worldObj.getBlockId(x, --y, z) == 0 && y > 0) { y--; }    				
+    	if (var1 != null && CoroUtilBlock.isAir(var1.worldObj.getBlock(x, y-1, z))) {
+    		while (CoroUtilBlock.isAir(var1.worldObj.getBlock(x, --y, z)) && y > 0) { y--; }    				
     	}
     	
     	//SOURCE - might not work right - fix fence horror, find the near air block
@@ -821,28 +823,7 @@ public class PFQueue implements Runnable {
 	    	PathPoint points[] = new PathPoint[pathEx.pathLength];
 	    	for (int i = 0; i < points.length; i++) {
 	    		int y = pathEx.points[i].yCoord;
-	    		int id = worldMap.getBlockId(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
 	    		
-	    		//just 0
-	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
-	    			//y+=1;
-	    		}
-	    		
-	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
-	    			//y-=1;
-	    		}
-	    		
-	    		//check 1 lower
-	    		id = worldMap.getBlockId(pathEx.points[i].xCoord, y-1, pathEx.points[i].zCoord);
-	    		
-	    		//just 0
-	    		if (i == 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
-	    			//y+=0;
-	    		}
-	    		
-	    		if (i != 0 && id != 0 && Block.blocksList[id] != null && Block.blocksList[id].blockMaterial == Material.water) {
-	    			//y-=1;
-	    		}
 	    		
 	    		points[i] = new PathPoint(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
 	    	}
@@ -895,9 +876,9 @@ public class PFQueue implements Runnable {
     	//for some reason adding in the air check to each direction check broke it entirely, without the check this mostly works, they strafe to side sometimes as distance check isnt perfect
     	
     	//ZC zombies are resisting the fix, they backtrack but then give up on path following quickly, why? lets add in random for now
-    	int id = getBlockId(parJob.source.posX, parJob.source.posY, parJob.source.posZ);
+    	Block block = getBlock(parJob.source.posX, parJob.source.posY, parJob.source.posZ);
     	
-    	if (id == Block.fence.blockID || id == Block.fence.blockID || id == Block.fenceIron.blockID || id == Block.fenceGate.blockID) {
+    	if (isFenceLike(block)/*id == Block.fence.blockID || id == Block.fenceIron.blockID || id == Block.fenceGate.blockID*/) {
     		if (parJob.sourceEntity != null) {
     			double bestDist = 99999;
     			ChunkCoordinatesSize bestCoords = null;
@@ -906,28 +887,28 @@ public class PFQueue implements Runnable {
     			
     			double dist = parJob.sourceEntity.getDistance(parJob.source.posX+1.5D, parJob.source.posY, parJob.source.posZ+0.5D);
     			ChunkCoordinatesSize coords = new ChunkCoordinatesSize(parJob.source.posX+1, parJob.source.posY, parJob.source.posZ, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
-    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    			if (CoroUtilBlock.isAir(getBlock(coords.posX, coords.posY+1, coords.posZ)) && dist < bestDist && rand.nextInt(4) == 0) {
     				bestDist = dist;
     				bestCoords = coords;
     			}
     			
     			dist = parJob.sourceEntity.getDistance(parJob.source.posX+0.5D, parJob.source.posY, parJob.source.posZ+1.5D);
     			coords = new ChunkCoordinatesSize(parJob.source.posX, parJob.source.posY, parJob.source.posZ+1, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
-    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    			if (CoroUtilBlock.isAir(getBlock(coords.posX, coords.posY+1, coords.posZ)) && dist < bestDist && rand.nextInt(4) == 0) {
     				bestDist = dist;
     				bestCoords = coords;
     			}
     			
     			dist = parJob.sourceEntity.getDistance(parJob.source.posX-1.5D, parJob.source.posY, parJob.source.posZ+0.5D);
     			coords = new ChunkCoordinatesSize(parJob.source.posX-1, parJob.source.posY, parJob.source.posZ, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
-    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    			if (CoroUtilBlock.isAir(getBlock(coords.posX, coords.posY+1, coords.posZ)) && dist < bestDist && rand.nextInt(4) == 0) {
     				bestDist = dist;
     				bestCoords = coords;
     			}
     			
     			dist = parJob.sourceEntity.getDistance(parJob.source.posX+0.5D, parJob.source.posY, parJob.source.posZ-1.5D);
     			coords = new ChunkCoordinatesSize(parJob.source.posX, parJob.source.posY, parJob.source.posZ-1, parJob.source.dimensionId, parJob.source.width, parJob.source.height);
-    			if (getBlockId(coords.posX, coords.posY+1, coords.posZ) == 0 && dist < bestDist && rand.nextInt(4) == 0) {
+    			if (CoroUtilBlock.isAir(getBlock(coords.posX, coords.posY+1, coords.posZ)) && dist < bestDist && rand.nextInt(4) == 0) {
     				bestDist = dist;
     				bestCoords = coords;
     			}
@@ -982,13 +963,9 @@ public class PFQueue implements Runnable {
     	
     	int y = 0;
     	
-    	if (getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY-1), MathHelper.floor_double(var1.boundingBox.minZ)) == 0) {
-    		//y--;
-    	}
+    	Block block = getBlock(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
     	
-    	int id = getBlockId(MathHelper.floor_double(var1.boundingBox.minX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.boundingBox.minZ));
-    	
-    	if (id == Block.stoneSingleSlab.blockID || id == Block.woodSingleSlab.blockID) {
+    	if (block instanceof BlockSlab) {
     		y++;
     	}
     	
@@ -1166,15 +1143,15 @@ public class PFQueue implements Runnable {
         	sourceEntity = parJob.sourceEntity;
         }
 
-        if(this.getVerticalOffset(sourceEntity, curPoint.xCoord, curPoint.yCoord + 1, curPoint.zCoord, size) == 1) {
+        if(this.getVerticalOffset(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord + 1, curPoint.zCoord, size) == 1) {
             var7 = 1;
         }
 
-        PathPointEx var8 = this.getSafePoint(sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7);
-        PathPointEx var9 = this.getSafePoint(sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7);
-        PathPointEx var10 = this.getSafePoint(sourceEntity, curPoint.xCoord + 1, curPoint.yCoord, curPoint.zCoord, size, var7);
-        PathPointEx var11 = this.getSafePoint(sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord - 1, size, var7);
-
+        PathPointEx var8 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7);
+        PathPointEx var9 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7);
+        PathPointEx var10 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord + 1, curPoint.yCoord, curPoint.zCoord, size, var7);
+        PathPointEx var11 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord - 1, size, var7);
+        
         if(var8 != null && !var8.isFirst && var8.distanceTo(endPoint) < var5) {
             this.pathOptions[var6++] = var8;
         }
@@ -1189,6 +1166,17 @@ public class PFQueue implements Runnable {
 
         if(var11 != null && !var11.isFirst && var11.distanceTo(endPoint) < var5) {
             this.pathOptions[var6++] = var11;
+        }
+        
+        if (parJob.useFlyPathfinding || parJob.useSwimPathfinding) {
+        	PathPointEx var12 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord + 1, curPoint.zCoord, size, var7);
+        	PathPointEx var13 = this.getSafePoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord - 1, curPoint.zCoord, size, var7);
+        	if(var12 != null && !var12.isFirst && var12.distanceTo(endPoint) < var5) {
+                this.pathOptions[var6++] = var12;
+            }
+        	if(var13 != null && !var13.isFirst && var13.distanceTo(endPoint) < var5) {
+                this.pathOptions[var6++] = var13;
+            }
         }
 
         if (parJob != null && parJob.climbHeight > 1) {
@@ -1215,12 +1203,12 @@ public class PFQueue implements Runnable {
         }
 
         if (/*parJob != null && parJob.sourceEntity != null && */canUseLadder) {
-        	if (getBlockId(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord) != 0 && Block.blocksList[getBlockId(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)].isLadder(null, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord, null)) {
+        	if (!CoroUtilBlock.isAir(getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)) && getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord).isLadder(null, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord, null)) {
         		//if (queue.get(0) != null) queue.get(0).ladderInPath = true; //might conflict with non queue using requests
-		        PathPointEx vvar8 = this.getLadderPoint(sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7, curPoint.xCoord, curPoint.zCoord);
-		        PathPointEx vvar9 = this.getLadderPoint(sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
-		        PathPointEx vvar10 = this.getLadderPoint(sourceEntity, curPoint.xCoord + 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
-		        PathPointEx vvar11 = this.getLadderPoint(sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord - 1, size, var7, curPoint.xCoord, curPoint.zCoord);
+		        PathPointEx vvar8 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7, curPoint.xCoord, curPoint.zCoord);
+		        PathPointEx vvar9 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
+		        PathPointEx vvar10 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord + 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
+		        PathPointEx vvar11 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord - 1, size, var7, curPoint.xCoord, curPoint.zCoord);
 		
 		        if(vvar8 != null && !vvar8.isFirst && vvar8.distanceTo(endPoint) < var5) {
 		            this.pathOptions[var6++] = vvar8;
@@ -1243,14 +1231,14 @@ public class PFQueue implements Runnable {
         return var6;
     }
 
-    private PathPointEx getLadderPoint(Entity var1, int x, int y, int z, PathPointEx var5, int var6, int origX, int origZ) {
+    private PathPointEx getLadderPoint(PFJobData parJob, Entity var1, int x, int y, int z, PathPointEx var5, int var6, int origX, int origZ) {
         PathPointEx var7 = null;
 
-        if(this.getVerticalOffset(var1, x, y, z, var5) == 1) {
+        if(this.getVerticalOffset(parJob, var1, x, y, z, var5) == 1) {
             var7 = this.openPoint(x, y, z);
         }
 
-        if(var7 == null && var6 > 0 && this.getVerticalOffset(var1, x, y + var6, z, var5) == 1) {
+        if(var7 == null && var6 > 0 && this.getVerticalOffset(parJob, var1, x, y + var6, z, var5) == 1) {
             var7 = this.openPoint(x, y + var6, z);
             y += var6;
         }
@@ -1261,8 +1249,8 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(var1, x, y + 1, z, var5)) == 0) && (getBlockId(origX, y + 1, origZ) != 0 && Block.blocksList[getBlockId(origX, y + 1, origZ)].isLadder(null/*var1.worldObj*/, origX, y, origZ, null))) {
-                var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5);
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(parJob, var1, x, y + 1, z, var5)) == 0) && (!CoroUtilBlock.isAir(getBlock(origX, y + 1, origZ)) && getBlock(origX, y + 1, origZ).isLadder(null/*var1.worldObj*/, origX, y, origZ, null))) {
+                var10 = this.getVerticalOffset(parJob, var1, origX, y + 1, origZ, var5);
                 ++var8;
                 /*if(var8 >= 3) {
                    return null;
@@ -1289,11 +1277,11 @@ public class PFQueue implements Runnable {
     private PathPointEx getClimbPoint(PFJobData parJob, int x, int y, int z, PathPointEx var5, int var6, int origX, int origZ) {
         PathPointEx var7 = null;
 
-        if(this.getVerticalOffset(parJob.sourceEntity, x, y, z, var5) == 1) {
+        if(this.getVerticalOffset(parJob, parJob.sourceEntity, x, y, z, var5) == 1) {
             var7 = this.openPoint(x, y, z);
         }
 
-        if(var7 == null && var6 > 0 && this.getVerticalOffset(parJob.sourceEntity, x, y + var6, z, var5) == 1) {
+        if(var7 == null && var6 > 0 && this.getVerticalOffset(parJob, parJob.sourceEntity, x, y + var6, z, var5) == 1) {
             var7 = this.openPoint(x, y + var6, z);
             y += var6;
         }
@@ -1304,7 +1292,7 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(parJob.sourceEntity, x, y, z, var5)) == 0) && (var10 = this.getVerticalOffset(parJob.sourceEntity, origX, y, origZ, var5)) == 1 && (var10 = this.getVerticalOffset(parJob.sourceEntity, origX, y+1, origZ, var5)) == 1) {
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(parJob, parJob.sourceEntity, x, y, z, var5)) == 0) && (var10 = this.getVerticalOffset(parJob, parJob.sourceEntity, origX, y, origZ, var5)) == 1 && (var10 = this.getVerticalOffset(parJob, parJob.sourceEntity, origX, y+1, origZ, var5)) == 1) {
                 //;
                 ++var8;
 
@@ -1331,10 +1319,10 @@ public class PFQueue implements Runnable {
         return var7;
     }
 
-    private PathPointEx getSafePoint(Entity var1, int var2, int var3, int var4, PathPointEx size, int var6) {
+    private PathPointEx getSafePoint(PFJobData parJob, Entity var1, int var2, int var3, int var4, PathPointEx size, int var6) {
         PathPointEx var7 = null;
 
-        if(this.getVerticalOffset(var1, var2, var3, var4, size) == 1) {
+        if(this.getVerticalOffset(parJob, var1, var2, var3, var4, size) == 1) {
             var7 = this.openPoint(var2, var3, var4);
         }
         
@@ -1359,7 +1347,7 @@ public class PFQueue implements Runnable {
         	//return this.openPoint(var2, var3 + var6 - 1, var4);
         //}
         
-        if(var7 == null && var6 > 0 && this.getVerticalOffset(var1, var2, var3 + var6, var4, size) == 1) {
+        if(var7 == null && var6 > 0 && this.getVerticalOffset(parJob, var1, var2, var3 + var6, var4, size) == 1) {
             var7 = this.openPoint(var2, var3 + var6, var4);
             var3 += var6;
         }
@@ -1370,38 +1358,42 @@ public class PFQueue implements Runnable {
         	}
         }*/
         
-
-        if(var7 != null) {
-            int var8 = 0;
-            int var9 = 0;
-
-            while(var3 > 0 && (var9 = this.getVerticalOffset(var1, var2, var3 - 1, var4, size)) == 1) {
-                ++var8;
-
-                //if ladder
-                /*if (var9 == -10) {
-                	System.out.println("ladder marked!");
-                	return this.openPoint(var2, var3 - 1, var4);
-                }*/
-                
-                if(var8 >= dropSize + 30) {
-                	/*if (queue.get(0).retryState > 0) {
-                		dbg("dropsize abort " + var1);
-                		dbg("");
-                	}*/
-                    return null;
-                }
-
-                --var3;
-
-                if(var3 > 0) {
-                    var7 = this.openPoint(var2, var3, var4);
-                }
-            }
-
-            if(var9 == -2) {
-                return null;
-            }
+        if (!parJob.useFlyPathfinding) {
+            //if we have a safe point
+	        if(var7 != null) {
+	            int var8 = 0;
+	            int var9 = 0;
+	
+	            //start downscanning for actual ground, while still above y0, 
+	            while(var3 > 0 && (var9 = this.getVerticalOffset(parJob, var1, var2, var3 - 1, var4, size)) == 1) {
+	                ++var8;
+	
+	                //if ladder
+	                /*if (var9 == -10) {
+	                	System.out.println("ladder marked!");
+	                	return this.openPoint(var2, var3 - 1, var4);
+	                }*/
+	                
+	                //why 30?!!??! is this debug that wasnt removed?! removed the 30, hope i dont break stuff....
+	                if(var8 >= dropSize) {
+	                	/*if (queue.get(0).retryState > 0) {
+	                		dbg("dropsize abort " + var1);
+	                		dbg("");
+	                	}*/
+	                    return null;
+	                }
+	
+	                --var3;
+	
+	                if(var3 > 0) {
+	                    var7 = this.openPoint(var2, var3, var4);
+	                }
+	            }
+	
+	            if(var9 == -2) {
+	                return null;
+	            }
+	        }
         }
 
         return var7;
@@ -1419,15 +1411,15 @@ public class PFQueue implements Runnable {
         return var5;
     }
     
-    private int getVerticalOffset(Entity var1, int var2, int var3, int var4, PathPointEx size) {
+    private int getVerticalOffset(PFJobData parJob, Entity var1, int var2, int var3, int var4, PathPointEx size) {
         for(int var6 = var2; var6 < var2 + size.xCoord; ++var6) {
             for(int var7 = var3; var7 < var3 + size.yCoord; ++var7) {
                 for(int var8 = var4; var8 < var4 + size.zCoord; ++var8) {
-                    int var9 = getBlockId(var6, var7, var8);
+                    Block var9 = getBlock(var6, var7, var8);
 
-                    if(var9 > 0) {
-                        if(var9 != Block.doorIron.blockID && var9 != Block.doorWood.blockID) {
-                            if (var9 == Block.fence.blockID || var9 == Block.netherFence.blockID || var9 == Block.cobblestoneWall.blockID) {
+                    if(!CoroUtilBlock.isAir(var9)) {
+                        //if(var9 != Blocks.iron_door && var9 != Blocks.wooden_door) {
+                            if (isFenceLike(var9)) {
                                 return -2;
                             }
                             
@@ -1439,8 +1431,8 @@ public class PFQueue implements Runnable {
                                 System.out.println("ladder!");
                             }*/
                             
-                            Material var11 = Block.blocksList[var9].blockMaterial;
-                            Block block = Block.blocksList[var9];
+                            Material var11 = var9.getMaterial();//Block.blocksList[var9].blockMaterial;
+                            //Block block = Block.blocksList[var9];
                             int meta = getBlockMetadata(var2, var3, var4);
                             
                             
@@ -1472,7 +1464,7 @@ public class PFQueue implements Runnable {
                             	return 1;
                             }
                             
-                            if (var9 == Block.pressurePlatePlanks.blockID || var9 == Block.pressurePlateStone.blockID) {
+                            if (isPressurePlate(var9)) {
                                 return 1;
                             }
 
@@ -1480,24 +1472,33 @@ public class PFQueue implements Runnable {
                                 return 0;
                             }
                             
-                            if (block instanceof BlockEnchantmentTable || block instanceof BlockFlowing) {
+                            if (isNotPathable(var9)) {
                             	return -2;
                             }
                             
                             if(var11 == Material.water) {
-                                return -1;
+                            	if (parJob.useSwimPathfinding) {
+                            		return 1;
+                            	} else {
+                            		return -1;
+                            	}
                             }
 
                             if(var11 == Material.lava || var11 == Material.cactus) {
                                 return -2;
                             }
                             
+                            //this is to replace isDoor open, this is the new more generic way to check for movement blockage
+                            if (var9.getBlocksMovement(worldMap, var6, var7, var8)) {
+                            	return -2;
+                            }
                             
-                        } else {
+                            
+                        /*} else {
                             if(!((BlockDoor)Block.doorWood).isDoorOpen(worldMap, var6, var7, var8)) {
                                 return -2;
                             }
-                        }
+                        }*/
                     }
                 }
             }
@@ -1526,7 +1527,7 @@ public class PFQueue implements Runnable {
         return new PathEntityEx(var5);
     }
     
-    public PathEntityEx simplifyPath(PathEntityEx pathentity, PathPointEx pathpoint)
+    public PathEntityEx simplifyPath(PFJobData parJob, PathEntityEx pathentity, PathPointEx pathpoint)
     {
         if(pathentity == null)
         {
@@ -1592,7 +1593,7 @@ public class PFQueue implements Runnable {
                 }
                 for(int j1 = 1; j1 < Math.abs(i1); j1++)
                 {
-                    if(getVerticalOffset(null, pathpoint1.xCoord + (int)Math.floor(f), pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(null, pathpoint1.xCoord + (int)Math.floor(f), pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1 || getVerticalOffset(null, pathpoint1.xCoord + (int)Math.floor(f) + 1, pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(null, pathpoint1.xCoord + (int)Math.floor(f) + 1, pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1 || getVerticalOffset(null, (pathpoint1.xCoord + (int)Math.floor(f)) - 1, pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(null, (pathpoint1.xCoord + (int)Math.floor(f)) - 1, pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1)
+                    if(getVerticalOffset(parJob, null, pathpoint1.xCoord + (int)Math.floor(f), pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + (int)Math.floor(f), pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + (int)Math.floor(f) + 1, pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + (int)Math.floor(f) + 1, pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1 || getVerticalOffset(parJob, null, (pathpoint1.xCoord + (int)Math.floor(f)) - 1, pathpoint1.yCoord, pathpoint1.zCoord + j1 * byte0, pathpoint) != 1 || getVerticalOffset(parJob, null, (pathpoint1.xCoord + (int)Math.floor(f)) - 1, pathpoint1.yCoord - 1, pathpoint1.zCoord + j1 * byte0, pathpoint) == 1)
                     {
                         pathpoint1 = pathpoint2;
                         linkedlist.add(pathpoint2);
@@ -1614,7 +1615,7 @@ public class PFQueue implements Runnable {
                 }
                 for(int k1 = 1; k1 < Math.abs(l); k1++)
                 {
-                    if(getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, pathpoint1.zCoord + (int)Math.floor(f1), pathpoint) != 1 || getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, pathpoint1.zCoord + (int)Math.floor(f1), pathpoint) == 1 || getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, pathpoint1.zCoord + (int)Math.floor(f1) + 1, pathpoint) != 1 || getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, pathpoint1.zCoord + (int)Math.floor(f1) + 1, pathpoint) == 1 || getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, (pathpoint1.zCoord + (int)Math.floor(f1)) - 1, pathpoint) != 1 || getVerticalOffset(null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, (pathpoint1.zCoord + (int)Math.floor(f1)) - 1, pathpoint) == 1)
+                    if(getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, pathpoint1.zCoord + (int)Math.floor(f1), pathpoint) != 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, pathpoint1.zCoord + (int)Math.floor(f1), pathpoint) == 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, pathpoint1.zCoord + (int)Math.floor(f1) + 1, pathpoint) != 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, pathpoint1.zCoord + (int)Math.floor(f1) + 1, pathpoint) == 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord, (pathpoint1.zCoord + (int)Math.floor(f1)) - 1, pathpoint) != 1 || getVerticalOffset(parJob, null, pathpoint1.xCoord + k1 * byte1, pathpoint1.yCoord - 1, (pathpoint1.zCoord + (int)Math.floor(f1)) - 1, pathpoint) == 1)
                     {
                         pathpoint1 = pathpoint2;
                         linkedlist.add(pathpoint2);
@@ -1647,9 +1648,9 @@ public class PFQueue implements Runnable {
         return new PathEntityEx(apathpoint1);
     }
     
-    private int getBlockId(int x, int y, int z) {
+    private Block getBlock(int x, int y, int z) {
     	//if (!worldMap.checkChunksExist(x, 0, z , x, 128, z)) return 10;
-    	return worldMap.getBlockId(x, y, z);
+    	return worldMap.getBlock(x, y, z);
     }
     
     private int getBlockMetadata(int x, int y, int z) {
@@ -1832,5 +1833,18 @@ public class PFQueue implements Runnable {
     
     public void dbg(Object obj) {
     	//if (debug) System.out.println(obj);
+    }
+    
+    public static boolean isFenceLike(Block block) {
+    	return block == Blocks.fence || block == Blocks.iron_bars || block == Blocks.fence_gate || block == Blocks.cobblestone_wall || block == Blocks.nether_brick_fence;
+    }
+    
+    public static boolean isPressurePlate(Block block) {
+    	return block == Blocks.light_weighted_pressure_plate || block == Blocks.heavy_weighted_pressure_plate || block == Blocks.stone_pressure_plate || block == Blocks.wooden_pressure_plate;
+    }
+    
+    //in 1.6.4 PFQueue, BlockFlowing was considered a -2 return..... it was probably an attempt to stop mobs from pathing into flowing water that stops their pathing progress, lets remove it for now
+    public static boolean isNotPathable(Block block) {
+    	return block == Blocks.enchanting_table/* || block == Blocks.flowing_water*/;
     }
 }

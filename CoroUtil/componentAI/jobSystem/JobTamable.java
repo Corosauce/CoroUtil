@@ -3,6 +3,7 @@ package CoroUtil.componentAI.jobSystem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import CoroUtil.componentAI.AITamable;
+import CoroUtil.util.CoroUtilEntity;
 
 
 public class JobTamable extends JobBase {
@@ -36,18 +37,18 @@ public class JobTamable extends JobBase {
 			if (!ent.worldObj.isRemote) {
 				if (par1EntityPlayer.getCurrentEquippedItem().isItemEqual(tameItem)) {
 					AITamable tamable = entInt.getAIAgent().jobMan.getPrimaryJob().tamable;
-					if (!tamable.isTame()) tamable.tameBy(par1EntityPlayer.username);
+					if (!tamable.isTame()) tamable.tameBy(CoroUtilEntity.getName(par1EntityPlayer));
 					incTameTime();
-					if (ai.useInv) {
+					/*if (ai.useInv) {
 						ai.entInv.inventory.setInventorySlotContents(0, par1EntityPlayer.getCurrentEquippedItem().copy());
 			    		par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = null;
 			    		ai.entInv.sync();
 			    		ai.entInv.setCurrentSlot(0);
 			    		ai.entInv.rightClickItem();
 			    		ai.entInv.inventory.setInventorySlotContents(0, null);
-					} else {
+					} else {*/
 						par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = par1EntityPlayer.getCurrentEquippedItem().copy();
-					}
+					//}
 		    		
 		    		
 				}

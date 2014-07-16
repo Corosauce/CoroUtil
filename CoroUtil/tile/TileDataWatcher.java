@@ -13,14 +13,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.entity.WatchableObject;
+import net.minecraft.entity.DataWatcher;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.Packet;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ReportedException;
+import CoroUtil.packet.WatchableObject;
 
 public class TileDataWatcher
 {
+	
+	//must test all of this for 1.7, had to remove stream methods and add in packetbuffer methods
+	
     /** When isBlank is true the DataWatcher is not watching any objects */
     private boolean isBlank = true;
     public static final HashMap dataTypes = new HashMap();
@@ -164,7 +169,7 @@ public class TileDataWatcher
     /**
      * writes every object in passed list to dataoutputstream, terminated by 0x7F
      */
-    public static void writeObjectsInListToStream(List par0List, DataOutputStream par1DataOutputStream) throws IOException
+    /*public static void writeObjectsInListToStream(List par0List, DataOutputStream par1DataOutputStream) throws IOException
     {
         if (par0List != null)
         {
@@ -178,6 +183,21 @@ public class TileDataWatcher
         }
 
         par1DataOutputStream.writeByte(127);
+    }*/
+    
+    public void func_151509_a(PacketBuffer p_151509_1_) throws IOException
+    {
+        this.lock.readLock().lock();
+        Iterator iterator = this.watchedObjects.values().iterator();
+
+        while (iterator.hasNext())
+        {
+            DataWatcher.WatchableObject watchableobject = (DataWatcher.WatchableObject)iterator.next();
+            writeWatchableObjectToPacketBuffer(p_151509_1_, watchableobject);
+        }
+
+        this.lock.readLock().unlock();
+        p_151509_1_.writeByte(127);
     }
 
     public List unwatchAndReturnAllWatched()
@@ -213,7 +233,7 @@ public class TileDataWatcher
         return arraylist;
     }
 
-    public void writeWatchableObjects(DataOutputStream par1DataOutputStream) throws IOException
+    /*public void writeWatchableObjects(DataOutputStream par1DataOutputStream) throws IOException
     {
         this.lock.readLock().lock();
         Iterator iterator = this.watchedObjects.values().iterator();
@@ -226,7 +246,7 @@ public class TileDataWatcher
 
         this.lock.readLock().unlock();
         par1DataOutputStream.writeByte(127);
-    }
+    }*/
 
     public List getAllWatched()
     {
@@ -248,7 +268,7 @@ public class TileDataWatcher
         return arraylist;
     }
 
-    public static void writeWatchableObject(DataOutputStream par0DataOutputStream, WatchableObject par1WatchableObject) throws IOException
+    /*public static void writeWatchableObject(DataOutputStream par0DataOutputStream, WatchableObject par1WatchableObject) throws IOException
     {
         int i = (par1WatchableObject.getObjectType() << 5 | par1WatchableObject.getDataValueId() & 31) & 255;
         par0DataOutputStream.writeByte(i);
@@ -322,6 +342,92 @@ public class TileDataWatcher
                     int l = par0DataInputStream.readInt();
                     int i1 = par0DataInputStream.readInt();
                     watchableobject = new WatchableObject(i, j, new ChunkCoordinates(k, l, i1));
+            }
+
+            arraylist.add(watchableobject);
+        }
+
+        return arraylist;
+    }*/
+    
+    private static void writeWatchableObjectToPacketBuffer(PacketBuffer p_151510_0_, DataWatcher.WatchableObject p_151510_1_) throws IOException
+    {
+        int i = (p_151510_1_.getObjectType() << 5 | p_151510_1_.getDataValueId() & 31) & 255;
+        p_151510_0_.writeByte(i);
+
+        switch (p_151510_1_.getObjectType())
+        {
+            case 0:
+                p_151510_0_.writeByte(((Byte)p_151510_1_.getObject()).byteValue());
+                break;
+            case 1:
+                p_151510_0_.writeShort(((Short)p_151510_1_.getObject()).shortValue());
+                break;
+            case 2:
+                p_151510_0_.writeInt(((Integer)p_151510_1_.getObject()).intValue());
+                break;
+            case 3:
+                p_151510_0_.writeFloat(((Float)p_151510_1_.getObject()).floatValue());
+                break;
+            case 4:
+                p_151510_0_.writeStringToBuffer((String)p_151510_1_.getObject());
+                break;
+            case 5:
+                ItemStack itemstack = (ItemStack)p_151510_1_.getObject();
+                p_151510_0_.writeItemStackToBuffer(itemstack);
+                break;
+            case 6:
+                ChunkCoordinates chunkcoordinates = (ChunkCoordinates)p_151510_1_.getObject();
+                p_151510_0_.writeInt(chunkcoordinates.posX);
+                p_151510_0_.writeInt(chunkcoordinates.posY);
+                p_151510_0_.writeInt(chunkcoordinates.posZ);
+        }
+    }
+
+    /**
+     * Reads a list of watched objects (entity attribute of type {byte, short, int, float, string, ItemStack,
+     * ChunkCoordinates}) from the supplied PacketBuffer
+     */
+    public static List readWatchedListFromPacketBuffer(PacketBuffer p_151508_0_) throws IOException
+    {
+        ArrayList arraylist = null;
+
+        for (byte b0 = p_151508_0_.readByte(); b0 != 127; b0 = p_151508_0_.readByte())
+        {
+            if (arraylist == null)
+            {
+                arraylist = new ArrayList();
+            }
+
+            int i = (b0 & 224) >> 5;
+            int j = b0 & 31;
+            DataWatcher.WatchableObject watchableobject = null;
+
+            switch (i)
+            {
+                case 0:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, Byte.valueOf(p_151508_0_.readByte()));
+                    break;
+                case 1:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, Short.valueOf(p_151508_0_.readShort()));
+                    break;
+                case 2:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, Integer.valueOf(p_151508_0_.readInt()));
+                    break;
+                case 3:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, Float.valueOf(p_151508_0_.readFloat()));
+                    break;
+                case 4:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, p_151508_0_.readStringFromBuffer(32767));
+                    break;
+                case 5:
+                    watchableobject = new DataWatcher.WatchableObject(i, j, p_151508_0_.readItemStackFromBuffer());
+                    break;
+                case 6:
+                    int k = p_151508_0_.readInt();
+                    int l = p_151508_0_.readInt();
+                    int i1 = p_151508_0_.readInt();
+                    watchableobject = new DataWatcher.WatchableObject(i, j, new ChunkCoordinates(k, l, i1));
             }
 
             arraylist.add(watchableobject);

@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.formation.Manager;
+import CoroUtil.util.CoroUtilBlock;
 
 
 public class JobFormation extends JobBase {
@@ -43,12 +44,12 @@ public class JobFormation extends JobBase {
 					int randY = (int)ent.posY + rand.nextInt(size/4) - size/8;
 					int randZ = (int)ent.posZ + rand.nextInt(size) - size/2;
 					
-					int idGround = ent.worldObj.getBlockId(randX, ent.worldObj.getHeightValue(randX, randZ) - 1, randZ);
-					int id1 = ent.worldObj.getBlockId(randX, ent.worldObj.getHeightValue(randX, randZ), randZ);
-					int id2 = ent.worldObj.getBlockId(randX, ent.worldObj.getHeightValue(randX, randZ) + 1, randZ);
+					Block idGround = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ) - 1, randZ);
+					Block id1 = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ), randZ);
+					Block id2 = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ) + 1, randZ);
 					
-					if (idGround != 0 && Block.blocksList[idGround].blockMaterial != Material.water) {
-						if (id1 == 0 && id2 == 0) {
+					if (idGround.getMaterial() != Material.water) {
+						if (CoroUtilBlock.isAir(id1) && CoroUtilBlock.isAir(id2)) {
 							//System.out.println("LEADER EXTENDED IDLE PATHING!");
 							ai.walkTo(ent, randX, randY, randZ, ai.maxPFRange, 600);
 						}

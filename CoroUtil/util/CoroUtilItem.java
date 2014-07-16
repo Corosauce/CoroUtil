@@ -10,4 +10,19 @@ public class CoroUtilItem {
     	return item;
     }
 	
+	public static Item getItemByName(String name) {
+		try {
+			return (Item) Item.itemRegistry.getObject(name);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static String getNameByItem(Item item) {
+		return Item.itemRegistry.getNameForObject(item);
+	}
+	
+	
+	
 }

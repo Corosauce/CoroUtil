@@ -3,10 +3,10 @@ package CoroUtil.bt;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeInstance;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.MathHelper;
@@ -25,7 +25,7 @@ public class PathNavigateCustom
     /**
      * The number of blocks (extra) +/- in each axis that get pulled out as cache for the pathfinder's search space
      */
-    private AttributeInstance pathSearchRange;
+    private IAttributeInstance pathSearchRange;
     private boolean noSunPathfind;
 
     /** Time, in number of ticks, following the current path */
@@ -56,7 +56,9 @@ public class PathNavigateCustom
      * If the entity can swim. Swimming AI enables this and the pathfinder will also cause the entity to swim straight
      * upwards when underwater
      */
-    private boolean canSwim;
+    private boolean canSwimOnSurface;
+    public boolean canSwimInWater; //used for navigating under the water without strait up float forcing (float code is elsewhere usually)
+    public boolean canFly; //used for navigating flying paths
 
     public PathNavigateCustom(EntityLivingBase par1EntityLiving, World par2World)
     {
@@ -117,7 +119,7 @@ public class PathNavigateCustom
      */
     public void setCanSwim(boolean par1)
     {
-        this.canSwim = par1;
+        this.canSwimOnSurface = par1;
     }
 
     /**
@@ -133,7 +135,7 @@ public class PathNavigateCustom
      */
     public PathEntity getPathToXYZ(double par1, double par3, double par5)
     {
-        return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(par1), (int)par3, MathHelper.floor_double(par5), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwim);
+        return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(par1), (int)par3, MathHelper.floor_double(par5), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     }
 
     /**
@@ -150,7 +152,7 @@ public class PathNavigateCustom
      */
     public PathEntity getPathToEntityLiving(Entity par1Entity)
     {
-        return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwim);
+        return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     }
 
     /**
@@ -311,21 +313,21 @@ public class PathNavigateCustom
      */
     private int getPathableYPos()
     {
-        if (this.theEntity.isInWater() && this.canSwim)
+        if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
             int i = (int)this.theEntity.boundingBox.minY;
-            int j = this.worldObj.getBlockId(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
+            Block block = this.worldObj.getBlock(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
             int k = 0;
 
             do
             {
-                if (j != Block.waterMoving.blockID && j != Block.waterStill.blockID)
+            	if (block != Blocks.flowing_water && block != Blocks.water)
                 {
                     return i;
                 }
 
                 ++i;
-                j = this.worldObj.getBlockId(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
+                block = this.worldObj.getBlock(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
                 ++k;
             }
             while (k <= 16);
@@ -343,7 +345,7 @@ public class PathNavigateCustom
      */
     private boolean canNavigate()
     {
-        return this.theEntity.onGround || this.canSwim && this.isInFluid();
+        return this.canFly || this.canSwimInWater || this.theEntity.onGround || (this.canSwimOnSurface && this.isInFluid());
     }
 
     /**
@@ -481,14 +483,13 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        int k2 = this.worldObj.getBlockId(i2, par2 - 1, j2);
+                    	Block block = this.worldObj.getBlock(i2, par2 - 1, j2);
+                        Material material = block.getMaterial();
 
-                        if (k2 <= 0)
+                        if (material == Material.air)
                         {
                             return false;
                         }
-
-                        Material material = Block.blocksList[k2].blockMaterial;
 
                         if (material == Material.water && !this.theEntity.isInWater())
                         {
@@ -524,9 +525,9 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        int j2 = this.worldObj.getBlockId(k1, l1, i2);
+                    	Block block = this.worldObj.getBlock(k1, l1, i2);
 
-                        if (j2 > 0 && !Block.blocksList[j2].getBlocksMovement(this.worldObj, k1, l1, i2))
+                        if (!block.getBlocksMovement(this.worldObj, k1, l1, i2))
                         {
                             return false;
                         }

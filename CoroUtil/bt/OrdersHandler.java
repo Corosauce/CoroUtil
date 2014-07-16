@@ -47,7 +47,7 @@ public class OrdersHandler {
 			
 			NBTTagCompound activeOrdersNBT = new NBTTagCompound();
 			activeOrdersNBT = activeOrders.writeToNBT(activeOrdersNBT);
-			parentCompound.setCompoundTag("activeOrdersNBT", activeOrdersNBT);
+			parentCompound.setTag("activeOrdersNBT", activeOrdersNBT);
 		}
 		return parentCompound;
 	}

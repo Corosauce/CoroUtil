@@ -16,10 +16,8 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.minecraftforge.event.Event;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import CoroUtil.quest.quests.ActiveQuest;
@@ -28,6 +26,7 @@ import CoroUtil.quest.quests.KillEntityQuest;
 import CoroUtil.util.CoroUtilFile;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -72,7 +71,7 @@ public class PlayerQuests {
 	}
 	
 	public EntityPlayer getPlayer() {
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getServerConfigurationManager(FMLCommonHandler.instance().getMinecraftServerInstance()).getPlayerForUsername(playerName);
+		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
 	}
 	
 	public void tick(World parWorld) {
@@ -118,11 +117,12 @@ public class PlayerQuests {
                 
                 //dos.write(data);
 
-	            Packet250CustomPayload pkt = new Packet250CustomPayload();
+                System.out.println("missing quest packet syncing code");
+	            /*Packet250CustomPayload pkt = new Packet250CustomPayload();
 	            pkt.channel = "CoroUtilQuest";
 	            pkt.data = bos.toByteArray();
 	            pkt.length = bos.size();
-	            MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(playerName).playerNetServerHandler.sendPacketToPlayer(pkt);
+	            MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(playerName).playerNetServerHandler.sendPacketToPlayer(pkt);*/
             }
             catch (Exception ex)
             {
@@ -307,10 +307,12 @@ public class PlayerQuests {
 	public void nbtLoad(NBTTagCompound parNBT) {
 		
 		if (!parNBT.hasNoTags()) {
-			Iterator it = parNBT.getTags().iterator();
+			//Iterator it = parNBT.getTags().iterator();
+			Iterator it = parNBT.func_150296_c().iterator();
 		
 			while (it.hasNext()) {
-				NBTTagCompound data = (NBTTagCompound)it.next();
+				String tagName = (String) it.next();
+				NBTTagCompound data = parNBT.getCompoundTag(tagName);
 				
 				String classNamePath = data.getString("classNamePath");
 				

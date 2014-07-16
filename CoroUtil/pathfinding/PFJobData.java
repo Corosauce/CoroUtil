@@ -18,7 +18,7 @@ public class PFJobData {
 	
 	//Configurable settings
 	public int priority = 1; //higher the lower priority
-	public int climbHeight = 1;
+	public int climbHeight = 1; //upwards only
 	public int safeDropHeight = 4;
 	public boolean canUseLadder = true;
 	public boolean canSwimOnWater = true; //requires addition to PFQueue
@@ -26,6 +26,8 @@ public class PFJobData {
 	public boolean performShortPathRetries = false;
 	public boolean omniDirectionalPathRequest = false;
 	public long maxNodeIterations = 15000;
+	public boolean useFlyPathfinding = false;
+	public boolean useSwimPathfinding = false; //not just top of water, full water pathing, like as if flying
 	
 	//Extra data usage
 	public boolean mapOutPathfind = false;

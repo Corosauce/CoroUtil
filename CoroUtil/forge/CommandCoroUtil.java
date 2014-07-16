@@ -4,11 +4,13 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
+import net.minecraft.init.Items;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
+import CoroUtil.util.CoroUtilEntity;
+import CoroUtil.util.CoroUtilItem;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -36,13 +38,16 @@ public class CommandCoroUtil extends CommandBase {
 						aq.initCreateObject(plQuests);
 						
 						aq.initFirstTime(player.worldObj.provider.dimensionId);
-						((ItemQuest)aq).initCustomData(Item.diamond.itemID, 5, false);
+						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.diamond), 5, false);
 						
-						PlayerQuestManager.i().getPlayerQuests(player.username).questAdd(aq);
+						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);
 						System.out.println("create success type: " + aq.questType);
 					} else {
 						System.out.println("failed to create quest " + createQuestStr);
 					}
+				} else if (var2[0].equals("aitest")) {
+					/*System.out.println("AI TEST MODIFY!");
+					BehaviorModifier.test(player.worldObj, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
 				}
 			}
 		} catch (Exception ex) {

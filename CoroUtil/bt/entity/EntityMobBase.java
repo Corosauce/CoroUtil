@@ -3,7 +3,7 @@ package CoroUtil.bt.entity;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityLivingData;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -58,7 +58,7 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
 	}
 	
 	@Override
-    public EntityLivingData onSpawnWithEgg(EntityLivingData par1EntityLivingData) {
+    public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1EntityLivingData) {
         initRPGStats();
         return super.onSpawnWithEgg(getAIBTAgent().onSpawnEvent(par1EntityLivingData));
     }
@@ -89,7 +89,7 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
         
         agent.setSpeedNormalBase(0.30F);
         agent.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setAttribute(20);
+        this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20);
     }
     
     public void updateAITasks() {

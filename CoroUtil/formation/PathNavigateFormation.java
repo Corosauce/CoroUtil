@@ -1,5 +1,6 @@
 package CoroUtil.formation;
 
+import CoroUtil.util.CoroUtilBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.EntityMoveHelper;
@@ -451,14 +452,14 @@ public class PathNavigateFormation
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        int k2 = this.worldObj.getBlockId(i2, par2 - 1, j2);
+                        Block k2 = this.worldObj.getBlock(i2, par2 - 1, j2);
 
-                        if (k2 <= 0)
+                        if (CoroUtilBlock.isAir(k2))
                         {
                             return false;
                         }
 
-                        Material material = Block.blocksList[k2].blockMaterial;
+                        Material material = k2.getMaterial();
 
                         /*if (material == Material.water && !this.theEntity.isInWater())
                         {
@@ -494,9 +495,9 @@ public class PathNavigateFormation
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        int j2 = this.worldObj.getBlockId(k1, l1, i2);
+                        Block j2 = this.worldObj.getBlock(k1, l1, i2);
 
-                        if (j2 > 0 && !Block.blocksList[j2].getBlocksMovement(this.worldObj, k1, l1, i2))
+                        if (j2.getBlocksMovement(this.worldObj, k1, l1, i2))
                         {
                             return false;
                         }

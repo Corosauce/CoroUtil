@@ -16,12 +16,12 @@ public class CoroUtilNBT {
 		
 		//do magic
 		try {
-			Collection dataCl = nbtSource.getTags();
-			Iterator it = dataCl.iterator();
+			Iterator it = nbtSource.func_150296_c().iterator();
 			
 			while (it.hasNext()) {
-				NBTBase data = (NBTBase)it.next();
-				newNBT.setTag(data.getName(), data);
+				String tagName = (String) it.next();
+				NBTBase data = nbtSource.getCompoundTag(tagName);
+				newNBT.setTag(tagName, data);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

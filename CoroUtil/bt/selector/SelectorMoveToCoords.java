@@ -103,7 +103,7 @@ public class SelectorMoveToCoords extends Selector {
 	public boolean canBeSeen(Vec3 pos)
     {
 		EntityLivingBase entL = ((EntityLivingBase)ent);
-        return entL.worldObj.clip(entL.worldObj.getWorldVec3Pool().getVecFromPool(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
+        return entL.worldObj.rayTraceBlocks(entL.worldObj.getWorldVec3Pool().getVecFromPool(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	
 }

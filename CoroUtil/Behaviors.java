@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import CoroUtil.pathfinding.c_IEnhPF;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -18,6 +17,7 @@ import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 
 
@@ -42,8 +42,8 @@ public class Behaviors {
 	
 	public static void check(Entity me) {
 		if (instance == null) new Behaviors();
-		if (!(entFields.containsKey(me.entityId))) {
-			entFields.put(me.entityId, new DataLatcher());
+		if (!(entFields.containsKey(me.getEntityId()))) {
+			entFields.put(me.getEntityId(), new DataLatcher());
 		}
 	}
 	
@@ -120,14 +120,14 @@ public class Behaviors {
 		//System.out.println("set: " + ent.entityId);
 		//DataLatcher dl = (DataLatcher)entFields.get(ent.entityId);
 		//System.out.println("set: " + ent.entityId + "|" + dl);
-		((DataLatcher)entFields.get(ent.entityId)).values.put(dtEnum, obj);
+		((DataLatcher)entFields.get(ent.getEntityId())).values.put(dtEnum, obj);
 	}
 	
 	public static Object getData(Entity ent, DataTypes dtEnum) {
 		
 		//DataLatcher dl = (DataLatcher)entFields.get(ent.entityId);
 		//System.out.println("get: " + ent.entityId + "|" + dl);
-		return ((DataLatcher)entFields.get(ent.entityId)).values.get(dtEnum);
+		return ((DataLatcher)entFields.get(ent.getEntityId())).values.get(dtEnum);
 	}
 	
 	public static void wheatFollow(EntityCreature me) {
@@ -138,7 +138,7 @@ public class Behaviors {
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {
-		           if(var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().itemID == Item.wheat.itemID) {
+		           if(var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.wheat) {
 		        	  found = true;
 		              setTarget(me, var5);
 		              
@@ -154,7 +154,7 @@ public class Behaviors {
         		Entity target = (Entity)getData(me, DataTypes.followTarg);
         		if (target instanceof EntityPlayer) {
         			EntityPlayer var5 = (EntityPlayer)target;
- 	           		if(var5.getCurrentEquippedItem() == null || (var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().itemID != Item.wheat.itemID)) {
+ 	           		if(var5.getCurrentEquippedItem() == null || (var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.wheat)) {
  	           			setTarget(me, null);
  	           		}
         		}

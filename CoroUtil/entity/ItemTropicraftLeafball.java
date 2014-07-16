@@ -1,6 +1,6 @@
 package CoroUtil.entity;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -10,9 +10,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemTropicraftLeafball extends Item
 {
-    public ItemTropicraftLeafball(int i)
+    public ItemTropicraftLeafball()
     {
-        super(i);
         maxStackSize = 16;
     }
 
@@ -32,7 +31,7 @@ public class ItemTropicraftLeafball extends Item
     
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerIcons(IconRegister par1IconRegister) {
+    public void registerIcons(IIconRegister par1IconRegister) {
         this.itemIcon = par1IconRegister.registerIcon("tropicraftmod:" + "leaf_green");
     }
 }

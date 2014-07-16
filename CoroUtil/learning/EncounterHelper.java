@@ -42,8 +42,8 @@ public class EncounterHelper {
 	
 	public static float getShouldAvoid(Entity source, Entity target) {
 		check();
-		String strVal = "attack-value-" + target.getEntityName() + "-" + source.getEntityName();
-		String strCount = "attack-count-" + target.getEntityName() + "-" + source.getEntityName();
+		String strVal = "attack-value-" + target.getCommandSenderName() + "-" + source.getCommandSenderName();
+		String strCount = "attack-count-" + target.getCommandSenderName() + "-" + source.getCommandSenderName();
 		float val = data.getFloat(strVal);
 		int count = data.getInteger(strCount);
 		
@@ -54,8 +54,8 @@ public class EncounterHelper {
 	
 	public static float getShouldAttack(Entity source, Entity target) {
 		check();
-		String strVal = "attack-value-" + target.getEntityName() + "-" + source.getEntityName();
-		String strCount = "attack-count-" + target.getEntityName() + "-" + source.getEntityName();
+		String strVal = "attack-value-" + target.getCommandSenderName() + "-" + source.getCommandSenderName();
+		String strCount = "attack-count-" + target.getCommandSenderName() + "-" + source.getCommandSenderName();
 		float val = data.getFloat(strVal);
 		int count = data.getInteger(strCount);
 		
@@ -67,8 +67,8 @@ public class EncounterHelper {
 	//log target damage vs source total health (and other resistances)
 	public static void logDamageFrom(EntityLivingBase source, Entity target, float parDamage) {
 		check();
-		String strVal = "attack-value-" + source.getEntityName() + "-" + target.getEntityName();
-		String strCount = "attack-count-" + source.getEntityName() + "-" + target.getEntityName();
+		String strVal = "attack-value-" + source.getCommandSenderName() + "-" + target.getCommandSenderName();
+		String strCount = "attack-count-" + source.getCommandSenderName() + "-" + target.getCommandSenderName();
 		float val = data.getFloat(strVal);
 		int count = data.getInteger(strCount)+1;
 		
@@ -80,8 +80,8 @@ public class EncounterHelper {
 	
 	public static void logDeathFrom(Entity source, Entity target) {
 		check();
-		String strVal = "attack-value-" + source.getEntityName() + "-" + target.getEntityName();
-		String strCount = "attack-count-" + source.getEntityName() + "-" + target.getEntityName();
+		String strVal = "attack-value-" + source.getCommandSenderName() + "-" + target.getCommandSenderName();
+		String strCount = "attack-count-" + source.getCommandSenderName() + "-" + target.getCommandSenderName();
 		float val = data.getFloat(strVal);
 		int count = data.getInteger(strCount)+1;
 		

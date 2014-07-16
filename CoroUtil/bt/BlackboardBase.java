@@ -14,6 +14,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import CoroUtil.OldUtil;
 import CoroUtil.pathfinding.IPFCallback;
 import CoroUtil.pathfinding.PFCallbackItem;
+import CoroUtil.pathfinding.PFJobData;
 import CoroUtil.pathfinding.PFQueue;
 
 public class BlackboardBase implements IPFCallback {
@@ -71,6 +72,11 @@ public class BlackboardBase implements IPFCallback {
 	public long lastTimeRequestedPFThreaded = 0;
 	public long PFThreadedTimeout = 5000;
 	
+	//testing flying and swimming pathing
+	public MutableBoolean canFlyPath = new MutableBoolean(false);
+	public MutableBoolean canSwimPath = new MutableBoolean(false);
+	public MutableBoolean canFlyStraitToTarget = new MutableBoolean(false);
+	
 	public BlackboardBase(AIBTAgent parAgent) {
 		agent = parAgent;
 	}
@@ -99,7 +105,7 @@ public class BlackboardBase implements IPFCallback {
 	public void setTarget(Entity parTarget) {
 		target = parTarget;
 		if (parTarget != null) {
-			targetID = parTarget.entityId;
+			targetID = parTarget.getEntityId();
 		} else {
 			targetID = -1;
 		}
@@ -147,8 +153,18 @@ public class BlackboardBase implements IPFCallback {
 	}
 	
 	public void requestPathFar(Vec3 parPos, int pathRange) {
-		System.out.println("request pf set: " + parPos);
-		PFQueue.tryPath(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange, 0, this);
+		if (canFlyPath.getValue() || canSwimPath.getValue()) {
+			//System.out.println("request TEST FLYING/SWIMMING PATH pf set: " + parPos);
+			PFJobData job = new PFJobData(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange);
+			job.callback = this;
+			job.canUseLadder = true;
+			job.useFlyPathfinding = canFlyPath.getValue();
+			job.useSwimPathfinding = canSwimPath.getValue();
+			PFQueue.tryPath(job);
+		} else {
+			//System.out.println("request pf set: " + parPos);
+			PFQueue.tryPath(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange, 0, this);
+		}
 		isWaitingForPath.setValue(true);
 		isPathReceived.setValue(false);
 		lastTimeRequestedPFThreaded = System.currentTimeMillis();

@@ -8,8 +8,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeInstance;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,8 +34,7 @@ public class AIAgent {
 	//Main
 	public EntityLiving ent;
 	public ICoroAI entInt;
-	public AIFakePlayer entInv;
-	public boolean useInv;
+	//public boolean useInv;
 	public JobManager jobMan;
 	public Formation activeFormation;
 	
@@ -143,10 +142,10 @@ public class AIAgent {
 	public AIAgent(ICoroAI parEnt, boolean useInventory) {
 		ent = (EntityLiving)parEnt;
 		entInt = parEnt;
-		useInv = useInventory;
+		/*useInv = useInventory;
 		if (useInv) {
 			entInv = new AIFakePlayer(this);
-		}
+		}*/
 		jobMan = new JobManager(this);
 		rand = new Random();
 		setState(EnumActState.IDLE);
@@ -160,24 +159,24 @@ public class AIAgent {
 	
 	public void applyEntityAttributes() {
 		//baseline movespeed
-		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(moveSpeed);
+		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(moveSpeed);
 	}
 	
 	public void attrRemoveSpeeds() {
-		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		IAttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
         attributeinstance.removeModifier(speedBoostAttack);
         attributeinstance.removeModifier(speedBoostFlee);
 	}
 
 	public void attrSetSpeedFlee() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		IAttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
 		attributeinstance.applyModifier(speedBoostFlee);
 	}
 	
 	public void attrSetSpeedAttack() {
 		attrRemoveSpeeds();
-		AttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
+		IAttributeInstance attributeinstance = ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
 		attributeinstance.applyModifier(speedBoostAttack);
 	}
 	
@@ -212,13 +211,13 @@ public class AIAgent {
 	}
 	
 	public void spawnedOrNBTReloadedInit() {
-		dbg(ent.entityId + " - CALLED: spawnedOrNBTReloadedInit()"); 
+		dbg(ent.getEntityId() + " - CALLED: spawnedOrNBTReloadedInit()"); 
 		hasBeenSpawnedOrNBTInitialized = true;
-		if (useInv) {
+		/*if (useInv) {
 			waitingToMakeFakePlayer = true;
-		} else {
+		} else {*/
 			postFullInit();
-		}
+		//}
 	}
 	
 	public void postFullInit() {
@@ -235,7 +234,7 @@ public class AIAgent {
 	}
 	
 	public void initJobs() {
-		if (useInv) entInv.initJobs();
+		//if (useInv) entInv.initJobs();
 	}
 	
 	public void setState(EnumActState eka) {
@@ -289,12 +288,13 @@ public class AIAgent {
 			ent.getDataWatcher().updateObject(25, Integer.valueOf(swingArm ? 1 : 0));
 			if (swingArm) swingArm = false; //to reset the state so client doesnt get extra swing arm state?
 		}
-		if (useInv) entInv.onLivingUpdateTick();
+		//if (useInv) entInv.onLivingUpdateTick();
 	}
 	
 	public void updateAITasks() {
-		OldUtil.addAge(ent, 1);
-		OldUtil.despawnEntity(ent);
+		System.out.println("AIAgent inc age and despawn calls missing");
+		/*OldUtil.addAge(ent, 1);
+		OldUtil.despawnEntity(ent);*/
         
         //if (fakePlayer == null) return;
         
@@ -303,7 +303,7 @@ public class AIAgent {
         //this.tasks.onUpdateTasks();
 		lastMovementState = -1;
         
-		if (useInv) entInv.updateTick();
+		//if (useInv) entInv.updateTick();
 		
         if (jobMan.getPrimaryJob() == null) return;
         
@@ -503,7 +503,7 @@ public class AIAgent {
 	public void heal(int val) {
 		ent.heal(val);
 		//dbg("healing, new health: " + ent.getHealth());
-		if (useInv) entInv.sync();
+		//if (useInv) entInv.sync();
 	}
 	
 	public void updateAI() {
@@ -706,36 +706,36 @@ public class AIAgent {
     }
 	
 	protected void attackEntity(Entity var1, float var2) {
-		if (useInv) {
+		/*if (useInv) {
 			//Cancel if outsourced management says no
 			if (entInv.inventoryOutsourced != null && !entInv.inventoryOutsourced.canAttack()) return;
 			entInv.sync();
-		}
+		}*/
     	
 		//no charge fix
-		if (useInv && entInv.rangedInUseTicksMax == 0) rangedInUse = false;
+		//if (useInv && entInv.rangedInUseTicksMax == 0) rangedInUse = false;
 		
     	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
     		if (curCooldown_Melee <= 0) {
     			if (rangedInUse) rangedUsageCancelCharge();
     			ent.faceEntity(var1, 180, 180);
     			if (!meleeUseRightClick) {
-	    			if (useInv) {
+	    			/*if (useInv) {
 	    				entInv.attackMelee(var1, var2);
-	    			} else {
+	    			} else {*/
 	    				entInt.attackMelee(var1, var2);
-	    			}
+	    			//}
     			} else {
-    				if (useInv) {
+    				/*if (useInv) {
         				//entInv.attackRanged(var1, var2);
     					if (entInv.inventory == null) return;
     					faceEntity(ent, 180, 180);
     					entInv.setCurrentSlot(entInv.slot_Melee);
     					//this.setCurrentSlot(entInv.slot_Ranged);
     					entInv.rightClickItem();
-        			} else {
+        			} else {*/
         				entInt.attackRanged(var1, var2);
-        			}
+        			//}
     			}
         		this.curCooldown_Melee = entInt.getCooldownMelee();
         	}
@@ -744,11 +744,11 @@ public class AIAgent {
     	} else if (var2 < maxReach_Ranged) {
     		if (curCooldown_Ranged <= 0 && curCooldown_Melee < maxReach_Melee - (maxReach_Melee / 4)) {
     			ent.faceEntity(var1, 180, 180);
-    			if (useInv) {
+    			/*if (useInv) {
     				entInv.attackRanged(var1, var2);
-    			} else {
+    			} else {*/
     				entInt.attackRanged(var1, var2);
-    			}
+    			//}
         		this.curCooldown_Ranged = entInt.getCooldownRanged(); //keep here for fallback when charging items not used
     		}
     	}
@@ -767,7 +767,7 @@ public class AIAgent {
 		//dbg(ent.entityId + " - rangedUsageCancelCharge() stopped using item!");
 		rangedInUse = false;
 		this.curCooldown_Ranged = entInt.getCooldownRanged();
-		if (useInv) entInv.rangedUsageCancelCharge();
+		//if (useInv) entInv.rangedUsageCancelCharge();
 	}
 	
     public void updateWanderPath()
@@ -933,7 +933,7 @@ public class AIAgent {
         Vec3 var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
-        return ent.worldObj.clip(var4, var6);
+        return ent.worldObj.rayTraceBlocks(var4, var6);
     }
 	
 	public boolean isInFormation() {
@@ -941,7 +941,7 @@ public class AIAgent {
 	}
 	
 	public void readEntityFromNBT(NBTTagCompound var1) {
-		if (useInv) this.entInv.readEntityFromNBT(var1);
+		//if (useInv) this.entInv.readEntityFromNBT(var1);
 		spawnedOrNBTReloadedInit();
 		entID = var1.getInteger("ICoroAI_entID");
 		homeX = var1.getInteger("homeX");
@@ -954,7 +954,7 @@ public class AIAgent {
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound var1) {
-		if (useInv) this.entInv.writeEntityToNBT(var1);
+		//if (useInv) this.entInv.writeEntityToNBT(var1);
 		var1.setInteger("ICoroAI_entID", entID);
 		var1.setInteger("homeX", homeX);
 		var1.setInteger("homeY", homeY);
@@ -986,7 +986,7 @@ public class AIAgent {
 	}
 	
 	public void cleanup() {
-		if (useInv) entInv.cleanup();
+		//if (useInv) entInv.cleanup();
 		//kill cyclical references
 		//System.out.println("cleaning up entity " + ent.entityId);
 		PFQueue.pfDelays.remove(ent);
@@ -994,7 +994,7 @@ public class AIAgent {
 		ent = null;
 		entInt.cleanup();
 		entInt = null;
-		entInv = null;
+		//entInv = null;
 		jobMan = null;
 		activeFormation = null;
 		retaliateEntity = null;

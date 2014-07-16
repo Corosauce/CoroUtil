@@ -1,24 +1,23 @@
 package CoroUtil.entity;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import CoroUtil.componentAI.AIFakePlayer;
 
 public class ItemTropicalFishingRod extends Item 
 {
 
-    public ItemTropicalFishingRod(int var1) {
-        super(var1);
+    public ItemTropicalFishingRod() {
         this.setMaxDamage(64);
         this.setMaxStackSize(1);
     }
     
     @Override
-	public void registerIcons(IconRegister iconRegistry) {
-		this.itemIcon = Item.fishingRod.getIconFromDamage(0);
+	public void registerIcons(IIconRegister iconRegistry) {
+		this.itemIcon = Items.fishing_rod.getIconFromDamage(0);
 	}
 
     public boolean isFull3D() {
@@ -29,7 +28,7 @@ public class ItemTropicalFishingRod extends Item
         return true;
     }
     
-    public ItemStack onItemRightClick3(ItemStack var1, World var2, AIFakePlayer var3, float speed) {
+    /*public ItemStack onItemRightClick3(ItemStack var1, World var2, AIFakePlayer var3, float speed) {
     	//System.out.println(System.currentTimeMillis() + " - try cast item, fishEntity:" + var3.fishEntity);
         if(var3.fishEntity != null) {
             int var4 = var3.fishEntity.catchFish();
@@ -47,7 +46,7 @@ public class ItemTropicalFishingRod extends Item
         }
 
         return var1;
-    }
+    }*/
     
     /*public ItemStack onItemRightClick2(ItemStack var1, World var2, c_PlayerProxy var3, float speed) {
     	//System.out.println(System.currentTimeMillis() + " - try cast item, fishEntity:" + var3.fishEntity);
@@ -70,7 +69,7 @@ public class ItemTropicalFishingRod extends Item
 
     public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3) {
         if(var3.fishEntity != null) {
-            int var4 = var3.fishEntity.catchFish();
+            int var4 = var3.fishEntity.func_146034_e();
             var1.damageItem(var4, var3);
             var3.swingItem();
         } else {

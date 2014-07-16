@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.EnumOS;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -74,13 +73,20 @@ public class CoroUtilFile {
     	
     }
 	
+	public static String getMinecraftSaveFolderPath() {
+    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    		return getClientSidePath() + File.separator + "config" + File.separator;
+    	} else {
+    		return new File(".").getAbsolutePath() + File.separator + "config" + File.separator;
+    	}
+    }
+	
 	public static String getWorldSaveFolderPath() {
     	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "saves" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;
     	}
-    	
     }
     
     @SideOnly(Side.CLIENT)

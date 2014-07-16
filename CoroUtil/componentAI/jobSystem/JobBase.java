@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -27,7 +28,9 @@ import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilInventory;
+import CoroUtil.util.CoroUtilItem;
 
 public class JobBase {
 	
@@ -100,7 +103,7 @@ public class JobBase {
 	
 	public void onTickChestScan() {
 		if (ai.scanForHomeChest && ent.worldObj.getWorldTime() % 100 == 0) {
-			if (!CoroUtilInventory.isChest(ent.worldObj.getBlockId(ai.homeX, ai.homeY, ai.homeZ))) {
+			if (!CoroUtilInventory.isChest(ent.worldObj.getBlock(ai.homeX, ai.homeY, ai.homeZ))) {
 				//System.out.println("scanning for chests or allies - " + ent);
 				ChunkCoordinates tryCoords = getChestNearby();
 				if (tryCoords != null) {
@@ -116,7 +119,7 @@ public class JobBase {
 			            Entity entity1 = (Entity)list.get(j);
 			            
 			            if (entity1 instanceof ICoroAI) {
-			            	if (CoroUtilInventory.isChest(ent.worldObj.getBlockId(((ICoroAI) entity1).getAIAgent().homeX, ((ICoroAI) entity1).getAIAgent().homeY, ((ICoroAI) entity1).getAIAgent().homeZ))) {
+			            	if (CoroUtilInventory.isChest(ent.worldObj.getBlock(((ICoroAI) entity1).getAIAgent().homeX, ((ICoroAI) entity1).getAIAgent().homeY, ((ICoroAI) entity1).getAIAgent().homeZ))) {
 			            		ai.homeX = ((ICoroAI) entity1).getAIAgent().homeX;
 			            		ai.homeY = ((ICoroAI) entity1).getAIAgent().homeY;
 			            		ai.homeZ = ((ICoroAI) entity1).getAIAgent().homeZ;
@@ -137,7 +140,7 @@ public class JobBase {
 		for (int xx = (int)Math.floor(ent.posX - range/2); xx < ent.posX + range/2; xx++) {
 			for (int yy = (int)Math.max(1, Math.floor(ent.posY - 2)); yy < ent.posY + 2; yy++) {
 				for (int zz = (int)Math.floor(ent.posZ - range/2); zz < ent.posZ + range/2; zz++) {
-					int id = ent.worldObj.getBlockId(xx, yy, zz);
+					Block id = ent.worldObj.getBlock(xx, yy, zz);
 					
 					if (CoroUtilInventory.isChest(id)) {
 						return new ChunkCoordinates(xx, yy, zz);
@@ -154,7 +157,7 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.clip(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
 				if (pe.getPosition(ent).distanceTo(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
@@ -208,7 +211,7 @@ public class JobBase {
         	}
         } else {
         	if (ent.getNavigator().noPath()) {
-    			if (ai.useInv && ai.entInv.shouldLookForPickups) lookForItems();
+    			//if (ai.useInv && ai.entInv.shouldLookForPickups) lookForItems();
         	}
         }
 	}
@@ -227,7 +230,7 @@ public class JobBase {
 	
 	                if(!var5.isDead && var5 instanceof EntityItem) {
 	                	EntityItem entTemp = (EntityItem)var5;
-	                	if (ai.entInv.wantedItems.contains(entTemp.getEntityItem().getItem().itemID)) {
+	                	/*if (ai.entInv.wantedItems.contains(entTemp.getEntityItem().getItem().getUnlocalizedName())) {
 		                	if (this.ent.canEntityBeSeen(var5)) {
 		                		//if (this.team == 1) {
 		                		if (!var5.isInsideOfMaterial(Material.water)) {
@@ -235,7 +238,7 @@ public class JobBase {
 		                			PFQueue.getPath(ent, var5, itemSearchRange+2F);
 		                		}
 		                	}
-	                	}
+	                	}*/
 	                } else if (var5 instanceof EntityXPOrb) {
 	                	if (ent.canEntityBeSeen(var5)) {
 	                		if (!var5.isInsideOfMaterial(Material.water)) {
@@ -251,7 +254,7 @@ public class JobBase {
 	
 	public void onJobRemove() {
 		//Job cleanup stuff - 
-		if (ai.useInv) this.ai.entInv.setCurrentSlot(0);
+		//if (ai.useInv) this.ai.entInv.setCurrentSlot(0);
 	}
 	
 	public void setJobItems() {
@@ -285,9 +288,9 @@ public class JobBase {
 	public boolean checkHunger() {
 		//System.out.println("TEMP OFF FOR REFACTOR");
 		
-		if (!ai.useInv || ai.entInv.fakePlayer == null) return false;
+		/*if (!ai.useInv || ai.entInv.fakePlayer == null) */return false;
 		
-		if (ai.entInv.fakePlayer.getFoodStats().getFoodLevel() <= 16) {
+		/*if (ai.entInv.fakePlayer.getFoodStats().getFoodLevel() <= 16) {
 			if (ai.entInv.eat()) {
 				//System.out.println("NH: " + fakePlayer.foodStats.getFoodLevel());
 			} else {
@@ -299,7 +302,7 @@ public class JobBase {
 			}
 			//try heal
 		}
-		return false;
+		return false;*/
 	}
 	
 	public boolean checkDangers() {
@@ -402,16 +405,16 @@ public class JobBase {
         gatherX = (int)(ent.posX - (d / f * dist));
         gatherZ = (int)(ent.posZ - (d1 / f * dist));
         
-        int id = ent.worldObj.getBlockId(gatherX, gatherY, gatherZ);
+        Block id = ent.worldObj.getBlock(gatherX, gatherY, gatherZ);
         
         int offset = -10;
         
         while (offset < 10) {
-        	if (id == 0) {
+        	if (CoroUtilBlock.isAir(id)) {
         		break;
         	}
         	
-        	id = ent.worldObj.getBlockId(gatherX, gatherY+offset++, gatherZ);
+        	id = ent.worldObj.getBlock(gatherX, gatherY+offset++, gatherZ);
         }
         
         double homeDist = ent.getDistance(ai.homeX, ai.homeY, ai.homeZ);
@@ -448,12 +451,12 @@ public class JobBase {
 			tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
 			i = tryY + ai.rand.nextInt(scanSizeY)-scanSizeY/2;
 			tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
-			if (ent.worldObj.getBlockId(tryX, i, tryZ) == Block.waterStill.blockID || (Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)] != null && Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)].blockMaterial == Material.water)) {
+			if (ent.worldObj.getBlock(tryX, i, tryZ).getMaterial() == Material.water) {
 				//System.out.println("found water");
 				
 				int newY = i;
 				
-				while (ent.worldObj.getBlockId(tryX, newY, tryZ) != 0) {
+				while (!CoroUtilBlock.isAir(ent.worldObj.getBlock(tryX, newY, tryZ))) {
 					newY++;
 				}
 				
@@ -492,7 +495,8 @@ public class JobBase {
 		
 		//System.out.println(this.worldObj.getBlockId(tryX, tryY, tryZ));
 		for (int i = tryY; i > tryY - 10; i--) {
-			if (ent.worldObj.getBlockId(tryX, i, tryZ) != 0 && !((Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)] != null && Block.blocksList[ent.worldObj.getBlockId(tryX, i, tryZ)].blockMaterial == Material.water))) {
+			Block block = ent.worldObj.getBlock(tryX, i, tryZ);
+			if (!CoroUtilBlock.isAir(block) && block.getMaterial() != Material.water) {
 				//System.out.println("found water");
 				
 				PFQueue.getPath(ent, tryX, tryY, tryZ, scanSize/2+6);
@@ -552,14 +556,14 @@ public class JobBase {
     }
 	
 	//transferCount: -1 for all, foodOverride: makes id not used, scans for ItemFood
-	public void transferItems(IInventory invFrom, IInventory invTo, int id, int transferCount, boolean foodOverride) {
+	public void transferItems(IInventory invFrom, IInventory invTo, String id, int transferCount, boolean foodOverride) {
 
 		int count = 0;
 		for(int j = 0; j < invFrom.getSizeInventory(); j++)
         {
 			//
 			ItemStack ourStack = invFrom.getStackInSlot(j);
-			if (ourStack != null && ((id == -1 && !foodOverride) || ourStack.itemID == id || (ourStack.getItem() instanceof ItemFood && foodOverride)))
+			if (ourStack != null && ((id.equals("-1") && !foodOverride) || CoroUtilItem.getNameByItem(ourStack.getItem()).equals(id) || (ourStack.getItem() instanceof ItemFood && foodOverride)))
             {
             	for (int k = 0; k < invTo.getSizeInventory(); k++) {
             		ItemStack theirStack = invTo.getStackInSlot(k);
@@ -586,7 +590,7 @@ public class JobBase {
             			//transfer! the sexyness! lol haha i typ so gut ikr
             			ourStack.stackSize -= addCount;
             			//theirStack.stackSize += addCount;
-            			invTo.setInventorySlotContents(k, new ItemStack(ourStack.itemID, addCount, ourStack.getItemDamage()));
+            			invTo.setInventorySlotContents(k, new ItemStack(ourStack.getItem(), addCount, ourStack.getItemDamage()));
             			if (transferCount != -1) transferCount -= addCount;
             			
             			if (ourStack.stackSize == 0) {
@@ -602,7 +606,7 @@ public class JobBase {
             			}
             			
             			//break;
-            		} else if (ourStack.itemID == theirStack.itemID && theirStack.stackSize < theirStack.getMaxStackSize()) {
+            		} else if (CoroUtilItem.getNameByItem(ourStack.getItem()).equals(CoroUtilItem.getNameByItem(theirStack.getItem())) && theirStack.stackSize < theirStack.getMaxStackSize()) {
             			int space = theirStack.getMaxStackSize() - theirStack.stackSize;
             			
             			int addCount = ourStack.stackSize;
@@ -675,7 +679,7 @@ public class JobBase {
 		
 		Vec3 vec = ai.activeFormation.getPosition(ent);
 		
-		if (ent.isCollidedHorizontally && ent.onGround) ent.jump();
+		if (ent.isCollidedHorizontally && ent.onGround) OldUtil.jump(ent);
 		
 		if (ent.isInWater() && ent.getNavigator().noPath()) {
 			//ent.motionY += 0.07D;
@@ -743,7 +747,7 @@ public class JobBase {
 		//ai.lungeFactor = 1.2F;
 
 		if (entInt.isBreaking()) return;
-		if (ent.isCollidedHorizontally && ent.onGround) ent.jump();
+		if (ent.isCollidedHorizontally && ent.onGround) OldUtil.jump(ent);
 		
 		//temp
 		//ent.setMoveSpeed(0.35F);
@@ -857,14 +861,14 @@ public class JobBase {
 				int zz = (int)posZ;
 				
 				if (checkThreats) {
-					int lookAheadIDDrop = ent.worldObj.getBlockId(xx, yy, zz);
-					int lookAheadIDCollide = ent.worldObj.getBlockId(xx, legsAheadY, zz);
-					if (ent.onGround && ((lookAheadIDDrop == 0 || Block.blocksList[lookAheadIDDrop].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop].blockMaterial == Material.water || */Block.blocksList[lookAheadIDDrop].blockMaterial == Material.cactus) || 
-							(lookAheadIDCollide != 0 && (Block.blocksList[lookAheadIDCollide].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDDrop0].blockMaterial == Material.water || */Block.blocksList[lookAheadIDCollide].blockMaterial == Material.cactus)))) {
+					Block lookAheadIDDrop = ent.worldObj.getBlock(xx, yy, zz);
+					Block lookAheadIDCollide = ent.worldObj.getBlock(xx, legsAheadY, zz);
+					if (ent.onGround && (lookAheadIDDrop.getMaterial() == Material.lava || lookAheadIDDrop.getMaterial() == Material.cactus) || 
+							(lookAheadIDCollide.getMaterial() == Material.lava || lookAheadIDCollide.getMaterial() == Material.cactus)) {
 						safe = false;
 						//System.out.println("drop alert!");
 						break;
-					} else if (ent.onGround && (lookAheadIDCollide != 0 && (Block.blocksList[lookAheadIDCollide] instanceof BlockFence || Block.blocksList[lookAheadIDCollide].blockMaterial == Material.lava || /*Block.blocksList[lookAheadIDCollide].blockMaterial == Material.water || */Block.blocksList[lookAheadIDCollide].blockMaterial == Material.cactus))) {
+					} else if (ent.onGround && (lookAheadIDCollide instanceof BlockFence)) {
 						safe = false;
 						//System.out.println("front alert!");
 						break;
@@ -872,23 +876,23 @@ public class JobBase {
 				}
 				
 				if (checkDrops) {
-					int lookAheadIDDrop0 = ent.worldObj.getBlockId(xx, yy, zz);
-					int lookAheadIDDrop1 = ent.worldObj.getBlockId(xx, yy-1, zz);
-					if (lookAheadIDDrop0 == 0 && lookAheadIDDrop1 == 0) {
+					Block lookAheadIDDrop0 = ent.worldObj.getBlock(xx, yy, zz);
+					Block lookAheadIDDrop1 = ent.worldObj.getBlock(xx, yy-1, zz);
+					if (CoroUtilBlock.isAir(lookAheadIDDrop0) && CoroUtilBlock.isAir(lookAheadIDDrop1)) {
 						safe = false;
 						break;
 					}
 				}
 				
 				if (checkWalls/* && adjAngle == 0 && lookAheadDist == 0.5D*/) {
-					int lookAheadIDCollideTooHigh = ent.worldObj.getBlockId(xx, headAheadY, zz);
+					Block lookAheadIDCollideTooHigh = ent.worldObj.getBlock(xx, headAheadY, zz);
 					//System.out.println("id " + lookAheadIDCollideTooHigh + " - " + xx + ", " + headAheadY + ", " + zz);
 					//System.out.println(center.rotationYaw);
 					//System.out.println("X-: " + Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 					//System.out.println("Z+: " + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 					
 					//System.out.println(lookAheadIDCollideTooHigh);
-					if (ent.onGround && (lookAheadIDCollideTooHigh != 0 && Block.blocksList[lookAheadIDCollideTooHigh].blockMaterial.isSolid())) {
+					if (ent.onGround && (lookAheadIDCollideTooHigh.getMaterial().isSolid())) {
 						safe = false;
 						//System.out.println("front wall alert!");
 						break;
@@ -934,16 +938,16 @@ public class JobBase {
 				yy = (int)(posY - 0.5D);
 				int zz = (int)posZ;
 				
-				int lookAheadIDDrop0 = ent.worldObj.getBlockId(xx, yy, zz);
+				Block lookAheadIDDrop0 = ent.worldObj.getBlock(xx, yy, zz);
 				
-				if (isWater(lookAheadIDDrop0)) return true;
+				if (lookAheadIDDrop0.getMaterial() == Material.water) return true;
 				
-				if (lookAheadIDDrop0 == 0) {
+				if (CoroUtilBlock.isAir(lookAheadIDDrop0)) {
 					int scanDownY = yy - 1;
 					for (int tries = 0; tries < 8; tries++) {
-						int tryID = ent.worldObj.getBlockId(xx, scanDownY--, zz);
-						if (tryID != 0) {
-							if (isWater(tryID)) {
+						Block tryID = ent.worldObj.getBlock(xx, scanDownY--, zz);
+						if (!CoroUtilBlock.isAir(tryID)) {
+							if (tryID.getMaterial() == Material.water) {
 								return true;
 							} else {
 								return false;
@@ -957,9 +961,9 @@ public class JobBase {
 		return false;
 	}
 	
-	public boolean isWater(int id) {
+	/*public boolean isWater(int id) {
 		return id != 0 && Block.blocksList[id].blockMaterial == Material.water;
-	}
+	}*/
 	
 	// Job shared functions //
 	

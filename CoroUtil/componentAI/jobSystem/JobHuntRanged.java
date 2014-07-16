@@ -56,11 +56,11 @@ public class JobHuntRanged extends JobBase {
 			ai.entityToAttack = ai.lastFleeEnt;
 			if (ai.entityToAttack != null) {
 				ai.faceEntity(ai.entityToAttack, 180F, 180F);
-				if (ai.useInv) {
+				/*if (ai.useInv) {
 					ai.entInv.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
-    			} else {
+    			} else {*/
     				entInt.attackRanged(ai.entityToAttack, ent.getDistanceToEntity(ai.lastFleeEnt));
-    			}
+    			//}
 				//ent.attackEntity(ent.entityToAttack, ent.getDistanceToEntity(ent.entityToAttack));
 				//System.out.println("H&R " + ent.name + " health: " + ent.getHealth());
 			}

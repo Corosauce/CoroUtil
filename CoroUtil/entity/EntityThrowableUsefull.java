@@ -2,16 +2,19 @@ package CoroUtil.entity;
 
 import java.util.List;
 
+import CoroUtil.util.CoroUtilEntity;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.EnumMovingObjectType;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
@@ -22,7 +25,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      int xTile = -1;
     private int yTile = -1;
     private int zTile = -1;
-    private int inTile = 0;
+    private Block inTile = null;
     protected boolean inGround = false;
     public int throwableShake = 0;
 
@@ -189,7 +192,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         if (this.inGround)
         {
-            int i = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
+            Block i = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
 
             if (i == this.inTile)
             {
@@ -217,7 +220,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         Vec3 vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
         Vec3 vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition movingobjectposition = this.worldObj.clip(vec3, vec31);
+        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
         vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
         vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -234,7 +237,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         if (movingobjectposition != null)
         {
-            if (movingobjectposition.typeOfHit == EnumMovingObjectType.TILE && this.worldObj.getBlockId(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ) == Block.portal.blockID)
+            if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK && this.worldObj.getBlock(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ) instanceof BlockPortal)
             {
                 this.setInPortal();
             }
@@ -353,13 +356,13 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         par1NBTTagCompound.setShort("xTile", (short)this.xTile);
         par1NBTTagCompound.setShort("yTile", (short)this.yTile);
         par1NBTTagCompound.setShort("zTile", (short)this.zTile);
-        par1NBTTagCompound.setByte("inTile", (byte)this.inTile);
+        par1NBTTagCompound.setByte("inTile", (byte)Block.getIdFromBlock(this.inTile));
         par1NBTTagCompound.setByte("shake", (byte)this.throwableShake);
         par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
 
         if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower != null && this.thrower instanceof EntityPlayer)
         {
-            this.throwerName = this.thrower.getEntityName();
+            this.throwerName = CoroUtilEntity.getName(thrower);
         }
 
         par1NBTTagCompound.setString("ownerName", this.throwerName == null ? "" : this.throwerName);
@@ -373,7 +376,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.xTile = par1NBTTagCompound.getShort("xTile");
         this.yTile = par1NBTTagCompound.getShort("yTile");
         this.zTile = par1NBTTagCompound.getShort("zTile");
-        this.inTile = par1NBTTagCompound.getByte("inTile") & 255;
+        this.inTile = Block.getBlockById(par1NBTTagCompound.getByte("inTile") & 255);
         this.throwableShake = par1NBTTagCompound.getByte("shake") & 255;
         this.inGround = par1NBTTagCompound.getByte("inGround") == 1;
         this.throwerName = par1NBTTagCompound.getString("ownerName");
