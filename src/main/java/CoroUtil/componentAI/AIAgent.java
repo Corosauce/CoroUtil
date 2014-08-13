@@ -152,7 +152,7 @@ public class AIAgent {
 		if (useInv) {
 			entInv = new AIFakePlayer(this);
 		}*/
-		entInv = new AIInventory();
+		entInv = new AIInventory(ent);
 		jobMan = new JobManager(this);
 		rand = new Random();
 		setState(EnumActState.IDLE);
@@ -997,7 +997,7 @@ public class AIAgent {
     {
 		float partialTick = 1F;
 		
-        Vec3 var4 = ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY+yOffset, ent.posZ);
+        Vec3 var4 = Vec3.createVectorHelper(ent.posX, ent.posY+yOffset, ent.posZ);
         Vec3 var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);

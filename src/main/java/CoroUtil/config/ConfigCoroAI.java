@@ -8,6 +8,7 @@ import modconfig.IConfigCategory;
 public class ConfigCoroAI implements IConfigCategory {
 
 	public static boolean chunkCacheOverworldOnly = false;
+	public static boolean usePlayerRadiusChunkLoadingForFallback = true;
 	
 	public static String chunkCacheDimensionBlacklist_IDs = "";
 	public static String chunkCacheDimensionBlacklist_Names = "promised";

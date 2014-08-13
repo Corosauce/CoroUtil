@@ -7,7 +7,6 @@ import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.leaf.LeafAction;
-import CoroUtil.pathfinding.PFQueue;
 
 public class SenseEnvironment extends LeafAction {
 
@@ -43,7 +42,7 @@ public class SenseEnvironment extends LeafAction {
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
 			
-			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.rayTraceBlocks(this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
+			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
 			
 			if (!canSeeCoord || (target != null && !this.blackboard.agent.ent.canEntityBeSeen(target)) || distToPos > blackboard.distMed.getValue()) {
 				distLevel = 2;
@@ -134,7 +133,7 @@ public class SenseEnvironment extends LeafAction {
 	
 	public boolean canEntityBeSeen(Entity par1Entity)
     {
-        return this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), this.blackboard.agent.ent.worldObj.getWorldVec3Pool().getVecFromPool(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
+        return this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
     }
 
 }

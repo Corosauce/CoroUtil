@@ -192,6 +192,7 @@ public class PacketHelper {
         {
             byte[] abyte = new byte[short1];
             fullBuffer.readBytes(abyte);
+            //return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
             return CompressedStreamTools.decompress(abyte);
         }
     }

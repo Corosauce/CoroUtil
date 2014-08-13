@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.Vec3;
@@ -143,13 +144,23 @@ public class OldUtil {
 		return field;
 	}
 	
-	public static void check() {
+	/*public static void check() {
 		checkforMCP = false;
 		try {
 			runningMCP = getPrivateValue(Vec3.class, Vec3.fakePool, "fakePool") != null;
 		} catch (Exception e) {
 			runningMCP = false;
 			System.out.println("CoroAI: 'fakePool' field not found, mcp mode disabled");
+		}
+	}*/
+	
+	public static void check() {
+		checkforMCP = false;
+		try {
+			runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "tickables") != null;
+		} catch (Exception e) {
+			runningMCP = false;
+			System.out.println("CoroAI: 'tickables' field not found, mcp mode disabled");
 		}
 	}
 	

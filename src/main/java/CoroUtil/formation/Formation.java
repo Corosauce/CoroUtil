@@ -120,14 +120,14 @@ public class Formation {
     {
         if (par1 == 1.0F)
         {
-            return ent.worldObj.getWorldVec3Pool().getVecFromPool(ent.posX, ent.posY, ent.posZ);
+            return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
         }
         else
         {
             double d0 = ent.prevPosX + (ent.posX - ent.prevPosX) * (double)par1;
             double d1 = ent.prevPosY + (ent.posY - ent.prevPosY) * (double)par1;
             double d2 = ent.prevPosZ + (ent.posZ - ent.prevPosZ) * (double)par1;
-            return ent.worldObj.getWorldVec3Pool().getVecFromPool(d0, d1, d2);
+            return Vec3.createVectorHelper(d0, d1, d2);
         }
     }
 	

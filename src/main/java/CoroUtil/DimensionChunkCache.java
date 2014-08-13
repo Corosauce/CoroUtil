@@ -90,24 +90,34 @@ public class DimensionChunkCache implements IBlockAccess
 	    	int maxX = 0;
 	    	int maxZ = 0;
 	    	
-	    	if (useLoadedChunks) {
+	    	List chunks = null;//((ChunkProviderServer)world.getChunkProvider()).func_152380_a();
+    		
+    		try {
+    			chunks = (ArrayList)OldUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
+    		} catch (Exception ex) {
+    			try {
+    				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
+    			} catch (Exception ex2) {
+    				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
+    			}
+    		}
+    		
+    		if (chunks == null) {
+    			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
+    				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
+    			} else {
+    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.dimensionId + " - " + world.provider.getDimensionName());
+    			}
+    		}
+	    	
+	    	if (chunks != null && useLoadedChunks) {
 	    		
 	    		//dont forget to readapt this for 1.7.10
 	    		//in 1.7.10, i think func_152380_a can return null, so null check our chunks variable
 	    		//just added null check for 1.7.2
 	    		//Mrbysco was having issues for it in 1.7.10
 	    		
-	    		List chunks = null;//((ChunkProviderServer)world.getChunkProvider()).func_152380_a();
 	    		
-	    		try {
-	    			chunks = (ArrayList)OldUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
-	    		} catch (Exception ex) {
-	    			try {
-	    				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
-	    			} catch (Exception ex2) {
-	    				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
-	    			}
-	    		}
 	    		
 	    		if (chunks != null) {
 		    		for (int i = 0; i < chunks.size(); i++) {
@@ -138,11 +148,9 @@ public class DimensionChunkCache implements IBlockAccess
 		    			this.chunkArray[chunk.xPosition - this.chunkX][chunk.zPosition - this.chunkZ] = chunk;
 		    			chunkCount++;
 		    		}
-	    		} else {
-	    			System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.dimensionId + " - " + world.provider.getDimensionName());
 	    		}
 	    		
-	    	} else {
+	    	} else if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
 		    	byte playerRadius = 8;
 		    	
 		    	for (int i = 0; i < world.playerEntities.size(); ++i)

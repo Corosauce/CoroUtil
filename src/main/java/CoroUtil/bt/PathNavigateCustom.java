@@ -305,7 +305,7 @@ public class PathNavigateCustom
 
     private Vec3 getEntityPosition()
     {
-        return this.worldObj.getWorldVec3Pool().getVecFromPool(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
+        return Vec3.createVectorHelper(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
     }
 
     /**

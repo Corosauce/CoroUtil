@@ -1,14 +1,11 @@
 package CoroUtil.bt.selector;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.componentAI.ICoroAI;
 
 public class SelectorMoveToCoords extends Selector {
 
@@ -103,7 +100,7 @@ public class SelectorMoveToCoords extends Selector {
 	public boolean canBeSeen(Vec3 pos)
     {
 		EntityLivingBase entL = ((EntityLivingBase)ent);
-        return entL.worldObj.rayTraceBlocks(entL.worldObj.getWorldVec3Pool().getVecFromPool(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
+        return entL.worldObj.rayTraceBlocks(Vec3.createVectorHelper(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	
 }
