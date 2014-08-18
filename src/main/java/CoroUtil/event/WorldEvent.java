@@ -372,4 +372,12 @@ public class WorldEvent {
     	lastLeaderCount = data.getInteger("lastLeaderCount");
     	curCooldown = data.getInteger("curCooldown");
     }
+	
+	public void init() {
+		
+	}
+
+	public void cleanup() {
+		
+	}
 }

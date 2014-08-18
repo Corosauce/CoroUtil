@@ -5,6 +5,7 @@ import net.minecraftforge.common.DimensionManager;
 import CoroUtil.formation.Manager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
+import CoroUtil.world.WorldDirectorManager;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -49,6 +50,8 @@ public class EventHandlerFML {
 			for (int i = 0; i < worlds.length; i++) {
 				PlayerQuestManager.i().tick(worlds[i]);
 			}
+			
+			WorldDirectorManager.instance().onTick();
 		}
 		
 	}

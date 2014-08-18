@@ -7,6 +7,7 @@ import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
+import CoroUtil.world.WorldDirectorManager;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
@@ -91,6 +92,9 @@ public class CoroAI {
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
 	    	petsManager.nbtReadFromDisk();
+	    	
+	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
+	    	WorldDirectorManager.instance().reset();
     	}
     }
     
@@ -98,6 +102,7 @@ public class CoroAI {
     	petsManager.nbtWriteToDisk();
     	if (unloadInstances) petsManager.reset();
     	PlayerQuestManager.i().saveData(false, unloadInstances);
+    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     }
     
 	public static void dbg(Object obj) {

@@ -1,4 +1,4 @@
-package CoroUtil.location;
+package CoroUtil.world.location;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -5,8 +5,11 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import CoroUtil.quest.PlayerQuestManager;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandlerForge {
@@ -28,6 +31,15 @@ public class EventHandlerForge {
 		
 		if (((WorldServer)event.world).provider.dimensionId == 0) {
 			CoroAI.writeOutData(false);
+		}
+	}
+	
+	@SubscribeEvent
+	public void worldLoad(Load event) {
+		if (!event.world.isRemote) {
+			if (((WorldServer)event.world).provider.dimensionId == 0) {
+				WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(), CoroAI.modID, event.world);
+			}
 		}
 	}
 	

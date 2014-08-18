@@ -1,8 +1,10 @@
-package CoroUtil.location;
+package CoroUtil.world.location;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import CoroUtil.util.CoroUtilFile;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,12 +23,16 @@ public class ManagedLocation {
 	public HashMap<Long, Object> lookupIDToTownObject = new HashMap<Long, Object>(); //includes both StructureObjects and ResourceNodes
 	public int lastTownObjectIDSet = 1; //command building uses 0, cant increment it from its init
 	
-	public ManagedLocation(int parTeam, int parDim, ChunkCoordinates parCoords) {
-		locationID = parTeam;
+	public ManagedLocation() {
+		
+	}
+
+	public void initData(int parLocation, int parDim, ChunkCoordinates parCoords) {
+		locationID = parLocation;
 		dimID = parDim;
 		spawn = parCoords;
 	}
-
+	
 	public void initFirstTime() {
 		
 	}
@@ -69,10 +75,17 @@ public class ManagedLocation {
 	public void writeToNBT(NBTTagCompound var1)
     {
 		var1.setString("classname", this.getClass().getCanonicalName());
+		
+		var1.setInteger("locationID", locationID);
+		var1.setInteger("dimID", dimID);
+		CoroUtilFile.writeCoords("spawn", spawn, var1);
     }
 	
 	public void readFromNBT(NBTTagCompound var1)
     {
-		
+		hasInit = true;
+    	locationID = var1.getInteger("locationID");
+    	dimID = var1.getInteger("dimID");
+    	spawn = CoroUtilFile.readCoords("spawn", var1);
     }
 }

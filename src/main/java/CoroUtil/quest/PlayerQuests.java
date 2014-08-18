@@ -270,7 +270,7 @@ public class PlayerQuests {
 		FileInputStream fis = null;
 		
     	try {
-    		String URL = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtilQuests" + File.separator;
+    		String URL = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "Quests" + File.separator;
     		
     		File file = new File(URL + playerName + ".dat");
     		if (file.exists()) {
@@ -300,7 +300,7 @@ public class PlayerQuests {
 			
 			nbtSave(nbt);
 			
-			String URL = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtilQuests" + File.separator;
+			String URL = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "Quests" + File.separator;
 			
 			File fl = new File(URL);
 			if (!fl.exists()) fl.mkdirs();
