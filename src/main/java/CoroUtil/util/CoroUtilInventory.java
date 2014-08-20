@@ -16,9 +16,16 @@ public class CoroUtilInventory {
 		for(int j = 0; j < inv.getSizeInventory(); j++)
         {
 			ItemStack is = inv.getStackInSlot(j);
-            if(is != null && CoroUtilItem.getNameByItem(is.getItem()).equals(id))
+            if(is != null && is.getItem() != null)
             {
-            	count += is.stackSize;
+            	String itemName = CoroUtilItem.getNameByItem(is.getItem());
+            	if (itemName != null) {
+            		if (itemName.equals(id)) {
+            			count += is.stackSize;
+            		}
+            	} else {
+            		System.out.println("CoroUtilInventory.getItemCount found nameless item " + is.getItem() + " in inventory, its not registered properly!");
+            	}
             }
         }
 		

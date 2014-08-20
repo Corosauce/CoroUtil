@@ -84,7 +84,7 @@ public class JobBase {
 	
 	public void setJobState(EnumJobState ekos) {
 		state = ekos;
-		//System.out.println("jobState: " + occupationState);
+		//System.out.println("jobState: " + ekos);
 	}
 
 	public void tick() {

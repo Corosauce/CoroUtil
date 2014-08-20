@@ -24,6 +24,7 @@ import CoroUtil.OldUtil;
 import CoroUtil.componentAI.jobSystem.JobManager;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
+import CoroUtil.entity.EntityTropicalFishHook;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.formation.Formation;
@@ -36,7 +37,7 @@ public class AIAgent {
 	public EntityLiving ent;
 	public ICoroAI entInt;
 	public AIInventory entInv;
-	public boolean useInv;
+	public boolean useInv = true;
 	public JobManager jobMan;
 	public Formation activeFormation;
 	
@@ -674,6 +675,8 @@ public class AIAgent {
 		} else if (currentAction == EnumActState.WALKING) {
 			actWalk();
 		}
+		
+		entInv.tick();
 	}
 	
 	public void actFight() {
@@ -1009,7 +1012,7 @@ public class AIAgent {
 	}
 	
 	public void readEntityFromNBT(NBTTagCompound var1) {
-		//if (useInv) this.entInv.readEntityFromNBT(var1);
+		this.entInv.nbtRead(var1.getCompoundTag("inventory"));
 		spawnedOrNBTReloadedInit();
 		entID = var1.getInteger("ICoroAI_entID");
 		homeX = var1.getInteger("homeX");
@@ -1022,7 +1025,7 @@ public class AIAgent {
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound var1) {
-		//if (useInv) this.entInv.writeEntityToNBT(var1);
+		var1.setTag("inventory", entInv.nbtWrite());
 		var1.setInteger("ICoroAI_entID", entID);
 		var1.setInteger("homeX", homeX);
 		var1.setInteger("homeY", homeY);

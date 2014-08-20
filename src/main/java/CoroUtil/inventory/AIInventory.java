@@ -1,22 +1,29 @@
 package CoroUtil.inventory;
 
-import CoroUtil.util.CoroUtilItem;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-import com.google.common.collect.Multimap;
-
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import CoroUtil.bt.IBTAgent;
+import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.entity.EntityTropicalFishHook;
+import CoroUtil.entity.ItemTropicalFishingRod;
+import CoroUtil.util.CoroUtilItem;
 
 public class AIInventory {
 
@@ -35,10 +42,24 @@ public class AIInventory {
 	public int slot_Ranged = 1;
 	public int slot_Tool = 2;
 	
+	//because cross compatibility
+	public EntityTropicalFishHook fishEntity;
+	
+	public boolean grabItems = false;
+	
 	public AIInventory(EntityLivingBase parEnt) {
 		entOwner = parEnt;
 		inventory = new InventoryWrapper();
 		inventory.invInitData(new ItemStack[slot_Count]);
+	}
+	
+	public static AIInventory getInventory(EntityLivingBase parEntSource) {
+		if (parEntSource instanceof ICoroAI) {
+			return ((ICoroAI)parEntSource).getAIAgent().entInv;
+		} else if (parEntSource instanceof IBTAgent) {
+			return ((IBTAgent)parEntSource).getAIBTAgent().entInv;
+		}
+		return null;
 	}
 	
 	//server side only
@@ -55,6 +76,10 @@ public class AIInventory {
 		return slot_Active;
 	}
 	
+	public ItemStack getActiveItem() {
+		return inventory.getStackInSlot(slot_Active);
+	}
+	
 	public void attackMelee(Entity ent, float dist) {
 		setSlotActive(slot_Melee);
 		performLeftClick(ent, dist);
@@ -66,9 +91,47 @@ public class AIInventory {
 		performRightClick();
 	}
 	
+	public NBTTagCompound nbtWrite() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		
+		NBTTagList nbttaglist = new NBTTagList();
+		NBTTagCompound nbttagcompound1;
+
+        for (int i = 0; i < inventory.invList.length; ++i)
+        {
+            nbttagcompound1 = new NBTTagCompound();
+
+            if (inventory.invList[i] != null)
+            {
+            	inventory.invList[i].writeToNBT(nbttagcompound1);
+            }
+
+            nbttaglist.appendTag(nbttagcompound1);
+        }
+
+        nbt.setTag("listInv", nbttaglist);
+		
+		return nbt;
+	}
+	
+	public void nbtRead(NBTTagCompound parNBT) {
+		NBTTagList nbttaglist;
+        int i;
+
+        if (parNBT.hasKey("listInv", 9))
+        {
+            nbttaglist = parNBT.getTagList("listInv", 10);
+
+            for (i = 0; i < inventory.invList.length; ++i)
+            {
+            	inventory.invList[i] = ItemStack.loadItemStackFromNBT(nbttaglist.getCompoundTagAt(i));
+            }
+        }
+	}
+	
 	public void performLeftClick(Entity ent, float dist) {
-		System.out.println("TODO: performLeftClick in AIInventory");
-		ItemStack is = inventory.getStackInSlot(slot_Active);
+		System.out.println("CHECK: performLeftClick in AIInventory");
+		ItemStack is = getActiveItem();//inventory.getStackInSlot(slot_Active);
 		if (is != null) {
 			Item item = is.getItem();
 			if (item != null) {
@@ -87,19 +150,52 @@ public class AIInventory {
 	}
 
 	public void performRightClick() {
-		System.out.println("TODO: performRightClick in AIInventory");
-		ItemStack is = inventory.getStackInSlot(slot_Active);
+		System.out.println("CHECK: performRightClick in AIInventory");
+		ItemStack is = getActiveItem();//inventory.getStackInSlot(slot_Active);
 		if (is != null) {
 			Item item = is.getItem();
 			if (item != null) {
-				item.onItemRightClick(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj));
+				//special fishing exception
+				if (item instanceof ItemTropicalFishingRod) {
+					((ItemTropicalFishingRod)item).onItemRightClickSpecial(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj), entOwner);
+				} else {
+					item.onItemRightClick(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj));
+				}
 			}
 		}
 	}
 	
 	public void syncToClient() {
 		//syncing might not actually be needed given we are setting from our inventory to vanilla EntityLivingBase inventory
-		entOwner.setCurrentItemOrArmor(0, inventory.getStackInSlot(0));
+		entOwner.setCurrentItemOrArmor(0, inventory.getStackInSlot(getSlotActive()));
 	}
 	
+	public void tick() {
+		tickItemPickupScan();
+	}
+	
+	public void tickItemPickupScan() {
+    	List var3 = entOwner.worldObj.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.boundingBox.expand(2.0D, 1.0D, 2.0D));
+    	
+        if(var3 != null) {
+            for(int var4 = 0; var4 < var3.size(); ++var4) {
+                Entity var5 = (Entity)var3.get(var4);
+
+                if(!var5.isDead) {
+                	if (/*(grabXP && (var5 instanceof EntityXPOrb)) || */(grabItems && (var5 instanceof EntityItem))) {
+                		collideWithItem((EntityItem)var5);
+                	}
+                }
+            }
+        }
+    }
+	
+	public void collideWithItem(EntityItem parItem) {
+		ItemStack is = parItem.getEntityItem();
+		inventory.addItemStackToInventory(is);
+		if (is.stackSize <= 0)
+        {
+			parItem.setDead();
+        }
+	}
 }

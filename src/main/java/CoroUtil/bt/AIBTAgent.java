@@ -24,6 +24,7 @@ import CoroUtil.bt.selector.SelectorSequence;
 import CoroUtil.diplomacy.DiplomacyHelper;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
+import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
 
 
@@ -42,6 +43,7 @@ public class AIBTAgent {
 	public TeamInstance dipl_info = TeamTypes.getType("neutral");
 	public BlackboardBase blackboard;
 	public IBTAgent entInt;
+	public AIInventory entInv; //needs proper setup for this AI type
 	public EntityLivingBase ent;
 
   	public OrdersHandler ordersHandler;

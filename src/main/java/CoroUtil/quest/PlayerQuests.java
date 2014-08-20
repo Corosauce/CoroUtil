@@ -76,8 +76,8 @@ public class PlayerQuests {
 	}
 	
 	public EntityPlayer getPlayer() {
-		//return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
+		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+		//return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
 	}
 	
 	public void tick(World parWorld) {

@@ -3,19 +3,14 @@ package CoroUtil.packet;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import CoroUtil.forge.CoroAI;
-import CoroUtil.tile.ITilePacket;
-import CoroUtil.tile.TileDataWatcher;
-import CoroUtil.tile.TileHandler;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
@@ -192,8 +187,8 @@ public class PacketHelper {
         {
             byte[] abyte = new byte[short1];
             fullBuffer.readBytes(abyte);
-            //return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
-            return CompressedStreamTools.decompress(abyte);
+            return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
+            //return CompressedStreamTools.decompress(abyte);
         }
     }
 	

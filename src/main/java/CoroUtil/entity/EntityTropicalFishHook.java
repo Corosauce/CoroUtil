@@ -90,9 +90,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
       this.angler = var2;
       /*if (var2 instanceof c_PlayerProxy) {
     	  ((c_PlayerProxy)this.angler).fishEntity = this;
-      } else *//*if (var2 instanceof ICoroAI && ((ICoroAI)var2).getAIAgent().useInv) {
-    	  ((ICoroAI)var2).getAIAgent().entInv.fishEntity = this;
-      }*/
+      } else */if (var2 instanceof ICoroAI && ((ICoroAI)var2).getAIAgent().useInv) {
+    	  setFishEntity(this);
+      }
       this.setSize(0.25F, 0.25F);
       this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.yOffset, var2.posZ, var2.rotationYaw, var2.rotationPitch);
       this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
@@ -147,11 +147,11 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 	     		//System.out.println(System.currentTimeMillis() + " - no owner, fishEntity:" + ((c_PlayerProxy)this.angler).fishEntity);
 	     		this.setDead();
 	     	}
-      }*//* else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent().useInv) {
-    	  ((ICoroAI)angler).getAIAgent().entInv.fishEntity = this;
-      }*/
+      }*/ else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent().useInv) {
+    	  setFishEntity(this);
+      }
       
-      
+      //System.out.println("ticking bobber, isRemote: " + worldObj.isRemote);
       
       if(this.field_6149_an > 0) {
          double var21 = this.posX + (this.field_6148_ao - this.posX) / (double)this.field_6149_an;
@@ -179,14 +179,14 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             /*if (angler instanceof c_PlayerProxy) {
             	var1 = ((c_PlayerProxy)this.angler).getCurrentEquippedItem();
             } else */if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
-            	//var1 = ((ICoroAI)angler).getAIAgent().entInv.getCurrentEquippedItem();
+            	var1 = ((ICoroAI)angler).getAIAgent().entInv.getActiveItem();
             }
             if(this.angler.isDead || !this.angler.isEntityAlive() || var1 == null/* || var1.getItem() != Item.fishingRod*/ || this.getDistanceSqToEntity(this.angler) > 1024.0D) {
                this.setDead();
                /*if (angler instanceof c_PlayerProxy) {
             	   ((c_PlayerProxy)this.angler).fishEntity = null;
                } else */if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
-             	  //((ICoroAI)angler).getAIAgent().entInv.fishEntity = null;
+            	   setFishEntity(null);
                }
                //this.angler.fishEntity = null;
                return;
@@ -425,10 +425,18 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
       this.setDead();
       /*if (angler instanceof c_PlayerProxy) {
       	((c_PlayerProxy)this.angler).fishEntity = null;
-      } else *//*if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
-     	  ((ICoroAI)angler).getAIAgent().entInv.fishEntity = null;
-       }*/
+      } else */if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+     	  setFishEntity(null);
+       }
       return var1;
+   }
+   
+   public void setFishEntity(EntityTropicalFishHook ent) {
+	   //System.out.println("set fish entity: " + ent);
+	   /*if (ent == null) {
+		   System.out.println("SDfsdfsdf");
+	   }*/
+	   ((ICoroAI)angler).getAIAgent().entInv.fishEntity = ent;
    }
 
 	@Override
@@ -449,9 +457,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 			angler = (EntityLivingBase)ent;
 			/*if (angler instanceof c_PlayerProxy) {
 		    	  ((c_PlayerProxy)this.angler).fishEntity = this;
-			} else *//*if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
-				((ICoroAI)angler).getAIAgent().entInv.fishEntity = this;
-            }*/
+			} else */if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
+				setFishEntity(this);
+            }
 		}
 		// TODO Auto-generated method stub
 		
@@ -461,4 +469,15 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 	public Entity getEntByID(int id) {
 		return FMLClientHandler.instance().getClient().theWorld.getEntityByID(id);
 	}
+	
+	@Override
+	public boolean isInRangeToRenderDist(double var1) {
+        return var1 < 12;
+    }
+    
+    @Override
+    public boolean isInRangeToRender3d(double p_145770_1_, double p_145770_3_,
+    		double p_145770_5_) {
+    	return true;
+    }
 }

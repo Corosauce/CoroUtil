@@ -96,7 +96,7 @@ public class BuildClientTicks
     		mainStr = "Copy Mode: Mark end coord with (" + BuildConfig.key_Copy + "), (" + BuildConfig.key_Build + ") to cancel";
     	}
     	Minecraft mc = FMLClientHandler.instance().getClient();
-    	ScaledResolution var8 = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+    	ScaledResolution var8 = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         int width = var8.getScaledWidth();
         int height = var8.getScaledHeight();
         

@@ -224,7 +224,7 @@ public class GuiConfigEditor extends GuiScreen
     	int startX = (this.width - this.xSize) / 2;
         int startY = (this.height - this.ySize) / 2;
         
-        ScaledResolution var8 = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+        ScaledResolution var8 = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
         int scaledWidth = var8.getScaledWidth();
         int scaledHeight = var8.getScaledHeight();
         

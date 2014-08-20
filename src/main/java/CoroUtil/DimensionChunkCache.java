@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3Pool;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -23,8 +20,6 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.pathfinding.PFQueue;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class DimensionChunkCache implements IBlockAccess
 {
@@ -548,11 +543,11 @@ public class DimensionChunkCache implements IBlockAccess
     /**
      * Return the Vec3Pool object for this world.
      */
-    @Override
+    /*@Override
     public Vec3Pool getWorldVec3Pool()
     {
         return this.worldObj.getWorldVec3Pool();
-    }
+    }*/
 
     /**
      * Returns true if the block at the specified coordinates is empty
