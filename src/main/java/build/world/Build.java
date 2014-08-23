@@ -46,17 +46,12 @@ public class Build {
 	public int sizeY = 0;
 	public int sizeZ = 0;*/
 	
-	//visual data
-	public int curTick = 0;
-	public int maxTicks = 0;
-	
 	//world data
 	public NBTTagCompound levelData = null;
 	public NBTTagList tileEntities;
 	public NBTTagList entities;
 	public Block build_blockIDArr[][][];
 	public int build_blockMetaArr[][][];
-	public boolean build_blockPlaced[][][];
 	
 	//afaik, this is saved internal ID to runtime ID (changed runtime ID to Block for 1.7.x)
 	//public HashMap<Integer, Block> blockMappingInternalIDToRuntimeID = new HashMap<Integer, Block>();
@@ -237,10 +232,10 @@ public class Build {
             [sizeY]
             [sizeZ];
 			
-			build_blockPlaced = new boolean
+			/*build_blockPlaced = new boolean
             [sizeX]
             [sizeY]
-            [sizeZ];
+            [sizeZ];*/
 			
 			if (newFormat) {
 				int metadata[] = nbttagcompound.getIntArray("Data");
@@ -252,7 +247,7 @@ public class Build {
 							int index = yy * sizeX * sizeZ + zz * sizeX + xx;
 							//build_blockIDArr[xx][yy][zz] = blockids[index];
 							build_blockMetaArr[xx][yy][zz] = metadata[index];
-							build_blockPlaced[xx][yy][zz] = false;
+							//build_blockPlaced[xx][yy][zz] = false;
 							
 							int internalID = blockids[index];
 							Block block = getConvertInternalIDToBlock(internalID);
@@ -280,7 +275,7 @@ public class Build {
 							int index = yy * sizeX * sizeZ + zz * sizeX + xx;
 							//build_blockIDArr[xx][yy][zz] = blockids[index];
 							build_blockMetaArr[xx][yy][zz] = metadata[index];
-							build_blockPlaced[xx][yy][zz] = false;
+							//build_blockPlaced[xx][yy][zz] = false;
 							
 							int internalID = blockids[index];
 							//fixing old bug using bytes for blockIDs greater than 256
@@ -355,12 +350,12 @@ public class Build {
 		build_blockMetaArr = new int
         [map_sizeX]
         [map_sizeY]
-        [map_sizeZ];
+        [map_sizeZ];/*
 		
 		build_blockPlaced = new boolean
         [map_sizeX]
         [map_sizeY]
-        [map_sizeZ];
+        [map_sizeZ];*/
 	}
 	
 	public void scanLevelToData() {
@@ -382,7 +377,7 @@ public class Build {
 					
 					build_blockIDArr[xx][yy][zz] = worldRef.getBlock(map_coord_minX+xx, map_coord_minY+yy, map_coord_minZ+zz);
 					build_blockMetaArr[xx][yy][zz] = worldRef.getBlockMetadata(map_coord_minX+xx, map_coord_minY+yy, map_coord_minZ+zz);
-					build_blockPlaced[xx][yy][zz] = false;
+					//build_blockPlaced[xx][yy][zz] = false;
 					
 					//System.out.println("build_blockIDArr[xx][yy][zz]: " + build_blockIDArr[xx][yy][zz]);
 					

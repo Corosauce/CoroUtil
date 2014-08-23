@@ -66,6 +66,8 @@ public class BuildClientTicks
     		//EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
     		//int l = MathHelper.floor_double((double)((-player.rotationYaw-45) * 4.0F / 360.0F)/* + 0.5D*/) & 3;
     		Overlays.renderBuildOutline(clipboardData, direction);
+    		
+    		//glitchy, doesnt rotate right sometimes
     		Overlays.renderDirectionArrow(clipboardData, direction);
     		
     		/*Vec3 pos = Vec3.createVectorHelper(clipboardData.map_coord_minX, clipboardData.map_coord_minY, clipboardData.map_coord_minZ);
@@ -89,7 +91,7 @@ public class BuildClientTicks
     {
     	String mainStr = "";
     	if (buildState == EnumBuildState.PLACE) {
-    		mainStr = "Paste Mode: (" + BuildConfig.key_Build + ") to paste, (" + BuildConfig.key_Rotate + ") to rotate, (" + BuildConfig.key_Copy + ") to cancel";
+    		mainStr = "Paste Mode: (" + BuildConfig.key_Build + ") to paste, (" + BuildConfig.key_Rotate + ") to rotate, (" + BuildConfig.key_Copy + ") to cancel. Dir: " + direction;
     	} else if (copyState == EnumCopyState.SETMIN) {
     		mainStr = "Copy Mode: Mark start coord with (" + BuildConfig.key_Copy + "), (" + BuildConfig.key_Build + ") to cancel";
     	} else if (copyState == EnumCopyState.SETMAX) {
@@ -116,9 +118,10 @@ public class BuildClientTicks
     public boolean wasKeyDown = false;
     
     public void onTickInGame() {
-		// TODO Auto-generated method stub
 		
     	Minecraft mc = FMLClientHandler.instance().getClient();
+    	
+    	if (mc.thePlayer == null || mc.theWorld == null) return;
     	
     	if (mc.theWorld != null) {
     		clipboardData.dim = mc.theWorld.provider.dimensionId;
@@ -138,7 +141,7 @@ public class BuildClientTicks
     		}
     	}
     	
-    	if (BuildConfig.enableEditMode) {
+    	if (BuildConfig.enableEditMode && mc.currentScreen == null) {
     		updateInput();
     	} else {
     		copyState = EnumCopyState.NORMAL;
@@ -219,7 +222,8 @@ public class BuildClientTicks
 			clipboardData.recalculateLevelSize(sx, sy, sz, ex, ey, ez, true);
 			clipboardData.scanLevelToData(FMLClientHandler.instance().getClient().theWorld);
 			clipboardData.writeNBT();
-			System.out.println("TODO: BuildMod clipboard packet");
+			//System.out.println("TODO: BuildMod clipboard packet");
+			BuildMod.eventChannel.sendToServer(EventHandlerPacket.getBuildCommandPacket(clipboardData, 0, -1));
 			//FMLClientHandler.instance().getClient().thePlayer.sendQueue.addToSendQueue(BuildPacketHandler.getBuildCommandPacket(clipboardData, 0, -1));
 			
     		copyState = EnumCopyState.NORMAL;
@@ -237,7 +241,8 @@ public class BuildClientTicks
     		
     		//REWIRE TO SEND ACTION TO SERVER INSTEAD
     		
-    		System.out.println("TODO: BuildMod clipboard packet");
+    		//System.out.println("TODO: BuildMod clipboard packet");
+    		BuildMod.eventChannel.sendToServer(EventHandlerPacket.getBuildCommandPacket(clipboardData, 1, direction));
     		//FMLClientHandler.instance().getClient().thePlayer.sendQueue.addToSendQueue(BuildPacketHandler.getBuildCommandPacket(clipboardData, 1, direction));
     		
     		

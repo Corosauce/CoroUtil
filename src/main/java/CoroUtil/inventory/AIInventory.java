@@ -1,20 +1,15 @@
 package CoroUtil.inventory;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
@@ -38,9 +33,9 @@ public class AIInventory {
 	public int slot_Count = 3;
 	
 	//profiled stuff? or standard?
-	public int slot_Melee = 0;
-	public int slot_Ranged = 1;
-	public int slot_Tool = 2;
+	public static int slot_Melee = 0;
+	public static int slot_Ranged = 1;
+	public static int slot_Tool = 2;
 	
 	//because cross compatibility
 	public EntityTropicalFishHook fishEntity;
@@ -67,9 +62,15 @@ public class AIInventory {
 		return FakePlayerFactory.getMinecraft((WorldServer) parWorld);
 	}
 	
-	public void setSlotActive(int parSlot) {
-		slot_Active = parSlot;
+	public void setSlotContents(int parSlot, ItemStack parStack) {
+		inventory.setInventorySlotContents(parSlot, parStack);
 		syncToClient();
+	}
+	
+	public void setSlotActive(int parSlot) {
+		int oldSlot = slot_Active;
+		slot_Active = parSlot;
+		if (slot_Active != oldSlot) syncToClient();
 	}
 	
 	public int getSlotActive() {

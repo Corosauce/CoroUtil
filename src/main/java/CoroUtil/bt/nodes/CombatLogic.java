@@ -59,6 +59,13 @@ public class CombatLogic extends Selector {
 						return children.get(1).tick();
 					}
 				}
+			} else {
+				//let active usage finish
+				if (blackboard.isUsingMelee.getValue()) {
+					return children.get(0).tick();
+				} else if (blackboard.isUsingRanged.getValue()) {
+					return children.get(1).tick();
+				}
 			}
 			
 			

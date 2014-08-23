@@ -25,6 +25,7 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
 		
 		initAIProfile();
     	agent.initBTTemplate();
+    	initExtraAI();
 	}
 
 	@Override
@@ -79,15 +80,22 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
         //this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setAttribute(20);
     }
     
+	/* For initializing different profiles if needed */
     public void initAIProfile() {
         agent.profile.init();
+        agent.profile.initDefaultProfile();
+    }
+    
+    /* For adding onto the existing AI template and profile stuff */
+    public void initExtraAI() {
+    	
     }
     
     @Override
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         
-        agent.setSpeedNormalBase(0.30F);
+        agent.setSpeedNormalBase(0.50F);
         agent.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20);
     }

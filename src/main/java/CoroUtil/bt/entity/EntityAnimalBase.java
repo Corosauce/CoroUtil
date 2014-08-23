@@ -87,10 +87,16 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
 		//getAIBTAgent().profile.addAbilityMelee(AbilityMapping.newAbility("AttackMelee").init(this));
         //this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setAttribute(20);
     }
-    
+
+    /* For initializing different profiles if needed */
     public void initAIProfile() {
         agent.profile.init();
         agent.profile.initDefaultProfile();
+    }
+    
+    /* For adding onto the existing AI template and profile stuff */
+    public void initExtraAI() {
+    	
     }
     
     @Override

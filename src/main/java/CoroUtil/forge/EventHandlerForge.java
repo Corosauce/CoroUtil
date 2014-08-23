@@ -38,7 +38,9 @@ public class EventHandlerForge {
 	public void worldLoad(Load event) {
 		if (!event.world.isRemote) {
 			if (((WorldServer)event.world).provider.dimensionId == 0) {
-				WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(), CoroAI.modID, event.world);
+				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.world) == null) {
+					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(), CoroAI.modID, event.world);
+				}
 			}
 		}
 	}

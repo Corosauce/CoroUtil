@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.forge.CoroAI;
 import CoroUtil.util.CoroUtilFile;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -64,6 +65,10 @@ public class ManagedLocation {
 	}
 	
 	public void addEntity(String unitType, EntityLivingBase ent) {
+		if (listEntities.contains(ent)) {
+			//this might have false positives, like when an entity is unloaded from chunk while game is running... unless somewhere else trims those types out
+			CoroAI.dbg("WARNING: adding already existing entity to ManagedLocation");
+		}
 		listEntities.add(ent);
 	}
 	

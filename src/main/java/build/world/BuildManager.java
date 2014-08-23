@@ -25,6 +25,7 @@ import build.SchematicData;
 import cpw.mods.fml.common.FMLCommonHandler;
 
 //This class works nice and fast, unless the generated thing is hovering in the air. Lighting calculations going overboard perhaps
+//maybe clear area top down to make air clearing pass faster?
 public class BuildManager {
 
 	public List<BuildJob> activeBuilds;
@@ -178,7 +179,7 @@ public class BuildManager {
 		    		
 		    		
 		    		
-		    		if (!build.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ]) {
+		    		if (!buildJob.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ]) {
 			    		
 				    	//try {
 				    		id = build.build_blockIDArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ];
@@ -198,7 +199,7 @@ public class BuildManager {
 				    			
 				    			worldRef.setBlock(xx, yy, zz, id, build.build_blockMetaArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ], 3);
 				    			//worldRef.markBlockNeedsUpdate(xx, yy, zz);
-				    			build.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ] = true;
+				    			buildJob.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ] = true;
 				    			buildJob.curLayerCount++;
 				    			//if (id != 0) {
 				    				//buildParticles(xx,yy,zz);
@@ -228,7 +229,7 @@ public class BuildManager {
 			    		buildJob.build_loopTickZ = 0;
 			    		buildJob.build_loopTickY++;
 			    		buildJob.curLayerCount = 0;
-			    		buildJob.doRandomBuild = true;
+			    		//buildJob.doRandomBuild = true;
 			    		
 			    	}
 			    	
@@ -257,10 +258,14 @@ public class BuildManager {
 			    		return;
 			    	}
 			    	
-			    	build.curTick++;// = buildJob.build_loopTickX + ((buildJob.build_loopTickY + 1) * (buildJob.build_loopTickZ + 1));
+			    	buildJob.curTick++;// = buildJob.build_loopTickX + ((buildJob.build_loopTickY + 1) * (buildJob.build_loopTickZ + 1));
 			    	
-			    	//float percent = ((float)build.curTick + 1) / ((float)build.maxTicks) * 100F;
-					//System.out.println("build percent: " + percent);
+			    	try {
+				    	float percent = ((float)buildJob.curTick + 1) / ((float)buildJob.maxTicks) * 100F;
+						System.out.println(buildJob.id + " - build percent: " + percent + " " + buildJob.curTick + " / " + buildJob.maxTicks + " build ref: " + build);
+			    	} catch (Exception ex) {
+			    		
+			    	}
 			    	
 			    	if (buildJob.pass == 0) {
 			    		int xx = buildJob.build_startX+buildJob.build_loopTickX;
@@ -296,7 +301,7 @@ public class BuildManager {
 			    		//TEEEEEMMMMMPPPPPPPP
 			    		//build_rate = 1;
 			    		
-				    	if (!build.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ]) {
+				    	if (!buildJob.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ]) {
 				    		
 					    	//try {
 					    		id = build.build_blockIDArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ];
@@ -377,7 +382,7 @@ public class BuildManager {
 					    			//worldRef.setBlockMetadata(xx, yy, zz, meta);
 					    			
 					    			
-					    			build.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ] = true;
+					    			buildJob.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ] = true;
 					    			buildJob.curLayerCount++;
 					    		} else {
 					    			loopCount--;
@@ -460,6 +465,8 @@ public class BuildManager {
 		
 		//CHECK OUT  RotationHelper.metadataToDirection and RotationHelper.rotateMetadata !!!!!!!
 		
+		//was this method updated to match rotateNew's ways? i dont think it was which might be why things mismatch now for EVERY rotation 
+		
 		int dir = MathHelper.floor_double((double)(rotation * 4.0F / 360.0F) + 0.5D) & 3;
 		
 		dir = (((int)rotation) / 90) & 3;
@@ -470,7 +477,7 @@ public class BuildManager {
 			
 			int rotateMeta = meta & 4;
 			
-			//System.out.println("dir: " + dir + ", meta: " + meta + ", rotateMeta: " + rotateMeta);
+			System.out.println("dir: " + dir + ", meta: " + meta + ", rotateMeta: " + rotateMeta);
 			
 			int fMeta = -1;
 

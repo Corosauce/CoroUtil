@@ -48,6 +48,13 @@ public class BuildJob {
     public int customGenOffset = 0;
     
     public int buildRate = 99999999;
+    
+
+	
+	//visual data - CAUSES OVERLAP FOR BUILDJOBS BOTH USING SAME BUILD OBJECT!
+	public int curTick = 0; //MOVE TO BUILDJOB FOR SHARED BUILDS!
+	public int maxTicks = 0; //MOVE TO BUILDJOB FOR SHARED BUILDS!
+	public boolean build_blockPlaced[][][]; //MOVE TO BUILDJOB FOR SHARED BUILDS!
 	
 	//REFACTOR THESE NAMES TO THE ABOVE COMMENTED OUT ONES ONCE COMPILING
 	/*public int map_sizeX = 0;
@@ -175,7 +182,7 @@ public class BuildJob {
     
     
     public void resetBuildState() {
-    	build.build_blockPlaced = new boolean
+    	build_blockPlaced = new boolean
         [build.map_sizeX]
         [build.map_sizeY]
         [build.map_sizeZ];
@@ -184,13 +191,13 @@ public class BuildJob {
 			for (int yy = 0; yy < build.map_sizeY; yy++) {
 				for (int zz = 0; zz < build.map_sizeZ; zz++) {
 					int index = yy * build.map_sizeX * build.map_sizeZ + zz * build.map_sizeX + xx;
-					build.build_blockPlaced[xx][yy][zz] = false;
+					build_blockPlaced[xx][yy][zz] = false;
 					
 				}
 			}
 		}
 		
-		build.curTick = 0;
-		build.maxTicks = build.map_sizeX * build.map_sizeY * build.map_sizeZ * 3; //3 build passes
+		curTick = 0;
+		maxTicks = build.map_sizeX * build.map_sizeY * build.map_sizeZ * 3; //3 build passes
     }
 }

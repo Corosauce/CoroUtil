@@ -81,7 +81,7 @@ public class Overlays {
 	}
 	
 	public static void renderDirectionArrow(Build b, int dir) {
-		float x = (float)b.map_coord_minX + 0.5F + (float)b.map_sizeX / 2F;// + 0.5F;
+		float x = (float)b.map_coord_minX - 5.5F + (float)b.map_sizeX / 2F;// + 0.5F;
 		float y = b.map_coord_minY;
 		float z = (float)b.map_coord_minZ + (float)b.map_sizeZ / 2F;// + 0.5F;
 		float x1 = (float)b.map_coord_minX + (float)b.map_sizeX / 2F;// + 0.5F;
@@ -91,10 +91,10 @@ public class Overlays {
 		float y2 = b.map_sizeY + y - 1F;
 		float z2 = b.map_sizeZ/2 + z - 1F;
 		
-		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
-		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c1 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c2 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
 		
-		renderLineFromToBlock(c1.posX + 0.5, y + 3.5, c1.posZ + 0.5, c2.posX + 0.5, y + 3.5, c2.posZ + 0.5, 0x00FF00);
+		renderLineFromToBlock(c1.posX + 0.5, y + 3.5, c1.posZ + 0.5, c2.posX + 0.5, y + 8.5, c2.posZ + 0.5, 0x00FF00);
 	}
 	
 	/*public static void renderDirectionArrow(Vec3 pos, int dir) {

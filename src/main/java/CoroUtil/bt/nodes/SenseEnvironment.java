@@ -1,5 +1,7 @@
 package CoroUtil.bt.nodes;
 
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.Vec3;
@@ -57,6 +59,39 @@ public class SenseEnvironment extends LeafAction {
 		
 		if (!safetyCheck()) {
 			blackboard.shouldTrySurvival.setValue(true);
+			
+			//track closest threat, maybe move to survival leaf in template
+			float huntRange = 32F;
+			if (blackboard.agent.ent.worldObj.getTotalWorldTime() % 10 == 0) {
+				boolean found = false;
+				//boolean sanityAborted = false;
+				Entity clEnt = null;
+				float closest = 9999F;
+		    	List list = blackboard.agent.ent.worldObj.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		        for(int j = 0; j < list.size(); j++)
+		        {
+		            Entity entity1 = (Entity)list.get(j);
+		            if(blackboard.agent.isEnemy(entity1))
+		            {
+		            	if (false || ((EntityLivingBase) entity1).canEntityBeSeen(blackboard.agent.ent)) {
+		            		//if (sanityCheck()/* && entity1 instanceof EntityPlayer*/) {
+		            			float dist = blackboard.agent.ent.getDistanceToEntity(entity1);
+		            			//System.out.println("dist: " + dist);
+		            			if (dist < closest) {
+		            				closest = dist;
+		            				clEnt = entity1;
+		            			}
+		            		//} else {
+		            			//sanityAborted = true;
+		            		//}
+		            	}
+		            }
+		        }
+		        if (clEnt != null) {
+		        	blackboard.lastFleeTarget = clEnt;
+		        }
+			}
+			
 		} else {
 			blackboard.shouldTrySurvival.setValue(false);
 		}

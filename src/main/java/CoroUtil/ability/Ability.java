@@ -154,6 +154,7 @@ public class Ability {
 	public NBTTagCompound nbtSave() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("name", name);
+		nbt.setString("classname", this.getClass().getCanonicalName());
 		nbt.setInteger("type", type);
 		nbt.setBoolean("fullSave", true); //lets client side know if it can try to do a full load (more of a safety)
 		return nbt;
@@ -175,6 +176,7 @@ public class Ability {
 	public NBTTagCompound nbtSyncWrite() {
 		NBTTagCompound nbt = new NBTTagCompound();
 		nbt.setString("name", name);
+		nbt.setString("classname", this.getClass().getCanonicalName());
 		nbt.setInteger("usageCount", usageCount);
 		nbt.setBoolean("isActive", isActive);
 		nbt.setInteger("curTickCharge", curTickCharge);

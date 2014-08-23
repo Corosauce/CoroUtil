@@ -10,6 +10,7 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import CoroUtil.bt.actions.Delay;
 import CoroUtil.bt.actions.OrdersUser;
@@ -24,8 +25,13 @@ import CoroUtil.bt.selector.SelectorSequence;
 import CoroUtil.diplomacy.DiplomacyHelper;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.CoroUtilNBT;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ManagedLocation;
 
 
 public class AIBTAgent {
@@ -47,6 +53,8 @@ public class AIBTAgent {
 	public EntityLivingBase ent;
 
   	public OrdersHandler ordersHandler;
+  	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
+  	public ChunkCoordinates coordsManagedLocation;
 	
   	public AIBTTamable tamable;
   	
@@ -87,6 +95,7 @@ public class AIBTAgent {
 		pathNav.setAvoidsWater(false);
 		pathNav.setCanSwim(true);
 		moveHelper = new EntityMoveHelperCustom(ent);
+		entInv = new AIInventory(ent);
 		
 		ent.entityCollisionReduction = 0.2F;
 	}
@@ -173,7 +182,7 @@ public class AIBTAgent {
         
         SelectorMoveToPathClose sel_PathClosePartial = new SelectorMoveToPathClose(null, this.entInt, this.blackboard, 1, true);
         SelectorMoveToPathClose sel_PathCloseExact = new SelectorMoveToPathClose(null, this.entInt, this.blackboard, 1, false);
-        SelectorMoveToPosVec sel_MoveToPos = new SelectorMoveToPosVec(selSafeOrClosePath, this.entInt, this.blackboard, 2F);
+        SelectorMoveToPosVec sel_MoveToPos = new SelectorMoveToPosVec(selSafeOrClosePath, this.entInt, this.blackboard, 1.3F);
         
         selLongPath.add(selSafeOrClosePath);
         selLongPath.add(sel1_PathBest);
@@ -211,6 +220,15 @@ public class AIBTAgent {
 	}
 	
 	public void applyEntityAttributes() {
+		
+		//attribute operators
+		
+		//0: "+- amount", 1: "+- amount % (additive)", 2: "+- amount % (multiplicative)"
+		
+		//0: base val += modifier
+		//1: (prev operations) + (base val * modifier)
+		//2: (prev operations) * (1F + modifier) (so a negative can multiply it down)
+		
 		//baseline movespeed
 		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(moveSpeed);
 	}
@@ -229,6 +247,7 @@ public class AIBTAgent {
 		
 		tickMovement();
 		tickAgeEntity();
+		entInv.tick();
 		
 		ent.entityCollisionReduction = 0.2F;
 	}
@@ -353,8 +372,21 @@ public class AIBTAgent {
 	}
 	
 	public void postFullInit() {
-		profile.updateListCache();
+		profile.updateCache();
 		profile.syncAbilitiesFull(true); //calling this here does not work for entities outside tracker range on client, see SkillMapping errors for more detail
+		
+		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
+		if (coordsManagedLocation != null) {
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
+			if (ml != null) {
+				//unitType is mostly unused atm
+				ml.addEntity("member", ent);
+			} else {
+				//this should be expected, remove this sysout once you are sure this only happens at expected times
+				CoroAI.dbg("AIBT Entitys home has been destroyed!");
+			}
+		}
 	}
 	
 	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
@@ -363,20 +395,25 @@ public class AIBTAgent {
 	}
 	
     public void nbtRead(NBTTagCompound par1nbtTagCompound) {
+    	this.entInv.nbtRead(par1nbtTagCompound.getCompoundTag("inventory"));
     	tickAge = par1nbtTagCompound.getInteger("tickAge");
 		canDespawn = par1nbtTagCompound.getBoolean("canDespawn");
-    	
+    	if (par1nbtTagCompound.hasKey("coordsManagedLocationX")) coordsManagedLocation = CoroUtilNBT.readCoords("coordsManagedLocation", par1nbtTagCompound);
+		
     	profile.nbtRead(par1nbtTagCompound);
     	tamable.setTamedByOwner(par1nbtTagCompound.getString("owner"));
     	initPost(true);
 	}
 	
     public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
+    	par1nbtTagCompound.setTag("inventory", entInv.nbtWrite());
     	par1nbtTagCompound.setInteger("tickAge", tickAge);
     	par1nbtTagCompound.setBoolean("canDespawn", canDespawn);
+    	if (coordsManagedLocation != null) CoroUtilNBT.writeCoords("coordsManagedLocation", coordsManagedLocation, par1nbtTagCompound);
     	
     	profile.nbtWrite(par1nbtTagCompound);
     	par1nbtTagCompound.setString("owner", tamable.owner);
+    	
 	}
     
     public void nbtDataFromServer(NBTTagCompound nbt) {
@@ -452,5 +489,12 @@ public class AIBTAgent {
 		eventHandler.cleanup();
 		entInt.cleanup();
 		entInt = null;
+		if (coordsManagedLocation != null) {
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
+			if (ml != null) {
+				ml.removeObject(ent);
+			}
+		}
     }
 }

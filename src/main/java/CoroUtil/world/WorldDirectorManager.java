@@ -12,6 +12,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.world.grid.block.BlockDataGrid;
 import CoroUtil.world.grid.chunk.ChunkDataGrid;
 
@@ -50,6 +51,15 @@ public class WorldDirectorManager {
 	public WorldDirectorManager() {
 		//data = new NBTTagCompound();
 		reset();
+	}
+	
+	public WorldDirector getCoroUtilWorldDirector(World world) {
+		WorldDirector wd = getWorldDirector(CoroAI.modID, world);
+		if (wd == null) {
+			wd = new WorldDirector();
+			WorldDirectorManager.instance().registerWorldDirector(wd, CoroAI.modID, world);
+		}
+		return wd;
 	}
 	
 	public WorldDirector getWorldDirector(String parModID, World world) {

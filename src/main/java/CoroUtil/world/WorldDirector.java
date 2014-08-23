@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -38,11 +39,11 @@ public class WorldDirector {
 	//Not serialized for now
 	public List<WorldEvent> worldEvents = new ArrayList<WorldEvent>();
 	
-	public HashMap<Integer, ManagedLocation> lookupTickingManagedLocations;
+	public ConcurrentHashMap<Integer, ManagedLocation> lookupTickingManagedLocations;
 	
 	//reflection made
 	public WorldDirector() {
-		lookupTickingManagedLocations = new HashMap<Integer, ManagedLocation>();
+		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ManagedLocation>();
 	}
 	
 	//required for reading in, etc
@@ -247,8 +248,6 @@ public class WorldDirector {
 			ManagedLocation entrance = null;//new DungeonEntrance(this.dimID);
 		    if (aClass != null) {
 		    	try {
-		    		//needs constructor params
-		    		//WIP COOOOOOOOOOOOOOOOOOOOOOOOOOOOOODDDDDDDDDDDDDDDDDDDDDDDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 		    		entrance = (ManagedLocation)aClass.getConstructor(new Class[] {}).newInstance();
 				} catch (Exception ex) {
 					ex.printStackTrace();

@@ -79,6 +79,15 @@ public class PersonalityProfile {
 	
 	public float abilitySyncRange = 64F;
 	
+	/*public float cacheBestDistMelee = 10;
+	public float cacheBestDistRangeMelee = 10; //the acceptable range around bestDist
+	
+	public float cacheBestDistRanged = 10;
+	public float cacheBestDistRangeRanged = 10; //the acceptable range around bestDist
+*/	
+	
+	public float cacheFurthestMeleeUsable = 0;
+	
 	@SideOnly(Side.CLIENT)
 	public ConcurrentHashMap<String, AnimationStateObject> animationData;
 	
@@ -158,6 +167,12 @@ public class PersonalityProfile {
 		listAbilitiesRanged.add(parAbility);
 	}
 	
+	public void updateCache() {
+		
+		updateListCache();
+		updateAbilityInfoCache();
+	}
+	
 	public void updateListCache() {
 		listAbilitiesMelee.clear();
 		listAbilitiesRanged.clear();
@@ -167,6 +182,22 @@ public class PersonalityProfile {
 				listAbilitiesMelee.add(entry.getValue());
 			} else if (entry.getValue().type == Ability.TYPE_RANGED) {
 				listAbilitiesRanged.add(entry.getValue());
+			}
+		}
+	}
+	
+	public void updateAbilityInfoCache() {
+		
+		cacheFurthestMeleeUsable = 0;
+		
+		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
+			Ability ability = entry.getValue(); 
+			if (ability.type == Ability.TYPE_MELEE) {
+				if (ability.bestDist + ability.bestDistRange/2 > cacheFurthestMeleeUsable) {
+					cacheFurthestMeleeUsable = ability.bestDist + ability.bestDistRange/2;
+				}
+			} else if (ability.type == Ability.TYPE_RANGED) {
+				
 			}
 		}
 	}
@@ -274,11 +305,11 @@ public class PersonalityProfile {
 	}
 	
 	public void nbtSyncRead(NBTTagCompound par1nbtTagCompound) {
-		//override with mod specific profile that uses own skill mapping
+		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent, true);
 	}
 	
 	public void nbtRead(NBTTagCompound par1nbtTagCompound) {
-		//override with mod specific profile that uses own skill mapping
+		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent);
 	}
 	
     public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
@@ -329,6 +360,9 @@ public class PersonalityProfile {
 	public boolean shouldMelee(float curRange) {
 		if (!canMelee()) return false;
 		
+		//use cache of longest melee ability range
+		if (curRange > cacheFurthestMeleeUsable) return false;
+		
 		//if theres a skill within acceptable range given, return true...... return skill??
 		//for now...
 		//IDEA: just return true if any melee skill, then let the 'invoke best melee attack' behavior choose the actual skill used...
@@ -347,6 +381,10 @@ public class PersonalityProfile {
 		ability.setTarget(parTarget);
 		ability.setActive();
 		syncAbility(ability);
+	}
+	
+	public void setFearless() {
+		aggression = 1F;
 	}
 	
 	/*public void attackMeleeTrigger(Entity parTarget) {

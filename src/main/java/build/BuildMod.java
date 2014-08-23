@@ -22,6 +22,8 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.FMLEventChannel;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -35,12 +37,17 @@ public class BuildMod
     
     public Configuration preInitConfig;
     
-    public ItemEditTool itemEditTool; 
+    public ItemEditTool itemEditTool;
+
+	public static String eventChannelName = "buildmod";
+	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
     	ConfigMod.addConfigFile(event, "bm", new BuildConfig());
+    	
+    	eventChannel.register(new EventHandlerPacket());
     }
     
     @Mod.EventHandler
