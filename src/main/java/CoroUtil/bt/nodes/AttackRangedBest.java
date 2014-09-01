@@ -60,13 +60,49 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 				
 				//boolean usedAbility = false;
 				
+				//tries for a count of ability list size or until it finds an ability that isnt active
 				if (profile.listAbilitiesRanged.size() > 0) {
+					int tryCount = 0;
+					int maxTries = profile.listAbilitiesRanged.size();
+					
+					Ability ability = null;
+					while (true) {
+						
+						ability = profile.listAbilitiesRanged.get(rand.nextInt(profile.listAbilitiesRanged.size()));
+						
+						
+						if (ability.canActivate() && dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
+							
+						} else {
+							ability = null;
+						}
+						
+						if (ability != null || tryCount++ >= maxTries) {
+							break;
+						}
+					}
+					
+					if (ability != null) {
+						abilityStart(ability, target);
+					}
+					
+					
+					/*if (dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
+						//System.out.println("use ability: " + ability + " - " + ent);
+						abilityStart(ability, target);
+						//usedAbility = true;
+					} else {
+						//System.out.println("out of range - " + ent);
+					}*/
+				}
+				
+				/*if (profile.listAbilitiesRanged.size() > 0) {
 					Ability ability = profile.listAbilitiesRanged.get(rand.nextInt(profile.listAbilitiesRanged.size()));
 					if (dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
 						abilityStart(ability, target);
 						//usedAbility = true;
 					}
-				}
+				}*/
 				
 				/*if (!usedAbility) {
 					if (dist < profile.attackDistRanged) {
@@ -108,7 +144,7 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 	}
 	
 	public void abilityFinish() {
-		//System.out.println("combo finished");
+		System.out.println("callback finished");
 		//activeComboIndex = -1;
 		activeIsDefault = false;
 		activeAbility = null;
@@ -117,7 +153,10 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 	@Override
 	public void abilityFinished(Ability parAbility) {
 		//System.out.println("callback received");
-		abilityFinish();
+		//incase post cooldown callback from old ability calls while different ability is being used
+		if (parAbility == activeAbility) {
+			abilityFinish();
+		}
 	}
 	
 }

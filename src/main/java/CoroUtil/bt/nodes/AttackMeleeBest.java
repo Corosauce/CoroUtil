@@ -77,15 +77,40 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 				
 				//boolean usedAbility = false;
 				
+				//tries for a count of ability list size or until it finds an ability that isnt active
 				if (profile.listAbilitiesMelee.size() > 0) {
-					Ability ability = profile.listAbilitiesMelee.get(rand.nextInt(profile.listAbilitiesMelee.size()));
-					if (dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
+					int tryCount = 0;
+					int maxTries = profile.listAbilitiesMelee.size();
+					
+					Ability ability = null;
+					while (true) {
+						
+						ability = profile.listAbilitiesMelee.get(rand.nextInt(profile.listAbilitiesMelee.size()));
+						
+						
+						if (ability.canActivate() && dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
+							
+						} else {
+							ability = null;
+						}
+						
+						if (ability != null || tryCount++ >= maxTries) {
+							break;
+						}
+					}
+					
+					if (ability != null) {
+						abilityStart(ability, target);
+					}
+					
+					
+					/*if (dist <= ability.bestDist + ability.bestDistRange/2 && dist >= ability.bestDist - ability.bestDistRange/2) {
 						//System.out.println("use ability: " + ability + " - " + ent);
 						abilityStart(ability, target);
 						//usedAbility = true;
 					} else {
 						//System.out.println("out of range - " + ent);
-					}
+					}*/
 				}
 				
 				/*if (!usedAbility) {
@@ -140,7 +165,11 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 	@Override
 	public void abilityFinished(Ability parAbility) {
 		//System.out.println("callback received");
-		abilityFinish();
+		
+		//incase post cooldown callback from old ability calls while different ability is being used
+		if (parAbility == activeAbility) {
+			abilityFinish();
+		}
 	}
 	
 }

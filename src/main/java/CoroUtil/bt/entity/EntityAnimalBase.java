@@ -91,7 +91,7 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
     /* For initializing different profiles if needed */
     public void initAIProfile() {
         agent.profile.init();
-        agent.profile.initDefaultProfile();
+        agent.profile.initProfile(-1);
     }
     
     /* For adding onto the existing AI template and profile stuff */

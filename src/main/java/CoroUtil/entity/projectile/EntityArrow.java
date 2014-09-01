@@ -125,7 +125,7 @@ public class EntityArrow extends EntityProjectileBase
 				if (!worldObj.isRemote)
 				{
 					
-					float damage = 15;
+					float damage = 5;
 					
 					if (movingobjectposition.entityHit instanceof IBTAgent && getThrower() instanceof IBTAgent) {
 						if (((IBTAgent) getThrower()).getAIBTAgent().isEnemy(movingobjectposition.entityHit)) {
@@ -160,6 +160,8 @@ public class EntityArrow extends EntityProjectileBase
 			//owner entity agent was cleaned up
 			ex.printStackTrace();
 		}
+		
+		super.onImpact(movingobjectposition);
 		
 	}
 	

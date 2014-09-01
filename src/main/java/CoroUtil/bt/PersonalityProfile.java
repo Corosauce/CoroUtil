@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.nodes.AttackMeleeBest;
 import CoroUtil.bt.nodes.AttackRangedBest;
@@ -21,7 +23,6 @@ import CoroUtil.bt.selector.SelectorConcurrent;
 import CoroUtil.entity.render.AnimationStateObject;
 import CoroUtil.entity.render.ModelRendererBones;
 import CoroUtil.entity.render.RenderEntityCoroAI;
-import CoroUtil.entity.render.TechneModelCoroAI;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilAbility;
@@ -210,14 +211,15 @@ public class PersonalityProfile {
 			if (agent.blackboard.isMoving.getValue()) {
 				Ability ability = abilities.get("Walk");
 				if (ability != null) {
-					if (!ability.isActive()) {
+					if (ability.canActivate()) {
 						
 						abilityStart(ability, null);
 						
 					}
 					Ability ability2 = abilities.get("Idle");
 					if (ability2 != null) {
-						if (!ability2.isActive()) {
+						//switched to check active instead of not active...
+						if (ability2.isActiveOrCoolingDown()) {
 							ability2.setFinishedEntirely();
 							syncAbility(ability2);
 						}
@@ -227,7 +229,7 @@ public class PersonalityProfile {
 				if (agent.blackboard.getTarget() == null) {
 					Ability ability = abilities.get("Idle");
 					if (ability != null) {
-						if (!ability.isActive()) {
+						if (ability.canActivate()) {
 							abilityStart(ability, null);
 						}
 					}
@@ -235,18 +237,34 @@ public class PersonalityProfile {
 			}
 		}
 		
+		try {
+			for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
+				if (entry.getValue().isActiveOrCoolingDown()) {
+					entry.getValue().tick();
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void tickAbilitiesRender(Render parRender) {
+		//System.out.println("abilities count: " + abilities.size());
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			if (entry.getValue().isActive()) {
-				entry.getValue().tick();
+			//System.out.println("render active? " + entry.getValue().isActive());
+			if (entry.getValue().isActiveOrCoolingDown()) {
+				entry.getValue().tickRender(parRender);
 			}
 		}
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public void tickAbilitiesRender(TechneModelCoroAI model) {
+	public void tickAbilitiesRenderModel(ModelBase parModel) {
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			if (entry.getValue().isActive()) {
-				entry.getValue().tickRender(model);
+			//System.out.println("render active? " + entry.getValue().isActive());
+			if (entry.getValue().isActiveOrCoolingDown()) {
+				entry.getValue().tickRenderModel(parModel);
 			}
 		}
 	}
@@ -258,14 +276,23 @@ public class PersonalityProfile {
 		
 	}
 	
+	public void initProfile(int profileType) {
+		if (profileType == -1) {
+			initDefaultProfile();
+		} else {
+			System.out.println("unsupported profileType for PersonalityProfile");
+		}
+	}
+	
 	public void initDefaultProfile() {
 		btSurviving.add(new Flee(btSurviving, agent.entInt, agent.blackboard));
 		btIdling.add(new Wander(btIdling, agent.entInt, agent.blackboard, 8));
 		
-		//temp combat movement
+		//temp combat movement, becomes not so temp!
 		btAttacking.add(new TrackTarget(null, agent.entInt, agent.blackboard));
 		//btAttacking.add(new AttackMelee(btAttacking, agent.entInt, agent.blackboard, 3F, 5));
 		
+		//Ability system divided between melee and ranged abilities, no combos
 		CombatLogic selCombat = new CombatLogic(null, agent.entInt);
 		selCombat.add(new AttackMeleeBest(null, agent.entInt));
 		selCombat.add(new AttackRangedBest(null, agent.entInt));
@@ -273,14 +300,10 @@ public class PersonalityProfile {
 		btAttacking.add(selCombat);
 	}
 	
-	public void initProfile(int profileType) {
-		initDefaultProfile();
-	}
-	
 	public void syncAbilitiesFull(boolean rangeOverride) {
 		System.out.println("full sync abilities - " + agent.ent);
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("command", "syncAbilities");
+		nbt.setString("command", "CoroAI_Ent");
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
@@ -295,7 +318,7 @@ public class PersonalityProfile {
 	
 	public void syncAbility(Ability ability) {
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setString("command", "syncAbilities");
+		nbt.setString("command", "CoroAI_Ent");
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
 		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
@@ -315,6 +338,14 @@ public class PersonalityProfile {
     public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
     	par1nbtTagCompound.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 	}
+    
+    public boolean shouldChaseTarget() {
+    	return true;
+    }
+    
+    public boolean shouldWander() {
+    	return true;
+    }
 	
 	public boolean shouldFollowOrders() {
 		float healthRatio = agent.ent.getHealth() / agent.ent.getMaxHealth();
@@ -385,6 +416,28 @@ public class PersonalityProfile {
 	
 	public void setFearless() {
 		aggression = 1F;
+	}
+	
+	public boolean hookHitBy(DamageSource par1DamageSource, float par2) {
+		
+		Entity ent = par1DamageSource.getEntity();
+		if (!agent.ent.worldObj.isRemote) {
+			if (ent != null && agent.isEnemy(ent)) {
+				if (agent.blackboard.getTarget() == null) {
+					agent.blackboard.setTarget(ent);
+				}
+	
+				for (Map.Entry<String, Ability> entry : agent.profile.abilities.entrySet()) {
+					if (entry.getValue().isActive() && entry.getValue().canHitCancel(par1DamageSource)) {
+						entry.getValue().setFinishedPerform();
+					}
+				}
+				agent.profile.syncAbilitiesFull(false);
+			}
+		}
+		
+		//dont cancel
+		return false;
 	}
 	
 	/*public void attackMeleeTrigger(Entity parTarget) {

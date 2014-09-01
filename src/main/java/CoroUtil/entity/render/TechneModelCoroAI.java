@@ -525,7 +525,7 @@ public class TechneModelCoroAI extends ModelBase implements IModelCustom {
     	
     	
     	if (par1Entity instanceof IBTAgent) {
-        	((IBTAgent) par1Entity).getAIBTAgent().profile.tickAbilitiesRender(this);
+        	((IBTAgent) par1Entity).getAIBTAgent().profile.tickAbilitiesRenderModel(this);
         }
     	
     	//temp

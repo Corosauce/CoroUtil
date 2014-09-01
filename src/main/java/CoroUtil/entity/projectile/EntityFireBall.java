@@ -35,6 +35,18 @@ public class EntityFireBall extends EntityProjectileBase
 		super(par1World, par2EntityLivingBase, target, parSpeed);
     }
 
+	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed, float parYaw, float parPitch)
+	{
+		super(world, entityliving, parSpeed);
+		
+		float speed = 0.7F;
+		float f = 0.4F;
+        this.motionX = (double)(-MathHelper.sin(-parYaw / 180.0F * (float)Math.PI) * MathHelper.cos(-parPitch / 180.0F * (float)Math.PI) * f);
+        this.motionZ = (double)(MathHelper.cos(-parYaw / 180.0F * (float)Math.PI) * MathHelper.cos(-parPitch / 180.0F * (float)Math.PI) * f);
+        this.motionY = (double)(-MathHelper.sin((-parPitch + this.func_70183_g()) / 180.0F * (float)Math.PI) * f);
+        this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, speed, 1.0F);
+	}
+	
 	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed)
 	{
 		super(world, entityliving, parSpeed);
@@ -125,7 +137,7 @@ public class EntityFireBall extends EntityProjectileBase
 				if (!worldObj.isRemote)
 				{
 					
-					float damage = 15;
+					float damage = 5;
 					
 					if (movingobjectposition.entityHit instanceof IBTAgent && getThrower() instanceof IBTAgent) {
 						if (((IBTAgent) getThrower()).getAIBTAgent().isEnemy(movingobjectposition.entityHit)) {
@@ -161,6 +173,7 @@ public class EntityFireBall extends EntityProjectileBase
 			//ex.printStackTrace();
 		}
 		
+		super.onImpact(movingobjectposition);
 	}
 	
 	@Override

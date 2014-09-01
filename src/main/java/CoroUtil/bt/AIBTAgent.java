@@ -55,6 +55,9 @@ public class AIBTAgent {
   	public OrdersHandler ordersHandler;
   	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
   	public ChunkCoordinates coordsManagedLocation;
+  	
+  	//for respawning and other misc things
+  	public ChunkCoordinates coordsHome;
 	
   	public AIBTTamable tamable;
   	
@@ -90,7 +93,7 @@ public class AIBTAgent {
 		eventHandler = new AIEventHandler(this);
 		tamable = new AIBTTamable(this);
 		profile = new PersonalityProfile(this);
-		profile.init();
+		//profile.init();
 		pathNav = new PathNavigateCustom(ent, ent.worldObj);
 		pathNav.setAvoidsWater(false);
 		pathNav.setCanSwim(true);
@@ -376,17 +379,32 @@ public class AIBTAgent {
 		profile.syncAbilitiesFull(true); //calling this here does not work for entities outside tracker range on client, see SkillMapping errors for more detail
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
+		ManagedLocation ml = getManagedLocation();
+		if (ml != null) {
+			//unitType is mostly unused atm
+			ml.addEntity("member", ent);
+		} else {
+			//this should be expected, remove this sysout once you are sure this only happens at expected times
+			CoroAI.dbg("AIBT Entitys home has been destroyed!");
+		}
+		
+	}
+	
+	public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
-			if (ml != null) {
-				//unitType is mostly unused atm
-				ml.addEntity("member", ent);
-			} else {
-				//this should be expected, remove this sysout once you are sure this only happens at expected times
-				CoroAI.dbg("AIBT Entitys home has been destroyed!");
-			}
+			return ml;
 		}
+		return null;
+	}
+	
+	public void setManagedLocation(ChunkCoordinates parLocation) {
+		coordsManagedLocation = parLocation;
+	}
+	
+	public void setManagedLocation(ManagedLocation parLocation) {
+		coordsManagedLocation = parLocation.spawn;
 	}
 	
 	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
@@ -399,6 +417,7 @@ public class AIBTAgent {
     	tickAge = par1nbtTagCompound.getInteger("tickAge");
 		canDespawn = par1nbtTagCompound.getBoolean("canDespawn");
     	if (par1nbtTagCompound.hasKey("coordsManagedLocationX")) coordsManagedLocation = CoroUtilNBT.readCoords("coordsManagedLocation", par1nbtTagCompound);
+    	if (par1nbtTagCompound.hasKey("coordsHomeX")) coordsHome = CoroUtilNBT.readCoords("coordsHome", par1nbtTagCompound);
 		
     	profile.nbtRead(par1nbtTagCompound);
     	tamable.setTamedByOwner(par1nbtTagCompound.getString("owner"));
@@ -410,6 +429,7 @@ public class AIBTAgent {
     	par1nbtTagCompound.setInteger("tickAge", tickAge);
     	par1nbtTagCompound.setBoolean("canDespawn", canDespawn);
     	if (coordsManagedLocation != null) CoroUtilNBT.writeCoords("coordsManagedLocation", coordsManagedLocation, par1nbtTagCompound);
+    	if (coordsHome != null) CoroUtilNBT.writeCoords("coordsHome", coordsHome, par1nbtTagCompound);
     	
     	profile.nbtWrite(par1nbtTagCompound);
     	par1nbtTagCompound.setString("owner", tamable.owner);
@@ -419,9 +439,11 @@ public class AIBTAgent {
     public void nbtDataFromServer(NBTTagCompound nbt) {
 		String command = nbt.getString("command");
 		
-		if (command.equals("syncAbilities")) {
-			profile.nbtSyncRead(nbt);
-		}
+		profile.nbtSyncRead(nbt);
+		
+		/*if (command.equals("syncAbilities")) {
+			
+		}*/
 	}
     
     public void tickAgeEntity()
@@ -484,17 +506,18 @@ public class AIBTAgent {
     
     public void cleanup() {
     	PFQueue.pfDelays.remove(ent);
-		ent = null;
-		ordersHandler = null;
-		eventHandler.cleanup();
-		entInt.cleanup();
-		entInt = null;
-		if (coordsManagedLocation != null) {
+    	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
 			if (ml != null) {
 				ml.removeObject(ent);
 			}
 		}
+		ent = null;
+		ordersHandler = null;
+		eventHandler.cleanup();
+		entInt.cleanup();
+		entInt = null;
+		
     }
 }

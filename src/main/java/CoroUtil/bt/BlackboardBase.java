@@ -54,6 +54,8 @@ public class BlackboardBase implements IPFCallback {
 	//Combat
 	public MutableBoolean isFighting = new MutableBoolean(false);
 	public MutableBoolean shouldTrySurvival = new MutableBoolean(false);
+	public MutableBoolean shouldChaseTarget = new MutableBoolean(false);
+	public MutableBoolean shouldWander = new MutableBoolean(false);
 	public MutableBoolean isUsingMelee = new MutableBoolean(false);
 	public MutableBoolean isUsingRanged = new MutableBoolean(false);
 	

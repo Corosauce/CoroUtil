@@ -260,12 +260,12 @@ public class BuildManager {
 			    	
 			    	buildJob.curTick++;// = buildJob.build_loopTickX + ((buildJob.build_loopTickY + 1) * (buildJob.build_loopTickZ + 1));
 			    	
-			    	try {
+			    	/*try {
 				    	float percent = ((float)buildJob.curTick + 1) / ((float)buildJob.maxTicks) * 100F;
 						System.out.println(buildJob.id + " - build percent: " + percent + " " + buildJob.curTick + " / " + buildJob.maxTicks + " build ref: " + build);
 			    	} catch (Exception ex) {
 			    		
-			    	}
+			    	}*/
 			    	
 			    	if (buildJob.pass == 0) {
 			    		int xx = buildJob.build_startX+buildJob.build_loopTickX;
@@ -273,6 +273,8 @@ public class BuildManager {
 			    		int zz = buildJob.build_startZ+buildJob.build_loopTickZ;
 			    		
 			    		id = build.build_blockIDArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ];
+			    		
+			    		boolean skipGen = false;
 			    		
 			    		
 			    		
@@ -292,9 +294,26 @@ public class BuildManager {
 			    						Vec3.createVectorHelper(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
 		    				}
 		    				
+		    			} else {
+		    				boolean centerBuild = true;
+		    				if (centerBuild) {
+		    					//this was determined to work for odd sized schematics on X and Z
+		    					coords.posX -= MathHelper.floor_double(build.map_sizeX/2D);
+		    					coords.posZ -= MathHelper.floor_double(build.map_sizeZ/2D);
+		    					//coords.posZ += 1; //solve innacuracy for just Z
+		    				}
 		    			}
-			    		worldRef.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air, 0, 2);
+		    			if (buildJob.blockIDsNoBuildOver.size() > 0) {
+		    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+			    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
+			    				skipGen = true;
+				    		}
+		    			}
+		    			if (!skipGen) {
+		    				worldRef.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air, 0, 2);
+		    			}
 			    		//}
+			    		
 	    				
 			    	} else {
 			    		
@@ -351,6 +370,15 @@ public class BuildManager {
 					    				
 					    				int tryMeta = rotateMeta(worldRef, coords, buildJob.rotation, id, meta);
 					    				if (tryMeta != -1) meta = tryMeta;
+					    			} else {
+					    				//still center around coord if not rotated
+					    				boolean centerBuild = true;
+					    				if (centerBuild) {
+					    					//this was determined to work for odd sized schematics on X and Z
+					    					coords.posX -= MathHelper.floor_double(build.map_sizeX/2D);
+					    					coords.posZ -= MathHelper.floor_double(build.map_sizeZ/2D);
+					    					//coords.posZ += 1; //solve innacuracy for just Z
+					    				}
 					    			}
 					    			
 					    			//custom id fixing 
@@ -358,7 +386,16 @@ public class BuildManager {
 					    			
 					    			//new protection against schematics printing missing ids that will eventually crash the game
 					    			if (id != null || CoroUtilBlock.isAir(id)) {
-					    				worldRef.setBlock(coords.posX, coords.posY, coords.posZ, id, meta, 2);
+					    				boolean skipGen = false;
+					    				if (buildJob.blockIDsNoBuildOver.size() > 0) {
+						    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+							    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
+							    				skipGen = true;
+								    		}
+						    			}
+					    				if (!skipGen) {
+					    					worldRef.setBlock(coords.posX, coords.posY, coords.posZ, id, meta, 2);
+					    				}
 					    				//System.out.println("post print - " + coords.posX + " - " + coords.posZ);
 					    				/*if (buildJob.customGenCallback != null) {
 					    					NBTTagCompound nbt = buildJob.customGenCallback.getInitNBTTileEntity();
@@ -371,7 +408,16 @@ public class BuildManager {
 					    				}*/
 					    			} else {
 					    				System.out.println("BUILDMOD SEVERE: schematic contains non existant blockID: " + id + ", replacing with blockID: " + placeholderID);
-					    				worldRef.setBlock(coords.posX, coords.posY, coords.posZ, placeholderID, 0, 2);
+					    				boolean skipGen = false;
+					    				if (buildJob.blockIDsNoBuildOver.size() > 0) {
+						    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+							    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
+							    				skipGen = true;
+								    		}
+						    			}
+					    				if (!skipGen) {
+					    					worldRef.setBlock(coords.posX, coords.posY, coords.posZ, placeholderID, 0, 2);
+					    				}
 					    			}
 					    			/*if (id != 0) {
 					    				boolean returnVal = Block.blocksList[id].rotateBlock(worldRef, coords.posX, coords.posY, coords.posZ, ForgeDirection.EAST);
@@ -477,7 +523,7 @@ public class BuildManager {
 			
 			int rotateMeta = meta & 4;
 			
-			System.out.println("dir: " + dir + ", meta: " + meta + ", rotateMeta: " + rotateMeta);
+			System.out.println("rotation: " + rotation + ", dir: " + dir + ", meta: " + meta + ", rotateMeta: " + rotateMeta);
 			
 			int fMeta = -1;
 

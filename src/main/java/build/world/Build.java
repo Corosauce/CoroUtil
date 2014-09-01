@@ -204,6 +204,8 @@ public class Build {
 		    	} else {
 		    		System.out.println("CRITICAL! BuildMod does not support version: " + getVersion());
 		    	}
+	    	} else {
+	    		System.out.println("TODO: a fallback lookup table for old block IDs to unlocalized names");
 	    	}
 	    	
 	    	System.out.println("TODO for BuildMod: verify 9 is accurate type to use, NBTBase defines type 9 as NBTTagList");

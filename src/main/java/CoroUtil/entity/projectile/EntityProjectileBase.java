@@ -2,6 +2,7 @@ package CoroUtil.entity.projectile;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import CoroUtil.entity.EntityThrowableUsefull;
@@ -49,7 +50,7 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 
 	@Override
 	protected void onImpact(MovingObjectPosition movingobjectposition) {
-		// TODO Auto-generated method stub
+		super.onImpact(movingobjectposition);
 
 	}
 
@@ -73,6 +74,14 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 		}
 		
 		super.onUpdate();
+	}
+	
+	@Override
+	public void readEntityFromNBT(NBTTagCompound par1nbtTagCompound) {
+		super.readEntityFromNBT(par1nbtTagCompound);
+		
+		//kill on reload
+		setDead();
 	}
 
 }

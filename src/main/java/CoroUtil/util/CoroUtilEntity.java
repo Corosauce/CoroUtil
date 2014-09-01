@@ -35,6 +35,15 @@ public class CoroUtilEntity {
         return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
     }
 	
+	public static Vec3 getTargetVector(EntityLivingBase parEnt, EntityLivingBase target) {
+    	double vecX = target.posX - parEnt.posX;
+    	double vecY = target.posY - parEnt.posY;
+    	double vecZ = target.posZ - parEnt.posZ;
+    	double dist = Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
+    	Vec3 vec3 = Vec3.createVectorHelper(vecX / dist, vecY / dist, vecZ / dist);
+    	return vec3;
+    }
+	
 	public static void moveTowards(Entity ent, Entity targ, float speed) {
 		double vecX = targ.posX - ent.posX;
 		double vecY = targ.posY - ent.posY;

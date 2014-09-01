@@ -1,11 +1,15 @@
 package CoroUtil.ability;
 
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Vec3;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 
 
 public class Ability {
@@ -16,6 +20,11 @@ public class Ability {
 	//- runtime state update (new tick state)
 	
 	//If ability gets interrupted for state, or goes to next tick, send an update, that tells client its on the next stage at the right time
+	
+	//New cooldown design intention: 
+	//Cooldown shouldnt be factored into isActive, setFinishedEntirely should be used as a cooldown starter
+	//this design change will let the inner AI system use other skills while this one is still cooling down, better management and less locking
+	//atm all abilities use 'setFinishedPerform' to cancel, but isActive isnt set to false, needs logic fix
 	
 	public EntityLivingBase owner; //this should be allowed to be null, entityless abilities should be possible
 	
@@ -33,7 +42,8 @@ public class Ability {
 	public int curTickCharge = 0;
 	public int curTickCooldown = 0;
 	
-	private boolean isActive = false;
+	private boolean isActive = false; //does not account for cooldown anymore
+	private boolean isCoolingDown = false;
 	public IAbilityUsageCallback callback;
 	
 	public static int TYPE_MELEE = 0;
@@ -45,6 +55,10 @@ public class Ability {
 	public boolean hasAppliedDamage = false;
 	public int usageCount = 0;
 	
+	//central particle use
+	@SideOnly(Side.CLIENT)
+	public ParticleBehaviorCharge particleBehavior;
+	
 	public Ability() {
 	}
 	
@@ -54,6 +68,16 @@ public class Ability {
 	}
 
 	public void tick() {
+		
+		//particle ticking
+		if (owner.worldObj.isRemote) {
+			if (particleBehavior == null) {
+				particleBehavior = new ParticleBehaviorCharge(Vec3.createVectorHelper(owner.posX, owner.posY, owner.posZ));
+				particleBehavior.sourceEntity = owner;
+			} else {
+				particleBehavior.tickUpdateList();
+			}
+		}
 		
 		//System.out.println("Ability.tick(), isRemote: " + owner.worldObj.isRemote + " - name: " + name + " - charge: " + curTickCharge + " - perform: " + curTickPerform + " - cooldown: " + curTickCooldown);
 		
@@ -65,6 +89,10 @@ public class Ability {
 				curTickPerform++;
 				tickPerform();
 			} else {
+				if (curTickCooldown == 0) {
+					//for performance callback trigger
+					setFinishedPerform();
+				}
 				if (curTickCooldown < ticksToCooldown) {
 					curTickCooldown++;
 					tickCooldown();
@@ -76,7 +104,10 @@ public class Ability {
 	}
 	
 	public void tickChargeUp() {
-		
+		if (particleBehavior != null) {
+			particleBehavior.curTick = curTickCharge;
+			particleBehavior.ticksMax = ticksToCharge;
+		}
 	}
 	
 	public void tickPerform() {
@@ -88,7 +119,12 @@ public class Ability {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public void tickRender(ModelBase model) {
+	public void tickRender(Render parRender) {
+		
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void tickRenderModel(ModelBase parModel) {
 		
 	}
 	
@@ -97,11 +133,22 @@ public class Ability {
 	}
 	
 	public void setFinishedPerform() {
+		System.out.println("perform finish - " + owner.worldObj.isRemote);
 		curTickPerform = ticksToPerform;
+		isActive = false;
+		isCoolingDown = true;
+		
+		//moved here so callbacks can release active used skill upon perform finish instead of cooldown finish
+		//its assumed the callback class checks for proper canActivate to prevent using a skill thats still cooling down
+		//if (isActiveOrCoolingDown()) {
+			//isActive = false; //make sure its set to false for sync info
+			if (callback != null) callback.abilityFinished(this);
+		//}
 	}
 	
 	public void setFinishedCooldown() {
 		curTickCooldown = ticksToCooldown;
+		isCoolingDown = false;
 	}
 	
 	//called from skill invoker if relevant target, for overriding in skills that have targets
@@ -117,16 +164,29 @@ public class Ability {
 		return isActive;
 	}
 	
+	public boolean isActiveOrCoolingDown() {
+		return isActive || (isCoolingDown/*curTickCooldown < ticksToCooldown && curTickCooldown != 0*/);
+	}
+	
+	public boolean canActivate() {
+		return !isActive && !isCoolingDown;
+	}
+	
+	public boolean canHitCancel(DamageSource parSource) {
+		return true;
+	}
+	
 	public void setFinishedEntirely() {
 		
 		//System.out.println("finished ability!");
 		
-		//prevent multiple callback firings
-		if (isActive) {
-			isActive = false; //make sure its set to false for sync info
+		//incase something bypasses setFinishedPerform()
+		if (isActiveOrCoolingDown()) {
 			if (callback != null) callback.abilityFinished(this);
 		}
+		
 		isActive = false;
+		isCoolingDown = false;
 		reset();
 	}
 	
@@ -167,6 +227,7 @@ public class Ability {
 		usageCount = nbt.getInteger("usageCount");
 		boolean wasActive = isActive;
 		isActive = nbt.getBoolean("isActive");
+		isCoolingDown = nbt.getBoolean("isCoolingDown");
 		if (!isActive && wasActive) setFinishedEntirely();
 		curTickCharge = nbt.getInteger("curTickCharge");
 		curTickPerform = nbt.getInteger("curTickPerform");
@@ -179,6 +240,7 @@ public class Ability {
 		nbt.setString("classname", this.getClass().getCanonicalName());
 		nbt.setInteger("usageCount", usageCount);
 		nbt.setBoolean("isActive", isActive);
+		nbt.setBoolean("isCoolingDown", isCoolingDown);
 		nbt.setInteger("curTickCharge", curTickCharge);
 		nbt.setInteger("curTickPerform", curTickPerform);
 		nbt.setInteger("curTickCooldown", curTickCooldown);

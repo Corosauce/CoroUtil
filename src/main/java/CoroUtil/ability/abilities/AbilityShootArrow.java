@@ -2,9 +2,13 @@ package CoroUtil.ability.abilities;
 
 import java.util.Random;
 
+import javax.vecmath.Vector2d;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
@@ -27,18 +31,15 @@ public class AbilityShootArrow extends Ability {
 	public int projectileType = 0;
 	public boolean switchToRangedSlot = true;
 	
-	@SideOnly(Side.CLIENT)
-	public ParticleBehaviorCharge particleBehavior;
-	
 	public AbilityShootArrow() {
 		super();
 		this.name = "ShootArrow";
-		this.ticksToCharge = 20;
-		this.ticksToPerform = 5;
-		this.ticksToCooldown = 10;
+		this.ticksToCharge = 40;
+		this.ticksToPerform = 1;
+		this.ticksToCooldown = 1;
 		
 		//5-35
-		this.bestDist = 20;
+		this.bestDist = 25;
 		this.bestDistRange = 30;
 	}
 	
@@ -64,8 +65,8 @@ public class AbilityShootArrow extends Ability {
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void tickRender(ModelBase model) {
-		super.tickRender(model);
+	public void tickRender(Render parRender) {
+		super.tickRender(parRender);
 		
 		int curTick = curTickPerform;
 		//curTick = ticksToPerform/2;
@@ -89,39 +90,10 @@ public class AbilityShootArrow extends Ability {
 	}
 	
 	@Override
-	public void tick() {
-
-		if (owner.worldObj.isRemote) {
-			if (particleBehavior == null) {
-				//if (projectileType == EntityProjectileBase.PRJTYPE_FIREBALL) {
-				particleBehavior = new ParticleBehaviorCharge(Vec3.createVectorHelper(owner.posX, owner.posY, owner.posZ));
-				//}
-				particleBehavior.sourceEntity = owner;
-			} else {
-				particleBehavior.tickUpdateList();
-			}
-		}
-		
-		
-		
-		super.tick();
-	}
-	
-	@Override
 	public void tickChargeUp() {
 		super.tickChargeUp();
 		
-		//TEMP!
-		this.ticksToCharge = 40;
-		this.ticksToPerform = 1;
-		this.ticksToCooldown = 1;
-		
 		if (owner.worldObj.isRemote) {
-			
-			if (particleBehavior != null) {
-				particleBehavior.curTick = curTickCharge;
-				particleBehavior.ticksMax = ticksToCharge;
-			}
 			
 			Random rand = new Random();
 			//double speed = 0.3D;
@@ -142,8 +114,10 @@ public class AbilityShootArrow extends Ability {
 		        	double speedInheritFactor = 0.5D;
 		        	
 		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().theWorld, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
-		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
 		        	particleBehavior.initParticle(entityfx);
+		        	float f = 0.0F + (rand.nextFloat() * 0.4F);
+		        	entityfx.setRBGColorF(f, f, f);
 		        	entityfx.callUpdatePB = false;
 					ExtendedRenderer.rotEffRenderer.addEffect(entityfx);
 					particleBehavior.particles.add(entityfx);
@@ -161,9 +135,10 @@ public class AbilityShootArrow extends Ability {
 			}
 			
 			//temp hold in position
-			owner.motionX = 0;
-			owner.motionY = 0;
-			owner.motionZ = 0;
+			//change!
+			owner.motionX *= 0.3F;
+			owner.motionY *= 0.3F;
+			owner.motionZ *= 0.3F;
 		}
 	}
 	
@@ -174,10 +149,11 @@ public class AbilityShootArrow extends Ability {
 
 	@Override
 	public void tickPerform() {
-		//TEMP!!!
-		//this.ticksToPerform = 15;
-		//this.ticksToCooldown = 2;
 		
+		if (target == null) {
+			setFinishedPerform();
+			return;
+		}
 		
 		//System.out.println("isRemote: " + owner.worldObj.isRemote);
 		if (owner.worldObj.isRemote) {
@@ -193,6 +169,9 @@ public class AbilityShootArrow extends Ability {
 					hasAppliedDamage = true;
 					//System.out.println("hit");
 					
+					if (owner instanceof EntityLiving) {
+						((EntityLiving) owner).faceEntity(target, 180, 180);
+					}
 
 					if (target instanceof EntityLivingBase) {
 						EntityProjectileBase prj = null;

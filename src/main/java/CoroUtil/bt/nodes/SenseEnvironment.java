@@ -57,6 +57,9 @@ public class SenseEnvironment extends LeafAction {
 			}
 		}
 		
+		blackboard.shouldChaseTarget.setValue(blackboard.agent.profile.shouldChaseTarget());
+		blackboard.shouldWander.setValue(blackboard.agent.profile.shouldWander());
+		
 		if (!safetyCheck()) {
 			blackboard.shouldTrySurvival.setValue(true);
 			

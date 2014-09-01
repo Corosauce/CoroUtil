@@ -61,7 +61,7 @@ public class PacketHelper {
 		}
 	}
 	
-	public static FMLProxyPacket createPacketForNBTHandler(String parChannel, NBTTagCompound parNBT) {
+	public static FMLProxyPacket createPacketForNBTHandler(String parChannel, String packetChannel, NBTTagCompound parNBT) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
 		
@@ -80,7 +80,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+		return new FMLProxyPacket(byteBuf, packetChannel/*CoroAI.eventChannelName*/);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWClient(TileEntity tEnt, String name, Object val) {

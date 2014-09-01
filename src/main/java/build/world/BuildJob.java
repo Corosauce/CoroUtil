@@ -1,5 +1,6 @@
 package build.world;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +22,8 @@ public class BuildJob {
 	public int timeout = 0;
 
 	public int pass = 0;
-	public List<Block> blockIDsSkipFirstPass = new LinkedList();
+	public List<Block> blockIDsSkipFirstPass = new ArrayList();
+	public List<Block> blockIDsNoBuildOver = new ArrayList();
 	
 	public boolean build_active = false;
 	public int build_currentTick = 0;
@@ -102,7 +104,9 @@ public class BuildJob {
 	
 	public void setDirection(int dir) {
 		direction = dir;
-		rotation = (dir * 90) + 180;
+		
+		//this used to have + 180 on it, i guess to fix something with old rotation, its removed now
+		rotation = (dir * 90)/* + 180*/;
 	}
 	
 	public void load() {

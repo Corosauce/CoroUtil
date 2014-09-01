@@ -91,8 +91,7 @@ public class EventHandlerPacket {
             			cb.clipboardData.setCornerPosition(x, y, z);
             			cb.clipboardData.dim = entP.worldObj.provider.dimensionId;
             			BuildJob bj = new BuildJob(BuildServerTicks.buildMan.activeBuilds.size(), cb.clipboardData);
-                		bj.direction = dir;
-            			bj.rotation = (bj.direction * 90) + 180;
+                		bj.setDirection(dir);
             			System.out.println("build: " + x + ", " + y + ", " + z + ", dir:" + bj.direction);
             			bj.useRotationBuild = true;
             			bj.useFirstPass = false;

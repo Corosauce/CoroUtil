@@ -30,22 +30,10 @@ public class AIEventHandler {
 	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
     {
 		
-		Entity ent = par1DamageSource.getEntity();
-		if (ent != null && agent.isEnemy(ent)) {
-			if (agent.blackboard.getTarget() == null) {
-				agent.blackboard.setTarget(ent);
-			}
-
-			for (Map.Entry<String, Ability> entry : agent.profile.abilities.entrySet()) {
-				if (entry.getValue().isActive()) {
-					entry.getValue().setFinishedPerform();
-				}
-			}
-			agent.profile.syncAbilitiesFull(false);
-		}
+		return agent.profile.hookHitBy(par1DamageSource, par2);
 		
 		//dont cancel
-		return false;
+		//return false;
     }
 	
 	//Internal Events

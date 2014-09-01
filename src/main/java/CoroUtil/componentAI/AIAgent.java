@@ -24,12 +24,15 @@ import CoroUtil.OldUtil;
 import CoroUtil.componentAI.jobSystem.JobManager;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
-import CoroUtil.entity.EntityTropicalFishHook;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ManagedLocation;
 
 public class AIAgent {
 
@@ -121,6 +124,10 @@ public class AIAgent {
 	public double maxDistanceFromHome = 96;
 	public boolean facingWater = false;
 	public boolean wasInWater = false;
+	
+	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
+  	public ChunkCoordinates coordsManagedLocation;
+  	public int locationMemberID = -1;
 	
 	//Diplomatic fields
 	public boolean dipl_hostilePlayer = false;
@@ -234,6 +241,37 @@ public class AIAgent {
 			homeY = (int)Math.floor(ent.posY);
 			homeZ = (int)Math.floor(ent.posZ);
 		}
+		
+		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
+				ManagedLocation ml = getManagedLocation();
+				if (ml != null) {
+					//unitType is mostly unused atm
+					ml.addEntity("member", ent);
+				} else {
+					//this should be expected, remove this sysout once you are sure this only happens at expected times
+					CoroAI.dbg("AIBT Entitys home has been destroyed!");
+				}
+	}
+	
+	public ManagedLocation getManagedLocation() {
+		if (coordsManagedLocation != null) {
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
+			return ml;
+		}
+		return null;
+	}
+	
+	public void setManagedLocation(ChunkCoordinates parLocation) {
+		coordsManagedLocation = parLocation;
+	}
+	
+	public void setManagedLocation(ManagedLocation parLocation) {
+		coordsManagedLocation = parLocation.spawn;
+	}
+	
+	public void setLocationMemberID(int parID) {
+		locationMemberID = parID;
 	}
 	
 	public boolean notPathing() {
@@ -1015,6 +1053,7 @@ public class AIAgent {
 		this.entInv.nbtRead(var1.getCompoundTag("inventory"));
 		spawnedOrNBTReloadedInit();
 		entID = var1.getInteger("ICoroAI_entID");
+		locationMemberID = var1.getInteger("locationMemberID");
 		homeX = var1.getInteger("homeX");
 		homeY = var1.getInteger("homeY");
 		homeZ = var1.getInteger("homeZ");
@@ -1027,6 +1066,7 @@ public class AIAgent {
 	public void writeEntityToNBT(NBTTagCompound var1) {
 		var1.setTag("inventory", entInv.nbtWrite());
 		var1.setInteger("ICoroAI_entID", entID);
+		var1.setInteger("locationMemberID", locationMemberID);
 		var1.setInteger("homeX", homeX);
 		var1.setInteger("homeY", homeY);
 		var1.setInteger("homeZ", homeZ);
