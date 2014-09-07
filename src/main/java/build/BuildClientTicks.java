@@ -62,6 +62,16 @@ public class BuildClientTicks
     		}
     	}
     	
+    	
+    	//TEMP!
+    	try {
+    		if (clipboardData != null) {
+    			Overlays.renderBuildOutline(clipboardData, direction);
+    		}
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    	}
+    	
     	if (buildState == EnumBuildState.PLACE) {
     		//EntityPlayer player = FMLClientHandler.instance().getClient().thePlayer;
     		//int l = MathHelper.floor_double((double)((-player.rotationYaw-45) * 4.0F / 360.0F)/* + 0.5D*/) & 3;
@@ -112,7 +122,7 @@ public class BuildClientTicks
 
     public void onTickInGUI(GuiScreen guiscreen)
     {
-        //TODO: Your Code Here
+        
     }
     
     public boolean wasKeyDown = false;
@@ -222,7 +232,6 @@ public class BuildClientTicks
 			clipboardData.recalculateLevelSize(sx, sy, sz, ex, ey, ez, true);
 			clipboardData.scanLevelToData(FMLClientHandler.instance().getClient().theWorld);
 			clipboardData.writeNBT();
-			//System.out.println("TODO: BuildMod clipboard packet");
 			BuildMod.eventChannel.sendToServer(EventHandlerPacket.getBuildCommandPacket(clipboardData, 0, -1));
 			//FMLClientHandler.instance().getClient().thePlayer.sendQueue.addToSendQueue(BuildPacketHandler.getBuildCommandPacket(clipboardData, 0, -1));
 			
@@ -241,7 +250,6 @@ public class BuildClientTicks
     		
     		//REWIRE TO SEND ACTION TO SERVER INSTEAD
     		
-    		//System.out.println("TODO: BuildMod clipboard packet");
     		BuildMod.eventChannel.sendToServer(EventHandlerPacket.getBuildCommandPacket(clipboardData, 1, direction));
     		//FMLClientHandler.instance().getClient().thePlayer.sendQueue.addToSendQueue(BuildPacketHandler.getBuildCommandPacket(clipboardData, 1, direction));
     		

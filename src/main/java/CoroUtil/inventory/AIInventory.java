@@ -30,7 +30,7 @@ public class AIInventory {
 	public InventoryWrapper inventory;
 	
 	public int slot_Active = 0;
-	public int slot_Count = 3;
+	public int slot_Count = 3 + 10;
 	
 	//profiled stuff? or standard?
 	public static int slot_Melee = 0;
@@ -131,7 +131,7 @@ public class AIInventory {
 	}
 	
 	public void performLeftClick(Entity ent, float dist) {
-		System.out.println("CHECK: performLeftClick in AIInventory");
+		//System.out.println("CHECK: performLeftClick in AIInventory");
 		ItemStack is = getActiveItem();//inventory.getStackInSlot(slot_Active);
 		if (is != null) {
 			Item item = is.getItem();
@@ -151,7 +151,7 @@ public class AIInventory {
 	}
 
 	public void performRightClick() {
-		System.out.println("CHECK: performRightClick in AIInventory");
+		//System.out.println("CHECK: performRightClick in AIInventory");
 		ItemStack is = getActiveItem();//inventory.getStackInSlot(slot_Active);
 		if (is != null) {
 			Item item = is.getItem();

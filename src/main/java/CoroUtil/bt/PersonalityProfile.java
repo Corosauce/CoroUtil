@@ -286,7 +286,7 @@ public class PersonalityProfile {
 	
 	public void initDefaultProfile() {
 		btSurviving.add(new Flee(btSurviving, agent.entInt, agent.blackboard));
-		btIdling.add(new Wander(btIdling, agent.entInt, agent.blackboard, 8));
+		//btIdling.add(new Wander(btIdling, agent.entInt, agent.blackboard, 8));
 		
 		//temp combat movement, becomes not so temp!
 		btAttacking.add(new TrackTarget(null, agent.entInt, agent.blackboard));

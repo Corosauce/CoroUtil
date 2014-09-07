@@ -147,7 +147,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 	     		//System.out.println(System.currentTimeMillis() + " - no owner, fishEntity:" + ((c_PlayerProxy)this.angler).fishEntity);
 	     		this.setDead();
 	     	}
-      }*/ else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent().useInv) {
+      }*/ else if (angler instanceof ICoroAI && ((ICoroAI)angler).getAIAgent() != null) {
     	  setFishEntity(this);
       }
       

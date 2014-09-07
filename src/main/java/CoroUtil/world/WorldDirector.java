@@ -13,15 +13,19 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.event.WorldEvent;
 import CoroUtil.pathfinding.PathPointEx;
 import CoroUtil.util.CoroUtilFile;
+import CoroUtil.world.grid.chunk.ChunkDataPoint;
+import CoroUtil.world.grid.chunk.PlayerDataGrid;
 import CoroUtil.world.location.ManagedLocation;
 
 public class WorldDirector {
@@ -31,7 +35,7 @@ public class WorldDirector {
 	public int dimID = -1;
 	public String modID = "modID";
 	public String type = "default"; //for multiple world directors per mod per dimension (just in case), not actually supported atm, id need another hashmap layer...
-	private World world;
+	//private World world;
 	
 	public int cachedTopBlockHome = -1;
 	private NBTTagCompound extraData = new NBTTagCompound(); //this worlds extra data, excluding the read in non nbt stuff
@@ -59,7 +63,7 @@ public class WorldDirector {
 	
 	public World getWorld() {
 		//if (world == null) {
-			world = DimensionManager.getWorld(dimID);
+			World world = DimensionManager.getWorld(dimID);
 		//}
 		return world;
 	}
@@ -119,6 +123,16 @@ public class WorldDirector {
 			ml.tickUpdate();
 		}
 		
+		World world = getWorld();
+		
+		//update occupance chunk data for each player
+		if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
+			for (int i = 0; i < world.playerEntities.size(); i++) {
+				EntityPlayer entP = (EntityPlayer) world.playerEntities.get(i);
+				ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor_double(entP.posX) / 16, MathHelper.floor_double(entP.posZ) / 16);
+				cdp.addToPlayerActivityTime(entP.getGameProfile().getId(), PlayerDataGrid.playerTimeSpentUpdateInterval);
+			}
+		}
 	}
 	
 	public boolean isCoordAndNearAreaNaturalBlocks(World parWorld, int x, int y, int z, int range) {

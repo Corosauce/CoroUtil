@@ -175,8 +175,8 @@ public class InventoryWrapper implements IInventory {
                         p_70441_1_.stackSize = this.storePartialItemStack(p_70441_1_);
                     }
                     while (p_70441_1_.stackSize > 0 && p_70441_1_.stackSize < i);
-
                     /*if (p_70441_1_.stackSize == i && this.player.capabilities.isCreativeMode)
+
                     {
                         p_70441_1_.stackSize = 0;
                         return true;

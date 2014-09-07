@@ -59,7 +59,7 @@ public class EventHandlerPacket {
 			
 			String command = nbt.getString("command");
 			
-			System.out.println("CoroUtil packet command from server: " + command);
+			//System.out.println("CoroUtil packet command from server: " + command);
 			
 			if (command.equals("CoroAI_Inv")) {
 				int entID = nbt.getInteger("entID");
@@ -122,7 +122,7 @@ public class EventHandlerPacket {
 			
 			String command = nbt.getString("command");
 			
-			System.out.println("CoroUtil packet command from client: " + command);
+			//System.out.println("CoroUtil packet command from client: " + command);
 			
 			if (command.equals("CoroAI_TEntCmd")) {
 				int dimID = nbt.getInteger("dimID");

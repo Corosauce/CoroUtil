@@ -221,6 +221,8 @@ public class PathNavigateCustom
             if (this.canNavigate())
             {
                 this.pathFollow();
+            } else {
+            	//System.out.println(this.getEntityPosition());
             }
 
             if (!this.noPath())
@@ -240,13 +242,37 @@ public class PathNavigateCustom
         Vec3 vec3 = this.getEntityPosition();
         int i = this.currentPath.getCurrentPathLength();
 
-        for (int j = this.currentPath.getCurrentPathIndex(); j < this.currentPath.getCurrentPathLength(); ++j)
-        {
-            if (this.currentPath.getPathPointFromIndex(j).yCoord != (int)vec3.yCoord)
-            {
-                i = j;
-                break;
-            }
+        double adjY = 0;
+        
+        //so, the pathnodes were in the water, but they should be out of the water (vanilla pathfinder maybe puts them above water, but mine puts them in water)
+        //this code below patches the issue, saw successfull results while live debugging
+        //this introduces a new problem, tricks the AI into thinking it can get out of water where theres 1 block higher than water blocking him
+        //make AI able to hop/climb out of water with a 1 high wall around it to fix
+        
+        //System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
+        //if (MathHelper.floor_double(vec3.zCoord) > -17 && MathHelper.floor_double(vec3.zCoord) < -13) {
+        	//System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
+        	
+        	PathPoint pp = this.currentPath.getPathPointFromIndex(this.currentPath.getCurrentPathIndex());
+        	Block block = this.theEntity.worldObj.getBlock(pp.xCoord, pp.yCoord, pp.zCoord);
+        	//System.out.println("block type for next node: " + block);
+        	
+        	if (block.getMaterial() == Material.water || block.getMaterial() == Material.lava) {
+        		//System.out.println("adjusting water based node pos");
+        		adjY = 1;
+        	}
+        //}
+        
+        //make this path trimming code only run when our fix isnt running, so it doesnt break water nav correction
+        if (adjY == 0) {
+	        for (int j = this.currentPath.getCurrentPathIndex(); j < this.currentPath.getCurrentPathLength(); ++j)
+	        {
+	            if (this.currentPath.getPathPointFromIndex(j).yCoord != (int)vec3.yCoord)
+	            {
+	                i = j;
+	                break;
+	            }
+	        }
         }
 
         float f = this.theEntity.width * this.theEntity.width;
@@ -257,7 +283,21 @@ public class PathNavigateCustom
             if (vec3.squareDistanceTo(this.currentPath.getVectorFromIndex(this.theEntity, k)) < (double)f)
             {
                 this.currentPath.setCurrentPathIndex(k + 1);
+            } else {
+
+	            /*double dist = Vec3.createVectorHelper(vec3.xCoord, vec3.yCoord, vec3.zCoord).squareDistanceTo(this.currentPath.getVectorFromIndex(this.theEntity, k));
+	            if (dist < 4D) {
+	            	System.out.println("dist: " + dist + " - " + vec3.xCoord + " - " + vec3.zCoord);
+	            }
+	            
+	            //water nav help
+	            if (dist < (double)f)
+	            {
+	            	System.out.println("trigger water nav help");
+	                this.currentPath.setCurrentPathIndex(k + 1);
+	            }*/
             }
+            
         }
 
         k = MathHelper.ceiling_float_int(this.theEntity.width);
@@ -345,6 +385,7 @@ public class PathNavigateCustom
      */
     private boolean canNavigate()
     {
+    	//System.out.println("is in fluid: " + this.isInFluid() + " - " + this.getEntityPosition());
         return this.canFly || this.canSwimInWater || this.theEntity.onGround || (this.canSwimOnSurface && this.isInFluid());
     }
 
@@ -353,7 +394,7 @@ public class PathNavigateCustom
      */
     private boolean isInFluid()
     {
-        return this.theEntity.isInWater() || this.theEntity.handleLavaMovement();
+        return /*true*//*this.theEntity.isInsideOfMaterial(Material.water)*/this.theEntity.isInWater() || this.theEntity.handleLavaMovement();
     }
 
     /**

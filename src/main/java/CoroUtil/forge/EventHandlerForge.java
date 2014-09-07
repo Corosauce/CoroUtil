@@ -3,6 +3,8 @@ package CoroUtil.forge;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
@@ -10,6 +12,7 @@ import net.minecraftforge.event.world.WorldEvent.Save;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandlerForge {
@@ -53,5 +56,22 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void breakBlockPlayer(BreakEvent event) {
 		PlayerQuestManager.i().onEvent(event);
+	}
+	
+	@SubscribeEvent
+	public void blockPlayerInteract(PlayerInteractEvent event) {
+		if (!event.world.isRemote) {
+			try {
+				
+				//an event is fired where its air and has no chunk X or Z, cancel this
+				if (event.action == Action.RIGHT_CLICK_AIR) return;
+				
+				ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.x / 16, event.z / 16);
+				cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
+				
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 }

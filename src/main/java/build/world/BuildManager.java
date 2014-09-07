@@ -26,6 +26,11 @@ import cpw.mods.fml.common.FMLCommonHandler;
 
 //This class works nice and fast, unless the generated thing is hovering in the air. Lighting calculations going overboard perhaps
 //maybe clear area top down to make air clearing pass faster?
+
+//observations for rotateNew when building schematic with rotateNew then placing entities with rotateNew (tropicraft new village):
+//- if length AND width are both odd, rotation 1 is 1 block off for an axis
+//- if length and width are both even, rotations appear perfect (tested rot 1 against 0)
+//- given that, its assumed that either length or width with odd value will cause issues
 public class BuildManager {
 
 	public List<BuildJob> activeBuilds;

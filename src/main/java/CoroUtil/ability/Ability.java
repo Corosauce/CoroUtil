@@ -133,7 +133,7 @@ public class Ability {
 	}
 	
 	public void setFinishedPerform() {
-		System.out.println("perform finish - " + owner.worldObj.isRemote);
+		//System.out.println("perform finish - " + owner.worldObj.isRemote);
 		curTickPerform = ticksToPerform;
 		isActive = false;
 		isCoolingDown = true;

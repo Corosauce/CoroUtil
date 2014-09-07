@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockEnchantmentTable;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -23,8 +21,10 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.ChunkCoordinatesSize;
 import CoroUtil.DimensionChunkCache;
+import CoroUtil.IChunkLoader;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
@@ -329,11 +329,32 @@ public class PFQueue implements Runnable {
 						    			        points[0] = new PathPointEx(queue.get(0).x, queue.get(0).y, queue.get(0).z);
 						    			        setPath(new PathEntityEx(points));*/
 						    			        
-						    			        if (queue.get(0).sourceEntity instanceof c_IEnhPF) {
+					    						/*if (queue.get(0).sourceEntity instanceof IChunkLoader) {
+						    			        	System.out.println(queue.get(0).sourceEntity);
+						    			        }*/
+					    						
+						    			        /*if (queue.get(0).sourceEntity instanceof c_IEnhPF) {
 						    			        	((c_IEnhPF)queue.get(0).sourceEntity).faceCoord(queue.get(0).dest.posX, queue.get(0).dest.posY, queue.get(0).dest.posZ, 180F, 180F);
 						    			        } else if (queue.get(0).sourceEntity instanceof ICoroAI) {
 						    			        	((ICoroAI)queue.get(0).sourceEntity).getAIAgent().faceCoord(queue.get(0).dest.posX, queue.get(0).dest.posY, queue.get(0).dest.posZ, 180F, 180F);	
-						    			        }
+						    			        }*/
+						    			        
+					    						//get aim coords for best direction, use below for partial pathfind
+						    			        Entity ent = queue.get(0).sourceEntity;
+						    			        int x = queue.get(0).dest.posX;
+						    			        int y = queue.get(0).dest.posY;
+						    			        int z = queue.get(0).dest.posZ;
+						    			        
+						    			        double d = x+0.5F - ent.posX;
+						    			        double d2 = z+0.5F - ent.posZ;
+						    			        double d1;
+						    			        d1 = y+0.5F - (ent.posY + (double)ent.getEyeHeight());
+						    			        
+						    			        double d3 = MathHelper.sqrt_double(d * d + d2 * d2);
+						    			        float f2 = (float)((Math.atan2(d2, d) * 180D) / 3.1415927410125732D) - 90F;
+						    			        float f3 = (float)(-((Math.atan2(d1, d3) * 180D) / 3.1415927410125732D));
+						    			        float rotationPitch = -f3;//-ent.updateRotation(rotationPitch, f3, 180D);
+						    			        float rotationYaw = f2;//updateRotation(rotationYaw, f2, 180D);
 						    			        
 						    			        EntityLiving center = (EntityLiving)queue.get(0).sourceEntity;
 						    			        
@@ -342,9 +363,9 @@ public class PFQueue implements Runnable {
 						    			        float look = rand.nextInt(90)-45;
 						    			        //int height = 10;
 						    			        double dist = rand.nextInt(26)+(queue.get(0).retryState * 6);
-						    			        int gatherX = (int)Math.floor(center.posX + ((double)(-Math.sin((center.rotationYaw+look) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
+						    			        int gatherX = (int)Math.floor(center.posX + ((double)(-Math.sin((rotationYaw+look) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
 						    			        int gatherY = (int)center.posY;//Math.floor(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
-						    			        int gatherZ = (int)Math.floor(center.posZ + ((double)(Math.cos((center.rotationYaw+look) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
+						    			        int gatherZ = (int)Math.floor(center.posZ + ((double)(Math.cos((rotationYaw+look) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
 						    			        
 						    			        Block block = getBlock(gatherX, gatherY, gatherZ);
 						    			        int tries = 0;
@@ -352,7 +373,7 @@ public class PFQueue implements Runnable {
 						    			        	int offset = -5;
 							    			        
 							    			        while (tries < 30) {
-							    			        	if (CoroUtilBlock.isAir(block)) {
+							    			        	if (CoroUtilBlock.isAir(block) || !block.isSideSolid(worldMap, gatherX, gatherY, gatherZ, ForgeDirection.UP)) {
 							    			        		break;
 							    			        	}
 							    			        	gatherY += offset++;
@@ -360,10 +381,10 @@ public class PFQueue implements Runnable {
 							    			        	tries++;
 							    			        }
 						    			        } else {
-						    			        	int offset = 0;
+						    			        	//int offset = 0;
 						    			        	while (tries < 30) {
-						    			        		if (!CoroUtilBlock.isAir(block)) break;
-						    			        		gatherY -= offset++;
+						    			        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(worldMap, gatherX, gatherY, gatherZ, ForgeDirection.UP)) break;
+						    			        		gatherY -= 1;//offset++;
 						    			        		block = getBlock(gatherX, gatherY, gatherZ);
 							    			        	tries++;
 						    			        	}
@@ -1460,6 +1481,8 @@ public class PFQueue implements Runnable {
                             	return 1;
                             }*/
                             
+                            //note...... an entity was unable to use stairs with tallgrass on it, even with this code here, wtf?
+                            //adding isSideSolid checks to the partial pathing part possible fixed this, saw an entity path through 2 high tallgrass this time
                             if (var11 == Material.circuits || var11 == Material.snow || var11 == Material.plants) {
                             	return 1;
                             }
@@ -1476,6 +1499,7 @@ public class PFQueue implements Runnable {
                             	return -2;
                             }
                             
+                            //note, vanilla Pathfinder uses different values for this now, might cause issues alternating between 2 pathfinders...
                             if(var11 == Material.water) {
                             	if (parJob.useSwimPathfinding) {
                             		return 1;

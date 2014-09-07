@@ -144,7 +144,7 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 	}
 	
 	public void abilityFinish() {
-		System.out.println("callback finished");
+		//System.out.println("callback finished");
 		//activeComboIndex = -1;
 		activeIsDefault = false;
 		activeAbility = null;

@@ -1,7 +1,11 @@
 package CoroUtil.world.grid.chunk;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -38,6 +42,10 @@ public class ChunkDataPoint
     //runtime instance data
     public long lastTickTime; //uses gettotalworldtime
     public int countEntitiesEnemy = -1;
+    //activityValue per player UUID
+    private HashMap<UUID, PlayerDataGrid> lookupPlayersToActivity = new HashMap<UUID, PlayerDataGrid>();
+    public PlayerDataGrid playerDataForAll = new PlayerDataGrid();
+    //public long playerActivityTotal = 0;
     
     public Class enemyClass = EntityMob.class;
     
@@ -150,6 +158,20 @@ public class ChunkDataPoint
     	lastTickTime = nbt.getLong("lastTickTime");
     	spawnableType = nbt.getInteger("spawnableType");
     	countEntitiesEnemy = nbt.getInteger("countEntitiesEnemy");
+    	NBTTagCompound nbtListPlayers = nbt.getCompoundTag("listPlayers");
+    	Iterator it = nbtListPlayers.func_150296_c().iterator();
+    	while (it.hasNext()) {
+    		String entryName = (String) it.next();
+    		NBTTagCompound entry = nbtListPlayers.getCompoundTag(entryName);
+    		UUID uuid = UUID.fromString(entry.getString("UUID"));
+    		PlayerDataGrid playerData = new PlayerDataGrid();
+    		playerData.nbtRead(entry.getCompoundTag("playerData"));
+    		//long activityVal = entry.getLong("activityVal");
+    		
+    		lookupPlayersToActivity.put(uuid, playerData);
+    	}
+    	
+    	playerDataForAll.nbtRead(nbt.getCompoundTag("playerDataForAll"));
     	/*xCoord = nbt.getInteger("xCoord");
     	yCoord = nbt.getInteger("yCoord");  -- read in from init
     	zCoord = nbt.getInteger("zCoord");*/
@@ -162,7 +184,20 @@ public class ChunkDataPoint
     	nbt.setInteger("spawnableType", spawnableType);
     	nbt.setInteger("countEntitiesEnemy", countEntitiesEnemy);
     	
+    	NBTTagCompound nbtListPlayers = new NBTTagCompound();
+    	int count = 0;
+    	for (Map.Entry<UUID, PlayerDataGrid> entry : lookupPlayersToActivity.entrySet()) {
+    		NBTTagCompound nbtEntry = new NBTTagCompound();
+    		nbtEntry.setString("UUID", entry.getKey().toString());
+    		nbtEntry.setTag("playerData", entry.getValue().nbtWrite());
+    		//nbtEntry.setLong("activityVal", entry.getValue());
+    		
+    		//a taglist might be more efficient on space....
+    		nbtListPlayers.setTag("entry_" + count++, nbtEntry);
+    	}
+    	nbt.setTag("listPlayers", nbtListPlayers);
     	
+    	nbt.setTag("playerDataForAll", playerDataForAll.nbtWrite());
     	
     	nbt.setInteger("xCoord", xCoord);
     	nbt.setInteger("yCoord", yCoord);
@@ -202,5 +237,35 @@ public class ChunkDataPoint
             }
         }
     	return list;
+    }
+    
+    public PlayerDataGrid getPlayerData(UUID uuid) {
+    	PlayerDataGrid playerData = lookupPlayersToActivity.get(uuid);
+    	if (playerData == null) {
+    		playerData = new PlayerDataGrid();
+    		lookupPlayersToActivity.put(uuid, playerData);
+    	}
+    	return playerData;
+    }
+    
+    public void addToPlayerActivityTime(UUID uuid, long parVal) {
+    	playerDataForAll.playerActivityTimeSpent += parVal;
+    	playerDataForAll.playerActivityLastUpdated = grid.world.getTotalWorldTime();
+    	if (uuid != null) {
+    		getPlayerData(uuid).playerActivityTimeSpent += parVal;
+    		getPlayerData(uuid).playerActivityLastUpdated = grid.world.getTotalWorldTime();
+    		System.out.println("setting player activity time value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityTimeSpent);
+    	}
+    }
+    
+    public void addToPlayerActivityInteract(UUID uuid, long parVal) {
+    	playerDataForAll.playerActivityInteraction += parVal;
+    	playerDataForAll.playerActivityLastUpdated = grid.world.getTotalWorldTime();
+    	if (uuid != null) {
+    		getPlayerData(uuid).playerActivityInteraction += parVal;
+    		getPlayerData(uuid).playerActivityLastUpdated = grid.world.getTotalWorldTime();
+    		System.out.println("setting player activity interaction value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityInteraction);
+    	}
+    	
     }
 }

@@ -85,10 +85,10 @@ public class ChunkDataGrid
     public void readFromFile() {
 		try {
 			
-			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "epoch" + File.separator;
+			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
 			
-			if ((new File(saveFolder + "EpochChunkDataDim_" + world.provider.dimensionId + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "EpochChunkDataDim_" + world.provider.dimensionId + ".dat"));
+			if ((new File(saveFolder + "ChunkDataDim_" + world.provider.dimensionId + ".dat")).exists()) {
+				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.dimensionId + ".dat"));
 				
 				/*Collection playerDataCl = data.getTags();
 				Iterator it = playerDataCl.iterator();*/
@@ -127,11 +127,11 @@ public class ChunkDataGrid
 				data.setTag(""+bdp.hash, bdp.writeToNBT());
 			}
     		
-    		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "epoch" + File.separator;
+    		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
     		
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
-    		FileOutputStream fos = new FileOutputStream(saveFolder + "EpochChunkDataDim_" + world.provider.dimensionId + ".dat");
+    		FileOutputStream fos = new FileOutputStream(saveFolder + "ChunkDataDim_" + world.provider.dimensionId + ".dat");
 	    	CompressedStreamTools.writeCompressed(data, fos);
 	    	fos.close();
 			
