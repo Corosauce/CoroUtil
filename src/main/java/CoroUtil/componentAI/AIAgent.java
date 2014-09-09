@@ -30,6 +30,7 @@ import CoroUtil.forge.CoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ManagedLocation;
@@ -243,14 +244,14 @@ public class AIAgent {
 		}
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
-				ManagedLocation ml = getManagedLocation();
-				if (ml != null) {
-					//unitType is mostly unused atm
-					ml.addEntity("member", ent);
-				} else {
-					//this should be expected, remove this sysout once you are sure this only happens at expected times
-					CoroAI.dbg("AIBT Entitys home has been destroyed!");
-				}
+		ManagedLocation ml = getManagedLocation();
+		if (ml != null) {
+			//unitType is mostly unused atm
+			ml.addEntity("member", ent);
+		} else {
+			//this should be expected, remove this sysout once you are sure this only happens at expected times
+			CoroAI.dbg("AIAgent Entitys home has been destroyed or never had one set!");
+		}
 	}
 	
 	public ManagedLocation getManagedLocation() {
@@ -1051,7 +1052,6 @@ public class AIAgent {
 	
 	public void readEntityFromNBT(NBTTagCompound var1) {
 		this.entInv.nbtRead(var1.getCompoundTag("inventory"));
-		spawnedOrNBTReloadedInit();
 		entID = var1.getInteger("ICoroAI_entID");
 		locationMemberID = var1.getInteger("locationMemberID");
 		homeX = var1.getInteger("homeX");
@@ -1061,6 +1061,10 @@ public class AIAgent {
 		if (!tameName.equals("")) {
 			jobMan.getPrimaryJob().tamable.tameBy(tameName);
 		}
+		
+		if (var1.hasKey("coordsManagedLocationX")) coordsManagedLocation = CoroUtilNBT.readCoords("coordsManagedLocation", var1);
+		
+		spawnedOrNBTReloadedInit();
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound var1) {
@@ -1071,6 +1075,8 @@ public class AIAgent {
 		var1.setInteger("homeY", homeY);
 		var1.setInteger("homeZ", homeZ);
 		var1.setString("tamedByUser", jobMan.getPrimaryJob().tamable.owner);
+		
+		if (coordsManagedLocation != null) CoroUtilNBT.writeCoords("coordsManagedLocation", coordsManagedLocation, var1);
 	}
 	
 	public boolean hookHit(DamageSource par1DamageSource, int par2) {
@@ -1083,6 +1089,18 @@ public class AIAgent {
 		if (!ent.worldObj.isRemote) {
 			return jobMan.hookInteract(par1EntityPlayer);
 		} else return false;
+	}
+	
+	public void hookSetDead() {
+		if (!ent.worldObj.isRemote) {
+			if (coordsManagedLocation != null) {
+				WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+				ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
+				if (ml != null) {
+					ml.hookEntityDied(ent);
+				}
+			}
+		}
 	}
 	
 	public boolean isThreat(Entity ent) {
@@ -1101,6 +1119,15 @@ public class AIAgent {
 		//kill cyclical references
 		//System.out.println("cleaning up entity " + ent.entityId);
 		PFQueue.pfDelays.remove(ent);
+		
+		if (coordsManagedLocation != null) {
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
+			if (ml != null) {
+				ml.hookEntityDestroyed(ent);
+			}
+		}
+		
 		jobMan.cleanup();
 		ent = null;
 		entInt.cleanup();

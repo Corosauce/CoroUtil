@@ -298,15 +298,17 @@ public class WorldDirector {
 	}
 	
 	//grid methods
-	/*public void markEntityDied(EntityEpochBase ent) {
+	
+	//bypassing death and chunkunload hooks to go right to managed location data through entity AI agent
+	/*public void markEntityDied(EntityLivingBase ent) {
 		
 	}
 	
 	public void markEntityRemoved(EntityEpochBase ent) {
 		
-	}
+	}*/
 	
-	public void markEntitySpawnedFirstTime(EntityEpochBase ent) {
+	/*public void markEntitySpawnedFirstTime(EntityEpochBase ent) {
 		
 	}
 	

@@ -385,7 +385,7 @@ public class AIBTAgent {
 			ml.addEntity("member", ent);
 		} else {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
-			CoroAI.dbg("AIBT Entitys home has been destroyed!");
+			CoroAI.dbg("AIBTAgent Entitys home has been destroyed or never had one set!");
 		}
 		
 	}
@@ -504,13 +504,14 @@ public class AIBTAgent {
     	}
     }
     
+    //called from entity destroyed hook, does not mean entity died, could be just unloaded
     public void cleanup() {
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
 			if (ml != null) {
-				ml.removeObject(ent);
+				ml.hookEntityDestroyed(ent);
 			}
 		}
 		ent = null;
