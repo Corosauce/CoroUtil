@@ -19,7 +19,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.tile.ITilePacket;
 import CoroUtil.util.CoroUtilEntity;
-import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -44,6 +43,11 @@ public class EventHandlerPacket {
 	}
 	
 	@SideOnly(Side.CLIENT)
+	public EntityPlayer getClientPlayer() {
+		return Minecraft.getMinecraft().thePlayer;
+	}
+	
+	@SideOnly(Side.CLIENT)
 	public INBTPacketHandler getClientDataInterface() {
 		if (Minecraft.getMinecraft().currentScreen instanceof INBTPacketHandler) {
 			return (INBTPacketHandler)Minecraft.getMinecraft().currentScreen;
@@ -51,6 +55,7 @@ public class EventHandlerPacket {
 		return null;
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
 		
@@ -100,7 +105,7 @@ public class EventHandlerPacket {
 				//receiving quest data for a specific player
 				NBTTagCompound data = nbt.getCompoundTag("data");
 				
-				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(FMLClientHandler.instance().getClient().thePlayer);
+				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(getClientPlayer());
 				
 				//clear quests since we reload fully to sync
 				quests.reset();

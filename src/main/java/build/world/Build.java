@@ -19,6 +19,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilBlock;
+import CoroUtil.util.CoroUtilFile;
 import build.SchematicData;
 import cpw.mods.fml.common.FMLCommonHandler;
 
@@ -179,7 +180,9 @@ public class Build {
 		
 		try {
 			
-	    	NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(level + ".schematic"));
+			NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(new FileInputStream(level + ".schematic"));
+			
+			
 	    	
 	    	levelData = nbttagcompound;
 	    	
@@ -206,11 +209,13 @@ public class Build {
 		    	}
 	    	} else {
 	    		System.out.println("TODO: a fallback lookup table for old block IDs to unlocalized names");
+	    		NBTTagCompound nbtFallbackLookup = CompressedStreamTools.readCompressed(new FileInputStream(CoroUtilFile.getSaveFolderPath() + "BlockTranslationMapFallback.schematic"));
+	    		this.blockMappingInternalIDToBlock = genBlockIDSchemToBlockWithUnlocalizedName(nbtFallbackLookup.getCompoundTag("blockTranslationMap"));
 	    	}
 	    	
-	    	System.out.println("TODO for BuildMod: verify 9 is accurate type to use, NBTBase defines type 9 as NBTTagList");
-			tileEntities = nbttagcompound.getTagList("TileEntities", 9);
-			entities = nbttagcompound.getTagList("Entities", 9);
+	    	//System.out.println("TODO for BuildMod: verify 9 is accurate type to use, NBTBase defines type 9 as NBTTagList");
+			tileEntities = nbttagcompound.getTagList("TileEntities", 10);
+			entities = nbttagcompound.getTagList("Entities", 10);
 			
 			
 			
@@ -617,10 +622,17 @@ public class Build {
 			while (it.hasNext()) {
 				String tagName = (String) it.next();
 				int tag = parMappingNBT.getInteger(tagName);//(NBTTagInt)it.next();
+				//drunken fix, review in future
+				if (swapMap.get(tagName) == null && !tagName.contains("zombiecraft:")) {
+					
+					//this currently blindly fixes non zc issues as well, adding in z_ to scan didnt cover all old zc blocks, hmm
+					tagName = tagName.replace("tile.", "tile.zombiecraft:");
+					
+				}
 				if (swapMap.get(tagName) != null) {
 					finalMap.put(tag, swapMap.get(tagName));
 				} else {
-					System.out.println("missing a mapping in this schematic for: " + tag);
+					System.out.println("missing a mapping in this schematic for: " + tag + " - " + tagName);
 				}
 			}
 		} catch (Exception ex) {

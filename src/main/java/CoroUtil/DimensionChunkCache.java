@@ -19,6 +19,7 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.pathfinding.PFQueue;
 
 public class DimensionChunkCache implements IBlockAccess
@@ -85,17 +86,20 @@ public class DimensionChunkCache implements IBlockAccess
 	    	int maxX = 0;
 	    	int maxZ = 0;
 	    	
-	    	List chunks = null;//((ChunkProviderServer)world.getChunkProvider()).func_152380_a();
+	    	List chunks = ((ChunkProviderServer)world.getChunkProvider()).func_152380_a();
     		
-    		try {
-    			chunks = (ArrayList)OldUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
-    		} catch (Exception ex) {
-    			try {
+	    	if (chunks == null) {
+	    		try {
     				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
     			} catch (Exception ex2) {
     				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
     			}
-    		}
+	    		/*try {
+	    			chunks = (ArrayList)OldUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
+	    		} catch (Exception ex) {
+	    			
+	    		}*/
+	    	}
     		
     		if (chunks == null) {
     			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
@@ -319,7 +323,7 @@ public class DimensionChunkCache implements IBlockAccess
     public int getBlockLightValue_do(int par1, int par2, int par3, boolean par4)
     {
     	
-    	System.out.println("test this replacement usage of skylightSubtracted being 0");
+    	CoroAI.dbg("test this replacement usage of skylightSubtracted being 0");
     	int skylightSubtracted = 0;
     	
         if (par1 >= -30000000 && par3 >= -30000000 && par1 < 30000000 && par3 < 30000000)
@@ -371,7 +375,7 @@ public class DimensionChunkCache implements IBlockAccess
                 if (chunk != null) {
                 	return chunk.getBlockLightValue(par1, par2, par3, skylightSubtracted);
                 } else {
-                	System.out.println("null chunk, returning 0 for getBlockLightValue_do");
+                	CoroAI.dbg("null chunk, returning 0 for getBlockLightValue_do");
                 	return 0;
                 }
                 

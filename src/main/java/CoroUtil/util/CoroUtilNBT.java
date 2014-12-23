@@ -13,14 +13,14 @@ public class CoroUtilNBT {
 
 	public static NBTTagCompound copyOntoNBT(NBTTagCompound nbtSource, NBTTagCompound nbtDest) {
 		NBTTagCompound newNBT = (NBTTagCompound) nbtDest.copy();
-		
+
+		String tagName = "";
 		//do magic
 		try {
 			Iterator it = nbtSource.func_150296_c().iterator();
-			
 			while (it.hasNext()) {
-				String tagName = (String) it.next();
-				NBTBase data = nbtSource.getCompoundTag(tagName);
+				tagName = (String) it.next();
+				NBTBase data = nbtSource.getTag(tagName);
 				newNBT.setTag(tagName, data);
 			}
 		} catch (Exception ex) {

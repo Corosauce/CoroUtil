@@ -145,11 +145,15 @@ public class TileDataWatcher
     {
         WatchableObject watchableobject = this.getWatchedObject(par1);
 
-        if (!par2Obj.equals(watchableobject.getObject()))
-        {
-            watchableobject.setObject(par2Obj);
-            watchableobject.setWatched(true);
-            this.objectChanged = true;
+        try {
+	        if (!par2Obj.equals(watchableobject.getObject()))
+	        {
+	            watchableobject.setObject(par2Obj);
+	            watchableobject.setWatched(true);
+	            this.objectChanged = true;
+	        }
+        } catch (Exception ex) {
+        	ex.printStackTrace();
         }
     }
 

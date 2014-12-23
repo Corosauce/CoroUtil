@@ -87,9 +87,9 @@ public class Overlays {
 		
 		renderBuildOutline(c1.posX, c1.posY, c1.posZ, c2.posX, c2.posY, c2.posZ);
 		
-		renderCircle(c1.posX, c1.posY + 3D, c1.posZ, 0x0000FF, 3D);
+		//renderCircle(c1.posX, c1.posY + 3D, c1.posZ, 0x0000FF, 3D);
 		//renderSphereFun(c1.posX, c1.posY, c1.posZ, 0x0000FF);
-		renderFun(c1.posX, c1.posY, c1.posZ, 0x0000FF);
+		//renderFun(c1.posX, c1.posY, c1.posZ, 0x0000FF);
 		
 	}
 	

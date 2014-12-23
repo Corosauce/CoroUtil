@@ -21,6 +21,7 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.event.WorldEvent;
 import CoroUtil.pathfinding.PathPointEx;
 import CoroUtil.util.CoroUtilFile;
@@ -89,7 +90,7 @@ public class WorldDirector {
 		if (!lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.put(hash, location);
 		} else {
-			System.out.println("epoch error: location already exists at these coords: " + location.spawn);
+			System.out.println("error: location already exists at these coords: " + location.spawn);
 		}
 	}
 	
@@ -126,11 +127,13 @@ public class WorldDirector {
 		World world = getWorld();
 		
 		//update occupance chunk data for each player
-		if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
-			for (int i = 0; i < world.playerEntities.size(); i++) {
-				EntityPlayer entP = (EntityPlayer) world.playerEntities.get(i);
-				ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor_double(entP.posX) / 16, MathHelper.floor_double(entP.posZ) / 16);
-				cdp.addToPlayerActivityTime(entP.getGameProfile().getId(), PlayerDataGrid.playerTimeSpentUpdateInterval);
+		if (ConfigCoroAI.trackPlayerData) {
+			if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
+				for (int i = 0; i < world.playerEntities.size(); i++) {
+					EntityPlayer entP = (EntityPlayer) world.playerEntities.get(i);
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor_double(entP.posX) / 16, MathHelper.floor_double(entP.posZ) / 16);
+					cdp.addToPlayerActivityTime(entP.getGameProfile().getId(), PlayerDataGrid.playerTimeSpentUpdateInterval);
+				}
 			}
 		}
 	}
@@ -208,7 +211,7 @@ public class WorldDirector {
     		
     		boolean bool = false;
     		if (extraData != null) bool = extraData.getBoolean("generatedTown");
-    		System.out.println("writing nbt, generatedTown: " + bool);
+    		//System.out.println("writing nbt, generatedTown: " + bool);
     		
     		//update runtime data to nbt
     		writeToNBT(nbt);
@@ -216,7 +219,7 @@ public class WorldDirector {
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
     		
-    		System.out.println("saveFolder: " + saveFolder);
+    		//System.out.println("saveFolder: " + saveFolder);
     		
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
@@ -254,7 +257,7 @@ public class WorldDirector {
 			
 		    try {
 		        aClass = classLoader.loadClass(classname);//"com.jenkov.MyClass");
-		        System.out.println("aClass.getName() = " + aClass.getName());
+		        //System.out.println("aClass.getName() = " + aClass.getName());
 		    } catch (ClassNotFoundException e) {
 		        e.printStackTrace();
 		    }
@@ -271,7 +274,7 @@ public class WorldDirector {
 				entrance.readFromNBT(nbt);
 				addTickingLocation(entrance);
 				
-				System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.spawn.posX + " - " + entrance.spawn.posZ);
+				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.spawn.posX + " - " + entrance.spawn.posZ);
 		    }
 		}
 	}

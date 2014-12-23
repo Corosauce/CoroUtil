@@ -9,11 +9,14 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
+import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
 
 public class EventHandlerForge {
 
@@ -31,9 +34,11 @@ public class EventHandlerForge {
 	public void worldSave(Save event) {
 		
 		//this is called for every dimension
-		
-		if (((WorldServer)event.world).provider.dimensionId == 0) {
-			CoroAI.writeOutData(false);
+		//check server side because some mods invoke saving client side (bad standard)
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			if (((WorldServer)event.world).provider.dimensionId == 0) {
+				CoroAI.writeOutData(false);
+			}
 		}
 	}
 	
@@ -66,8 +71,10 @@ public class EventHandlerForge {
 				//an event is fired where its air and has no chunk X or Z, cancel this
 				if (event.action == Action.RIGHT_CLICK_AIR) return;
 				
-				ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.x / 16, event.z / 16);
-				cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
+				if (ConfigCoroAI.trackPlayerData) {
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.x / 16, event.z / 16);
+					cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
+				}
 				
 			} catch (Exception ex) {
 				ex.printStackTrace();

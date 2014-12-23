@@ -41,7 +41,7 @@ public class AIAgent {
 	public EntityLiving ent;
 	public ICoroAI entInt;
 	public AIInventory entInv;
-	public boolean useInv = true;
+	public boolean useInv = false;
 	public JobManager jobMan;
 	public Formation activeFormation;
 	
@@ -157,8 +157,8 @@ public class AIAgent {
 	public AIAgent(ICoroAI parEnt, boolean useInventory) {
 		ent = (EntityLiving)parEnt;
 		entInt = parEnt;
-		/*useInv = useInventory;
-		if (useInv) {
+		useInv = useInventory;
+		/*if (useInv) {
 			entInv = new AIFakePlayer(this);
 		}*/
 		entInv = new AIInventory(ent);
@@ -250,7 +250,8 @@ public class AIAgent {
 			ml.addEntity("member", ent);
 		} else {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
-			CoroAI.dbg("AIAgent Entitys home has been destroyed or never had one set!");
+			//removing without being sure, months in between development
+			//CoroAI.dbg("AIAgent Entitys home has been destroyed or never had one set!");
 		}
 	}
 	
@@ -824,27 +825,33 @@ public class AIAgent {
 		//no charge fix
 		//if (useInv && entInv.rangedInUseTicksMax == 0) rangedInUse = false;
 		
+		float prevRotYaw = ent.rotationYaw;
+		float prevRotPitch = ent.rotationPitch;
+		
     	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
     		if (curCooldown_Melee <= 0) {
     			if (rangedInUse) rangedUsageCancelCharge();
+    			
     			ent.faceEntity(var1, 180, 180);
     			if (!meleeUseRightClick) {
-	    			/*if (useInv) {
+	    			if (useInv) {
 	    				entInv.attackMelee(var1, var2);
-	    			} else {*/
+	    			} else {
 	    				entInt.attackMelee(var1, var2);
-	    			//}
+	    			}
     			} else {
-    				/*if (useInv) {
+    				if (useInv) {
         				//entInv.attackRanged(var1, var2);
     					if (entInv.inventory == null) return;
     					faceEntity(ent, 180, 180);
-    					entInv.setCurrentSlot(entInv.slot_Melee);
-    					//this.setCurrentSlot(entInv.slot_Ranged);
-    					entInv.rightClickItem();
-        			} else {*/
+    					entInv.setSlotActive(entInv.slot_Melee);
+    					entInv.performRightClick();
+    					//entInv.setCurrentSlot(entInv.slot_Melee);
+    					////this.setCurrentSlot(entInv.slot_Ranged);
+    					//entInv.rightClickItem();
+        			} else {
         				entInt.attackRanged(var1, var2);
-        			//}
+        			}
     			}
         		this.curCooldown_Melee = entInt.getCooldownMelee();
         	}
@@ -853,14 +860,18 @@ public class AIAgent {
     	} else if (var2 < maxReach_Ranged) {
     		if (curCooldown_Ranged <= 0 && curCooldown_Melee < maxReach_Melee - (maxReach_Melee / 4)) {
     			ent.faceEntity(var1, 180, 180);
-    			/*if (useInv) {
+    			if (useInv) {
     				entInv.attackRanged(var1, var2);
-    			} else {*/
+    			} else {
     				entInt.attackRanged(var1, var2);
-    			//}
+    			}
         		this.curCooldown_Ranged = entInt.getCooldownRanged(); //keep here for fallback when charging items not used
     		}
     	}
+    	
+    	//prevent locking in on target
+    	ent.rotationYaw = prevRotYaw;
+    	ent.rotationPitch = prevRotPitch;
     }
 	
 	//placeholder
@@ -1115,7 +1126,7 @@ public class AIAgent {
 	}
 	
 	public void cleanup() {
-		//if (useInv) entInv.cleanup();
+		entInv.cleanup();
 		//kill cyclical references
 		//System.out.println("cleaning up entity " + ent.entityId);
 		PFQueue.pfDelays.remove(ent);
@@ -1132,7 +1143,7 @@ public class AIAgent {
 		ent = null;
 		entInt.cleanup();
 		entInt = null;
-		//entInv = null;
+		entInv = null;
 		jobMan = null;
 		activeFormation = null;
 		retaliateEntity = null;

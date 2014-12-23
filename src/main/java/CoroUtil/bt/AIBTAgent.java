@@ -506,6 +506,7 @@ public class AIBTAgent {
     
     //called from entity destroyed hook, does not mean entity died, could be just unloaded
     public void cleanup() {
+    	entInv.cleanup();
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
@@ -519,6 +520,7 @@ public class AIBTAgent {
 		eventHandler.cleanup();
 		entInt.cleanup();
 		entInt = null;
+		entInv = null;
 		
     }
 }

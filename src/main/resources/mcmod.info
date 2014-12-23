@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "coroutil",
+  "name": "CoroUtil Library",
+  "description": "Collection of systems and helper code for Corosus's mods",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "http://Coros.us/",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["Corosus"],
+  "credits": "I'd like to thank Coro, Corosauce, and CordonFreeman for making this possible",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

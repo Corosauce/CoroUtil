@@ -40,6 +40,7 @@ public class BuildJob {
     public boolean doRandomBuild = false;
     
     public boolean useRotationBuild = false;
+    public boolean centerBuildIfNoRotate = true;
     public int direction = 0;
     public float rotation = 0;
     
@@ -50,6 +51,8 @@ public class BuildJob {
     public int customGenOffset = 0;
     
     public int buildRate = 99999999;
+    
+    public int notifyFlag = 2;
     
 
 	

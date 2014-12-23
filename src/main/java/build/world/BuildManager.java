@@ -202,7 +202,7 @@ public class BuildManager {
 				    			//worldRef.removeBlockTileEntity(xx, yy, zz);
 				    			//worldRef.setBlockAndMetadata(build_startX+build_loopTickX, build_startY+build_loopTickY, build_startZ+build_loopTickZ, 0, 0);
 				    			
-				    			worldRef.setBlock(xx, yy, zz, id, build.build_blockMetaArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ], 3);
+				    			worldRef.setBlock(xx, yy, zz, id, build.build_blockMetaArr[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ], buildJob.notifyFlag);
 				    			//worldRef.markBlockNeedsUpdate(xx, yy, zz);
 				    			buildJob.build_blockPlaced[buildJob.build_loopTickX][buildJob.build_loopTickY][buildJob.build_loopTickZ] = true;
 				    			buildJob.curLayerCount++;
@@ -300,8 +300,8 @@ public class BuildManager {
 		    				}
 		    				
 		    			} else {
-		    				boolean centerBuild = true;
-		    				if (centerBuild) {
+		    				//boolean centerBuild = true;
+		    				if (buildJob.centerBuildIfNoRotate) {
 		    					//this was determined to work for odd sized schematics on X and Z
 		    					coords.posX -= MathHelper.floor_double(build.map_sizeX/2D);
 		    					coords.posZ -= MathHelper.floor_double(build.map_sizeZ/2D);
@@ -315,7 +315,7 @@ public class BuildManager {
 				    		}
 		    			}
 		    			if (!skipGen) {
-		    				worldRef.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air, 0, 2);
+		    				worldRef.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air, 0, buildJob.notifyFlag);
 		    			}
 			    		//}
 			    		
@@ -377,8 +377,8 @@ public class BuildManager {
 					    				if (tryMeta != -1) meta = tryMeta;
 					    			} else {
 					    				//still center around coord if not rotated
-					    				boolean centerBuild = true;
-					    				if (centerBuild) {
+					    				//boolean centerBuild = true;
+					    				if (buildJob.centerBuildIfNoRotate) {
 					    					//this was determined to work for odd sized schematics on X and Z
 					    					coords.posX -= MathHelper.floor_double(build.map_sizeX/2D);
 					    					coords.posZ -= MathHelper.floor_double(build.map_sizeZ/2D);
@@ -421,7 +421,7 @@ public class BuildManager {
 								    		}
 						    			}
 					    				if (!skipGen) {
-					    					worldRef.setBlock(coords.posX, coords.posY, coords.posZ, placeholderID, 0, 2);
+					    					worldRef.setBlock(coords.posX, coords.posY, coords.posZ, placeholderID, 0, buildJob.notifyFlag);
 					    				}
 					    			}
 					    			/*if (id != 0) {

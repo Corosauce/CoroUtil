@@ -65,9 +65,9 @@ public class BuildClientTicks
     	
     	//TEMP!
     	try {
-    		if (clipboardData != null) {
+    		/*if (clipboardData != null) {
     			Overlays.renderBuildOutline(clipboardData, direction);
-    		}
+    		}*/
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}

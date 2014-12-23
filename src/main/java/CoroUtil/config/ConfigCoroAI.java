@@ -13,6 +13,8 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static String chunkCacheDimensionBlacklist_IDs = "";
 	public static String chunkCacheDimensionBlacklist_Names = "promised";
 	
+	public static boolean trackPlayerData = false;
+	
 	@Override
 	public String getConfigFileName() {
 		return "CoroUtil";

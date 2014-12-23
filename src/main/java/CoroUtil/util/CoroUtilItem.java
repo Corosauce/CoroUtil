@@ -42,9 +42,15 @@ public class CoroUtilItem {
 	public static float getLeftClickDamage(ItemStack is) {
 		if (is.getItem() == null) return 0;
 		ServersideAttributeMap attributes = new ServersideAttributeMap();
+		attributes.registerAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(1.0D);
 		Multimap map = is.getItem().getAttributeModifiers(is);
 		attributes.applyAttributeModifiers(map);
-		return (float)attributes.getAttributeInstance(SharedMonsterAttributes.attackDamage).getAttributeValue();
+		try {
+			return (float)attributes.getAttributeInstance(SharedMonsterAttributes.attackDamage).getAttributeValue();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return 1;
+		}
 	}
 	
 	public static EntityItem tossItemFromEntity(Entity parEnt, ItemStack p_146097_1_, boolean p_146097_2_, boolean p_146097_3_)

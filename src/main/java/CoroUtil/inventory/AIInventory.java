@@ -1,6 +1,7 @@
 package CoroUtil.inventory;
 
 import java.util.List;
+import java.util.UUID;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,16 +15,24 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
+import CoroUtil.OldUtil;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EntityTropicalFishHook;
 import CoroUtil.entity.ItemTropicalFishingRod;
+import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilItem;
+
+import com.mojang.authlib.GameProfile;
 
 public class AIInventory {
 
 	//Inventory size of 3 for melee, ranged, and tool
 	//Armor will use vanilla stack system for now
+	
+	//custom fakePlayer for Comrade support
+	public GameProfile playerProfile = null;
+	public FakePlayer fakePlayer = null;
 	
 	public EntityLivingBase entOwner;
 	
@@ -59,7 +68,25 @@ public class AIInventory {
 	
 	//server side only
 	public FakePlayer getFakePlayer(World parWorld) {
-		return FakePlayerFactory.getMinecraft((WorldServer) parWorld);
+		if (fakePlayer == null) {
+			playerProfile = new GameProfile(UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C99CAE77"), "fakePlayer" + entOwner.getEntityId()/*"[Minecraft]"*/);
+			fakePlayer = FakePlayerFactory.get((WorldServer) parWorld, playerProfile);
+			if (entOwner instanceof ICoroAI) {
+				OldUtil.playerToCompAILookup.put(CoroUtilEntity.getName(fakePlayer), ((ICoroAI)entOwner).getAIAgent().entInt);
+			} else if (entOwner instanceof IBTAgent) {
+				System.out.println("TODO: add lookup for fakeplayer to AIBTAgent");//((IBTAgent)entOwner).getAIBTAgent().entInv;
+			}
+			
+			//need username to be "fakePlayer" + this.getEntityId();
+		}
+		
+		//sync fakeplayer to real ent pos
+		fakePlayer.setPosition(entOwner.posX, entOwner.posY, entOwner.posZ);
+		fakePlayer.rotationPitch = entOwner.rotationPitch;
+		fakePlayer.rotationYaw = entOwner.rotationYaw;
+		fakePlayer.rotationYawHead = entOwner.rotationYawHead;
+		
+		return fakePlayer;
 	}
 	
 	public void setSlotContents(int parSlot, ItemStack parStack) {
@@ -199,4 +226,13 @@ public class AIInventory {
 			parItem.setDead();
         }
 	}
+	
+	public void cleanup() {
+		if (fakePlayer != null) OldUtil.playerToCompAILookup.remove(CoroUtilEntity.getName(fakePlayer));
+		entOwner = null;
+    	//inventory = null; //playerKillEvent needs this, race condition?
+    	fishEntity = null;
+    	playerProfile = null;
+    	fakePlayer = null;
+    }
 }

@@ -61,41 +61,45 @@ public class ChunkDataPoint
     }
     
     public void initFirstTime() {
-    	updateCache();
-    	
-    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
-	    	Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
+    	try {
+	    	updateCache();
 	    	
-	    	int countWater = 0;
-	    	int countLand = 0;
-	    	
-	    	//this should get threaded?
-	    	//just do a basic scan for majority of chunk being land (even land consider too?)
-	    	for (int x = 0; x < 16; x++) {
-	    		for (int z = 0; z < 16; z++) {
-	    			int heightVal = chunk.getHeightValue(x, z)-1;
-	    			
-	    			Block id = chunk.getBlock(x, heightVal, z);
-	    			
-	    			if (id.getMaterial().isLiquid()) {
-    					countWater++;
-    				} else {
-    					countLand++;
-    				}
-	    		}
+	    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+		    	Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
+		    	
+		    	int countWater = 0;
+		    	int countLand = 0;
+		    	
+		    	//this should get threaded?
+		    	//just do a basic scan for majority of chunk being land (even land consider too?)
+		    	for (int x = 0; x < 16; x++) {
+		    		for (int z = 0; z < 16; z++) {
+		    			int heightVal = Math.max(0, chunk.getHeightValue(x, z)-1);
+		    			
+		    			Block id = chunk.getBlock(x, heightVal, z);
+		    			
+		    			if (id.getMaterial().isLiquid()) {
+	    					countWater++;
+	    				} else {
+	    					countLand++;
+	    				}
+		    		}
+		    	}
+	
+				//System.out.println("ChunkDataPoint, countWater: " + countWater + ", countLand: " + countLand);
+		    	
+				if (countLand > countWater) {
+					spawnableType = 0;
+					//System.out.println("set to land");
+				} else {
+					spawnableType = 1;
+					//System.out.println("set to water");
+				}
+	    	} else {
+	    		//System.out.println("chunk doesnt exist");
 	    	}
-
-			//System.out.println("ChunkDataPoint, countWater: " + countWater + ", countLand: " + countLand);
-	    	
-			if (countLand > countWater) {
-				spawnableType = 0;
-				//System.out.println("set to land");
-			} else {
-				spawnableType = 1;
-				//System.out.println("set to water");
-			}
-    	} else {
-    		//System.out.println("chunk doesnt exist");
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
     	}
     }
 
@@ -254,7 +258,7 @@ public class ChunkDataPoint
     	if (uuid != null) {
     		getPlayerData(uuid).playerActivityTimeSpent += parVal;
     		getPlayerData(uuid).playerActivityLastUpdated = grid.world.getTotalWorldTime();
-    		System.out.println("setting player activity time value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityTimeSpent);
+    		//System.out.println("setting player activity time value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityTimeSpent);
     	}
     }
     
@@ -264,7 +268,7 @@ public class ChunkDataPoint
     	if (uuid != null) {
     		getPlayerData(uuid).playerActivityInteraction += parVal;
     		getPlayerData(uuid).playerActivityLastUpdated = grid.world.getTotalWorldTime();
-    		System.out.println("setting player activity interaction value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityInteraction);
+    		//System.out.println("setting player activity interaction value for chunk " + xCoord + " - " + zCoord + " to " + lookupPlayersToActivity.get(uuid).playerActivityInteraction);
     	}
     	
     }
