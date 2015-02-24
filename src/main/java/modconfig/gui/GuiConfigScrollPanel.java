@@ -191,6 +191,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         str = (index == selected ? EnumChatFormatting.WHITE + "> " + EnumChatFormatting.YELLOW + "??? " + EnumChatFormatting.WHITE + "<" : str);
         //config.drawString(mc.fontRenderer, str, xPosition + 20/* + (width / 2)*/, yPosition + (height - 8) / 2, 0xFFFFFFFF);
         List<ConfigEntryInfo> configDataTest = config.getData().configData;
+        if (config.getData().configData.get(index) == null) return;
         config.getData().configData.get(index).editBox.xPos = xPosition + 20;
         config.getData().configData.get(index).editBox.yPos = yPosition/* + (height - 8) / 2*/;
         //config.configData.get(index).editBox.text = config.configData.get(index).value.toString();
