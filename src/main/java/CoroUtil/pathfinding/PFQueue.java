@@ -1224,7 +1224,7 @@ public class PFQueue implements Runnable {
         }
 
         if (/*parJob != null && parJob.sourceEntity != null && */canUseLadder) {
-        	if (!CoroUtilBlock.isAir(getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)) && getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord).isLadder(null, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord, null)) {
+        	if (!CoroUtilBlock.isAir(getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)) && getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord).isLadder(worldMap, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord, null)) {
         		//if (queue.get(0) != null) queue.get(0).ladderInPath = true; //might conflict with non queue using requests
 		        PathPointEx vvar8 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7, curPoint.xCoord, curPoint.zCoord);
 		        PathPointEx vvar9 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
