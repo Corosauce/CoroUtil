@@ -74,7 +74,7 @@ public class ItemTropicalFishingRod extends Item
     	AIInventory inv = AIInventory.getInventory(entAIUser);
     	if (inv != null) {
 	    	if(inv.fishEntity != null) {
-	        	System.out.println("ItemTropicalFishingRod catch fish");
+	        	//System.out.println("ItemTropicalFishingRod catch fish");
 	            int var4 = inv.fishEntity.catchFish();
 	            //var1.damageItem(var4, var3);
 	            entAIUser.swingItem();
@@ -94,7 +94,7 @@ public class ItemTropicalFishingRod extends Item
     
     public ItemStack onItemRightClick(ItemStack var1, World var2, EntityPlayer var3) {
         if(var3.fishEntity != null) {
-        	System.out.println("ItemTropicalFishingRod catch fish");
+        	//System.out.println("ItemTropicalFishingRod catch fish");
             int var4 = var3.fishEntity.func_146034_e();
             //var1.damageItem(var4, var3);
             var3.swingItem();

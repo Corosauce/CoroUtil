@@ -76,13 +76,15 @@ public class ChunkDataPoint
 		    		for (int z = 0; z < 16; z++) {
 		    			int heightVal = Math.max(0, chunk.getHeightValue(x, z)-1);
 		    			
-		    			Block id = chunk.getBlock(x, heightVal, z);
-		    			
-		    			if (id.getMaterial().isLiquid()) {
-	    					countWater++;
-	    				} else {
-	    					countLand++;
-	    				}
+		    			if (heightVal >= 0) {
+			    			Block id = chunk.getBlock(x, heightVal, z);
+			    			
+			    			if (id.getMaterial().isLiquid()) {
+		    					countWater++;
+		    				} else {
+		    					countLand++;
+		    				}
+		    			}
 		    		}
 		    	}
 	
