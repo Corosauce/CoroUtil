@@ -53,6 +53,7 @@ public class OldUtil {
 	
 	public static boolean checkforMCP = true;
 	public static boolean runningMCP = true;
+	//TODO: USE THIS INSTEAD NOW (for 1.8 only possibly) Launch.blackboard.get("fml.deobfuscatedEnvironment") , if it doesnt exist it means its running in production
 	
 	//public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
 	public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();

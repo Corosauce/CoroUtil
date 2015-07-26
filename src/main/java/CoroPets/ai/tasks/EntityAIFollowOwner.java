@@ -1,9 +1,10 @@
 package CoroPets.ai.tasks;
 
+import java.util.UUID;
+
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -12,7 +13,8 @@ public class EntityAIFollowOwner extends EntityAIBase
 {
     private EntityLiving thePet;
     //private EntityLivingBase theOwner;
-    public String ownerName;
+    //public String ownerName;
+    public UUID ownerUUID;
     World theWorld;
     private double moveSpeedAdj;
     private PathNavigate petPathfinder;
@@ -21,10 +23,10 @@ public class EntityAIFollowOwner extends EntityAIBase
     float minDist;
     private boolean field_75344_i;
 
-    public EntityAIFollowOwner(EntityLiving par1EntityTameable, String parOwnerName, double par2, float par4, float par5)
+    public EntityAIFollowOwner(EntityLiving par1EntityTameable, UUID parOwner, double par2, float par4, float par5)
     {
         this.thePet = par1EntityTameable;
-        ownerName = parOwnerName;
+        ownerUUID = parOwner;
         this.theWorld = par1EntityTameable.worldObj;
         this.moveSpeedAdj = par2;
         this.petPathfinder = par1EntityTameable.getNavigator();
@@ -35,7 +37,8 @@ public class EntityAIFollowOwner extends EntityAIBase
     
     //might require caching to be more efficient
     public EntityLivingBase getOwner() {
-    	return thePet.worldObj.getPlayerEntityByName(ownerName);
+    	return thePet.worldObj.func_152378_a(ownerUUID);
+    	//return thePet.worldObj.getPlayerEntityByName(ownerName);
     }
     
     //method for future order handling

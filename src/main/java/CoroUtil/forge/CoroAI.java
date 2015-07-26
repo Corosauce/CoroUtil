@@ -37,7 +37,7 @@ public class CoroAI {
     public static String eventChannelName = "coroutil";
 	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
     
-    public static PetsManager petsManager;
+    //public static PetsManager petsManager;
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -57,7 +57,7 @@ public class CoroAI {
     	proxy.init(this);
     	TeamTypes.initTypes();
 
-    	petsManager = new PetsManager();
+    	//petsManager = new PetsManager();
     }
     
     @Mod.EventHandler
@@ -91,7 +91,7 @@ public class CoroAI {
     		System.out.println("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
-	    	petsManager.nbtReadFromDisk();
+	    	PetsManager.instance().nbtReadFromDisk();
 	    	
 	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
 	    	WorldDirectorManager.instance().reset();
@@ -100,8 +100,8 @@ public class CoroAI {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-	    	petsManager.nbtWriteToDisk();
-	    	if (unloadInstances) petsManager.reset();
+    		PetsManager.instance().nbtWriteToDisk();
+	    	if (unloadInstances) PetsManager.instance().reset();
 	    	PlayerQuestManager.i().saveData(false, unloadInstances);
 	    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     	} catch (Exception ex) {

@@ -28,6 +28,8 @@ public class CoroPets {
     
     public static String eventChannelName = "coropets";
 	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
+	
+	public static String tameString = "CoroPets_isTame";
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)

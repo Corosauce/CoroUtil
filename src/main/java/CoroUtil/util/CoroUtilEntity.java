@@ -1,7 +1,13 @@
 package CoroUtil.util;
 
+import java.util.Iterator;
+import java.util.UUID;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
@@ -57,5 +63,20 @@ public class CoroUtilEntity {
 	
 	public static String getName(Entity ent) {
 		return ent.getCommandSenderName();
+	}
+	
+	public static EntityPlayer getPlayerByUUID(UUID uuid) {
+		Iterator iterator = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
+        EntityPlayerMP entityplayermp;
+        
+        while (iterator.hasNext()) {
+        	entityplayermp = (EntityPlayerMP) iterator.next();
+        	
+        	if (entityplayermp.getGameProfile().getId().equals(uuid)) {
+        		return entityplayermp;
+        	}
+        }
+        
+        return null;
 	}
 }

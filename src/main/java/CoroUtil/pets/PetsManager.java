@@ -4,33 +4,72 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import CoroPets.ai.BehaviorModifier;
+import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilFile;
 
 public class PetsManager {
 
-	public List<PetEntry> pets = new ArrayList<PetEntry>();
+	private static PetsManager instance = null;
 	
-	public PetsManager() {
-		
+	public List<PetEntry> pets = new ArrayList<PetEntry>();
+	public HashMap<UUID, PetEntry> lookupUUIDToPet = new HashMap<UUID, PetEntry>();
+	
+	public static PetsManager instance() {
+		if (instance == null) {
+			instance = new PetsManager();
+		}
+		return instance;
 	}
 	
-	public void addPet(String parOwner, EntityLiving parEnt) {
+	public void addPet(UUID parOwner, EntityLiving parEnt) {
 		PetEntry entry = new PetEntry();
-		entry.ownerName = parOwner;
-		entry.UUIDLeast = parEnt.getUniqueID().getLeastSignificantBits();
-		entry.UUIDMost = parEnt.getUniqueID().getMostSignificantBits();
-		entry.uUIDObj = parEnt.getUniqueID();
+		entry.ownerUUID = parOwner;
+		//entry.UUIDLeast = parEnt.getUniqueID().getLeastSignificantBits();
+		//entry.UUIDMost = parEnt.getUniqueID().getMostSignificantBits();
+		entry.entUUID = parEnt.getUniqueID();
 		addPetEntry(entry);
 	}
 	
 	public void addPetEntry(PetEntry parEntry) {
 		pets.add(parEntry);
+		lookupUUIDToPet.put(parEntry.entUUID, parEntry);
+	}
+	
+	public void removePet(EntityLiving parEnt) {
+		PetEntry entry = lookupUUIDToPet.get(parEnt.getUniqueID());
+		pets.remove(entry);
+		lookupUUIDToPet.remove(parEnt.getUniqueID());
+	}
+	
+	public void hookPetInstanceReloaded(EntityCreature ent) {
+		System.out.println("pet reloaded: " + ent);
+		UUID uuid = ent.getUniqueID();
+		initPetsNewInstance(ent);
+	}
+	
+	public void hookPetInstanceUnloaded(EntityCreature ent) {
+		System.out.println("pet unloaded: " + ent);
+	}
+	
+	public void initPetsNewInstance(EntityCreature ent) {
+		//do stuff from behavior modifiers
+		PetEntry entry = lookupUUIDToPet.get(ent.getUniqueID());
+		if (entry != null) {
+			BehaviorModifier.tameMob(ent, entry.ownerUUID, false);
+		} else {
+			System.out.println("WARNING!!! failed to find entry for this reloaded mob that is marked tame ");
+		}
 	}
 	
 	public void nbtReadFromDisk() {
@@ -89,7 +128,7 @@ public class PetsManager {
         	
         	PetEntry petEntry = new PetEntry();
         	petEntry.nbtRead(entry);
-        	petEntry.initLoad();
+        	//petEntry.initLoad();
         	
         	addPetEntry(petEntry);
         }
