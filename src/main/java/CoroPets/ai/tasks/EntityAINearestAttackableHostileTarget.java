@@ -68,11 +68,11 @@ public class EntityAINearestAttackableHostileTarget extends EntityAITarget
         else
         {
             double d0 = this.getTargetDistance();
-            List list = this.taskOwner.worldObj.selectEntitiesWithinAABB(IMob.class, this.taskOwner.boundingBox.expand(d0, 4.0D, d0), this.targetEntitySelector);
+            List list = this.taskOwner.worldObj.getEntitiesWithinAABB(IMob.class, this.taskOwner.boundingBox.expand(d0, 4.0D, d0));
             Collections.sort(list, this.theNearestAttackableTargetSorter);
 
             for (Object obj : list) {
-            	if (obj instanceof EntityLivingBase) {
+            	if (obj instanceof EntityLivingBase && obj instanceof IMob && this.taskOwner.canEntityBeSeen((Entity) obj)) {
             		EntityLivingBase ent = (EntityLivingBase) obj;
             		if (!ent.getEntityData().getBoolean(CoroPets.tameString)) {
             			this.targetEntity = ent;

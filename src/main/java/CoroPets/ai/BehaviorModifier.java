@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IRangedAttackMob;
@@ -15,6 +16,7 @@ import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -24,6 +26,7 @@ import net.minecraft.world.World;
 import CoroPets.CoroPets;
 import CoroPets.ai.tasks.EntityAIAttackHostilesOnCollide;
 import CoroPets.ai.tasks.EntityAIFollowOwner;
+import CoroPets.ai.tasks.EntityAIMisc;
 import CoroPets.ai.tasks.EntityAINearestAttackableHostileTarget;
 import CoroUtil.OldUtil;
 import CoroUtil.forge.CoroAI;
@@ -125,10 +128,6 @@ public class BehaviorModifier {
 	}
 	
 	public static void tameMob(EntityCreature ent, UUID uuid, boolean addEntry) {
-		removeTargetPlayer(ent);
-		addFollowTask(ent, uuid);
-		addTargetNonPetsTask(ent);
-		//aiEnhanced.put(ent.getEntityId(), true);
 		
 		if (addEntry) {
 			PetsManager.instance().addPet(uuid, ent);
@@ -140,11 +139,21 @@ public class BehaviorModifier {
 			CoroAI.dbg("retamed: " + ent);
 		}
 		
-		
+
+		removeTargetPlayer(ent);
+		addFollowTask(ent, uuid);
+		addTargetNonPetsTask(ent);
+		ent.tasks.addTask(0, new EntityAIMisc(ent));
+		//aiEnhanced.put(ent.getEntityId(), true);
 		
 		if (!ent.isChild()) {
 			ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25D);
 		}
+		
+		ent.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(50);
+		//FIRE IMMUNE NEED HERE
+		OldUtil.setPrivateValueSRGMCP(Entity.class, ent, "field_70178_ae", "isImmuneToFire", true);
+		//ent.set
 		
 		ent.addPotionEffect(new PotionEffect(Potion.regeneration.id, 10000, 1, false));
 		ent.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 10000, 1, false));
@@ -156,9 +165,11 @@ public class BehaviorModifier {
 				EntityAITaskEntry entry = (EntityAITaskEntry) parEnt.targetTasks.taskEntries.get(i);
 				if (entry.action instanceof EntityAINearestAttackableTarget) {
 					Class clazz = (Class)OldUtil.getPrivateValueSRGMCP(EntityAINearestAttackableTarget.class, entry.action, "field_75307_b", "targetClass");
-					if (EntityPlayer.class.isAssignableFrom(clazz)) {
+					if (EntityPlayer.class.isAssignableFrom(clazz) || EntityVillager.class.isAssignableFrom(clazz)) {
+						System.out.println("removing target task for: " + clazz);
 						parEnt.targetTasks.removeTask(entry.action);
 						parEnt.setAttackTarget(null);
+						i--;
 					}
 				}
 			}
@@ -168,7 +179,7 @@ public class BehaviorModifier {
 	}
 	
 	public static void addFollowTask(EntityCreature ent, UUID player) {
-		EntityAIBase newTask = new EntityAIFollowOwner(ent, player, 1.0D, 10.0F, 2.0F);
+		EntityAIBase newTask = new EntityAIFollowOwner(ent, player, 1.0D, 5.0F, 2.0F);
 		
 		ent.tasks.addTask(4, newTask);
 		

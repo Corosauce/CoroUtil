@@ -9,6 +9,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent.Save;
+import CoroUtil.forge.CoroAI;
 import CoroUtil.pets.PetsManager;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -40,11 +41,12 @@ public class EventHandlerForge {
 			EntityCreature creature = (EntityCreature) event.entity;
 			
 			if (creature.getEntityData().getBoolean(CoroPets.tameString)) {
+				CoroAI.initTry();
 				PetsManager.instance().hookPetInstanceReloaded(creature);
 				//PetsManager.instance().addPet(parOwner, parEnt);
 			}
 			
-			System.out.println(creature.getEntityData());
+			//System.out.println(creature.getEntityData());
 		}
 	}
 	
