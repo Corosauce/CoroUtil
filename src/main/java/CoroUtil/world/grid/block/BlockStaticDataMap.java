@@ -185,10 +185,10 @@ public class BlockStaticDataMap {
 	
 	public static float getBlockStength(Block id) {
 		float str = 1F;
-		if (mapBlockHashIDToName.containsKey(id)) {
+		if (mapBlockHashIDToName != null && mapBlockHashIDToName.containsKey(id)) {
 			return getBlockStength(mapBlockHashIDToName.get(id));
 		} else {
-			System.out.println("epoch block id to name lookup fail for: " + id);
+			System.out.println("block data map block id to name lookup fail for: " + id);
 		}
 		return str;
 	}
