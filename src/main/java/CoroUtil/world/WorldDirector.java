@@ -27,6 +27,7 @@ import CoroUtil.pathfinding.PathPointEx;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import CoroUtil.world.grid.chunk.PlayerDataGrid;
+import CoroUtil.world.location.ISimulationTickable;
 import CoroUtil.world.location.ManagedLocation;
 
 public class WorldDirector {
@@ -44,11 +45,11 @@ public class WorldDirector {
 	//Not serialized for now
 	public List<WorldEvent> worldEvents = new ArrayList<WorldEvent>();
 	
-	public ConcurrentHashMap<Integer, ManagedLocation> lookupTickingManagedLocations;
+	public ConcurrentHashMap<Integer, ISimulationTickable> lookupTickingManagedLocations;
 	
 	//reflection made
 	public WorldDirector() {
-		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ManagedLocation>();
+		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ISimulationTickable>();
 	}
 	
 	//required for reading in, etc
@@ -84,18 +85,18 @@ public class WorldDirector {
 		event.init();
 	}
 	
-	public void addTickingLocation(ManagedLocation location) {
+	public void addTickingLocation(ISimulationTickable location) {
 		//if (lookupDungeonEntrances == null) lookupDungeonEntrances = new HashMap<Integer, DungeonEntrance>();
-		Integer hash = PathPointEx.makeHash(location.spawn.posX, location.spawn.posY, location.spawn.posZ);
+		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 		if (!lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.put(hash, location);
 		} else {
-			System.out.println("error: location already exists at these coords: " + location.spawn);
+			System.out.println("error: location already exists at these coords: " + location.getOrigin());
 		}
 	}
 	
-	public void removeTickingLocation(ManagedLocation location) {
-		Integer hash = PathPointEx.makeHash(location.spawn.posX, location.spawn.posY, location.spawn.posZ);
+	public void removeTickingLocation(ISimulationTickable location) {
+		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 		if (lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.remove(hash);
 		} else {
@@ -103,7 +104,7 @@ public class WorldDirector {
 		}
 	}
 	
-	public ManagedLocation getTickingLocation(ChunkCoordinates parCoords) {
+	public ISimulationTickable getTickingLocation(ChunkCoordinates parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}
@@ -118,9 +119,9 @@ public class WorldDirector {
 		}
 		
 		//efficient enough? or should i use a list...
-		Iterator<ManagedLocation> it = lookupTickingManagedLocations.values().iterator();
+		Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
 		while (it.hasNext()) {
-			ManagedLocation ml = it.next();
+			ISimulationTickable ml = it.next();
 			ml.tickUpdate();
 		}
 		
@@ -240,14 +241,14 @@ public class WorldDirector {
 		type = parData.getString("type");
 		dimID = parData.getInteger("dimID");*/
 		
-		NBTTagCompound dungeonEntrances = parData.getCompoundTag("tickingLocations");
+		NBTTagCompound tickingLocations = parData.getCompoundTag("tickingLocations");
 		
-		Iterator it = dungeonEntrances.func_150296_c().iterator();
+		Iterator it = tickingLocations.func_150296_c().iterator();
 		
 		
 		while (it.hasNext()) {
 			String keyName = (String)it.next();
-			NBTTagCompound nbt = dungeonEntrances.getCompoundTag(keyName);
+			NBTTagCompound nbt = tickingLocations.getCompoundTag(keyName);
 			
 			String classname = nbt.getString("classname");
 			
@@ -256,25 +257,25 @@ public class WorldDirector {
 			Class aClass = null;
 			
 		    try {
-		        aClass = classLoader.loadClass(classname);//"com.jenkov.MyClass");
+		        aClass = classLoader.loadClass(classname);
 		        //System.out.println("aClass.getName() = " + aClass.getName());
 		    } catch (ClassNotFoundException e) {
 		        e.printStackTrace();
 		    }
 
-			ManagedLocation entrance = null;//new DungeonEntrance(this.dimID);
+			ManagedLocation locationObj = null;
 		    if (aClass != null) {
 		    	try {
-		    		entrance = (ManagedLocation)aClass.getConstructor(new Class[] {}).newInstance();
+		    		locationObj = (ManagedLocation)aClass.getConstructor(new Class[] {}).newInstance();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 		    }
-		    if (entrance != null) {
-				entrance.readFromNBT(nbt);
-				addTickingLocation(entrance);
+		    if (locationObj != null) {
+				locationObj.readFromNBT(nbt);
+				addTickingLocation(locationObj);
 				
-				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.spawn.posX + " - " + entrance.spawn.posZ);
+				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
 		    }
 		}
 	}
@@ -283,7 +284,7 @@ public class WorldDirector {
 		NBTTagCompound nbtSet = new NBTTagCompound();
 		
 		int index = 0;
-		for (Map.Entry<Integer, ManagedLocation> entry : lookupTickingManagedLocations.entrySet()) {
+		for (Map.Entry<Integer, ISimulationTickable> entry : lookupTickingManagedLocations.entrySet()) {
 			NBTTagCompound nbt = new NBTTagCompound();
 			entry.getValue().writeToNBT(nbt);
 			nbtSet.setTag("" + index++, nbt);
@@ -311,7 +312,7 @@ public class WorldDirector {
 		
 	}*/
 	
-	/*public void markEntitySpawnedFirstTime(EntityEpochBase ent) {
+	/*public void markEntitySpawnegetOrigin()tTime(EntityEpochBase ent) {
 		
 	}
 	
