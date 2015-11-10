@@ -263,10 +263,10 @@ public class WorldDirector {
 		        e.printStackTrace();
 		    }
 
-			ManagedLocation locationObj = null;
+			ISimulationTickable locationObj = null;
 		    if (aClass != null) {
 		    	try {
-		    		locationObj = (ManagedLocation)aClass.getConstructor(new Class[] {}).newInstance();
+		    		locationObj = (ISimulationTickable)aClass.getConstructor(new Class[] {}).newInstance();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
