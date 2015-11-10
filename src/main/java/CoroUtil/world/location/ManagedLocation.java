@@ -16,7 +16,7 @@ import CoroUtil.forge.CoroAI;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.grid.chunk.PlayerDataGrid;
 
-public class ManagedLocation {
+public class ManagedLocation implements ISimulationTickable {
 
 	public int locationID = -1;
 	public int dimID;
@@ -48,6 +48,12 @@ public class ManagedLocation {
 		
 	}
 	
+	@Override
+	public ChunkCoordinates getOrigin() {
+		return spawn;
+	}
+	
+	@Override
 	public void tickUpdate() {
 		//listPersistantEntities.clear();
 		if (getWorld().getTotalWorldTime() % 100 == 0) {
@@ -157,6 +163,7 @@ public class ManagedLocation {
 		lookupIDToTownObject.clear();
 	}
 	
+	@Override
 	public void writeToNBT(NBTTagCompound var1)
     {
 		var1.setString("classname", this.getClass().getCanonicalName());
@@ -175,6 +182,7 @@ public class ManagedLocation {
     	var1.setTag("listPersistantEntities", nbtListPersistantEntities);
     }
 	
+	@Override
 	public void readFromNBT(NBTTagCompound var1)
     {
 		hasInit = true;

@@ -31,6 +31,7 @@ import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ISimulationTickable;
 import CoroUtil.world.location.ManagedLocation;
 
 
@@ -393,8 +394,10 @@ public class AIBTAgent {
 	public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
-			return ml;
+			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			if (ml instanceof ManagedLocation) {
+				return (ManagedLocation) ml;
+			}
 		}
 		return null;
 	}
@@ -510,9 +513,9 @@ public class AIBTAgent {
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ManagedLocation ml = wd.getTickingLocation(coordsManagedLocation);
-			if (ml != null) {
-				ml.hookEntityDestroyed(ent);
+			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			if (ml != null && ml instanceof ManagedLocation) {
+				((ManagedLocation) ml).hookEntityDestroyed(ent);
 			}
 		}
 		ent = null;
