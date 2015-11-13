@@ -43,18 +43,23 @@ public class BlockDataGrid
     	return BlockStaticDataMap.getBlockStength(blockID);
     }
     
+    public BlockDataPoint getBlockDataFromNBT(int i, int j, int k, NBTTagCompound nbt)
+    {
+    	return getBlockData(i, j, k, false, false, nbt);
+    }
+    
     public BlockDataPoint getBlockData(int i, int j, int k)
     {
-    	return getBlockData(i, j, k, false, false);
+    	return getBlockData(i, j, k, false, false, null);
     }
     
     public BlockDataPoint getBlockDataIfExists(int i, int j, int k)
     {
-    	return getBlockData(i, j, k, false, true);
+    	return getBlockData(i, j, k, false, true, null);
     }
 
     //returns null if air block unless told to not check
-    public BlockDataPoint getBlockData(int i, int j, int k, boolean skipAirCheckOnCreate, boolean onlyIfExists)
+    public BlockDataPoint getBlockData(int i, int j, int k, boolean skipAirCheckOnCreate, boolean onlyIfExists, NBTTagCompound nbt)
     {
     	
     	//i could technically add a check to see if bdp.isRemovable(), but thats bad practice, lets plan to have our system keep it clean, and let it balloon up so we can see the issue instead of hiding the issue
@@ -64,12 +69,13 @@ public class BlockDataGrid
         if (!grid.containsKey(hash))
         {
         	if (!onlyIfExists) {
-	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(this.world.getBlock(i, j, k))) {
+        		//this was invoking the chunkgenerator, thats bad, switching to using internally stored blockID
+	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(nbt != null ? Block.getBlockById(nbt.getInteger("blockID")) : this.world.getBlock(i, j, k))) {
 	        		BlockDataPoint newVec = new BlockDataPoint(this, i, j, k);
 	                grid.put(newVec.hash, newVec);
 	                return newVec;
 	        	} else {
-	        		System.out.println("Epoch BlockDataGrid detected air block load, skipping");
+	        		//System.out.println("Epoch BlockDataGrid detected air block load, skipping");
 	        		return null;
 	        	}
         	} else {
@@ -111,7 +117,7 @@ public class BlockDataGrid
 					String keyName = (String)it.next();
 					NBTTagCompound nbt = data.getCompoundTag(keyName);
 					
-					BlockDataPoint bdp = this.getBlockData(nbt.getInteger("xCoord"), nbt.getInteger("yCoord"), nbt.getInteger("zCoord"));
+					BlockDataPoint bdp = this.getBlockDataFromNBT(nbt.getInteger("xCoord"), nbt.getInteger("yCoord"), nbt.getInteger("zCoord"), nbt);
 					if (bdp != null) {
 						bdp.readFromNBT(nbt);
 					} else {

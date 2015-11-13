@@ -117,6 +117,10 @@ public class BlockDataPoint
     }
     
     public void readFromNBT(NBTTagCompound nbt) {
+    	
+    	blockID = Block.getBlockById(nbt.getInteger("blockID"));
+    	blockMeta = nbt.getInteger("blockMeta");
+    	
     	health = nbt.getFloat("health");
     	lastTickTime = nbt.getLong("lastTickTime");
     	creationType = nbt.getByte("creationType");
@@ -128,6 +132,11 @@ public class BlockDataPoint
     
     public NBTTagCompound writeToNBT() {
     	NBTTagCompound nbt = new NBTTagCompound();
+    	
+    	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits 
+    	
+    	nbt.setInteger("blockID", Block.getIdFromBlock(blockID));
+    	nbt.setInteger("blockMeta", blockMeta);
     	
     	nbt.setFloat("health", health);
     	nbt.setLong("lastTickTime", lastTickTime);
