@@ -7,7 +7,7 @@ public interface ISimulationTickable {
 
 	public void tickUpdate();
 	public void readFromNBT(NBTTagCompound parData);
-	public void writeToNBT(NBTTagCompound parData);
+	public NBTTagCompound writeToNBT(NBTTagCompound parData);
 	public void cleanup();
 	public ChunkCoordinates getOrigin();
 }

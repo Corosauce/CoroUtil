@@ -164,7 +164,7 @@ public class ManagedLocation implements ISimulationTickable {
 	}
 	
 	@Override
-	public void writeToNBT(NBTTagCompound var1)
+	public NBTTagCompound writeToNBT(NBTTagCompound var1)
     {
 		var1.setString("classname", this.getClass().getCanonicalName());
 		
@@ -180,6 +180,8 @@ public class ManagedLocation implements ISimulationTickable {
     		nbtListPersistantEntities.setTag("entry_" + count++, nbtEntry);
 		}
     	var1.setTag("listPersistantEntities", nbtListPersistantEntities);
+    	
+    	return var1;
     }
 	
 	@Override
