@@ -56,7 +56,7 @@ public class WorldDirectorManager {
 	public WorldDirector getCoroUtilWorldDirector(World world) {
 		WorldDirector wd = getWorldDirector(CoroAI.modID, world);
 		if (wd == null) {
-			wd = new WorldDirector();
+			wd = new WorldDirector(true);
 			WorldDirectorManager.instance().registerWorldDirector(wd, CoroAI.modID, world);
 		}
 		return wd;

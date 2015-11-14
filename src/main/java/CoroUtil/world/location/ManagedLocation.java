@@ -201,4 +201,14 @@ public class ManagedLocation implements ISimulationTickable {
     		listPersistantEntities.add(uuid);
     	}
     }
+
+	@Override
+	public boolean isThreaded() {
+		return false;
+	}
+
+	@Override
+	public void tickUpdateThreaded() {
+		
+	}
 }

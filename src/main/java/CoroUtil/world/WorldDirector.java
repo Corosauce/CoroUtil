@@ -30,7 +30,7 @@ import CoroUtil.world.grid.chunk.PlayerDataGrid;
 import CoroUtil.world.location.ISimulationTickable;
 import CoroUtil.world.location.ManagedLocation;
 
-public class WorldDirector {
+public class WorldDirector implements Runnable {
 
 	//For now only server side
 	
@@ -47,15 +47,48 @@ public class WorldDirector {
 	
 	public ConcurrentHashMap<Integer, ISimulationTickable> lookupTickingManagedLocations;
 	
+	//server side only thread
+	public boolean useThreading = false;
+	public Thread threadedDirector = null;
+	public boolean threadRunning = false;
+	//50ms sleep aka 20 tps without catchup
+	public int threadSleepRate = 50;
+	public boolean threadServerSideOnly = true;
+	
 	//reflection made
+	public WorldDirector(boolean runThread) {
+		this();
+		this.useThreading = runThread;
+	}
+	
 	public WorldDirector() {
 		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ISimulationTickable>();
+	}
+	
+	public void initAndStartThread() {
+		if (!threadRunning) {
+			threadRunning = true;
+			threadedDirector = new Thread("World Simulation Thread");
+			threadedDirector.start();
+		} else {
+			System.out.println("tried to start thread when already running for CoroUtil world director");
+		}
+	}
+	
+	public void stopThread() {
+		threadRunning = false;
 	}
 	
 	//required for reading in, etc
 	public void initData(String parModID, World parWorld) {
 		dimID = parWorld.provider.dimensionId;
 		modID = parModID;
+		
+		if (useThreading) {
+			if (!parWorld.isRemote || threadServerSideOnly) {
+				initAndStartThread();
+			}
+		}
 	}
 	
 	/*public void init(String parModID, int parDimID, String parType) {
@@ -231,6 +264,10 @@ public class WorldDirector {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+    	
+    	if (unloadInstances) {
+    		stopThread();
+    	}
 	}
 	
 	public void readFromNBT(NBTTagCompound parData) {
@@ -299,6 +336,27 @@ public class WorldDirector {
 		//parData.setInteger("dimID", dimID);
 		
 		parData.setTag("extraData", extraData);
+	}
+
+	@Override
+	public void run() {
+		while (threadRunning) {
+			try {
+				Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
+				while (it.hasNext()) {
+					ISimulationTickable ml = it.next();
+					if (ml.isThreaded()) {
+						ml.tickUpdateThreaded();
+					}
+				}
+				Thread.sleep(threadSleepRate);
+			} catch (Exception e) {
+				e.printStackTrace();
+				stopThread();
+			}
+			
+		}
+		
 	}
 	
 	//grid methods
