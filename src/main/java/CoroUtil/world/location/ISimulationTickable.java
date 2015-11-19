@@ -5,6 +5,7 @@ import net.minecraft.util.ChunkCoordinates;
 
 public interface ISimulationTickable {
 
+	public void init();
 	public void tickUpdate();
 	public void tickUpdateThreaded();
 	public void readFromNBT(NBTTagCompound parData);
@@ -12,4 +13,5 @@ public interface ISimulationTickable {
 	public void cleanup();
 	public ChunkCoordinates getOrigin();
 	public boolean isThreaded();
+	public String getSharedSimulationName();
 }

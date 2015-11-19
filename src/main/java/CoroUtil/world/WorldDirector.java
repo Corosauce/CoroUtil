@@ -52,8 +52,19 @@ public class WorldDirector implements Runnable {
 	public Thread threadedDirector = null;
 	public boolean threadRunning = false;
 	//50ms sleep aka 20 tps without catchup
-	public int threadSleepRate = 50;
+	public int threadSleepRate = 50 * 20;
 	public boolean threadServerSideOnly = true;
+	
+	/**
+	 * For sharing and maintaining an update queue limiter between simulations that do the same thing
+	 * eg: 2 trees that need lots of updates, between both of them they can only do a max of x amount of block updates
+	 * 
+	 * for future consider an elegant way to spread out these updates between all that need updates, factoring in a few weighted priorities like proximity to player
+	 */
+	public HashMap<String, Integer> lookupNameToUpdatesPerTickCur = new HashMap<String, Integer>();
+	
+	//in future think of a more proper registration way that wont make things conflict and redundantly add per instance so much
+	public HashMap<String, Integer> lookupNameToUpdatesPerTickLimit = new HashMap<String, Integer>();
 	
 	//reflection made
 	public WorldDirector(boolean runThread) {
@@ -68,7 +79,7 @@ public class WorldDirector implements Runnable {
 	public void initAndStartThread() {
 		if (!threadRunning) {
 			threadRunning = true;
-			threadedDirector = new Thread("World Simulation Thread");
+			threadedDirector = new Thread(this, "World Simulation Thread");
 			threadedDirector.start();
 		} else {
 			System.out.println("tried to start thread when already running for CoroUtil world director");
@@ -85,7 +96,7 @@ public class WorldDirector implements Runnable {
 		modID = parModID;
 		
 		if (useThreading) {
-			if (!parWorld.isRemote || threadServerSideOnly) {
+			if (!parWorld.isRemote || !threadServerSideOnly) {
 				initAndStartThread();
 			}
 		}
@@ -123,6 +134,7 @@ public class WorldDirector implements Runnable {
 		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 		if (!lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.put(hash, location);
+			location.init();
 		} else {
 			System.out.println("error: location already exists at these coords: " + location.getOrigin());
 		}
@@ -132,9 +144,29 @@ public class WorldDirector implements Runnable {
 		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 		if (lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.remove(hash);
+			location.cleanup();
 		} else {
 			System.out.println("Error, couldnt find location for removal");
 		}
+	}
+	
+	public void setSharedSimulationUpdateRateLimit(String name, int limit) {
+		lookupNameToUpdatesPerTickLimit.put(name, limit);
+	}
+	
+	public int getSharedSimulationUpdateRateLimit(String name) {
+		return lookupNameToUpdatesPerTickLimit.get(name);
+	}
+	
+	public int getSharedSimulationUpdateRateCurrent(String name) {
+		if (!lookupNameToUpdatesPerTickCur.containsKey(name)) {
+			lookupNameToUpdatesPerTickCur.put(name, 0);
+		}
+		return lookupNameToUpdatesPerTickCur.get(name);
+	}
+	
+	public void setSharedSimulationUpdateRateCurrent(String name, int cur) {
+		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
 	public ISimulationTickable getTickingLocation(ChunkCoordinates parCoords) {
@@ -150,6 +182,13 @@ public class WorldDirector implements Runnable {
 				worldEvents.remove(i--);
 			}
 		}
+		
+		//reset usage limits for this tick
+		/*Iterator<String, Integer> it = lookupNameToUpdatesPerTickCur.entrySet().iterator();
+		while (it.hasNext()) {
+			
+		}*/
+		lookupNameToUpdatesPerTickCur.clear();
 		
 		//efficient enough? or should i use a list...
 		Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
@@ -342,6 +381,7 @@ public class WorldDirector implements Runnable {
 	public void run() {
 		while (threadRunning) {
 			try {
+				//since the main purpose of this system will basically have all simulations all run with a thread too, no need to split up lookup to threaded and non threaded versions
 				Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
 				while (it.hasNext()) {
 					ISimulationTickable ml = it.next();

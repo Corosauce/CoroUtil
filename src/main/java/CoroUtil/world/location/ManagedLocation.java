@@ -211,4 +211,14 @@ public class ManagedLocation implements ISimulationTickable {
 	public void tickUpdateThreaded() {
 		
 	}
+
+	@Override
+	public String getSharedSimulationName() {
+		return "";
+	}
+
+	@Override
+	public void init() {
+		
+	}
 }

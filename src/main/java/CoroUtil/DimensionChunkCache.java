@@ -323,7 +323,7 @@ public class DimensionChunkCache implements IBlockAccess
     public int getBlockLightValue_do(int par1, int par2, int par3, boolean par4)
     {
     	
-    	CoroAI.dbg("test this replacement usage of skylightSubtracted being 0");
+    	//CoroAI.dbg("test this replacement usage of skylightSubtracted being 0");
     	int skylightSubtracted = 0;
     	
         if (par1 >= -30000000 && par3 >= -30000000 && par1 < 30000000 && par3 < 30000000)
@@ -375,7 +375,7 @@ public class DimensionChunkCache implements IBlockAccess
                 if (chunk != null) {
                 	return chunk.getBlockLightValue(par1, par2, par3, skylightSubtracted);
                 } else {
-                	CoroAI.dbg("null chunk, returning 0 for getBlockLightValue_do");
+                	//CoroAI.dbg("null chunk, returning 0 for getBlockLightValue_do");
                 	return 0;
                 }
                 
