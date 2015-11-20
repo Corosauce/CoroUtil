@@ -348,8 +348,8 @@ public class WorldDirector implements Runnable {
 				}
 		    }
 		    if (locationObj != null) {
-				locationObj.readFromNBT(nbt);
 				addTickingLocation(locationObj);
+				locationObj.readFromNBT(nbt);
 				
 				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
 		    }
