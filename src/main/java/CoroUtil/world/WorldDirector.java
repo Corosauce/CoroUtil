@@ -45,6 +45,7 @@ public class WorldDirector implements Runnable {
 	//Not serialized for now
 	public List<WorldEvent> worldEvents = new ArrayList<WorldEvent>();
 	
+	//TODO: consider locationless ticking simulations
 	public ConcurrentHashMap<Integer, ISimulationTickable> lookupTickingManagedLocations;
 	
 	//server side only thread
@@ -130,11 +131,16 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public void addTickingLocation(ISimulationTickable location) {
+		addTickingLocation(location, true);
+	}
+	
+	public void addTickingLocation(ISimulationTickable location, boolean init) {
 		//if (lookupDungeonEntrances == null) lookupDungeonEntrances = new HashMap<Integer, DungeonEntrance>();
 		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 		if (!lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.put(hash, location);
-			location.init();
+			//relocated to a ticking first time init so it can be after readnbt
+			if (init) location.init();
 		} else {
 			System.out.println("error: location already exists at these coords: " + location.getOrigin());
 		}
@@ -348,8 +354,8 @@ public class WorldDirector implements Runnable {
 				}
 		    }
 		    if (locationObj != null) {
-				addTickingLocation(locationObj);
 				locationObj.readFromNBT(nbt);
+				addTickingLocation(locationObj);
 				
 				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
 		    }
