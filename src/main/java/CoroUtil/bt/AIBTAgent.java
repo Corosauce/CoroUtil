@@ -394,7 +394,7 @@ public class AIBTAgent {
 	public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			if (ml instanceof ManagedLocation) {
 				return (ManagedLocation) ml;
 			}
@@ -513,7 +513,7 @@ public class AIBTAgent {
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
 			}

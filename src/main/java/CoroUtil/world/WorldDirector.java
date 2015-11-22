@@ -48,6 +48,8 @@ public class WorldDirector implements Runnable {
 	//TODO: consider locationless ticking simulations
 	public ConcurrentHashMap<Integer, ISimulationTickable> lookupTickingManagedLocations;
 	
+	public List<ISimulationTickable> listTickingLocations;
+	
 	//server side only thread
 	public boolean useThreading = false;
 	public Thread threadedDirector = null;
@@ -75,6 +77,7 @@ public class WorldDirector implements Runnable {
 	
 	public WorldDirector() {
 		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ISimulationTickable>();
+		listTickingLocations = new ArrayList<ISimulationTickable>();
 	}
 	
 	public void initAndStartThread() {
@@ -136,24 +139,30 @@ public class WorldDirector implements Runnable {
 	
 	public void addTickingLocation(ISimulationTickable location, boolean init) {
 		//if (lookupDungeonEntrances == null) lookupDungeonEntrances = new HashMap<Integer, DungeonEntrance>();
-		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
-		if (!lookupTickingManagedLocations.containsKey(hash)) {
-			lookupTickingManagedLocations.put(hash, location);
-			//relocated to a ticking first time init so it can be after readnbt
-			//if (init) location.init();
-		} else {
-			System.out.println("error: location already exists at these coords: " + location.getOrigin());
+		if (location.getOrigin() != null) {
+			Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
+			if (!lookupTickingManagedLocations.containsKey(hash)) {
+				lookupTickingManagedLocations.put(hash, location);
+				//relocated to a ticking first time init so it can be after readnbt
+				//if (init) location.init();
+			} else {
+				System.out.println("warning: location already exists at these coords: " + location.getOrigin());
+			}
 		}
+		listTickingLocations.add(location);
 	}
 	
 	public void removeTickingLocation(ISimulationTickable location) {
-		Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
-		if (lookupTickingManagedLocations.containsKey(hash)) {
-			lookupTickingManagedLocations.remove(hash);
-			location.cleanup();
-		} else {
-			System.out.println("Error, couldnt find location for removal");
+		if (location.getOrigin() != null) {
+			Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
+			if (lookupTickingManagedLocations.containsKey(hash)) {
+				lookupTickingManagedLocations.remove(hash);
+				location.cleanup();
+			} else {
+				System.out.println("Error, couldnt find location for removal");
+			}
 		}
+		listTickingLocations.remove(location);
 	}
 	
 	public void setSharedSimulationUpdateRateLimit(String name, int limit) {
@@ -175,7 +184,7 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
-	public ISimulationTickable getTickingLocation(ChunkCoordinates parCoords) {
+	public ISimulationTickable getTickingSimluationByLocation(ChunkCoordinates parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}
@@ -197,10 +206,13 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.clear();
 		
 		//efficient enough? or should i use a list...
-		Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
+		/*Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
 		while (it.hasNext()) {
 			ISimulationTickable ml = it.next();
 			ml.tickUpdate();
+		}*/
+		for (ISimulationTickable entry : listTickingLocations) {
+			entry.tickUpdate();
 		}
 		
 		World world = getWorld();
@@ -369,9 +381,14 @@ public class WorldDirector implements Runnable {
 		NBTTagCompound nbtSet = new NBTTagCompound();
 		
 		int index = 0;
-		for (Map.Entry<Integer, ISimulationTickable> entry : lookupTickingManagedLocations.entrySet()) {
+		/*for (Map.Entry<Integer, ISimulationTickable> entry : lookupTickingManagedLocations.entrySet()) {
 			NBTTagCompound nbt = new NBTTagCompound();
 			entry.getValue().writeToNBT(nbt);
+			nbtSet.setTag("" + index++, nbt);
+		}*/
+		for (ISimulationTickable entry : listTickingLocations) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			entry.writeToNBT(nbt);
 			nbtSet.setTag("" + index++, nbt);
 		}
 		parData.setTag("tickingLocations", nbtSet);
@@ -391,11 +408,16 @@ public class WorldDirector implements Runnable {
 		while (threadRunning) {
 			try {
 				//since the main purpose of this system will basically have all simulations all run with a thread too, no need to split up lookup to threaded and non threaded versions
-				Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
+				/*Iterator<ISimulationTickable> it = lookupTickingManagedLocations.values().iterator();
 				while (it.hasNext()) {
 					ISimulationTickable ml = it.next();
 					if (ml.isThreaded()) {
 						ml.tickUpdateThreaded();
+					}
+				}*/
+				for (ISimulationTickable entry : listTickingLocations) {
+					if (entry.isThreaded()) {
+						entry.tickUpdateThreaded();
 					}
 				}
 				Thread.sleep(threadSleepRate);

@@ -259,7 +259,7 @@ public class AIAgent {
 	public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			if (ml instanceof ManagedLocation) {
 				return (ManagedLocation) ml;
 			}
@@ -1109,7 +1109,7 @@ public class AIAgent {
 		if (!ent.worldObj.isRemote) {
 			if (coordsManagedLocation != null) {
 				WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-				ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+				ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 				if (ml != null && ml instanceof ManagedLocation) {
 					((ManagedLocation) ml).hookEntityDied(ent);
 				}
@@ -1136,7 +1136,7 @@ public class AIAgent {
 		
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
-			ISimulationTickable ml = wd.getTickingLocation(coordsManagedLocation);
+			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
 			}
