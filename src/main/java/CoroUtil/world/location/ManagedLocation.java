@@ -221,4 +221,10 @@ public class ManagedLocation implements ISimulationTickable {
 	public void init() {
 		
 	}
+
+	@Override
+	public void initPost() {
+		// TODO Auto-generated method stub
+		
+	}
 }

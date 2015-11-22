@@ -51,7 +51,7 @@ public class WorldDirector implements Runnable {
 	//server side only thread
 	public boolean useThreading = false;
 	public Thread threadedDirector = null;
-	public boolean threadRunning = false;
+	private boolean threadRunning = false;
 	//50ms sleep aka 20 tps without catchup
 	public int threadSleepRate = 50 * 20;
 	public boolean threadServerSideOnly = true;
@@ -140,7 +140,7 @@ public class WorldDirector implements Runnable {
 		if (!lookupTickingManagedLocations.containsKey(hash)) {
 			lookupTickingManagedLocations.put(hash, location);
 			//relocated to a ticking first time init so it can be after readnbt
-			if (init) location.init();
+			//if (init) location.init();
 		} else {
 			System.out.println("error: location already exists at these coords: " + location.getOrigin());
 		}
@@ -282,6 +282,11 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public void writeToFile(boolean unloadInstances) {
+
+    	if (unloadInstances) {
+    		stopThread();
+    	}
+    	
 		//means nothing to save, and that nbt read from disk hasnt been called yet, so we definately cant let it touch the file
 		//if (extraData == null) return;
     	try {
@@ -309,10 +314,6 @@ public class WorldDirector implements Runnable {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-    	
-    	if (unloadInstances) {
-    		stopThread();
-    	}
 	}
 	
 	public void readFromNBT(NBTTagCompound parData) {
@@ -354,7 +355,9 @@ public class WorldDirector implements Runnable {
 				}
 		    }
 		    if (locationObj != null) {
+		    	locationObj.init();
 				locationObj.readFromNBT(nbt);
+				locationObj.initPost();
 				addTickingLocation(locationObj);
 				
 				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
