@@ -54,7 +54,14 @@ public class WorldDirector implements Runnable {
 	public boolean useThreading = false;
 	public Thread threadedDirector = null;
 	private boolean threadRunning = false;
-	//50ms sleep aka 20 tps without catchup
+	/**
+	 * TODO: implement advanced scheduling system that lets delays happen on a per simulation level
+	 * - possible way to do is a cyclical linked list where each entry is an interval of '1', and entries(list of entries in entry) are spaced out based on their desired delays
+	 * -- size of list is determined by entry with largest delay
+	 * 
+	 * for now we use a 1 second delay for all simulations and internally they do additional delay on top of that
+	 */
+	
 	public int threadSleepRate = 50 * 20;
 	public boolean threadServerSideOnly = true;
 	
