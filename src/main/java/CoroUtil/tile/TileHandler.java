@@ -3,10 +3,9 @@ package CoroUtil.tile;
 import java.util.HashMap;
 import java.util.List;
 
-import CoroUtil.packet.PacketHelper;
-
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import CoroUtil.packet.PacketHelper;
 
 public class TileHandler {
 

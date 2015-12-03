@@ -39,7 +39,7 @@ public class PathNavigateCustom
     /**
      * Coordinates of the entity's position last time a check was done (part of monitoring getting 'stuck')
      */
-    private Vec3 lastPosCheck = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+    private Vec3 lastPosCheck = new Vec3(0.0D, 0.0D, 0.0D);
 
     /**
      * Specifically, if a wooden door block is even considered to be passable by the pathfinder
@@ -285,7 +285,7 @@ public class PathNavigateCustom
                 this.currentPath.setCurrentPathIndex(k + 1);
             } else {
 
-	            /*double dist = Vec3.createVectorHelper(vec3.xCoord, vec3.yCoord, vec3.zCoord).squareDistanceTo(this.currentPath.getVectorFromIndex(this.theEntity, k));
+	            /*double dist = new Vec3(vec3.xCoord, vec3.yCoord, vec3.zCoord).squareDistanceTo(this.currentPath.getVectorFromIndex(this.theEntity, k));
 	            if (dist < 4D) {
 	            	System.out.println("dist: " + dist + " - " + vec3.xCoord + " - " + vec3.zCoord);
 	            }
@@ -345,7 +345,7 @@ public class PathNavigateCustom
 
     private Vec3 getEntityPosition()
     {
-        return Vec3.createVectorHelper(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
+        return new Vec3(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
     }
 
     /**

@@ -1,15 +1,7 @@
 package CoroUtil.bt.nodes;
 
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.Vec3;
-import CoroUtil.bt.AIBTAgent;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;

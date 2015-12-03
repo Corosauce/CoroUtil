@@ -15,9 +15,9 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.util.CoroUtilEntity;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class EntityThrowableUsefull extends Entity implements IProjectile
 {
@@ -127,7 +127,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     	double vecY = target.posY - thrower.posY;
     	double vecZ = target.posZ - thrower.posZ;
     	double dist = Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-    	Vec3 vec3 = Vec3.createVectorHelper(vecX / dist, vecY / dist, vecZ / dist);
+    	Vec3 vec3 = new Vec3(vecX / dist, vecY / dist, vecZ / dist);
     	return vec3;
     }
 
@@ -230,15 +230,15 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         	setDead();
         }
 
-        Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+        Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
+        Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
         MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
-        vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+        vec3 = new Vec3(this.posX, this.posY, this.posZ);
+        vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
         if (movingobjectposition != null)
         {
-            vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+            vec31 = new Vec3(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
         }
 
         if (!this.worldObj.isRemote)

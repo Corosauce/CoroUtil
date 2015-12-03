@@ -13,7 +13,6 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -190,7 +189,7 @@ public class WorldEvent {
     	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().func_152612_a(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
-    	if (entP != null && entP.worldObj.provider.dimensionId == DimensionManager.getWorld(dimensionID).provider.dimensionId) {
+    	if (entP != null && entP.worldObj.provider.getDimensionId() == DimensionManager.getWorld(dimensionID).provider.getDimensionId()) {
     		return entP;
     	}
     	

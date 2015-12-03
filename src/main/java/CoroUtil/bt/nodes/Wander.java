@@ -3,7 +3,6 @@ package CoroUtil.bt.nodes;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.Behavior;
@@ -22,7 +21,7 @@ public class Wander extends Selector {
 	
 	public float wanderRange = 16;
 	
-	public Vec3 lastWanderPos = Vec3.createVectorHelper(0, 0, 0);
+	public Vec3 lastWanderPos = new Vec3(0, 0, 0);
 	
 	public Wander(Behavior parParent, IBTAgent parEnt, BlackboardBase parBB, float parRange) {
 		super(parParent);
@@ -104,7 +103,7 @@ public class Wander extends Selector {
         
         if (flag)
         {
-        	lastWanderPos = Vec3.createVectorHelper(i, j, k);
+        	lastWanderPos = new Vec3(i, j, k);
         	entInt.getAIBTAgent().blackboard.setMoveTo(lastWanderPos);
         	//System.out.println("wander - " + i + " - " + j + " - " + k);
         	

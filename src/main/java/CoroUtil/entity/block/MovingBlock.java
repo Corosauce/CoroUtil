@@ -10,14 +10,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 {
@@ -244,7 +243,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
-		    		Vec3 motion = Vec3.createVectorHelper(motionX, motionY, motionZ);
+		    		Vec3 motion = new Vec3(motionX, motionY, motionZ);
 			    	double aheadDistEnd = motion.lengthVector();
 			    	motion = motion.normalize();
 			    	
@@ -398,7 +397,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	float vecZ = (float) (ent.posZ - targ.posZ);
 
     	float dist2 = (float)Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-		return Vec3.createVectorHelper(vecX / dist2, vecY / dist2, vecZ / dist2);
+		return new Vec3(vecX / dist2, vecY / dist2, vecZ / dist2);
     }
     
     /*public Vector3f getMoveAwayVector3f(Entity ent, Entity targ) {

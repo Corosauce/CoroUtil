@@ -1,12 +1,9 @@
 package CoroUtil.quest.quests;
 
-import cpw.mods.fml.common.eventhandler.Event;
-import CoroUtil.quest.EnumQuestState;
-import CoroUtil.quest.PlayerQuests;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import CoroUtil.quest.EnumQuestState;
 
 public class KillEntityQuest extends ActiveQuest {
 	

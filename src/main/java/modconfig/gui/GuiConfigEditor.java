@@ -11,11 +11,10 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiConfigEditor extends GuiScreen
@@ -119,7 +118,7 @@ public class GuiConfigEditor extends GuiScreen
         int y2 = startY + 23;
     	
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-    	Tessellator tessellator = Tessellator.instance;
+    	Tessellator tessellator = Tessellator.getInstance();
     	tessellator.startDrawingQuads();
     	tessellator.setColorRGBA_I(13027014, 255);
     	//tessellator.setColorRGBA_I(0, 255);
@@ -377,7 +376,7 @@ public class GuiConfigEditor extends GuiScreen
     {
         float f = 0.00390625F / 2F;
         float f1 = 0.00390625F / 2F;
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = Tessellator.getInstance();
         tessellator.startDrawingQuads();
         tessellator.addVertexWithUV((double)(par1 + 0), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + 0) * f), (double)((float)(par4 + par6) * f1));
         tessellator.addVertexWithUV((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4 + par6) * f1));

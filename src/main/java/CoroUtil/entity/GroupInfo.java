@@ -3,8 +3,6 @@ package CoroUtil.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.init.Blocks;
-
 public class GroupInfo 
 {
 	

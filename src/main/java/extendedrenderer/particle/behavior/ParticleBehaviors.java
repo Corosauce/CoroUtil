@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.entity.EntityIconFX;
 import extendedrenderer.particle.entity.EntityIconWindFX;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -49,7 +48,7 @@ public class ParticleBehaviors {
 	public void tickUpdate(EntityRotFX particle) {
 		
 		if (sourceEntity != null) {
-			coordSource = Vec3.createVectorHelper(sourceEntity.posX, sourceEntity.posY, sourceEntity.posZ);
+			coordSource = new Vec3(sourceEntity.posX, sourceEntity.posY, sourceEntity.posZ);
 		}
 		
 		tickUpdateAct(particle);

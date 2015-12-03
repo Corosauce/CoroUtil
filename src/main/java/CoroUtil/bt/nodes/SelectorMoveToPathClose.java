@@ -60,7 +60,7 @@ public class SelectorMoveToPathClose extends Selector {
 								//PFQueue based retry code goes here
 								//System.out.println("trying partial pf - " + ent);
 								Random rand = new Random();
-								Vec3 vec = Vec3.createVectorHelper(blackboard.posMoveTo.xCoord - ent.posX, blackboard.posMoveTo.yCoord - ent.posY, blackboard.posMoveTo.zCoord - ent.posZ);
+								Vec3 vec = new Vec3(blackboard.posMoveTo.xCoord - ent.posX, blackboard.posMoveTo.yCoord - ent.posY, blackboard.posMoveTo.zCoord - ent.posZ);
 								vec = vec.normalize();
 								float dist = 16;//+rand.nextInt(10);
 								float distY = retryStage;

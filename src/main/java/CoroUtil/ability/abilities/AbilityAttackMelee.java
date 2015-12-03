@@ -2,20 +2,15 @@ package CoroUtil.ability.abilities;
 
 import java.util.Random;
 
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EntityDamageSource;
-
-import org.lwjgl.opengl.GL11;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.entity.render.ModelBipedTagged;
 import CoroUtil.inventory.AIInventory;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class AbilityAttackMelee extends Ability {
 	

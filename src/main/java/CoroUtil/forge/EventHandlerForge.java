@@ -9,14 +9,14 @@ import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
 
 public class EventHandlerForge {
 
@@ -36,7 +36,7 @@ public class EventHandlerForge {
 		//this is called for every dimension
 		//check server side because some mods invoke saving client side (bad standard)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			if (((WorldServer)event.world).provider.dimensionId == 0) {
+			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
 				CoroAI.writeOutData(false);
 			}
 		}
@@ -45,7 +45,7 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void worldLoad(Load event) {
 		if (!event.world.isRemote) {
-			if (((WorldServer)event.world).provider.dimensionId == 0) {
+			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
 				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.world) == null) {
 					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroAI.modID, event.world);
 				}

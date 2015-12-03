@@ -165,7 +165,7 @@ public class ChunkDataPoint
     	spawnableType = nbt.getInteger("spawnableType");
     	countEntitiesEnemy = nbt.getInteger("countEntitiesEnemy");
     	NBTTagCompound nbtListPlayers = nbt.getCompoundTag("listPlayers");
-    	Iterator it = nbtListPlayers.func_150296_c().iterator();
+    	Iterator it = nbtListPlayers.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
     		NBTTagCompound entry = nbtListPlayers.getCompoundTag(entryName);

@@ -19,8 +19,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraftforge.client.model.IModelCustom;
-import net.minecraftforge.client.model.ModelFormatException;
+import net.minecraftforge.fml.common.FMLLog;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 import org.w3c.dom.Document;
@@ -30,9 +31,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import CoroUtil.bt.IBTAgent;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Techne model importer, based on iChun's Hats importer

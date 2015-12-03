@@ -7,8 +7,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Vec3;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 
 
@@ -72,7 +72,7 @@ public class Ability {
 		//particle ticking
 		if (owner.worldObj.isRemote) {
 			if (particleBehavior == null) {
-				particleBehavior = new ParticleBehaviorCharge(Vec3.createVectorHelper(owner.posX, owner.posY, owner.posZ));
+				particleBehavior = new ParticleBehaviorCharge(new Vec3(owner.posX, owner.posY, owner.posZ));
 				particleBehavior.sourceEntity = owner;
 			} else {
 				particleBehavior.tickUpdateList();

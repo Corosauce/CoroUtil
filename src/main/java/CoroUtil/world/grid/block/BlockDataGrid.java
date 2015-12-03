@@ -107,11 +107,11 @@ public class BlockDataGrid
 			
 			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "epoch" + File.separator;
 			
-			if ((new File(saveFolder + "EpochBlockDataDim_" + world.provider.dimensionId + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "EpochBlockDataDim_" + world.provider.dimensionId + ".dat"));
+			if ((new File(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat")).exists()) {
+				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat"));
 				
 				//Collection playerDataCl = data.getTags();
-				Iterator it = data.func_150296_c().iterator();//playerDataCl.iterator();
+				Iterator it = data.getKeySet().iterator();//playerDataCl.iterator();
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
@@ -149,7 +149,7 @@ public class BlockDataGrid
     		
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
-    		FileOutputStream fos = new FileOutputStream(saveFolder + "EpochBlockDataDim_" + world.provider.dimensionId + ".dat");
+    		FileOutputStream fos = new FileOutputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat");
 	    	CompressedStreamTools.writeCompressed(data, fos);
 	    	fos.close();
 			

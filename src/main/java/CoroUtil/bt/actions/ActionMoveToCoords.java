@@ -2,7 +2,6 @@ package CoroUtil.bt.actions;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
@@ -79,7 +78,7 @@ public class ActionMoveToCoords extends LeafAction {
 							}
 						}
 					}
-					noMoveTicksLastPos = Vec3.createVectorHelper(entL.posX, entL.posY, entL.posZ);
+					noMoveTicksLastPos = new Vec3(entL.posX, entL.posY, entL.posZ);
 				}
 				
 				return EnumBehaviorState.RUNNING;

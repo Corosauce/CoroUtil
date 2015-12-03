@@ -10,7 +10,6 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import CoroUtil.bt.actions.Delay;
 import CoroUtil.bt.actions.OrdersUser;

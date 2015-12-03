@@ -17,9 +17,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.config.ConfigCoroAI;
-import CoroUtil.forge.CoroAI;
 import CoroUtil.pathfinding.PFQueue;
 
 public class DimensionChunkCache implements IBlockAccess
@@ -71,7 +69,7 @@ public class DimensionChunkCache implements IBlockAccess
     		
     		
     		if (!skip) {
-    			dimCacheLookup.put(world.provider.dimensionId, new DimensionChunkCache(world, true));
+    			dimCacheLookup.put(world.provider.getDimensionId(), new DimensionChunkCache(world, true));
     		}
     	}
     }
@@ -105,7 +103,7 @@ public class DimensionChunkCache implements IBlockAccess
     			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
     				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
     			} else {
-    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.dimensionId + " - " + world.provider.getDimensionName());
+    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimensionId() + " - " + world.provider.getDimensionName());
     			}
     		}
 	    	

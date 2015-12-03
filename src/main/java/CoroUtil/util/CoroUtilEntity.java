@@ -9,7 +9,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
@@ -17,12 +16,12 @@ public class CoroUtilEntity {
 
 	public static boolean canCoordBeSeen(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3(x, y, z)) == null;
     }
     
     public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(ent.posX, ent.boundingBox.minY+0.15, ent.posZ), Vec3.createVectorHelper(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.boundingBox.minY+0.15, ent.posZ), new Vec3(x, y, z)) == null;
     }
     
     public static double getDistance(Entity ent, ChunkCoordinates coords)
@@ -46,7 +45,7 @@ public class CoroUtilEntity {
     	double vecY = target.posY - parEnt.posY;
     	double vecZ = target.posZ - parEnt.posZ;
     	double dist = Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-    	Vec3 vec3 = Vec3.createVectorHelper(vecX / dist, vecY / dist, vecZ / dist);
+    	Vec3 vec3 = new Vec3(vecX / dist, vecY / dist, vecZ / dist);
     	return vec3;
     }
 	

@@ -2,26 +2,21 @@ package CoroUtil.ability.abilities;
 
 import java.util.Random;
 
-import javax.vecmath.Vector2d;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.entity.projectile.EntityArrow;
 import CoroUtil.entity.projectile.EntityProjectileBase;
 import CoroUtil.inventory.AIInventory;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 import extendedrenderer.particle.entity.EntityRotFX;
 
 public class AbilityShootArrow extends Ability {

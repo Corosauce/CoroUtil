@@ -207,7 +207,7 @@ public class JobHuntRanged extends JobBase {
 		}
 		if (ent.worldObj.getWorldTime() % 10 == 0) {
 			if (ai.entityToAttack != null) {
-				targetLastPos = Vec3.createVectorHelper(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ);
+				targetLastPos = new Vec3(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ);
 			}
 		}
 		ent.prevHealth = ent.getHealth();

@@ -1,7 +1,6 @@
 package CoroUtil.util;
 
 import java.lang.reflect.Constructor;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import CoroUtil.ability.Ability;
-import CoroUtil.quest.quests.ActiveQuest;
 
 public class CoroUtilAbility {
 
@@ -62,7 +60,7 @@ public class CoroUtilAbility {
 	/* It will try a full nbt load if it detected the skill wasnt there, but this requires the server to have predicted this and actually sent a full nbtLoad() package */
 	public static void nbtLoadSkills(NBTTagCompound nbt, ConcurrentHashMap<String, Ability> abilities, EntityLivingBase owner, boolean syncOnly) {
 
-		Iterator it = nbt.func_150296_c().iterator();
+		Iterator it = nbt.getKeySet().iterator();
 		
 		while (it.hasNext()) {
 			String tagName = (String) it.next();

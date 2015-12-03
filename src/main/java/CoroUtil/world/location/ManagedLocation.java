@@ -4,17 +4,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.util.CoroUtilFile;
-import CoroUtil.world.grid.chunk.PlayerDataGrid;
 
 public class ManagedLocation implements ISimulationTickable {
 
@@ -193,7 +190,7 @@ public class ManagedLocation implements ISimulationTickable {
     	spawn = CoroUtilFile.readCoords("spawn", var1);
     	
     	NBTTagCompound nbtPersistantEntities = var1.getCompoundTag("listPersistantEntities");
-    	Iterator it = nbtPersistantEntities.func_150296_c().iterator();
+    	Iterator it = nbtPersistantEntities.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
     		NBTTagCompound entry = nbtPersistantEntities.getCompoundTag(entryName);

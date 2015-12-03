@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
@@ -120,7 +119,7 @@ public class BlackboardBase implements IPFCallback {
 	public void trackTarget(boolean resetPathData) {
 		if (target != null) {
 			//System.out.println("tracking target");
-			setMoveTo(Vec3.createVectorHelper(target.posX, target.posY, target.posZ), resetPathData);
+			setMoveTo(new Vec3(target.posX, target.posY, target.posZ), resetPathData);
 		}
 	}
 	

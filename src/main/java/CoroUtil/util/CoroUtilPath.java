@@ -2,7 +2,6 @@ package CoroUtil.util;
 
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.ChunkCoordinates;
 
 public class CoroUtilPath {
 

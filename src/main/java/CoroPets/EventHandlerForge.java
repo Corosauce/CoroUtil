@@ -9,9 +9,9 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent.Save;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.pets.PetsManager;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class EventHandlerForge {
 
@@ -30,7 +30,7 @@ public class EventHandlerForge {
 		
 		//this is called for every dimension
 		
-		if (((WorldServer)event.world).provider.dimensionId == 0) {
+		if (((WorldServer)event.world).provider.getDimensionId() == 0) {
 			
 		}
 	}

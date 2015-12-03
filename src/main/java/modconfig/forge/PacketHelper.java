@@ -1,11 +1,8 @@
 package modconfig.forge;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import net.minecraft.nbt.NBTTagCompound;
 import modconfig.ConfigMod;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class PacketHelper {
 

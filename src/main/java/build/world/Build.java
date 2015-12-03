@@ -3,25 +3,21 @@ package build.world;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagInt;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilFile;
 import build.SchematicData;
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class Build {
 
@@ -618,7 +614,7 @@ public class Build {
 			Iterator it = playerDataCl.iterator();
 			
 			while (it.hasNext()) {*/
-			it = parMappingNBT.func_150296_c().iterator();
+			it = parMappingNBT.getKeySet().iterator();
 			while (it.hasNext()) {
 				String tagName = (String) it.next();
 				int tag = parMappingNBT.getInteger(tagName);//(NBTTagInt)it.next();
@@ -668,7 +664,7 @@ public class Build {
 	        	}
 			}
 			
-	        it = parMappingNBT.func_150296_c().iterator();
+	        it = parMappingNBT.getKeySet().iterator();
 			while (it.hasNext()) {
 				String tagName = (String) it.next();
 				int tag = parMappingNBT.getInteger(tagName);//(NBTTagInt)it.next();

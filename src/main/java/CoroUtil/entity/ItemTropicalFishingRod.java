@@ -1,14 +1,12 @@
 package CoroUtil.entity;
 
-import CoroUtil.inventory.AIInventory;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import CoroUtil.inventory.AIInventory;
 
 public class ItemTropicalFishingRod extends Item 
 {

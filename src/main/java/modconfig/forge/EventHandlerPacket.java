@@ -1,7 +1,6 @@
 package modconfig.forge;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
@@ -10,11 +9,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.packet.PacketHelper;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class EventHandlerPacket {
 
@@ -37,7 +36,7 @@ public class EventHandlerPacket {
 				if (!GuiConfigEditor.clientMode || ConfigMod.configLookup.get(modID).configData.size() == 0) {
 	                ConfigMod.configLookup.get(modID).configData.clear();
 	                //Iterator it = nbtEntries.getTagList(p_150295_1_, p_150295_2_)
-	                Iterator it = nbtEntries.func_150296_c().iterator();
+	                Iterator it = nbtEntries.getKeySet().iterator();
 	                while (it.hasNext()) {
 	                	String tagName = (String) it.next();
 	                	NBTTagCompound entry = nbtEntries.getCompoundTag(tagName);

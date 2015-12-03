@@ -1,13 +1,9 @@
 package CoroUtil.util;
 
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
-import CoroUtil.OldUtil;
 
 public class CoroUtilNBT {
 
@@ -17,7 +13,7 @@ public class CoroUtilNBT {
 		String tagName = "";
 		//do magic
 		try {
-			Iterator it = nbtSource.func_150296_c().iterator();
+			Iterator it = nbtSource.getKeySet().iterator();
 			while (it.hasNext()) {
 				tagName = (String) it.next();
 				NBTBase data = nbtSource.getTag(tagName);

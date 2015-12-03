@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import CoroUtil.util.CoroUtilBlock;
-import build.world.Build;
 
 public class BlockStaticDataMap {
 	public static HashMap<String, Float> mapBlockWeight;

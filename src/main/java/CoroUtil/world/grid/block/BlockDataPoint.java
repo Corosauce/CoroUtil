@@ -1,13 +1,8 @@
 package CoroUtil.world.grid.block;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 
 public class BlockDataPoint
 {

@@ -1,6 +1,5 @@
 package CoroPets.ai.tasks;
 
-import CoroPets.CoroPets;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -9,6 +8,7 @@ import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import CoroPets.CoroPets;
 
 public class EntityAIAttackHostilesOnCollide extends EntityAIBase
 {

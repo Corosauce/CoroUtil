@@ -2,12 +2,12 @@ package CoroUtil.world.location;
 
 import java.util.List;
 
-import CoroUtil.util.ChunkCoordinatesBlock;
-import CoroUtil.util.CoroUtilBlock;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import CoroUtil.util.ChunkCoordinatesBlock;
+import CoroUtil.util.CoroUtilBlock;
 
 public class StructureDamagable extends StructureObject {
 	

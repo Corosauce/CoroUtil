@@ -1,7 +1,6 @@
 package CoroUtil.bt.selector;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
@@ -52,7 +51,7 @@ public class SelectorMoveToCoords extends Selector {
 			//closeDist = 10;
 			
 			//dbg("moveto dist: " + dist);
-			if (dist < closeDist && (!useSight || canBeSeen(Vec3.createVectorHelper(coordsRef[0].posX, coordsRef[0].posY+1.1D, coordsRef[0].posZ)))) {
+			if (dist < closeDist && (!useSight || canBeSeen(new Vec3(coordsRef[0].posX, coordsRef[0].posY+1.1D, coordsRef[0].posZ)))) {
 				
 				noMoveTicks = 0;
 				//keep in mind, having this set to clear really broke the ai when job hunt is firing....
@@ -66,7 +65,7 @@ public class SelectorMoveToCoords extends Selector {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
 					//ent.getAIBTAgent().moveTo(coordsRef[0]);
-					ent.getAIBTAgent().blackboard.setMoveTo(Vec3.createVectorHelper(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ));
+					ent.getAIBTAgent().blackboard.setMoveTo(new Vec3(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ));
 					noMoveTicks = 0;
 				//}
 				//timeout check go here maybe?
@@ -86,7 +85,7 @@ public class SelectorMoveToCoords extends Selector {
 							}
 						}
 					}
-					noMoveTicksLastPos = Vec3.createVectorHelper(entL.posX, entL.posY, entL.posZ);
+					noMoveTicksLastPos = new Vec3(entL.posX, entL.posY, entL.posZ);
 				}
 				
 				return EnumBehaviorState.RUNNING;
@@ -100,7 +99,7 @@ public class SelectorMoveToCoords extends Selector {
 	public boolean canBeSeen(Vec3 pos)
     {
 		EntityLivingBase entL = ((EntityLivingBase)ent);
-        return entL.worldObj.rayTraceBlocks(Vec3.createVectorHelper(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
+        return entL.worldObj.rayTraceBlocks(new Vec3(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	
 }

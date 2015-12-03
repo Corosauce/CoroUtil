@@ -6,12 +6,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiBetterSlot
@@ -342,7 +341,7 @@ public abstract class GuiBetterSlot
         this.bindAmountScrolled();
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_FOG);
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = Tessellator.getInstance();
         drawContainerBackground(tessellator);
         j1 = this.width / 2/* - 92*/ - 16;
         k1 = this.top + 4 - (int)this.amountScrolled;
@@ -476,7 +475,7 @@ public abstract class GuiBetterSlot
      */
     protected void overlayBackground(int par1, int par2, int par3, int par4)
     {
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = Tessellator.getInstance();
         //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

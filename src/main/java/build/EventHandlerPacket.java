@@ -5,6 +5,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.packet.INBTPacketHandler;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilEntity;
@@ -12,11 +16,6 @@ import build.playerdata.PlayerData;
 import build.playerdata.objects.Clipboard;
 import build.world.Build;
 import build.world.BuildJob;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class EventHandlerPacket {
 
@@ -78,7 +77,7 @@ public class EventHandlerPacket {
             			int sY = nbt.getInteger("sizeY");
             			int sZ = nbt.getInteger("sizeZ");
             			cb.clipboardData = new Build(x, y, z, CoroUtilEntity.getName(entP) + "_clipboard", true);
-            			cb.clipboardData.dim = entP.worldObj.provider.dimensionId;
+            			cb.clipboardData.dim = entP.worldObj.provider.getDimensionId();
             			//cb.clipboardData.recalculateLevelSize(x, y, z, sX, sY, sZ, true);
             			cb.clipboardData.setCornerPosition(x, y, z);
             			cb.clipboardData.map_sizeX = sX;
@@ -89,7 +88,7 @@ public class EventHandlerPacket {
             		} else {
             			int dir = nbt.getInteger("direction");
             			cb.clipboardData.setCornerPosition(x, y, z);
-            			cb.clipboardData.dim = entP.worldObj.provider.dimensionId;
+            			cb.clipboardData.dim = entP.worldObj.provider.getDimensionId();
             			BuildJob bj = new BuildJob(BuildServerTicks.buildMan.activeBuilds.size(), cb.clipboardData);
                 		bj.setDirection(dir);
             			System.out.println("build: " + x + ", " + y + ", " + z + ", dir:" + bj.direction);

@@ -12,12 +12,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
@@ -142,7 +142,7 @@ public class RotatingEffectRenderer
                         this.renderer.bindTexture(resLayer5);
                     }
 
-                    Tessellator var10 = Tessellator.instance;
+                    Tessellator var10 = Tessellator.getInstance();
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                     
                     GL11.glDepthMask(false);

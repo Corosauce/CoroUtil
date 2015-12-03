@@ -1,11 +1,6 @@
 package extendedrenderer.particle.behavior;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.Vec3;
-import extendedrenderer.ExtendedRenderer;
-import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.behavior.ParticleBehaviors;
-import extendedrenderer.particle.entity.EntityIconFX;
 import extendedrenderer.particle.entity.EntityRotFX;
 
 public class ParticleBehaviorCharge extends ParticleBehaviors {

@@ -4,16 +4,9 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Vec3;
 import CoroPets.ai.BehaviorModifier;
-import CoroUtil.quest.PlayerQuestManager;
-import CoroUtil.quest.PlayerQuests;
-import CoroUtil.quest.quests.ActiveQuest;
-import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilItem;
 
 public class CommandCoroPets extends CommandBase {
 
@@ -30,10 +23,10 @@ public class CommandCoroPets extends CommandBase {
 			{
 				EntityPlayer player = getCommandSenderAsPlayer(var1);
 				
-				if (MinecraftServer.getServer().isSinglePlayer() || MinecraftServer.getServer().getConfigurationManager().func_152596_g(player.getGameProfile())) {
+				if (MinecraftServer.getServer().isSinglePlayer() || MinecraftServer.getServer().getConfigurationManager().canSendCommands(player.getGameProfile())) {
 					if (var2[0].equals("aitest")) {
 						System.out.println("AI TEST MODIFY!");
-						BehaviorModifier.test(player.worldObj, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), player);
+						BehaviorModifier.test(player.worldObj, new Vec3(player.posX, player.posY, player.posZ), player);
 					}
 				}
 			}

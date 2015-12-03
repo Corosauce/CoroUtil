@@ -1,6 +1,5 @@
 package CoroUtil.quest;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -20,20 +18,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.quest.quests.ActiveQuest;
-import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.quest.quests.KillEntityQuest;
 import CoroUtil.util.CoroUtilFile;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.Event;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class PlayerQuests {
 
@@ -324,7 +317,7 @@ public class PlayerQuests {
 		
 		if (!parNBT.hasNoTags()) {
 			//Iterator it = parNBT.getTags().iterator();
-			Iterator it = parNBT.func_150296_c().iterator();
+			Iterator it = parNBT.getKeySet().iterator();
 		
 			while (it.hasNext()) {
 				String tagName = (String) it.next();

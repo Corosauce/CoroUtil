@@ -51,7 +51,7 @@ public class CommandCoroUtil extends CommandBase {
 					if (aq != null) {
 						aq.initCreateObject(plQuests);
 						
-						aq.initFirstTime(player.worldObj.provider.dimensionId);
+						aq.initFirstTime(player.worldObj.provider.getDimensionId());
 						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.diamond), 5, false);
 						
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);

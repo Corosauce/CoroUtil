@@ -11,12 +11,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -157,8 +155,8 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
-				if (pe.getPosition(ent).distanceTo(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
+			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+				if (pe.getPosition(ent).distanceTo(new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
 				//System.out.println("next path!");
@@ -166,7 +164,7 @@ public class JobBase {
 			
 			/*int pIndex = pe.pathIndex+1;
 			if (pIndex < this.pathToEntity.points.length) {
-				if (this.worldObj.rayTraceBlocks(Vec3.createVectorHelper((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
+				if (this.worldObj.rayTraceBlocks(new Vec3((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), new Vec3(posX, posY + (double)getEyeHeight(), posZ)) == null) {
 					this.pathToEntity.pathIndex++;
 				}
 			}*/

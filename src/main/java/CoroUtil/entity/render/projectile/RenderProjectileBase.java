@@ -6,7 +6,6 @@ import javax.vecmath.Matrix3f;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -14,11 +13,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.BufferUtils;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderProjectileBase extends Render
@@ -73,7 +71,7 @@ public class RenderProjectileBase extends Render
         float var9 = 1.0F;
         float var10 = 0.8F;
         float var11 = 0.6F;
-        Tessellator var12 = Tessellator.instance;
+        Tessellator var12 = Tessellator.getInstance();
         var12.startDrawingQuads();
         //float var13 = var2.getBlockBrightness(var3, var4, var5, var6);
         //float var14 = var2.getBlockBrightness(var3, var4, var5 - 1, var6);

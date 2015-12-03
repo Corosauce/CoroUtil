@@ -8,17 +8,17 @@ import javax.vecmath.Vector3d;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 
@@ -26,8 +26,6 @@ import scala.util.Random;
 import CoroUtil.util.CoroUtilBlock;
 import build.world.Build;
 import build.world.BuildManager;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class Overlays {
@@ -36,13 +34,13 @@ public class Overlays {
 	
 	public static void renderBuildPreview(Build b, Vec3 pos, Vec3 angle) {
 		
-		Tessellator tess = Tessellator.instance;
+		Tessellator tess = Tessellator.getInstance();
 		float scale = 1F;
 		GL11.glPushMatrix();
 
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		Vec3 posPlayer = Vec3.createVectorHelper(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
+		Vec3 posPlayer = new Vec3(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
 		GL11.glTranslated(-posPlayer.xCoord, -posPlayer.yCoord, -posPlayer.zCoord);
 		GL11.glTranslated(pos.xCoord-0.5D, pos.yCoord+0.5D, pos.zCoord-0.5D);
 		
@@ -82,8 +80,8 @@ public class Overlays {
 		float y1 = b.map_sizeY + y - 1F;
 		float z1 = b.map_sizeZ + z - 1F;
 		
-		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
-		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
 		
 		renderBuildOutline(c1.posX, c1.posY, c1.posZ, c2.posX, c2.posY, c2.posZ);
 		
@@ -104,8 +102,8 @@ public class Overlays {
 		float y2 = b.map_sizeY + y - 1F;
 		float z2 = b.map_sizeZ/2 + z - 1F;
 		
-		ChunkCoordinates c1 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
-		ChunkCoordinates c2 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, Vec3.createVectorHelper(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), Vec3.createVectorHelper(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c1 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		ChunkCoordinates c2 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
 		
 		renderLineFromToBlock(c1.posX + 0.5, y + 3.5, c1.posZ + 0.5, c2.posX + 0.5, y + 8.5, c2.posZ + 0.5, 0x00FF00);
 	}
@@ -114,8 +112,8 @@ public class Overlays {
 		
 		//double vecX = 
 		double arrowSize = 4;
-		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord), dir, Vec3.createVectorHelper(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), Vec3.createVectorHelper(arrowSize, arrowSize, arrowSize));
-		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord + 1, (int)pos.yCoord, (int)pos.zCoord), dir, Vec3.createVectorHelper(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), Vec3.createVectorHelper(arrowSize, arrowSize, arrowSize));
+		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
+		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord + 1, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
 		
 		renderLineFromToBlock(c1.posX, c1.posY, c1.posZ, c2.posX, c2.posY, c2.posZ, 0x00FF00);
 	}*/
@@ -284,7 +282,7 @@ public class Overlays {
 	}
 	
 	public static void renderLineFromToBlock(double x1, double y1, double z1, double x2, double y2, double z2, int stringColor) {
-	    Tessellator tessellator = Tessellator.instance;
+	    Tessellator tessellator = Tessellator.getInstance();
 	    RenderManager rm = RenderManager.instance;
 	    
 	    float castProgress = 1.0F;
@@ -340,7 +338,7 @@ public class Overlays {
         float var9 = 1.0F;
         float var10 = 0.8F;
         float var11 = 0.6F;
-        Tessellator var12 = Tessellator.instance;
+        Tessellator var12 = Tessellator.getInstance();
         var12.startDrawingQuads();
         //float var13 = var2.getBlockBrightness(var3, var4, var5, var6);
         //float var14 = var2.getBlockBrightness(var3, var4, var5 - 1, var6);
@@ -425,7 +423,7 @@ public class Overlays {
 	
 	public static void renderCircle(double x1, double y1, double z1, int stringColor, double size) {
 		try {
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
 		    RenderManager rm = RenderManager.instance;
 		    
 		    GL11.glMatrixMode(GL11.GL_MODELVIEW);
@@ -454,7 +452,7 @@ public class Overlays {
 	
 	public static void renderSphereFun(double xx1, double yy1, double zz1, int stringColor) {
 		try {
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
 		    RenderManager rm = RenderManager.instance;
 		    
 		    double size = 3D;
@@ -573,7 +571,7 @@ public class Overlays {
 	
 	public static void renderFun(double xx1, double yy1, double zz1, int stringColor) {
 		try {
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
 		    RenderManager rm = RenderManager.instance;
 		    
 		    double size = 3D;

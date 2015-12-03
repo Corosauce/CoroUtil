@@ -15,7 +15,6 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -26,7 +25,6 @@ import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
-import CoroUtil.forge.CoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
@@ -498,12 +496,12 @@ public class AIAgent {
 		
 		//No movement on x z
 		if (!ent.getNavigator().noPath()) {
-			Vec3 curPos = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+			Vec3 curPos = new Vec3(ent.posX, ent.posY, ent.posZ);
 			if (prevPos == null) {
 				prevPos = curPos;
 			} else {
 				//make y not count
-				prevPos = Vec3.createVectorHelper(prevPos.xCoord, ent.posY, prevPos.zCoord);
+				prevPos = new Vec3(prevPos.xCoord, ent.posY, prevPos.zCoord);
 			}
 			
 			if (curPos.distanceTo(prevPos) < 0.01) {
@@ -568,7 +566,7 @@ public class AIAgent {
 			}
 		}
 		
-		if (ent.onGround && ent.getNavigator().noPath()) lastSafeSpot = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+		if (ent.onGround && ent.getNavigator().noPath()) lastSafeSpot = new Vec3(ent.posX, ent.posY, ent.posZ);
 		
 		if (shouldFixBadYPathing) fixBadYPathing();
 	}
@@ -1053,7 +1051,7 @@ public class AIAgent {
     {
 		float partialTick = 1F;
 		
-        Vec3 var4 = Vec3.createVectorHelper(ent.posX, ent.posY+yOffset, ent.posZ);
+        Vec3 var4 = new Vec3(ent.posX, ent.posY+yOffset, ent.posZ);
         Vec3 var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);

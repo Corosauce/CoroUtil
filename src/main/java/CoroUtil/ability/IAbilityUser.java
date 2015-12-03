@@ -1,6 +1,5 @@
 package CoroUtil.ability;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public interface IAbilityUser {

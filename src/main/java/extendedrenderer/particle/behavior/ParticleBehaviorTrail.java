@@ -3,7 +3,6 @@ package extendedrenderer.particle.behavior;
 import java.util.Random;
 
 import net.minecraft.util.Vec3;
-import extendedrenderer.particle.behavior.ParticleBehaviors;
 import extendedrenderer.particle.entity.EntityRotFX;
 
 public class ParticleBehaviorTrail extends ParticleBehaviors {
@@ -53,7 +52,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			double vecX = centerX - particle.posX;
 			double vecY = centerY - particle.posY;
 			double vecZ = centerZ - particle.posZ;
-			Vec3 vec = Vec3.createVectorHelper(vecX, vecY, vecZ);
+			Vec3 vec = new Vec3(vecX, vecY, vecZ);
 			
 			double radius = 1.6D;
 			double amp = 0.005D * Math.max(1, (vec.lengthVector() * 0.01D))/* / (particle.getAge())*/;
@@ -61,7 +60,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			double rotSpeed = (particle.getAge()) * amp;
 			
 			
-			Vec3 vec2 = Vec3.createVectorHelper(vecX, vecY, vecZ);
+			Vec3 vec2 = new Vec3(vecX, vecY, vecZ);
 			vec = vec.normalize();
 			vec2 = vec2.normalize();
 			

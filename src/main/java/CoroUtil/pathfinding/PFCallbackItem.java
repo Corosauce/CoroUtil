@@ -1,7 +1,6 @@
 package CoroUtil.pathfinding;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.pathfinding.PathEntity;
 
 public class PFCallbackItem {

@@ -2,8 +2,6 @@ package CoroUtil.world.location;
 
 import java.util.UUID;
 
-import net.minecraft.util.ChunkCoordinates;
-
 public class SpawnLocationData {
 
 	public ChunkCoordinates coords;

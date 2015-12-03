@@ -10,7 +10,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
@@ -19,15 +18,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.componentAI.ICoroAI;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class EntityTropicalFishHook extends Entity implements IEntityAdditionalSpawnData {
 
@@ -59,7 +54,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    /*@Override
    public boolean isInRangeToRenderVec3D(Vec3 asd)
    {
-	   return asd.distanceTo(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)) < 80; 
+	   return asd.distanceTo(new Vec3(this.posX, this.posY, this.posZ)) < 80; 
        
    }*/
    
@@ -229,13 +224,13 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             ++this.ticksInAir;
          }
 
-         Vec3 var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-         Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         Vec3 var20 = new Vec3(this.posX, this.posY, this.posZ);
+         Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var20, var2);
-         var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-         var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         var20 = new Vec3(this.posX, this.posY, this.posZ);
+         var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          if(var3 != null) {
-            var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+            var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
          }
 
          Entity var4 = null;

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.client.FMLClientHandler;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -15,7 +16,6 @@ import build.enums.EnumBuildState;
 import build.enums.EnumCopyState;
 import build.render.Overlays;
 import build.world.Build;
-import cpw.mods.fml.client.FMLClientHandler;
 
 public class BuildClientTicks
 {
@@ -51,11 +51,11 @@ public class BuildClientTicks
     {
     	Minecraft mc = FMLClientHandler.instance().getClient();
     	
-    	if (mc.renderViewEntity != null) {
-    		extendedMouseOver = mc.renderViewEntity.rayTrace(lookDist, partialTicks);
+    	if (mc.getRenderViewEntity() != null) {
+    		extendedMouseOver = mc.getRenderViewEntity().rayTrace(lookDist, partialTicks);
     		if (extendedMouseOver == null) {
-	    		Vec3 vec3 = mc.renderViewEntity.getPosition(partialTicks);
-	            Vec3 vec31 = mc.renderViewEntity.getLook(partialTicks);
+	    		Vec3 vec3 = mc.getRenderViewEntity().getPosition(partialTicks);
+	            Vec3 vec31 = mc.getRenderViewEntity().getLook(partialTicks);
 	            Vec3 vec32 = vec3.addVector(vec31.xCoord * lookDist, vec31.yCoord * lookDist, vec31.zCoord * lookDist);
 	            
 	            extendedMouseOver = new MovingObjectPosition((int)vec32.xCoord, (int)vec32.yCoord, (int)vec32.zCoord, 0, vec32);
@@ -134,7 +134,7 @@ public class BuildClientTicks
     	if (mc.thePlayer == null || mc.theWorld == null) return;
     	
     	if (mc.theWorld != null) {
-    		clipboardData.dim = mc.theWorld.provider.dimensionId;
+    		clipboardData.dim = mc.theWorld.provider.getDimensionId();
     	}
     	
     	if (buildState == EnumBuildState.PLACE) {

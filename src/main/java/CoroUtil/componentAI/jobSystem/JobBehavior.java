@@ -1,6 +1,5 @@
 package CoroUtil.componentAI.jobSystem;
 
-import net.minecraft.nbt.NBTTagCompound;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.OrdersHandler;

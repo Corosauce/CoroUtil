@@ -7,7 +7,6 @@ import java.util.List;
 import net.minecraft.nbt.NBTTagCompound;
 import CoroUtil.quest.EnumQuestState;
 import CoroUtil.quest.PlayerQuests;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class ActiveQuest {
 
@@ -79,7 +78,7 @@ public class ActiveQuest {
 	}
 	
 	public boolean isPlayerInOriginalDimension() {
-		return dimIDCreatedIn == playerQuests.getWorld().provider.dimensionId;
+		return dimIDCreatedIn == playerQuests.getWorld().provider.getDimensionId();
 	}
 	
 	public boolean isComplete() {

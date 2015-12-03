@@ -8,7 +8,6 @@ import net.minecraft.entity.ai.attributes.ServersideAttributeMap;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.MathHelper;
 
 import com.google.common.collect.Multimap;

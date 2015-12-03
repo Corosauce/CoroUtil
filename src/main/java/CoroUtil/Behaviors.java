@@ -3,7 +3,6 @@ package CoroUtil;
 import java.util.HashMap;
 import java.util.List;
 
-import CoroUtil.pathfinding.c_IEnhPF;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -18,7 +17,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
+import CoroUtil.pathfinding.c_IEnhPF;
 
 
 public class Behaviors {
@@ -76,7 +75,7 @@ public class Behaviors {
                     	((c_IEnhPF)me).noMoveTriggerCallback();
                     } else {
                     	me.setAttackTarget(null);
-                        me.setPathToEntity(null);
+                        me.getNavigator().setPath(null, 0);
                     }
                     ticks = 0;
                 }
@@ -101,7 +100,7 @@ public class Behaviors {
 	public static void checkOrFixTargetTasks(EntityCreature ent, Class targetClass) {
 		if (!aiEnhanced.containsKey(ent)) {
 			EntityAIBase newTask = new EntityAIAttackOnCollide(ent, targetClass, 0.23D/*entC.getAIMoveSpeed()*/, true);
-			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, 0, true);
+			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, true);
 			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIArrowAttack((IRangedAttackMob)ent, 0.25F, 20, 60, 15.0F);
 			
 			ent.tasks.addTask(3, newTask);
@@ -134,7 +133,7 @@ public class Behaviors {
 		boolean found = false;
 		//followTriggerDist = 32F;
 		//if (me.getEntityToAttack() == null) {
-			List ents = me.worldObj.getEntitiesWithinAABB(EntityPlayer.class, me.boundingBox.addCoord((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
+			List ents = me.worldObj.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().addCoord((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {

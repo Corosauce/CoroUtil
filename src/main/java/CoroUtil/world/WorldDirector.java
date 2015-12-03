@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
@@ -17,7 +15,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -28,7 +25,6 @@ import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import CoroUtil.world.grid.chunk.PlayerDataGrid;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 public class WorldDirector implements Runnable {
 
@@ -96,7 +92,7 @@ public class WorldDirector implements Runnable {
 	
 	//required for reading in, etc
 	public void initData(String parModID, World parWorld) {
-		dimID = parWorld.provider.dimensionId;
+		dimID = parWorld.provider.getDimensionId();
 		modID = parModID;
 		
 		if (useThreading) {
@@ -338,7 +334,7 @@ public class WorldDirector implements Runnable {
 		
 		NBTTagCompound tickingLocations = parData.getCompoundTag("tickingLocations");
 		
-		Iterator it = tickingLocations.func_150296_c().iterator();
+		Iterator it = tickingLocations.getKeySet().iterator();
 		
 		
 		while (it.hasNext()) {

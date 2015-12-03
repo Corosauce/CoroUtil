@@ -2,12 +2,10 @@ package CoroUtil.quest.quests;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import CoroUtil.quest.EnumQuestState;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilNBT;
-import cpw.mods.fml.common.eventhandler.Event;
 
 public class BreakBlockQuest extends ActiveQuest {
 	

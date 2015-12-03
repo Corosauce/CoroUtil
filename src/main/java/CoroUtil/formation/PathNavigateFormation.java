@@ -1,6 +1,5 @@
 package CoroUtil.formation;
 
-import CoroUtil.util.CoroUtilBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.EntityMoveHelper;
@@ -8,6 +7,7 @@ import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import CoroUtil.util.CoroUtilBlock;
 
 public class PathNavigateFormation
 {
@@ -40,7 +40,7 @@ public class PathNavigateFormation
     /**
      * Coordinates of the entity's position last time a check was done (part of monitoring getting 'stuck')
      */
-    private Vec3 lastPosCheck = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+    private Vec3 lastPosCheck = new Vec3(0.0D, 0.0D, 0.0D);
 
     /**
      * Specifically, if a wooden door block is even considered to be passable by the pathfinder
@@ -210,7 +210,7 @@ public class PathNavigateFormation
         double d0 = (double)currentPath.getPathPointFromIndex(par2).xCoord + (double)((int)(width + 1.0F)) * 0.5D;
         double d1 = (double)currentPath.getPathPointFromIndex(par2).yCoord;
         double d2 = (double)currentPath.getPathPointFromIndex(par2).zCoord + (double)((int)(width + 1.0F)) * 0.5D;
-        return Vec3.createVectorHelper(d0, d1, d2);
+        return new Vec3(d0, d1, d2);
     }
 
     public void onUpdateNavigation()

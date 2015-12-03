@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockSapling;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -14,15 +13,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import CoroUtil.util.CoroUtilBlock;
 import build.ITileEntityCustomGenData;
 import build.SchematicData;
-import cpw.mods.fml.common.FMLCommonHandler;
 
 //This class works nice and fast, unless the generated thing is hovering in the air. Lighting calculations going overboard perhaps
 //maybe clear area top down to make air clearing pass faster?
@@ -291,12 +289,12 @@ public class BuildManager {
 		    			if (buildJob.useRotationBuild) {
 		    				if (buildJob.build.backwardsCompatibleOldRotate) {
 		    					coords = rotate(coords, buildJob.direction, 
-			    						Vec3.createVectorHelper(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
-			    						Vec3.createVectorHelper(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
+			    						new Vec3(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
+			    						new Vec3(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
 		    				} else {
 		    					coords = rotateNew(coords, buildJob.direction, 
-			    						Vec3.createVectorHelper(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
-			    						Vec3.createVectorHelper(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
+			    						new Vec3(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
+			    						new Vec3(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
 		    				}
 		    				
 		    			} else {
@@ -365,12 +363,12 @@ public class BuildManager {
 					    				//System.out.println("using new rotate");
 					    				if (buildJob.build.backwardsCompatibleOldRotate) {
 					    					coords = rotate(coords, buildJob.direction, 
-						    						Vec3.createVectorHelper(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
-						    						Vec3.createVectorHelper(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
+						    						new Vec3(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
+						    						new Vec3(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
 					    				} else {
 					    					coords = rotateNew(coords, buildJob.direction, 
-						    						Vec3.createVectorHelper(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
-						    						Vec3.createVectorHelper(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
+						    						new Vec3(buildJob.build_startX, buildJob.build_startY, buildJob.build_startZ), 
+						    						new Vec3(build.map_sizeX, build.map_sizeY, build.map_sizeZ));
 					    				}
 					    				
 					    				int tryMeta = rotateMeta(worldRef, coords, buildJob.rotation, id, meta);
@@ -460,8 +458,8 @@ public class BuildManager {
 	public static void rotateSet(BuildJob parBuildJob, ChunkCoordinates coords, Block id, int meta) {
 		
 		coords = rotate(coords, parBuildJob.direction, 
-				Vec3.createVectorHelper(parBuildJob.build_startX, parBuildJob.build_startY, parBuildJob.build_startZ), 
-				Vec3.createVectorHelper(parBuildJob.build.map_sizeX, parBuildJob.build.map_sizeY, parBuildJob.build.map_sizeZ));
+				new Vec3(parBuildJob.build_startX, parBuildJob.build_startY, parBuildJob.build_startZ), 
+				new Vec3(parBuildJob.build.map_sizeX, parBuildJob.build.map_sizeY, parBuildJob.build.map_sizeZ));
 		World world = DimensionManager.getWorld(parBuildJob.build.dim);
 		if (world != null) {
 			world.setBlock(coords.posX, coords.posY, coords.posZ, id, meta, 2);
@@ -507,7 +505,7 @@ public class BuildManager {
 		double vecX = (coords.posX+0.5D) - centerX;
 		double vecZ = (coords.posZ+0.5D) - centerZ;
 		
-		Vec3 vec = Vec3.createVectorHelper(vecX, 0, vecZ);
+		Vec3 vec = new Vec3(vecX, 0, vecZ);
 		vec.rotateAroundY((float)rotation);
 		return new ChunkCoordinates((int)Math.floor(start.xCoord+vec.xCoord), coords.posY, (int)Math.floor(start.zCoord+vec.zCoord));
 	}

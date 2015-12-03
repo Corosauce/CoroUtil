@@ -1,6 +1,5 @@
 package extendedrenderer.particle;
 
-import net.minecraft.util.IIcon;
 import net.minecraftforge.client.event.TextureStitchEvent;
 
 public class ParticleRegistry {

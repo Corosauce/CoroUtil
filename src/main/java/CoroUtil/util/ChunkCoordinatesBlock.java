@@ -1,7 +1,6 @@
 package CoroUtil.util;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.ChunkCoordinates;
 
 public class ChunkCoordinatesBlock extends ChunkCoordinates {
 

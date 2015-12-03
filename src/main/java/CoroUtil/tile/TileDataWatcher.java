@@ -1,7 +1,5 @@
 package CoroUtil.tile;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +13,7 @@ import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.DataWatcher;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.ReportedException;
 import CoroUtil.packet.WatchableObject;
 

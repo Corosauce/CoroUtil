@@ -1,6 +1,5 @@
 package extendedrenderer.particle.entity;
 
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 public class EntityIconWindFX extends EntityIconFX/* implements WindHandler*/ {

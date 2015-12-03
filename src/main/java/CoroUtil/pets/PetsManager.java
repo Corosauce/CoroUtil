@@ -11,11 +11,9 @@ import java.util.UUID;
 
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import CoroPets.ai.BehaviorModifier;
-import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilFile;
 
 public class PetsManager {
@@ -121,7 +119,7 @@ public class PetsManager {
 	}
 	
 	public void nbtRead(NBTTagCompound parNBT) {
-		Iterator it = parNBT.func_150296_c().iterator();
+		Iterator it = parNBT.getKeySet().iterator();
         while (it.hasNext()) {
         	String tagName = (String) it.next();
         	NBTTagCompound entry = parNBT.getCompoundTag(tagName);

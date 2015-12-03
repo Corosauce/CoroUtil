@@ -3,19 +3,17 @@ package CoroUtil.world.location;
 import java.util.ArrayList;
 import java.util.List;
 
-import build.ICustomGen;
-import build.world.BuildJob;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.util.ChunkCoordinatesBlock;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilNBT;
+import build.ICustomGen;
+import build.world.BuildJob;
 
 public class StructureObject implements ICustomGen {
 
