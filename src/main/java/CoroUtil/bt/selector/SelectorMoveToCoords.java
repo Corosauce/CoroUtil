@@ -5,11 +5,12 @@ import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
+import CoroUtil.util.BlockCoord;
 
 public class SelectorMoveToCoords extends Selector {
 
 	public IBTAgent ent;
-	public ChunkCoordinates[] coordsRef;
+	public BlockCoord[] coordsRef;
 	public int closeDist;
 	public boolean ignoreY = false;
 	
@@ -21,13 +22,13 @@ public class SelectorMoveToCoords extends Selector {
 	public Vec3 noMoveTicksLastPos;
 	public boolean useSight = true;
 	
-	public SelectorMoveToCoords(Behavior parParent, IBTAgent parEnt, ChunkCoordinates[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
+	public SelectorMoveToCoords(Behavior parParent, IBTAgent parEnt, BlockCoord[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
 		this(parParent, parEnt, parCoordsRef, parCloseDist);
 		ignoreY = parIgnoreY;
 		helpMonitor = parHelpMonitor;
 	}
 	
-	public SelectorMoveToCoords(Behavior parParent, IBTAgent parEnt, ChunkCoordinates[] parCoordsRef, int parCloseDist) {
+	public SelectorMoveToCoords(Behavior parParent, IBTAgent parEnt, BlockCoord[] parCoordsRef, int parCloseDist) {
 		super(parParent);
 		ent = parEnt;
 		coordsRef = parCoordsRef;

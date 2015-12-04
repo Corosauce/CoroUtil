@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.util.BlockCoord;
 
 public class Formation {
 
@@ -130,7 +131,7 @@ public class Formation {
         }
     }
 	
-	public void setDestination(ChunkCoordinates coords) {
+	public void setDestination(BlockCoord coords) {
 		System.out.println("TODO");
 	}
 	

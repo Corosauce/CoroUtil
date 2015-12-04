@@ -355,7 +355,7 @@ public class PathNavigateCustom
     {
         if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
-            int i = (int)this.theEntity.boundingBox.minY;
+            int i = (int)this.theEntity.getEntityBoundingBox().minY;
             Block block = this.worldObj.getBlock(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
             int k = 0;
 
@@ -372,11 +372,11 @@ public class PathNavigateCustom
             }
             while (k <= 16);
 
-            return (int)this.theEntity.boundingBox.minY;
+            return (int)this.theEntity.getEntityBoundingBox().minY;
         }
         else
         {
-            return (int)(this.theEntity.boundingBox.minY + 0.5D);
+            return (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D);
         }
     }
 
@@ -402,7 +402,7 @@ public class PathNavigateCustom
      */
     private void removeSunnyPath()
     {
-        if (!this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.theEntity.posX), (int)(this.theEntity.boundingBox.minY + 0.5D), MathHelper.floor_double(this.theEntity.posZ)))
+        if (!this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor_double(this.theEntity.posZ)))
         {
             for (int i = 0; i < this.currentPath.getCurrentPathLength(); ++i)
             {

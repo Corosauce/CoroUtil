@@ -27,6 +27,7 @@ import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
@@ -54,10 +55,10 @@ public class AIBTAgent {
 
   	public OrdersHandler ordersHandler;
   	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
-  	public ChunkCoordinates coordsManagedLocation;
+  	public BlockCoord coordsManagedLocation;
   	
   	//for respawning and other misc things
-  	public ChunkCoordinates coordsHome;
+  	public BlockCoord coordsHome;
 	
   	public AIBTTamable tamable;
   	
@@ -283,7 +284,7 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		Block block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY, MathHelper.floor_double(ent.posZ));
+		Block block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor_double(ent.posZ));
 		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -291,7 +292,7 @@ public class AIBTAgent {
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY-1, MathHelper.floor_double(ent.posZ));
+			block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor_double(ent.posZ));
 			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -401,7 +402,7 @@ public class AIBTAgent {
 		return null;
 	}
 	
-	public void setManagedLocation(ChunkCoordinates parLocation) {
+	public void setManagedLocation(BlockCoord parLocation) {
 		coordsManagedLocation = parLocation;
 	}
 	

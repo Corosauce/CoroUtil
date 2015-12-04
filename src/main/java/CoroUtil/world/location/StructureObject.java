@@ -9,7 +9,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import CoroUtil.util.ChunkCoordinatesBlock;
+import CoroUtil.util.BlockCoord;
+import CoroUtil.util.BlockCoordBlock;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilNBT;
 import build.ICustomGen;
@@ -31,20 +32,20 @@ public class StructureObject implements ICustomGen {
 	
 	public boolean isBuilt = false;
 	
-	public ChunkCoordinates pos; // the "center" of the building - getBuildingCornerCoord() is used to get the corner min XYZ, to help deal with even and odd sized buildings
+	public BlockCoord pos; // the "center" of the building - getBuildingCornerCoord() is used to get the corner min XYZ, to help deal with even and odd sized buildings
 	
 	public boolean callbackNeedsFirstTimeInit = false; //originally for first time max health calc
 	
 	public NBTTagCompound initNBTTileEntity = new NBTTagCompound();
 	
-	/*public BuildingBase(TeamObject parTeam, ChunkCoordinates parPos, ChunkCoordinates parSize) {
+	/*public BuildingBase(TeamObject parTeam, BlockCoord parPos, BlockCoord parSize) {
 		team = parTeam;
 		pos = parPos;
 		size = parSize;
 	}*/
 	
 	public StructureObject() {
-		pos = new ChunkCoordinates();
+		pos = new BlockCoord();
 	}
 	
 	public void dbg(Object obj) {
@@ -81,12 +82,12 @@ public class StructureObject implements ICustomGen {
         
     }
 	
-	public List<ChunkCoordinatesBlock> getStructureGenerationComplete(boolean firstTimeScan) {
+	public List<BlockCoordBlock> getStructureGenerationComplete(boolean firstTimeScan) {
 		
 		//get a list from each piece, or pass the list onto each piece?
 		//second idea is more efficient
 		
-		List<ChunkCoordinatesBlock> dataTotal = new ArrayList<ChunkCoordinatesBlock>();
+		List<BlockCoordBlock> dataTotal = new ArrayList<BlockCoordBlock>();
 		List<Integer> redundancyData = new ArrayList<Integer>();
 		
 		//we dont get redundancy data back, does it still work? a list isnt reinitialized so....
@@ -97,16 +98,16 @@ public class StructureObject implements ICustomGen {
 		return dataTotal;
 	}
 	
-	public List<ChunkCoordinatesBlock> getStructureGenerationPattern(List<ChunkCoordinatesBlock> parData, List<Integer> redundancyData, boolean firstTimeScan) {
+	public List<BlockCoordBlock> getStructureGenerationPattern(List<BlockCoordBlock> parData, List<Integer> redundancyData, boolean firstTimeScan) {
 		return parData;
 	}
 	
-	public List<ChunkCoordinatesBlock> getStructureGenerationSchematic(List<ChunkCoordinatesBlock> parData, List<Integer> redundancyData, boolean firstTimeScan) {
+	public List<BlockCoordBlock> getStructureGenerationSchematic(List<BlockCoordBlock> parData, List<Integer> redundancyData, boolean firstTimeScan) {
 		return parData;
 	}
 	
 	//meant for overriding by StructureDamagable
-	public void updateStructureState(List<ChunkCoordinatesBlock> parStructure, boolean firstTimeGen) {
+	public void updateStructureState(List<BlockCoordBlock> parStructure, boolean firstTimeGen) {
 		
 	}
     
@@ -114,7 +115,7 @@ public class StructureObject implements ICustomGen {
     	
     	updateInitNBTForTileEntities();
     	
-    	List<ChunkCoordinatesBlock> data = getStructureGenerationPattern(new ArrayList<ChunkCoordinatesBlock>(), new ArrayList<Integer>(), firstTimeGen);
+    	List<BlockCoordBlock> data = getStructureGenerationPattern(new ArrayList<BlockCoordBlock>(), new ArrayList<Integer>(), firstTimeGen);
 		buildPattern(data);
 		
 		//no need to wait, get health now
@@ -134,7 +135,7 @@ public class StructureObject implements ICustomGen {
 	public void genPassPre(World world, BuildJob parBuildJob, int parPass) {
 		if (parPass == -1) {
 			System.out.println("building gen complete, calculating cur and max health");
-			List<ChunkCoordinatesBlock> data = getStructureGenerationComplete(false);
+			List<BlockCoordBlock> data = getStructureGenerationComplete(false);
 			updateStructureState(data, callbackNeedsFirstTimeInit);
 			//healthCur = getStructureHealth(data, callbackNeedsFirstTimeInit);
 			buildingCompleted(callbackNeedsFirstTimeInit);
@@ -164,11 +165,11 @@ public class StructureObject implements ICustomGen {
     }
     
     //should get a full override (dont call super) for StructureDamagable so it can set the health data per block placement basis
-	public void buildPattern(List<ChunkCoordinatesBlock> parStructure) {
+	public void buildPattern(List<BlockCoordBlock> parStructure) {
 		World world = DimensionManager.getWorld(location.dimID);
 		if (world != null) {
 			for (int i = 0; i < parStructure.size(); i++) {
-				ChunkCoordinatesBlock coords = parStructure.get(i);
+				BlockCoordBlock coords = parStructure.get(i);
 				
 				world.setBlock(coords.posX, coords.posY, coords.posZ, coords.block, coords.meta, 3);
 			}
@@ -176,7 +177,7 @@ public class StructureObject implements ICustomGen {
 	}
     
     //meant to be overridden
-    public ChunkCoordinates getBuildingCornerCoord() {
+    public BlockCoord getBuildingCornerCoord() {
     	return null;
     }
 	

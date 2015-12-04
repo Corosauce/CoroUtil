@@ -60,7 +60,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      */
     public boolean isInRangeToRenderDist(double par1)
     {
-        double d1 = this.boundingBox.getAverageEdgeLength() * 4.0D;
+        double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
         d1 *= 64.0D;
         return par1 < d1 * d1;
     }
@@ -374,7 +374,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
         else
         {
-            d1 = (p_70625_1_.boundingBox.minY + p_70625_1_.boundingBox.maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
+            d1 = (p_70625_1_.getEntityBoundingBox().minY + p_70625_1_.getEntityBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d2 * d2);
@@ -406,7 +406,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public MovingObjectPosition tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -417,7 +417,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             if (entity1.canBeCollidedWith() && (entity1 != entityliving || this.ticksInAir >= 5))
             {
                 float f = 0.3F;
-                AxisAlignedBB axisalignedbb = entity1.boundingBox.expand((double)f, (double)f, (double)f);
+                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
                 MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3, vec31);
 
                 if (movingobjectposition1 != null)

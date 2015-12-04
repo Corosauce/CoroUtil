@@ -26,6 +26,7 @@ import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilInventory;
 import CoroUtil.util.CoroUtilItem;
@@ -103,7 +104,7 @@ public class JobBase {
 		if (ai.scanForHomeChest && ent.worldObj.getWorldTime() % 100 == 0) {
 			if (!CoroUtilInventory.isChest(ent.worldObj.getBlock(ai.homeX, ai.homeY, ai.homeZ))) {
 				//System.out.println("scanning for chests or allies - " + ent);
-				ChunkCoordinates tryCoords = getChestNearby();
+				BlockCoord tryCoords = getChestNearby();
 				if (tryCoords != null) {
 					//System.out.println("discovered a chest to call home! - " + ent);
 					ai.homeX = tryCoords.posX;
@@ -111,7 +112,7 @@ public class JobBase {
 					ai.homeZ = tryCoords.posZ;
 				} else {
 					int range = 30;
-					List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+					List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(range, range/2, range));
 			        for(int j = 0; j < list.size(); j++)
 			        {
 			            Entity entity1 = (Entity)list.get(j);
@@ -131,7 +132,7 @@ public class JobBase {
 		}
 	}
 	
-	public ChunkCoordinates getChestNearby() {
+	public BlockCoord getChestNearby() {
 		
 		int range = 30;
 		
@@ -141,7 +142,7 @@ public class JobBase {
 					Block id = ent.worldObj.getBlock(xx, yy, zz);
 					
 					if (CoroUtilInventory.isChest(id)) {
-						return new ChunkCoordinates(xx, yy, zz);
+						return new BlockCoord(xx, yy, zz);
 					}
 				}
 			}
@@ -220,7 +221,7 @@ public class JobBase {
     	if (itemLookDelay < System.currentTimeMillis()) {
     		itemLookDelay = System.currentTimeMillis() + 500;
     	
-	    	List var3 = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(itemSearchRange*1.0D, itemSearchRange*1.0D, itemSearchRange*1.0D));
+	    	List var3 = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(itemSearchRange*1.0D, itemSearchRange*1.0D, itemSearchRange*1.0D));
 	
 	        if(var3 != null) {
 	            for(int var4 = 0; var4 < var3.size(); ++var4) {
@@ -324,7 +325,7 @@ public class JobBase {
 		float range = 15F;
 		
             {
-            	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+            	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(range, range/2, range));
             	for(int j = 0; j < list.size(); j++)
             	{
             		Entity entity1 = (Entity)list.get(j);
@@ -645,7 +646,7 @@ public class JobBase {
 			ticksBeforeCloseCombatRetry--;
 			return false;
 		} else {
-			return ent.canEntityBeSeen(targ) && (ent.getDistanceToEntity(targ) < 12.0F) && ent.boundingBox.minY - targ.boundingBox.minY <= 2.5D && ent.boundingBox.minY - targ.boundingBox.minY > -2.5D;
+			return ent.canEntityBeSeen(targ) && (ent.getDistanceToEntity(targ) < 12.0F) && ent.getEntityBoundingBox().minY - targ.getEntityBoundingBox().minY <= 2.5D && ent.getEntityBoundingBox().minY - targ.getEntityBoundingBox().minY > -2.5D;
 		}
 	}
 	
@@ -847,7 +848,7 @@ public class JobBase {
 				dist = lookAheadDist;
 				
 				double posX = (center.posX - Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
-				double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+				double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 				double posZ = (center.posZ + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 				
 				int xx = (int)posX;
@@ -900,7 +901,7 @@ public class JobBase {
 		}
 		
 		double posX = (center.posX - Math.cos((-center.rotationYaw) * 0.01745329D) * 1D);
-		double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+		double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 		double posZ = (center.posZ + Math.sin((-center.rotationYaw) * 0.01745329D) * 1D);
 		
 		//this might not work yet....
@@ -925,7 +926,7 @@ public class JobBase {
 				dist = lookAheadDist;
 				
 				double posX = (center.posX - Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
-				double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+				double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 				double posZ = (center.posZ + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 				
 				int xx = (int)posX;

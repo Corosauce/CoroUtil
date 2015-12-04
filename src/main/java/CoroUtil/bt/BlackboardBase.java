@@ -15,6 +15,7 @@ import CoroUtil.pathfinding.IPFCallback;
 import CoroUtil.pathfinding.PFCallbackItem;
 import CoroUtil.pathfinding.PFJobData;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 
 public class BlackboardBase implements IPFCallback {
 
@@ -61,7 +62,7 @@ public class BlackboardBase implements IPFCallback {
 	public MutableBoolean shouldFollowOrders = new MutableBoolean(false);
 	
 	
-	public ChunkCoordinates fleeToCoords = new ChunkCoordinates();
+	public BlockCoord fleeToCoords = new BlockCoord();
 	public long lastTickSafetyCheck = 0;
 	
 	public MutableInt distMed = new MutableInt(18);

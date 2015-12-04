@@ -10,6 +10,7 @@ import net.minecraft.potion.PotionEffect;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.jobSystem.JobBase;
 import CoroUtil.diplomacy.DiplomacyHelper;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
 
 public class AITamable {
@@ -18,7 +19,7 @@ public class AITamable {
 	public String owner = "";
 	public int ownerEntityID = -1; //for non players, should use UUID
 	public EntityLivingBase ownerCachedInstance = null;
-	public ChunkCoordinates occupyCoord;
+	public BlockCoord occupyCoord;
 	public double followDistMin = 2D;
 	public double followDistMax = 8D;
 	public double strayDistMax = 32D;

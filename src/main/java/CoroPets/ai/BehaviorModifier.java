@@ -47,7 +47,7 @@ public class BehaviorModifier {
 	public static void enhanceZombiesToDig(World parWorld, Vec3 parPos, Class[] taskToInject, int priorityOfTask) {
 		int modifyRange = 100;
 		
-		AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(parPos.xCoord, parPos.yCoord, parPos.zCoord, parPos.xCoord, parPos.yCoord, parPos.zCoord);
+		AxisAlignedBB aabb = new AxisAlignedBB(parPos.xCoord, parPos.yCoord, parPos.zCoord, parPos.xCoord, parPos.yCoord, parPos.zCoord);
 		aabb = aabb.expand(modifyRange, modifyRange, modifyRange);
 		List list = parWorld.getEntitiesWithinAABB(EntityZombie.class, aabb);
         for(int j = 0; j < list.size(); j++)
@@ -82,7 +82,7 @@ public class BehaviorModifier {
 		
 		int modifyRange = 10;
 		
-		AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(parPos.xCoord, parPos.yCoord, parPos.zCoord, parPos.xCoord, parPos.yCoord, parPos.zCoord);
+		AxisAlignedBB aabb = new AxisAlignedBB(parPos.xCoord, parPos.yCoord, parPos.zCoord, parPos.xCoord, parPos.yCoord, parPos.zCoord);
 		aabb = aabb.expand(modifyRange, modifyRange, modifyRange);
 		List list = parWorld.getEntitiesWithinAABB(EntityCreature.class, aabb);
         for(int j = 0; j < list.size(); j++)

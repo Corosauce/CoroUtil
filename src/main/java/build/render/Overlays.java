@@ -23,6 +23,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 
 import scala.util.Random;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import build.world.Build;
 import build.world.BuildManager;
@@ -80,8 +81,8 @@ public class Overlays {
 		float y1 = b.map_sizeY + y - 1F;
 		float z1 = b.map_sizeZ + z - 1F;
 		
-		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
-		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		BlockCoord c1 = BuildManager.rotate(new BlockCoord((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		BlockCoord c2 = BuildManager.rotate(new BlockCoord((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
 		
 		renderBuildOutline(c1.posX, c1.posY, c1.posZ, c2.posX, c2.posY, c2.posZ);
 		
@@ -102,8 +103,8 @@ public class Overlays {
 		float y2 = b.map_sizeY + y - 1F;
 		float z2 = b.map_sizeZ/2 + z - 1F;
 		
-		ChunkCoordinates c1 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
-		ChunkCoordinates c2 = BuildManager.rotateNew(new ChunkCoordinates((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		BlockCoord c1 = BuildManager.rotateNew(new BlockCoord((int)Math.floor(x), (int)Math.floor(y), (int)Math.floor(z)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
+		BlockCoord c2 = BuildManager.rotateNew(new BlockCoord((int)Math.floor(x1), (int)Math.floor(y1), (int)Math.floor(z1)), dir, new Vec3(b.map_coord_minX, b.map_coord_minY, b.map_coord_minZ), new Vec3(b.map_sizeX, b.map_sizeY, b.map_sizeZ));
 		
 		renderLineFromToBlock(c1.posX + 0.5, y + 3.5, c1.posZ + 0.5, c2.posX + 0.5, y + 8.5, c2.posZ + 0.5, 0x00FF00);
 	}
@@ -112,8 +113,8 @@ public class Overlays {
 		
 		//double vecX = 
 		double arrowSize = 4;
-		ChunkCoordinates c1 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
-		ChunkCoordinates c2 = BuildManager.rotate(new ChunkCoordinates((int)pos.xCoord + 1, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
+		BlockCoord c1 = BuildManager.rotate(new BlockCoord((int)pos.xCoord, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
+		BlockCoord c2 = BuildManager.rotate(new BlockCoord((int)pos.xCoord + 1, (int)pos.yCoord, (int)pos.zCoord), dir, new Vec3(pos.xCoord - arrowSize/2, pos.yCoord - arrowSize/2, pos.zCoord - arrowSize/2), new Vec3(arrowSize, arrowSize, arrowSize));
 		
 		renderLineFromToBlock(c1.posX, c1.posY, c1.posZ, c2.posX, c2.posY, c2.posZ, 0x00FF00);
 	}*/

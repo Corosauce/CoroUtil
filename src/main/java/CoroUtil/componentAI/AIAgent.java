@@ -28,6 +28,7 @@ import CoroUtil.entity.EnumJobState;
 import CoroUtil.formation.Formation;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
@@ -126,7 +127,7 @@ public class AIAgent {
 	public boolean wasInWater = false;
 	
 	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
-  	public ChunkCoordinates coordsManagedLocation;
+  	public BlockCoord coordsManagedLocation;
   	public int locationMemberID = -1;
 	
 	//Diplomatic fields
@@ -265,7 +266,7 @@ public class AIAgent {
 		return null;
 	}
 	
-	public void setManagedLocation(ChunkCoordinates parLocation) {
+	public void setManagedLocation(BlockCoord parLocation) {
 		coordsManagedLocation = parLocation;
 	}
 	
@@ -592,7 +593,7 @@ public class AIAgent {
             {
             	//fast water pathing
             	//this.getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, 0.53F);
-            	double dist = ent.getDistance(var1.xCoord, ent.boundingBox.minY, var1.zCoord);
+            	double dist = ent.getDistance(var1.xCoord, ent.getEntityBoundingBox().minY, var1.zCoord);
             	//System.out.println(dist);
             	if (dist <= 0.5F) {
             		ent.getNavigator().getPath().incrementPathIndex();
@@ -758,7 +759,7 @@ public class AIAgent {
 			float closest = 9999F;
 			Entity clEnt = null;
 			
-			List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(checkRange, checkRange/2, checkRange));
+			List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(checkRange, checkRange/2, checkRange));
 	        for(int j = 0; j < list.size(); j++)
 	        {
 	            Entity entity1 = (Entity)list.get(j);
@@ -806,7 +807,7 @@ public class AIAgent {
         }
         else
         {
-            d2 = (par1Entity.boundingBox.minY + par1Entity.boundingBox.maxY) / 2.0D - (ent.posY + (double)ent.getEyeHeight());
+            d2 = (par1Entity.getEntityBoundingBox().minY + par1Entity.getEntityBoundingBox().maxY) / 2.0D - (ent.posY + (double)ent.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
@@ -829,7 +830,7 @@ public class AIAgent {
 		float prevRotYaw = ent.rotationYaw;
 		float prevRotPitch = ent.rotationPitch;
 		
-    	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
+    	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.getEntityBoundingBox().maxY > ent.getEntityBoundingBox().minY && var1.getEntityBoundingBox().minY < ent.getEntityBoundingBox().maxY) {
     		if (curCooldown_Melee <= 0) {
     			if (rangedInUse) rangedUsageCancelCharge();
     			
@@ -943,7 +944,7 @@ public class AIAgent {
         pathAvailable = true;
     }
 	
-	public void walkTo(Entity var1, ChunkCoordinates coords, float var2, int timeout) {
+	public void walkTo(Entity var1, BlockCoord coords, float var2, int timeout) {
 		walkTo(var1, coords.posX, coords.posY, coords.posZ, var2, timeout, 0);
 	}
 	
@@ -970,7 +971,7 @@ public class AIAgent {
 		targZ = pe.getFinalPathPoint().zCoord;
 	}
 	
-	public void walkToMark(Entity var1, ChunkCoordinates coords, int timeout) {
+	public void walkToMark(Entity var1, BlockCoord coords, int timeout) {
 		//PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
 		setState(EnumActState.WALKING);
 		jobMan.getPrimaryJob().walkingTimeout = timeout;
@@ -1008,12 +1009,12 @@ public class AIAgent {
 		huntTarget(parEnt, 0);
 	}
 	
-	public void moveTo(ChunkCoordinates coords) {
+	public void moveTo(BlockCoord coords) {
 		PFQueue.getPath(ent, coords.posX, coords.posY, coords.posZ, maxPFRange, 0);
 		walkToMark(null, coords, 600);
 	}
 	
-	public void faceCoord(ChunkCoordinates coord, float f, float f1) {
+	public void faceCoord(BlockCoord coord, float f, float f1) {
 		faceCoord(coord.posX, coord.posY, coord.posZ, f, f1);
 	}
 	

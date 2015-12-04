@@ -10,6 +10,7 @@ import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import CoroUtil.util.BlockCoord;
 
 public class Wander extends Selector {
 
@@ -91,7 +92,7 @@ public class Wander extends Selector {
 						i = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posX;
 						j = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posY;
 						k = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posZ;
-						entInt.getAIBTAgent().tamable.occupyCoord = new ChunkCoordinates((int)i, (int)j, (int)k);
+						entInt.getAIBTAgent().tamable.occupyCoord = new BlockCoord((int)i, (int)j, (int)k);
 						//i = occupyCoord.
 						//job.ai.walkTo(job.ent, occupyCoord, job.ai.maxPFRange, 600);
 						//int randsize = 8;

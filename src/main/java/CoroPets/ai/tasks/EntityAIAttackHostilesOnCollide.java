@@ -108,14 +108,14 @@ public class EntityAIAttackHostilesOnCollide extends EntityAIBase
     	if (this.attacker.getAttackTarget() == null) return;
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
         this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
-        double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.boundingBox.minY, entitylivingbase.posZ);
+        double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
         double d1 = (double)(this.attacker.width * 2.0F * this.attacker.width * 2.0F + entitylivingbase.width);
         --this.field_75445_i;
 
         if (/*(this.longMemory || this.attacker.getEntitySenses().canSee(entitylivingbase)) && */this.field_75445_i <= 0 && (this.field_151497_i == 0.0D && this.field_151495_j == 0.0D && this.field_151496_k == 0.0D || entitylivingbase.getDistanceSq(this.field_151497_i, this.field_151495_j, this.field_151496_k) >= 1.0D || this.attacker.getRNG().nextFloat() < 0.05F))
         {
             this.field_151497_i = entitylivingbase.posX;
-            this.field_151495_j = entitylivingbase.boundingBox.minY;
+            this.field_151495_j = entitylivingbase.getEntityBoundingBox().minY;
             this.field_151496_k = entitylivingbase.posZ;
             this.field_75445_i = failedPathFindingPenalty + 4 + this.attacker.getRNG().nextInt(7);
 

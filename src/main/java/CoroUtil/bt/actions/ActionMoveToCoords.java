@@ -7,11 +7,12 @@ import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.leaf.LeafAction;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.util.BlockCoord;
 
 public class ActionMoveToCoords extends LeafAction {
 
 	public ICoroAI ent;
-	public ChunkCoordinates[] coordsRef;
+	public BlockCoord[] coordsRef;
 	public int closeDist;
 	public boolean ignoreY = false;
 	
@@ -22,7 +23,7 @@ public class ActionMoveToCoords extends LeafAction {
 	public double noMoveTicksThreshold = 0.1D;
 	public Vec3 noMoveTicksLastPos;
 	
-	public ActionMoveToCoords(Behavior parParent, ICoroAI parEnt, ChunkCoordinates[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
+	public ActionMoveToCoords(Behavior parParent, ICoroAI parEnt, BlockCoord[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
 		super(parParent);
 		ent = parEnt;
 		coordsRef = parCoordsRef;

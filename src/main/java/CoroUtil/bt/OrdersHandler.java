@@ -27,7 +27,7 @@ public class OrdersHandler {
 			//needs to be moved to some sort of nbt serialization mapping
 			//orders name -> class, new instance with basic constructor, call its read with nbt data
 			if (activeOrdersName.equals("gather")) {
-				orders = OrdersGatherRes.newOrdersGatherResFromNBT(activeOrdersNBT, team);//(resNode, new ChunkCoordinates[] { new ChunkCoordinates(resNode.posOrigin) }, new ChunkCoordinates[] { new ChunkCoordinates(team.spawn) }, team);
+				orders = OrdersGatherRes.newOrdersGatherResFromNBT(activeOrdersNBT, team);//(resNode, new BlockCoord[] { new BlockCoord(resNode.posOrigin) }, new BlockCoord[] { new BlockCoord(team.spawn) }, team);
 			} else if (activeOrdersName.equals("guard_position")) {
 				orders = OrdersGuardPosition.newFromNBT(ent, activeOrdersNBT, team);
 			}

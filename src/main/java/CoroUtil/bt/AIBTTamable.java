@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import CoroUtil.OldUtil;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
 
 public class AIBTTamable {
@@ -18,7 +19,7 @@ public class AIBTTamable {
 	public String owner = ""; //when set to "", means not tame
 	public int ownerEntityID = -1; //for non players, should use UUID
 	public EntityLivingBase ownerCachedInstance = null;
-	public ChunkCoordinates occupyCoord;
+	public BlockCoord occupyCoord;
 	public double followDistMin = 2D;
 	public double followDistMax = 8D;
 	public double strayDistMax = 32D;

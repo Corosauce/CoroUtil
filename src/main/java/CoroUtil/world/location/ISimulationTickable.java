@@ -1,6 +1,7 @@
 package CoroUtil.world.location;
 
 import net.minecraft.nbt.NBTTagCompound;
+import CoroUtil.util.BlockCoord;
 
 public interface ISimulationTickable {
 
@@ -11,7 +12,7 @@ public interface ISimulationTickable {
 	public void readFromNBT(NBTTagCompound parData);
 	public NBTTagCompound writeToNBT(NBTTagCompound parData);
 	public void cleanup();
-	public ChunkCoordinates getOrigin();
+	public BlockCoord getOrigin();
 	public boolean isThreaded();
 	public String getSharedSimulationName();
 }

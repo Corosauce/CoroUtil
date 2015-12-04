@@ -18,6 +18,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import build.ITileEntityCustomGenData;
 import build.SchematicData;
@@ -284,7 +285,7 @@ public class BuildManager {
 			    		//if (id != 0) {
 			    		//if (worldRef.getBlockId(xx, yy, zz) != 0) { // its quicker to set then to check, mostly
 			    			//worldRef.removeBlockTileEntity(xx, yy, zz);		
-			    		ChunkCoordinates coords = new ChunkCoordinates(xx, yy, zz);
+			    		BlockCoord coords = new BlockCoord(xx, yy, zz);
 		    			
 		    			if (buildJob.useRotationBuild) {
 		    				if (buildJob.build.backwardsCompatibleOldRotate) {
@@ -357,7 +358,7 @@ public class BuildManager {
 					    			//}
 					    			//worldRef.setBlockAndMetadata(build_startX+build_loopTickX, build_startY+build_loopTickY, build_startZ+build_loopTickZ, 0, 0);
 					    			//System.out.println("newFormat: " + build.newFormat);
-					    			ChunkCoordinates coords = new ChunkCoordinates(xx, yy, zz);
+					    			BlockCoord coords = new BlockCoord(xx, yy, zz);
 					    			//System.out.println("printing: " + id + ", preMeta: " + meta);
 					    			if (buildJob.useRotationBuild/* && buildJob.direction != 0*/) {
 					    				//System.out.println("using new rotate");
@@ -455,7 +456,7 @@ public class BuildManager {
     	//worldRef.editingBlocks = false;
     }
 	
-	public static void rotateSet(BuildJob parBuildJob, ChunkCoordinates coords, Block id, int meta) {
+	public static void rotateSet(BuildJob parBuildJob, BlockCoord coords, Block id, int meta) {
 		
 		coords = rotate(coords, parBuildJob.direction, 
 				new Vec3(parBuildJob.build_startX, parBuildJob.build_startY, parBuildJob.build_startZ), 
@@ -467,7 +468,7 @@ public class BuildManager {
 	}
 	
 	/* coords: unrotated world coord, rotation: quantify to 90, start: uncentered world coords for structure start point, size: structure size */
-	public static ChunkCoordinates rotate(ChunkCoordinates coords, int direction, Vec3 start, Vec3 size) {
+	public static BlockCoord rotate(BlockCoord coords, int direction, Vec3 start, Vec3 size) {
 		double rotation = (direction * 90) + 180;
 		double centerX = start.xCoord+(size.xCoord/2D);
 		double centerZ = start.zCoord+(size.zCoord/2D);
@@ -488,11 +489,11 @@ public class BuildManager {
 			newX++;
 		}
 		
-		return new ChunkCoordinates((int)Math.floor(newX), coords.posY, (int)Math.floor(newZ));
+		return new BlockCoord((int)Math.floor(newX), coords.posY, (int)Math.floor(newZ));
 	}
 	
 	/* coords: unrotated world coord, rotation: quantify to 90, start: uncentered world coords for structure start point, size: structure size */
-	public static ChunkCoordinates rotateNew(ChunkCoordinates coords, int direction, Vec3 start, Vec3 size) {
+	public static BlockCoord rotateNew(BlockCoord coords, int direction, Vec3 start, Vec3 size) {
 		
 		//System.out.println("direction: " + direction);
 		
@@ -507,10 +508,10 @@ public class BuildManager {
 		
 		Vec3 vec = new Vec3(vecX, 0, vecZ);
 		vec.rotateAroundY((float)rotation);
-		return new ChunkCoordinates((int)Math.floor(start.xCoord+vec.xCoord), coords.posY, (int)Math.floor(start.zCoord+vec.zCoord));
+		return new BlockCoord((int)Math.floor(start.xCoord+vec.xCoord), coords.posY, (int)Math.floor(start.zCoord+vec.zCoord));
 	}
 	
-	public int rotateMeta(World par1World, ChunkCoordinates coords, double rotation, Block id, int meta) {
+	public int rotateMeta(World par1World, BlockCoord coords, double rotation, Block id, int meta) {
 		
 		//CHECK OUT  RotationHelper.metadataToDirection and RotationHelper.rotateMetadata !!!!!!!
 		

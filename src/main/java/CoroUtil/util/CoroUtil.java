@@ -22,7 +22,7 @@ public class CoroUtil {
         }
         else
         {
-            d2 = (par1Entity.boundingBox.minY + par1Entity.boundingBox.maxY) / 2.0D - (entToRotate.posY + (double)entToRotate.getEyeHeight());
+            d2 = (par1Entity.getEntityBoundingBox().minY + par1Entity.getEntityBoundingBox().maxY) / 2.0D - (entToRotate.posY + (double)entToRotate.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
@@ -72,12 +72,12 @@ public class CoroUtil {
 		return bb;
 	}*/
 	
-	public static ChunkCoordinates vecToChunkCoords(Vec3 parVec) {
-		return new ChunkCoordinates(MathHelper.floor_double(parVec.xCoord), MathHelper.floor_double(parVec.yCoord), MathHelper.floor_double(parVec.zCoord));
+	public static BlockCoord vecToChunkCoords(Vec3 parVec) {
+		return new BlockCoord(MathHelper.floor_double(parVec.xCoord), MathHelper.floor_double(parVec.yCoord), MathHelper.floor_double(parVec.zCoord));
 	}
 	
-	public static ChunkCoordinates addCoords(ChunkCoordinates coords1, ChunkCoordinates coords2) {
-		return new ChunkCoordinates(coords1.posX+coords2.posX, coords1.posY+coords2.posY, coords1.posZ+coords2.posZ);
+	public static BlockCoord addCoords(BlockCoord coords1, BlockCoord coords2) {
+		return new BlockCoord(coords1.posX+coords2.posX, coords1.posY+coords2.posY, coords1.posZ+coords2.posZ);
 	}
 	
 	public static void sendPlayerMsg(EntityPlayerMP entP, String msg) {

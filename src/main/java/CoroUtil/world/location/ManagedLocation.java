@@ -11,13 +11,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.forge.CoroAI;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilFile;
 
 public class ManagedLocation implements ISimulationTickable {
 
 	public int locationID = -1;
 	public int dimID;
-	public ChunkCoordinates spawn;
+	public BlockCoord spawn;
 	public boolean hasInit = false;
 
 	//for active entities in the world, should not contain unloaded entities, as they become invalid
@@ -35,7 +36,7 @@ public class ManagedLocation implements ISimulationTickable {
 		
 	}
 
-	public void initData(int parLocation, int parDim, ChunkCoordinates parCoords) {
+	public void initData(int parLocation, int parDim, BlockCoord parCoords) {
 		locationID = parLocation;
 		dimID = parDim;
 		spawn = parCoords;
@@ -46,7 +47,7 @@ public class ManagedLocation implements ISimulationTickable {
 	}
 	
 	@Override
-	public ChunkCoordinates getOrigin() {
+	public BlockCoord getOrigin() {
 		return spawn;
 	}
 	
@@ -115,7 +116,7 @@ public class ManagedLocation implements ISimulationTickable {
 	}
 	
 	/* register multiple types per coord */
-	public void registerSpawnLocation(ChunkCoordinates parCoords, String... types) {
+	public void registerSpawnLocation(BlockCoord parCoords, String... types) {
 		for (int i = 0; i < types.length; i++) {
 			listSpawnLocations.add(new SpawnLocationData(parCoords, types[i]));
 		}

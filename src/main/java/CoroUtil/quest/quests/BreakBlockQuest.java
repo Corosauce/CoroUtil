@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import CoroUtil.quest.EnumQuestState;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilNBT;
 
@@ -14,7 +15,7 @@ public class BreakBlockQuest extends ActiveQuest {
 	//note, count is for amount of blocks needed to break, not count in inventory
 	
 	//configurations
-	public ChunkCoordinates blockCoords;
+	public BlockCoord blockCoords;
 	public String blockType;
 	public int blockCountNeeded = -1;
 	
@@ -25,7 +26,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		questType = "breakBlock";
 	}
 	
-	public void initCustomData(ChunkCoordinates parCoords, Block parBlock) {
+	public void initCustomData(BlockCoord parCoords, Block parBlock) {
 		super.initCustomData();
 
 		blockCoords = parCoords;

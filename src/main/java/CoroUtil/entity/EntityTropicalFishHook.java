@@ -69,7 +69,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    {
 	   
 	   if (!inGround) {
-		   AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, this.boundingBox.minY, this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.maxY, this.boundingBox.maxZ);
+		   AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, this.getEntityBoundingBox().minY, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, this.getEntityBoundingBox().maxY, this.getEntityBoundingBox().maxZ);
            if(!this.worldObj.isAABBInMaterial(var18, Material.water)) {
         	   int sdfsdf = 0;
            }
@@ -190,7 +190,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             if(this.bobber != null) {
                if(!this.bobber.isDead) {
                   this.posX = this.bobber.posX;
-                  this.posY = this.bobber.boundingBox.minY + (double)this.bobber.height * 0.8D;
+                  this.posY = this.bobber.getEntityBoundingBox().minY + (double)this.bobber.height * 0.8D;
                   this.posZ = this.bobber.posZ;
                   return;
                }
@@ -234,7 +234,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          }
 
          Entity var4 = null;
-         List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+         List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
          double var6 = 0.0D;
 
          double var13;
@@ -242,7 +242,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             Entity var9 = (Entity)var5.get(var8);
             if(var9.canBeCollidedWith() && /*!(var9 instanceof c_PlayerProxy) &&*/ !(var9 instanceof ICoroAI) && (var9 != this.angler || this.ticksInAir >= 10)) {
                float var10 = 0.3F;
-               AxisAlignedBB var11 = var9.boundingBox.expand((double)var10, (double)var10, (double)var10);
+               AxisAlignedBB var11 = var9.getEntityBoundingBox().expand((double)var10, (double)var10, (double)var10);
                MovingObjectPosition var12 = var11.calculateIntercept(var20, var2);
                if(var12 != null) {
                   var13 = var20.distanceTo(var12.hitVec);
@@ -301,9 +301,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             double var26 = 0.0D;
 
             for(int var29 = 0; var29 < var27; ++var29) {
-               double var14 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var29 + 0) / (double)var27 - 0.125D + 0.125D;
-               double var16 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
-               AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, var14, this.boundingBox.minZ, this.boundingBox.maxX, var16, this.boundingBox.maxZ);
+               double var14 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 0) / (double)var27 - 0.125D + 0.125D;
+               double var16 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
+               AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, var14, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, var16, this.getEntityBoundingBox().maxZ);
                if(this.worldObj.isAABBInMaterial(var18, Material.water)) {
                   var26 += 0.6D / (double)var27;
                } else {
@@ -324,7 +324,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                      this.ticksCatchable = this.rand.nextInt(30) + 10;
                      this.motionY -= 0.20000000298023224D;
                      this.worldObj.playSoundAtEntity(this, "random.splash", 0.25F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
-                     float var30 = (float)MathHelper.floor_double(this.boundingBox.minY);
+                     float var30 = (float)MathHelper.floor_double(this.getEntityBoundingBox().minY);
 
                      int var15;
                      float var17;

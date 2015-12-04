@@ -130,7 +130,7 @@ public class EntityAIFollowOwner extends EntityAIBase
                         {
                             int i = MathHelper.floor_double(entitylivingbase.posX) - 2;
                             int j = MathHelper.floor_double(entitylivingbase.posZ) - 2;
-                            int k = MathHelper.floor_double(entitylivingbase.boundingBox.minY);
+                            int k = MathHelper.floor_double(entitylivingbase.getEntityBoundingBox().minY);
 
                             for (int l = 0; l <= 4; ++l)
                             {

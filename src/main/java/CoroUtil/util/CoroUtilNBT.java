@@ -70,15 +70,15 @@ public class CoroUtilNBT {
         return nbttagcompound;
     }*/
 	
-	public static void writeCoords(String name, ChunkCoordinates coords, NBTTagCompound nbt) {
+	public static void writeCoords(String name, BlockCoord coords, NBTTagCompound nbt) {
     	nbt.setInteger(name + "X", coords.posX);
     	nbt.setInteger(name + "Y", coords.posY);
     	nbt.setInteger(name + "Z", coords.posZ);
     }
     
-    public static ChunkCoordinates readCoords(String name, NBTTagCompound nbt) {
+    public static BlockCoord readCoords(String name, NBTTagCompound nbt) {
     	if (nbt.hasKey(name + "X")) {
-    		return new ChunkCoordinates(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
+    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
     	} else {
     		return null;
     	}

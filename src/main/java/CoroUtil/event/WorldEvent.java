@@ -17,6 +17,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.entity.EnumJobState;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilFile;
 
@@ -25,8 +26,8 @@ public class WorldEvent {
 	//WIP shared WorldEvent base class, needs more refactoring
 	
 	public int dimensionID;
-	public ChunkCoordinates coordSource;
-	public ChunkCoordinates coordDestination;
+	public BlockCoord coordSource;
+	public BlockCoord coordDestination;
 	public String mainPlayerName = "";
 	
 	public boolean invasionActive = true;
@@ -70,7 +71,7 @@ public class WorldEvent {
 		state = EnumJobState.IDLE;
 	}
 	
-	public WorldEvent(int parDim, String parName, EnumWorldEventType parType, ChunkCoordinates source, ChunkCoordinates dest) {
+	public WorldEvent(int parDim, String parName, EnumWorldEventType parType, BlockCoord source, BlockCoord dest) {
 		this();
 		type = parType;
 		coordSource = source;

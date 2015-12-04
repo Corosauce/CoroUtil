@@ -21,6 +21,7 @@ import net.minecraftforge.common.DimensionManager;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.event.WorldEvent;
 import CoroUtil.pathfinding.PathPointEx;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import CoroUtil.world.grid.chunk.PlayerDataGrid;
@@ -180,7 +181,7 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
-	public ISimulationTickable getTickingSimluationByLocation(ChunkCoordinates parCoords) {
+	public ISimulationTickable getTickingSimluationByLocation(BlockCoord parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}

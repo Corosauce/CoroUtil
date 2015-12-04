@@ -21,10 +21,10 @@ public class CoroUtilEntity {
     
     public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.boundingBox.minY+0.15, ent.posZ), new Vec3(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3(x, y, z)) == null;
     }
     
-    public static double getDistance(Entity ent, ChunkCoordinates coords)
+    public static double getDistance(Entity ent, BlockCoord coords)
     {
         double d3 = ent.posX - coords.posX;
         double d4 = ent.posY - coords.posY;

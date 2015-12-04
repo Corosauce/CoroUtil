@@ -17,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.util.BlockCoord;
 
 public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 {
@@ -45,7 +46,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	public float rotationPitchVel = 0;
 	
 	public int state = 0; //generic state var
-	public ChunkCoordinates coordsLastAir;
+	public BlockCoord coordsLastAir;
 	public boolean blockToEntCollision = true;
 	
 	public boolean firstTick = true;
@@ -84,11 +85,6 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     @Override
     public AxisAlignedBB getCollisionBox(Entity par1Entity) {
     	return super.getCollisionBox(par1Entity);
-    }
-    
-    @Override
-    public AxisAlignedBB getBoundingBox() {
-    	return super.getBoundingBox();
     }
     
     @Override
@@ -289,7 +285,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	        }
 	        
 	    	/*if (idCurPos == 0 || Block.blocksList[idCurPos].blockMaterial == Material.snow || Block.blocksList[idCurPos].blockMaterial == Material.plants) {
-	    		coordsLastAir = new ChunkCoordinates(curX, curY, curZ);
+	    		coordsLastAir = new BlockCoord(curX, curY, curZ);
 	    	}
 	    	
 	    	if (blockifyDelay != -1) {
@@ -330,7 +326,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	
     	if (blockToEntCollision) {
         	double size = 0.5D;
-	        List entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(size, size, size));
+	        List entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(size, size, size));
 	        
 	        for (int i = 0; entities != null && i < entities.size(); ++i)
 	        {

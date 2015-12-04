@@ -6,7 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import CoroUtil.util.ChunkCoordinatesBlock;
+import CoroUtil.util.BlockCoordBlock;
 import CoroUtil.util.CoroUtilBlock;
 
 public class StructureDamagable extends StructureObject {
@@ -33,7 +33,7 @@ public class StructureDamagable extends StructureObject {
 			
 			if (needCacheUpdate) {
 				//System.out.println("Updating building cache - thread me!");
-				List<ChunkCoordinatesBlock> data = getStructureGenerationComplete(false);
+				List<BlockCoordBlock> data = getStructureGenerationComplete(false);
 				healthCur = getStructureHealth(data, false);
 				
 				if (/*true || */healthCur < healthMax / 4 * 3) {
@@ -62,20 +62,20 @@ public class StructureDamagable extends StructureObject {
 	}
 	
 	@Override
-	public void updateStructureState(List<ChunkCoordinatesBlock> parStructure, boolean firstTimeGen) {
+	public void updateStructureState(List<BlockCoordBlock> parStructure, boolean firstTimeGen) {
 		super.updateStructureState(parStructure, firstTimeGen);
 		
 		healthCur = getStructureHealth(parStructure, firstTimeGen);
 	}
 	
-	public int getStructureHealth(List<ChunkCoordinatesBlock> parStructure, boolean andUpdateMaxHealth) {
+	public int getStructureHealth(List<BlockCoordBlock> parStructure, boolean andUpdateMaxHealth) {
 		float totalHealthCur = 0;
 		float totalHealthMax = 0; //only accurate when this is run on a fully untouched building (no block removals)
 		World world = DimensionManager.getWorld(location.dimID);
 		int blockCount = 0;
 		if (world != null) {
 			for (int i = 0; i < parStructure.size(); i++) {
-				ChunkCoordinatesBlock coords = parStructure.get(i);
+				BlockCoordBlock coords = parStructure.get(i);
 				int x = coords.posX;
 				int y = coords.posY;
 				int z = coords.posZ;
@@ -107,12 +107,12 @@ public class StructureDamagable extends StructureObject {
 	}
 	
 	@Override
-	public void buildPattern(List<ChunkCoordinatesBlock> parStructure) {
+	public void buildPattern(List<BlockCoordBlock> parStructure) {
 		//int blockID = Block.cobblestone.blockID;
 		World world = DimensionManager.getWorld(location.dimID);
 		if (world != null) {
 			for (int i = 0; i < parStructure.size(); i++) {
-				ChunkCoordinatesBlock coords = parStructure.get(i);
+				BlockCoordBlock coords = parStructure.get(i);
 				//System.out.println(coords.posX + " - " + coords.posY + " - " + coords.posZ + " - " + world.provider.dimensionId);
 				System.out.println("TODO: BlockDataGrid usage");
 				/*BlockDataPoint bdp = ServerTickHandler.wd.getBlockDataGrid(world).getBlockDataIfExists(coords.posX, coords.posY, coords.posZ);

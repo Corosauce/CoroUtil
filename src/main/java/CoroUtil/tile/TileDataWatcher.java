@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ReportedException;
 import CoroUtil.packet.WatchableObject;
+import CoroUtil.util.BlockCoord;
 
 public class TileDataWatcher
 {
@@ -295,10 +296,10 @@ public class TileDataWatcher
                 Packet.writeItemStack(itemstack, par0DataOutputStream);
                 break;
             case 6:
-                ChunkCoordinates chunkcoordinates = (ChunkCoordinates)par1WatchableObject.getObject();
-                par0DataOutputStream.writeInt(chunkcoordinates.posX);
-                par0DataOutputStream.writeInt(chunkcoordinates.posY);
-                par0DataOutputStream.writeInt(chunkcoordinates.posZ);
+                BlockCoord BlockCoord = (BlockCoord)par1WatchableObject.getObject();
+                par0DataOutputStream.writeInt(BlockCoord.posX);
+                par0DataOutputStream.writeInt(BlockCoord.posY);
+                par0DataOutputStream.writeInt(BlockCoord.posZ);
         }
     }
 
@@ -341,7 +342,7 @@ public class TileDataWatcher
                     int k = par0DataInputStream.readInt();
                     int l = par0DataInputStream.readInt();
                     int i1 = par0DataInputStream.readInt();
-                    watchableobject = new WatchableObject(i, j, new ChunkCoordinates(k, l, i1));
+                    watchableobject = new WatchableObject(i, j, new BlockCoord(k, l, i1));
             }
 
             arraylist.add(watchableobject);
@@ -377,16 +378,16 @@ public class TileDataWatcher
                 p_151510_0_.writeItemStackToBuffer(itemstack);
                 break;
             case 6:
-                ChunkCoordinates chunkcoordinates = (ChunkCoordinates)p_151510_1_.getObject();
-                p_151510_0_.writeInt(chunkcoordinates.posX);
-                p_151510_0_.writeInt(chunkcoordinates.posY);
-                p_151510_0_.writeInt(chunkcoordinates.posZ);
+                BlockCoord BlockCoord = (BlockCoord)p_151510_1_.getObject();
+                p_151510_0_.writeInt(BlockCoord.posX);
+                p_151510_0_.writeInt(BlockCoord.posY);
+                p_151510_0_.writeInt(BlockCoord.posZ);
         }
     }
 
     /**
      * Reads a list of watched objects (entity attribute of type {byte, short, int, float, string, ItemStack,
-     * ChunkCoordinates}) from the supplied PacketBuffer
+     * BlockCoord}) from the supplied PacketBuffer
      */
     public static List readWatchedListFromPacketBuffer(PacketBuffer p_151508_0_) throws IOException
     {
@@ -427,7 +428,7 @@ public class TileDataWatcher
                     int k = p_151508_0_.readInt();
                     int l = p_151508_0_.readInt();
                     int i1 = p_151508_0_.readInt();
-                    watchableobject = new DataWatcher.WatchableObject(i, j, new ChunkCoordinates(k, l, i1));
+                    watchableobject = new DataWatcher.WatchableObject(i, j, new BlockCoord(k, l, i1));
             }
 
             arraylist.add(watchableobject);
@@ -477,6 +478,6 @@ public class TileDataWatcher
         dataTypes.put(Float.class, Integer.valueOf(3));
         dataTypes.put(String.class, Integer.valueOf(4));
         dataTypes.put(ItemStack.class, Integer.valueOf(5));
-        dataTypes.put(ChunkCoordinates.class, Integer.valueOf(6));
+        dataTypes.put(BlockCoord.class, Integer.valueOf(6));
     }
 }

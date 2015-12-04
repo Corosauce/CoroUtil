@@ -61,7 +61,7 @@ public class JobFormation extends JobBase {
 	
 	public void lookForOthers() {
 		int huntRange = 16;
-		List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(huntRange, huntRange/2, huntRange));
 		
 		Formation foundFormation = null;
 		int formationSize = 0;

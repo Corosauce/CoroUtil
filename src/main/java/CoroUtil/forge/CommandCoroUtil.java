@@ -173,7 +173,7 @@ public class CommandCoroUtil extends CommandBase {
 		
 		//temp
 		//ent.setPosition(69, player.worldObj.getHeightValue(69, 301), 301);
-		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new ChunkCoordinates(44, player.worldObj.getHeightValue(44, 301), 301);
+		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.worldObj.getHeightValue(44, 301), 301);
 		
 		player.worldObj.spawnEntityInWorld(ent);
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
