@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -138,7 +139,7 @@ public class EventHandlerPacket {
 				
 				World world = DimensionManager.getWorld(dimID);
 				if (world != null) {
-					TileEntity tEnt = world.getTileEntity(x, y, z);
+					TileEntity tEnt = world.getTileEntity(new BlockPos(x, y, z));
 					if (tEnt instanceof ITilePacket) {
 						System.out.println("CONFIRM THIS SHOULD BE nbtData and not just nbt var");
 						((ITilePacket) tEnt).handleClientSentNBT(CoroUtilEntity.getName(entP), nbtData);

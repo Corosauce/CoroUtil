@@ -13,6 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -204,7 +205,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          }
 
          if(this.inGround) {
-            Block var19 = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+            Block var19 = this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
             if(var19 == this.inTile) {
                ++this.ticksInGround;
                if(this.ticksInGround == 1200) {

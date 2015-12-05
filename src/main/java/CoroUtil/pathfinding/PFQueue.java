@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
@@ -682,8 +683,8 @@ public class PFQueue implements Runnable {
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority, IPFCallback parCallback, ChunkCoordinatesSize parCoordSize) {
     	
     	//DESTINATION - Adjust if in air, assumes they are gravity bound
-    	if (var1 != null && CoroUtilBlock.isAir(var1.worldObj.getBlock(x, y-1, z))) {
-    		while (CoroUtilBlock.isAir(var1.worldObj.getBlock(x, --y, z)) && y > 0) { y--; }    				
+    	if (var1 != null && CoroUtilBlock.isAir(var1.worldObj.getBlockState(new BlockPos(x, y-1, z)).getBlock())) {
+    		while (CoroUtilBlock.isAir(var1.worldObj.getBlockState(new BlockPos(x, --y, z)).getBlock()) && y > 0) { y--; }    				
     	}
     	
     	//SOURCE - might not work right - fix fence horror, find the near air block
@@ -1672,7 +1673,7 @@ public class PFQueue implements Runnable {
     
     private Block getBlock(int x, int y, int z) {
     	//if (!worldMap.checkChunksExist(x, 0, z , x, 128, z)) return 10;
-    	return worldMap.getBlock(x, y, z);
+    	return worldMap.getBlockState(new BlockPos(x, y, z)).getBlock();
     }
     
     private int getBlockMetadata(int x, int y, int z) {

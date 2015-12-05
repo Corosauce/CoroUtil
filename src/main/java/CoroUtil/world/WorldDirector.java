@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -227,11 +228,11 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public boolean isCoordAndNearAreaNaturalBlocks(World parWorld, int x, int y, int z, int range) {
-		if (isNaturalSurfaceBlock(parWorld.getBlock(x, y, z)) && 
-				isNaturalSurfaceBlock(parWorld.getBlock(x+range, y, z)) && 
-				isNaturalSurfaceBlock(parWorld.getBlock(x-range, y, z)) &&
-				isNaturalSurfaceBlock(parWorld.getBlock(x, y, z+range)) &&
-				isNaturalSurfaceBlock(parWorld.getBlock(x, y, z-range))) {
+		if (isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z)).getBlock()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x+range, y, z)).getBlock()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x-range, y, z)).getBlock()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z+range)).getBlock()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z-range)).getBlock())) {
 			return true;
 		}
 		return false;
@@ -259,7 +260,7 @@ public class WorldDirector implements Runnable {
 		int curY = startY;
 		int safetyCount = 0;
 		while (curY > 0 && safetyCount++ < 300) {
-			Block id = world.getBlock(x, curY, z);
+			Block id = world.getBlockState(new BlockPos(x, curY, z)).getBlock();
 			
 			if (isNaturalSurfaceBlock(id)) {
 				return curY;

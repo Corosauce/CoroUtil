@@ -10,6 +10,7 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import CoroUtil.bt.actions.Delay;
 import CoroUtil.bt.actions.OrdersUser;
@@ -284,7 +285,7 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		Block block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor_double(ent.posZ));
+		Block block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor_double(ent.posZ))).getBlock();
 		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -292,7 +293,7 @@ public class AIBTAgent {
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor_double(ent.posZ));
+			block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor_double(ent.posZ))).getBlock();
 			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;

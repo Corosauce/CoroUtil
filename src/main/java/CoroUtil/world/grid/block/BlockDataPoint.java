@@ -2,6 +2,7 @@ package CoroUtil.world.grid.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 
 public class BlockDataPoint
@@ -58,7 +59,7 @@ public class BlockDataPoint
 
     public void updateCache()
     {
-    	blockID = grid.world.getBlock(xCoord, yCoord, zCoord);
+    	blockID = grid.world.getBlockState(new BlockPos(xCoord, yCoord, zCoord)).getBlock();
     	blockMeta = grid.world.getBlockMetadata(xCoord, yCoord, zCoord);
     }
     

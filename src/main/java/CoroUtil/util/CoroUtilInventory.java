@@ -6,6 +6,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import CoroUtil.componentAI.ICoroAI;
 
@@ -50,8 +51,8 @@ public class CoroUtilInventory {
 	}
 	
 	public static void chestStateSend(World world, int x, int y, int z, boolean close) {
-		if (isChest(world.getBlock(x, y, z))) {
-			TileEntity chest = (TileEntity)world.getTileEntity(x, y, z);
+		if (isChest(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+			TileEntity chest = (TileEntity)world.getTileEntity(new BlockPos(x, y, z));
 			if (chest instanceof TileEntityChest) {
 				if (close) {
 					((TileEntityChest)chest).closeInventory();
@@ -64,7 +65,7 @@ public class CoroUtilInventory {
 	
 	public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
     	
-    	TileEntity tEnt = (TileEntityChest)world.getTileEntity(x, y, z);
+    	TileEntity tEnt = (TileEntityChest)world.getTileEntity(new BlockPos(x, y, z));
 		if (tEnt instanceof TileEntityChest) {
 			TileEntityChest chest = (TileEntityChest)tEnt;
 			chestOpen(world, x, y, z);

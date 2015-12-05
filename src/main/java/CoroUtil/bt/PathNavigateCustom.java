@@ -9,6 +9,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -254,7 +255,7 @@ public class PathNavigateCustom
         	//System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
         	
         	PathPoint pp = this.currentPath.getPathPointFromIndex(this.currentPath.getCurrentPathIndex());
-        	Block block = this.theEntity.worldObj.getBlock(pp.xCoord, pp.yCoord, pp.zCoord);
+        	Block block = this.theEntity.worldObj.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
         	//System.out.println("block type for next node: " + block);
         	
         	if (block.getMaterial() == Material.water || block.getMaterial() == Material.lava) {
@@ -356,7 +357,7 @@ public class PathNavigateCustom
         if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
             int i = (int)this.theEntity.getEntityBoundingBox().minY;
-            Block block = this.worldObj.getBlock(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
+            Block block = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ))).getBlock();
             int k = 0;
 
             do
@@ -367,7 +368,7 @@ public class PathNavigateCustom
                 }
 
                 ++i;
-                block = this.worldObj.getBlock(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ));
+                block = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ))).getBlock();
                 ++k;
             }
             while (k <= 16);
@@ -524,7 +525,7 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                    	Block block = this.worldObj.getBlock(i2, par2 - 1, j2);
+                    	Block block = this.worldObj.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
                         Material material = block.getMaterial();
 
                         if (material == Material.air)
@@ -566,7 +567,7 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                    	Block block = this.worldObj.getBlock(k1, l1, i2);
+                    	Block block = this.worldObj.getBlockState(new BlockPos(k1, l1, i2)).getBlock();
 
                         if (!block.getBlocksMovement(this.worldObj, k1, l1, i2))
                         {

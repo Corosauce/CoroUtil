@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import CoroUtil.util.CoroUtilBlock;
@@ -378,7 +379,7 @@ public class Build {
 					
 					World worldRef = worldObj;
 					
-					build_blockIDArr[xx][yy][zz] = worldRef.getBlock(map_coord_minX+xx, map_coord_minY+yy, map_coord_minZ+zz);
+					build_blockIDArr[xx][yy][zz] = worldRef.getBlockState(new BlockPos(map_coord_minX+xx, map_coord_minY+yy, map_coord_minZ+zz)).getBlock();
 					build_blockMetaArr[xx][yy][zz] = worldRef.getBlockMetadata(map_coord_minX+xx, map_coord_minY+yy, map_coord_minZ+zz);
 					//build_blockPlaced[xx][yy][zz] = false;
 					
@@ -437,7 +438,7 @@ public class Build {
 						
 						World worldRef = FMLCommonHandler.instance().getMinecraftServerInstance().worldServerForDimension(dim);
 						
-						TileEntity tEnt = worldRef.getTileEntity(map_coord_minX+xx,map_coord_minY+yy,map_coord_minZ+zz);
+						TileEntity tEnt = worldRef.getTileEntity(new BlockPos(map_coord_minX+xx,map_coord_minY+yy,map_coord_minZ+zz));
 						if (tEnt != null) {
 							NBTTagCompound var10 = new NBTTagCompound();
 							

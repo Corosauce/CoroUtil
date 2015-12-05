@@ -10,6 +10,7 @@ import java.util.Iterator;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilFile;
@@ -35,7 +36,7 @@ public class BlockDataGrid
     }
     
     public float getBlockStrength(int x, int y, int z) {
-    	Block blockID = world.getBlock(x, y, z);
+    	Block blockID = world.getBlockState(new BlockPos(x, y, z)).getBlock();
     	int blockMeta = world.getBlockMetadata(x, y, z);
     	
     	//use block id to weight lookup map
@@ -70,7 +71,7 @@ public class BlockDataGrid
         {
         	if (!onlyIfExists) {
         		//this was invoking the chunkgenerator, thats bad, switching to using internally stored blockID
-	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(nbt != null ? Block.getBlockById(nbt.getInteger("blockID")) : this.world.getBlock(i, j, k))) {
+	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(nbt != null ? Block.getBlockById(nbt.getInteger("blockID")) : this.world.getBlockState(new BlockPos(i, j, k)).getBlock())) {
 	        		BlockDataPoint newVec = new BlockDataPoint(this, i, j, k);
 	                grid.put(newVec.hash, newVec);
 	                return newVec;

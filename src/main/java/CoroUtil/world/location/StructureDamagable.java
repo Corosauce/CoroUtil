@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.util.BlockCoordBlock;
@@ -80,7 +81,7 @@ public class StructureDamagable extends StructureObject {
 				int y = coords.posY;
 				int z = coords.posZ;
 				
-				Block id = world.getBlock(x, y, z);
+				Block id = world.getBlockState(new BlockPos(x, y, z)).getBlock();
 				//System.out.println("coords: " + x + " - " + y + " - " + z + " = " + id);
 				if (!CoroUtilBlock.isAir(id)) {
 					blockCount++;

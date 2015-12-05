@@ -10,6 +10,7 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -200,7 +201,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         if (this.inGround)
         {
-            Block i = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+            Block i = this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
 
             if (i == this.inTile)
             {

@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.EntityMoveHelper;
 import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -452,7 +453,7 @@ public class PathNavigateFormation
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        Block k2 = this.worldObj.getBlock(i2, par2 - 1, j2);
+                        Block k2 = this.worldObj.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
 
                         if (CoroUtilBlock.isAir(k2))
                         {
@@ -495,7 +496,7 @@ public class PathNavigateFormation
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                        Block j2 = this.worldObj.getBlock(k1, l1, i2);
+                        Block j2 = this.worldObj.getBlockState(new BlockPos(k1, l1, i2)).getBlock();
 
                         if (j2.getBlocksMovement(this.worldObj, k1, l1, i2))
                         {

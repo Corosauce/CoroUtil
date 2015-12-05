@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
@@ -221,44 +222,39 @@ public class DimensionChunkCache implements IBlockAccess
         return this.hasExtendedLevels;
     }
 
-    /**
-     * Returns the block ID at coords x,y,z
-     */
     @Override
-    public Block getBlock(int p_147439_1_, int p_147439_2_, int p_147439_3_)
-    {
-    	Block block = Blocks.air;
-
-        if (p_147439_2_ >= 0 && p_147439_2_ < 256)
+    public IBlockState getBlockState(BlockPos pos) {
+    	if (pos.getY() >= 0 && pos.getY() < 256)
         {
-            int l = (p_147439_1_ >> 4) - this.chunkX;
-            int i1 = (p_147439_3_ >> 4) - this.chunkZ;
+            int i = (pos.getX() >> 4) - this.chunkX;
+            int j = (pos.getZ() >> 4) - this.chunkZ;
+            if (i < 0 || i >= chunkArray.length || j < 0 || i >= chunkArray[i].length) return Blocks.air.getDefaultState();
 
-            if (l >= 0 && l < this.chunkArray.length && i1 >= 0 && i1 < this.chunkArray[l].length)
+            if (i >= 0 && i < this.chunkArray.length && j >= 0 && j < this.chunkArray[i].length)
             {
-                Chunk chunk = this.chunkArray[l][i1];
+                Chunk chunk = this.chunkArray[i][j];
 
                 if (chunk != null)
                 {
-                    block = chunk.getBlock(p_147439_1_ & 15, p_147439_2_, p_147439_3_ & 15);
+                    return chunk.getBlockState(pos);
                 }
             }
         }
 
-        return block;
+        return Blocks.air.getDefaultState();
     }
 
     /**
      * Returns the TileEntity associated with a given block in X,Y,Z coordinates, or null if no TileEntity exists
      */
     @Override
-    public TileEntity getTileEntity(int p_147438_1_, int p_147438_2_, int p_147438_3_)
+    public TileEntity getTileEntity(BlockPos pos)
     {
-        int l = (p_147438_1_ >> 4) - this.chunkX;
-        int i1 = (p_147438_3_ >> 4) - this.chunkZ;
-        if (l < 0 || l >= chunkArray.length || i1 < 0 || i1 >= chunkArray[l].length) return null;
-        if (chunkArray[l][i1] == null) return null;
-        return this.chunkArray[l][i1].func_150806_e(p_147438_1_ & 15, p_147438_2_, p_147438_3_ & 15);
+        int i = (pos.getX() >> 4) - this.chunkX;
+        int j = (pos.getZ() >> 4) - this.chunkZ;
+        if (i < 0 || i >= chunkArray.length || j < 0 || j >= chunkArray[i].length) return null;
+        if (chunkArray[i][j] == null) return null;
+        return this.chunkArray[i][j].getTileEntity(pos, Chunk.EnumCreateEntityType.IMMEDIATE);
     }
 
     

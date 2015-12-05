@@ -8,6 +8,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroUtil.componentAI.ICoroAI;
@@ -174,7 +175,7 @@ public class Formation {
 				
 				Vec3 tryPos = new Vec3(posX, posY, posZ);
 				
-				Block tryID = ent.worldObj.getBlock((int)tryPos.xCoord, (int)tryPos.yCoord + 1, (int)tryPos.zCoord);
+				Block tryID = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(tryPos.xCoord), (int)tryPos.yCoord + 1, MathHelper.floor_double(tryPos.zCoord))).getBlock();
 				
 				//if clear (check ent height too), if not return center formation for safety
 				if (!tryID.getMaterial().isSolid()) {

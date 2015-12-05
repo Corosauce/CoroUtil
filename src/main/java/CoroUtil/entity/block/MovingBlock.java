@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -225,7 +226,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         	int curX = MathHelper.floor_double(posX);
 	    	int curY = MathHelper.floor_double(posY);
 	    	int curZ = MathHelper.floor_double(posZ);
-	    	Block idCurPos = worldObj.getBlock(curX, curY, curZ);
+	    	Block idCurPos = worldObj.getBlockState(new BlockPos(curX, curY, curZ)).getBlock();
         	
 	        if (blockifyDelay != -1 && age > blockifyDelay) {
 		    	
@@ -235,7 +236,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	int aheadEndY = MathHelper.floor_double(posY + (motionY));
 		    	int aheadEndZ = MathHelper.floor_double(posZ + (motionZ));
 		    	
-		    	Block id = worldObj.getBlock(aheadEndX, aheadEndY, aheadEndZ);
+		    	Block id = worldObj.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ)).getBlock();
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
@@ -247,7 +248,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    		int aheadX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 				    	int aheadY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 				    	int aheadZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    	Block idCheck = worldObj.getBlock(aheadX, aheadY, aheadZ);
+				    	Block idCheck = worldObj.getBlockState(new BlockPos(aheadX, aheadY, aheadZ)).getBlock();
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -263,7 +264,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			int tryX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 					    	int tryY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 					    	int tryZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    		Block idTry = worldObj.getBlock(tryX, tryY, tryZ);
+				    		Block idTry = worldObj.getBlockState(new BlockPos(tryX, tryY, tryZ)).getBlock();
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);

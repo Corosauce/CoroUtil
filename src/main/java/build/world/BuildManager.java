@@ -13,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -308,7 +309,7 @@ public class BuildManager {
 		    				}
 		    			}
 		    			if (buildJob.blockIDsNoBuildOver.size() > 0) {
-		    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+		    				Block checkCoord = worldRef.getBlockState(new BlockPos(coords.posX, coords.posY, coords.posZ)).getBlock();
 			    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
 			    				skipGen = true;
 				    		}
@@ -392,7 +393,7 @@ public class BuildManager {
 					    			if (id != null || CoroUtilBlock.isAir(id)) {
 					    				boolean skipGen = false;
 					    				if (buildJob.blockIDsNoBuildOver.size() > 0) {
-						    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+						    				Block checkCoord = worldRef.getBlockState(new BlockPos(coords.posX, coords.posY, coords.posZ)).getBlock();
 							    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
 							    				skipGen = true;
 								    		}
@@ -414,7 +415,7 @@ public class BuildManager {
 					    				System.out.println("BUILDMOD SEVERE: schematic contains non existant blockID: " + id + ", replacing with blockID: " + placeholderID);
 					    				boolean skipGen = false;
 					    				if (buildJob.blockIDsNoBuildOver.size() > 0) {
-						    				Block checkCoord = worldRef.getBlock(coords.posX, coords.posY, coords.posZ);
+						    				Block checkCoord = worldRef.getBlockState(new BlockPos(coords.posX, coords.posY, coords.posZ)).getBlock();
 							    			if (buildJob.blockIDsNoBuildOver.contains(checkCoord)) {
 							    				skipGen = true;
 								    		}
@@ -633,7 +634,7 @@ public class BuildManager {
             	//verified that this loads ZC tile nbt ok
                 NBTTagCompound var20 = (NBTTagCompound)build.tileEntities.getCompoundTagAt(var21);
                 //TileEntity var13 = TileEntity.createAndLoadEntity(var20);
-                TileEntity var13 = worldRef.getTileEntity(build.map_coord_minX+var20.getInteger("x"), buildJob.build_startY+var20.getInteger("y"), build.map_coord_minZ+var20.getInteger("z"));
+                TileEntity var13 = worldRef.getTileEntity(new BlockPos(build.map_coord_minX+var20.getInteger("x"), buildJob.build_startY+var20.getInteger("y"), build.map_coord_minZ+var20.getInteger("z")));
                 
                 if (var13 instanceof SchematicData) {
                 	((SchematicData)var13).readFromNBT(var20, build);

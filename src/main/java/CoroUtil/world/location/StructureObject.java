@@ -7,6 +7,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.util.BlockCoord;
@@ -208,7 +209,7 @@ public class StructureObject implements ICustomGen {
 		int curY = startY;
 		int safetyCount = 0;
 		while (curY > 0 && safetyCount++ < 300) {
-			Block id = world.getBlock(x, curY, z);
+			Block id = world.getBlockState(new BlockPos(x, curY, z)).getBlock();
 			
 			if (isRequiredGroundBlock(id)) {
 				return curY;
