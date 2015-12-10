@@ -15,6 +15,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -90,12 +91,12 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
     	  setFishEntity(this);
       }
       this.setSize(0.25F, 0.25F);
-      this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.yOffset, var2.posZ, var2.rotationYaw, var2.rotationPitch);
+      this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.getYOffset(), var2.posZ, var2.rotationYaw, var2.rotationPitch);
       this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
       this.posY -= 0.10000000149011612D;
       this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
       this.setPosition(this.posX, this.posY, this.posZ);
-      this.yOffset = 0.0F;
+      //this.yOffset = 0.0F;
       float var3 = 0.4F;
       this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
       this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
@@ -317,7 +318,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                   --this.ticksCatchable;
                } else {
                   short var28 = 500;
-                  if(this.worldObj.canLightningStrikeAt(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ))) {
+                  if(this.worldObj.canLightningStrike(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ)))) {
                      var28 = 300;
                   }
 
@@ -333,13 +334,13 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                      for(var15 = 0; (float)var15 < 1.0F + this.width * 20.0F; ++var15) {
                         var31 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
                         var17 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                        this.worldObj.spawnParticle("bubble", this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
+                        this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
                      }
 
                      for(var15 = 0; (float)var15 < 1.0F + this.width * 20.0F; ++var15) {
                         var31 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
                         var17 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                        this.worldObj.spawnParticle("splash", this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY, this.motionZ);
+                        this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY, this.motionZ);
                      }
                   }
                }

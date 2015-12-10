@@ -62,7 +62,7 @@ public class BlackboardBase implements IPFCallback {
 	public MutableBoolean shouldFollowOrders = new MutableBoolean(false);
 	
 	
-	public BlockCoord fleeToCoords = new BlockCoord();
+	public BlockCoord fleeToCoords = new BlockCoord(0, 0, 0);
 	public long lastTickSafetyCheck = 0;
 	
 	public MutableInt distMed = new MutableInt(18);

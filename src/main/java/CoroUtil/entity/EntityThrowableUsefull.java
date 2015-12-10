@@ -104,7 +104,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.posY -= 0.10000000149011612D;
         this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
         this.setPosition(this.posX, this.posY, this.posZ);
-        this.yOffset = 0.0F;
+        //this.yOffset = 0.0F;
         float f = 0.4F;
         this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI) * f);
         this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI) * f);
@@ -114,13 +114,18 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, (float)parSpeed, 0.0F);
     }
+    
+    @Override
+    public double getYOffset() {
+    	return super.getYOffset();
+    }
 
     public EntityThrowableUsefull(World par1World, double par2, double par4, double par6)
     {
         super(par1World);
         this.setSize(0.25F, 0.25F);
         this.setPosition(par2, par4, par6);
-        this.yOffset = 0.0F;
+        //this.yOffset = 0.0F;
     }
     
     public Vec3 getTargetVector(EntityLivingBase target) {

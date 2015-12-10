@@ -121,12 +121,6 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     {
         return true;
     }
-
-    @Override
-    public float getShadowSize()
-    {
-        return 0.0F;
-    }
     
     @Override
     public boolean isInRangeToRender3d(double p_145770_1_, double p_145770_3_,
@@ -364,7 +358,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         this.prevRotationYaw = this.rotationYaw = this.rotationYawB = par7;
         this.prevRotationPitch = this.rotationPitch = this.rotationPitchB = par8;
         this.prevRotationRoll = this.rotationRoll = parRoll;
-        this.ySize = 0.0F;
+        //this.ySize = 0.0F;
         double d3 = (double)(this.prevRotationYaw - par7);
 
         if (d3 < -180.0D)
@@ -438,7 +432,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public void blockify(int x, int y, int z) {
-    	worldObj.setBlock(x, y, z, Block.getBlockById(blockID));
+    	worldObj.setBlockState(new BlockPos(x, y, z), Block.getBlockById(blockID).getDefaultState(), 3);
     	setDead();
     }
     

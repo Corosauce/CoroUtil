@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
@@ -26,8 +25,6 @@ import CoroUtil.bt.nodes.TrackTarget;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.bt.selector.SelectorConcurrent;
 import CoroUtil.entity.render.AnimationStateObject;
-import CoroUtil.entity.render.ModelRendererBones;
-import CoroUtil.entity.render.RenderEntityCoroAI;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilAbility;
@@ -100,7 +97,8 @@ public class PersonalityProfile {
 			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
 			
 			Render renderObj = (Render) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
-			if (renderObj instanceof RenderEntityCoroAI) {
+			//TODO: readd 1.8.8
+			/*if (renderObj instanceof RenderEntityCoroAI) {
 				
 				for (Map.Entry<String, ModelRendererBones> entry : ((RenderEntityCoroAI) renderObj).modelTechne.partsAllChildren.entrySet()) {
 					AnimationStateObject obj = new AnimationStateObject(entry.getKey());
@@ -113,7 +111,7 @@ public class PersonalityProfile {
 				}
 				//((RenderCoroAIEntity) renderObj).modelTechne.parts.get("top")
 				animationData.put("top", new AnimationStateObject("top"));
-			}
+			}*/
 		}
 	}
 	

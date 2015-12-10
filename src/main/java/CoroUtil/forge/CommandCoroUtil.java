@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.ICoroAI;
@@ -176,7 +177,8 @@ public class CommandCoroUtil extends CommandBase {
 		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.worldObj.getHeightValue(44, 301), 301);
 		
 		player.worldObj.spawnEntityInWorld(ent);
-		if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.worldObj.getDifficultyForLocation(new BlockPos(ent)), null);
 		if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
 	}
 	

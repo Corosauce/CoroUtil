@@ -210,7 +210,7 @@ public class JobHuntRanged extends JobBase {
 				targetLastPos = new Vec3(ai.entityToAttack.posX, ai.entityToAttack.posY, ai.entityToAttack.posZ);
 			}
 		}
-		ent.prevHealth = ent.getHealth();
+		//ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {

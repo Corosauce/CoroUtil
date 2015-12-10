@@ -13,7 +13,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import CoroPets.ai.BehaviorModifier;
 import CoroUtil.util.CoroUtilFile;
 
 public class PetsManager {
@@ -63,11 +62,12 @@ public class PetsManager {
 	public void initPetsNewInstance(EntityCreature ent) {
 		//do stuff from behavior modifiers
 		PetEntry entry = lookupUUIDToPet.get(ent.getUniqueID());
-		if (entry != null) {
+		//TODO: readd 1.8.8
+		/*if (entry != null) {
 			BehaviorModifier.tameMob(ent, entry.ownerUUID, false);
 		} else {
 			System.out.println("WARNING!!! failed to find entry for this reloaded mob that is marked tame ");
-		}
+		}*/
 	}
 	
 	public void nbtReadFromDisk() {

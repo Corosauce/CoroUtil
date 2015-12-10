@@ -177,7 +177,7 @@ public class JobHunt extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		//ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {

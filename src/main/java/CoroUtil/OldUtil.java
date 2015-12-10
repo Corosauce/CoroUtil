@@ -422,7 +422,7 @@ public class OldUtil {
     public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
     public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5
     
-    public static BlockPos entToCoord(Entity ent) { return new BlockPos(MathHelper.floor_double(ent.posX), MathHelper.floor_double(ent.posY), MathHelper.floor_double(ent.posZ)); }
+    public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor_double(ent.posX), MathHelper.floor_double(ent.posY), MathHelper.floor_double(ent.posZ)); }
     public static double getDistance(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }

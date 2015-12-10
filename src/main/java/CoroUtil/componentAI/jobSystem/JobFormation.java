@@ -6,6 +6,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.formation.Manager;
@@ -44,9 +45,9 @@ public class JobFormation extends JobBase {
 					int randY = (int)ent.posY + rand.nextInt(size/4) - size/8;
 					int randZ = (int)ent.posZ + rand.nextInt(size) - size/2;
 					
-					Block idGround = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ) - 1, randZ);
-					Block id1 = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ), randZ);
-					Block id2 = ent.worldObj.getBlock(randX, ent.worldObj.getHeightValue(randX, randZ) + 1, randZ);
+					Block idGround = ent.worldObj.getBlockState(ent.worldObj.getHeight(new BlockPos(randX, 0, randZ).add(0, -1, 0))).getBlock();
+					Block id1 = ent.worldObj.getBlockState(ent.worldObj.getHeight(new BlockPos(randX, 0, randZ).add(0, 0, 0))).getBlock();
+					Block id2 = ent.worldObj.getBlockState(ent.worldObj.getHeight(new BlockPos(randX, 0, randZ).add(0, 1, 0))).getBlock();
 					
 					if (idGround.getMaterial() != Material.water) {
 						if (CoroUtilBlock.isAir(id1) && CoroUtilBlock.isAir(id2)) {

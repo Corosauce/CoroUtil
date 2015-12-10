@@ -30,20 +30,20 @@ public class ExtendedRenderer {
     @SideOnly(Side.CLIENT)
     public static RotatingEffectRenderer rotEffRenderer;
     
-    @EventHandler
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
     	
     }
     
-    @EventHandler
+    @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
     	proxy.init();
     	MinecraftForge.EVENT_BUS.register(new extendedrenderer.EventHandler());
     }
     
-    @EventHandler
+    @Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
     	proxy.postInit();
 	}

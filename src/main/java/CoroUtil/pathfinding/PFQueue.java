@@ -1223,7 +1223,7 @@ public class PFQueue implements Runnable {
         }
 
         if (/*parJob != null && parJob.sourceEntity != null && */canUseLadder) {
-        	if (!CoroUtilBlock.isAir(getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)) && getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord).isLadder(worldMap, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord, null)) {
+        	if (!CoroUtilBlock.isAir(getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord)) && getBlock(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord).isLadder(worldMap, new BlockPos(curPoint.xCoord, curPoint.yCoord, curPoint.zCoord), null)) {
         		//if (queue.get(0) != null) queue.get(0).ladderInPath = true; //might conflict with non queue using requests
 		        PathPointEx vvar8 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord, curPoint.yCoord, curPoint.zCoord + 1, size, var7, curPoint.xCoord, curPoint.zCoord);
 		        PathPointEx vvar9 = this.getLadderPoint(parJob, sourceEntity, curPoint.xCoord - 1, curPoint.yCoord, curPoint.zCoord, size, var7, curPoint.xCoord, curPoint.zCoord);
@@ -1269,7 +1269,7 @@ public class PFQueue implements Runnable {
             int var10 = 0;
 
             //while(y > 0 && y < 128 && (worldMap.getBlockId(x, y + 1, z)) == Block.ladder.blockID && (var10 = this.getVerticalOffset(var1, origX, y + 1, origZ, var5)) == 1) {
-            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(parJob, var1, x, y + 1, z, var5)) == 0) && (!CoroUtilBlock.isAir(getBlock(origX, y + 1, origZ)) && getBlock(origX, y + 1, origZ).isLadder(null/*var1.worldObj*/, origX, y, origZ, null))) {
+            while(y > 0 && y < 256 && ((var9 = this.getVerticalOffset(parJob, var1, x, y + 1, z, var5)) == 0) && (!CoroUtilBlock.isAir(getBlock(origX, y + 1, origZ)) && getBlock(origX, y + 1, origZ).isLadder(null/*var1.worldObj*/, new BlockPos(origX, y, origZ), null))) {
                 var10 = this.getVerticalOffset(parJob, var1, origX, y + 1, origZ, var5);
                 ++var8;
                 /*if(var8 >= 3) {

@@ -207,12 +207,12 @@ public class JobInvade extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		//ent.prevHealth = ent.getHealth();
 	}
 	
 	//copied from c_EnhAI, might be replacable with new isMovementSafe stuff
 	public boolean isSolidPath(Entity var1) {
-        return ent.canEntityBeSeen(var1) && (ent.getDistanceToEntity(var1) < 3.0F) && Math.abs(ent.posY - (double)ent.yOffset - (var1.posY - (double)var1.yOffset)) <= 2.5D;
+        return ent.canEntityBeSeen(var1) && (ent.getDistanceToEntity(var1) < 3.0F) && Math.abs(ent.posY - (double)ent.getYOffset() - (var1.posY - (double)var1.getYOffset())) <= 2.5D;
     }
 	
 	public boolean sanityCheck(Entity target) {

@@ -33,7 +33,6 @@ import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 public class AIAgent {
 
@@ -244,7 +243,8 @@ public class AIAgent {
 		}
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
-		ManagedLocation ml = getManagedLocation();
+		//TODO: readd 1.8.8
+		/*ManagedLocation ml = getManagedLocation();
 		if (ml != null) {
 			//unitType is mostly unused atm
 			ml.addEntity("member", ent);
@@ -252,10 +252,11 @@ public class AIAgent {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
 			//removing without being sure, months in between development
 			//CoroAI.dbg("AIAgent Entitys home has been destroyed or never had one set!");
-		}
+		}*/
 	}
 	
-	public ManagedLocation getManagedLocation() {
+	//TODO: readd 1.8.8
+	/*public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
@@ -272,7 +273,7 @@ public class AIAgent {
 	
 	public void setManagedLocation(ManagedLocation parLocation) {
 		coordsManagedLocation = parLocation.spawn;
-	}
+	}*/
 	
 	public void setLocationMemberID(int parID) {
 		locationMemberID = parID;
@@ -533,7 +534,7 @@ public class AIAgent {
 				ent.motionZ *= 1.2F;
 			}
 			
-		} else if (ent.handleLavaMovement()) {
+		} else if (ent.isNotColliding()) {
 			ent.motionY += 0.07D;
 			float speed = 1.2F;
 			if (lastSafeSpot != null) {
@@ -546,7 +547,7 @@ public class AIAgent {
 			wasInLava = true;
 		}
 		
-		if (wasInLava && !ent.handleLavaMovement()) {
+		if (wasInLava && !ent.isNotColliding()) {
 			wasInLava = false;
 			ent.extinguish();
 		}
@@ -1109,9 +1110,10 @@ public class AIAgent {
 			if (coordsManagedLocation != null) {
 				WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 				ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-				if (ml != null && ml instanceof ManagedLocation) {
+				//TODO: readd 1.8.8
+				/*if (ml != null && ml instanceof ManagedLocation) {
 					((ManagedLocation) ml).hookEntityDied(ent);
-				}
+				}*/
 			}
 		}
 	}
@@ -1136,9 +1138,10 @@ public class AIAgent {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-			if (ml != null && ml instanceof ManagedLocation) {
+			//TODO: readd 1.8.8
+			/*if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
-			}
+			}*/
 		}
 		
 		jobMan.cleanup();

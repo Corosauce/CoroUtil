@@ -72,7 +72,7 @@ public class EventHandlerForge {
 				if (event.action == Action.RIGHT_CLICK_AIR) return;
 				
 				if (ConfigCoroAI.trackPlayerData) {
-					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.x / 16, event.z / 16);
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.pos.getX() / 16, event.pos.getZ() / 16);
 					cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
 				}
 				

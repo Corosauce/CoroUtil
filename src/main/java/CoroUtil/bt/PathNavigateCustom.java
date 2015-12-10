@@ -395,7 +395,7 @@ public class PathNavigateCustom
      */
     private boolean isInFluid()
     {
-        return /*true*//*this.theEntity.isInsideOfMaterial(Material.water)*/this.theEntity.isInWater() || this.theEntity.handleLavaMovement();
+        return /*true*//*this.theEntity.isInsideOfMaterial(Material.water)*/this.theEntity.isInWater()/* || (this.theEntity.isnotcolliding())*/;
     }
 
     /**
@@ -403,13 +403,13 @@ public class PathNavigateCustom
      */
     private void removeSunnyPath()
     {
-        if (!this.worldObj.canBlockSeeTheSky(MathHelper.floor_double(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor_double(this.theEntity.posZ)))
+        if (!this.worldObj.canBlockSeeSky(new BlockPos(MathHelper.floor_double(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor_double(this.theEntity.posZ))))
         {
             for (int i = 0; i < this.currentPath.getCurrentPathLength(); ++i)
             {
                 PathPoint pathpoint = this.currentPath.getPathPointFromIndex(i);
 
-                if (this.worldObj.canBlockSeeTheSky(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord))
+                if (this.worldObj.canBlockSeeSky(new BlockPos(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord)))
                 {
                     this.currentPath.setCurrentPathLength(i - 1);
                     return;

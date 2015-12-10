@@ -187,7 +187,7 @@ public class WorldEvent {
     }*/
     
     public EntityPlayer tryGetCursedPlayer(String username) {
-    	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().func_152612_a(username);
+    	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
     	if (entP != null && entP.worldObj.provider.getDimensionId() == DimensionManager.getWorld(dimensionID).provider.getDimensionId()) {

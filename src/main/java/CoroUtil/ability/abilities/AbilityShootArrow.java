@@ -7,12 +7,12 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.entity.projectile.EntityArrow;
 import CoroUtil.entity.projectile.EntityProjectileBase;
 import CoroUtil.inventory.AIInventory;
 import extendedrenderer.ExtendedRenderer;
@@ -172,7 +172,7 @@ public class AbilityShootArrow extends Ability {
 						EntityProjectileBase prj = null;
 						
 						if (projectileType == EntityProjectileBase.PRJTYPE_FIREBALL) {
-				        	prj = new EntityArrow(owner.worldObj, owner, (EntityLivingBase)target, 1.7);
+				        	//prj = new EntityArrow(owner.worldObj, owner, (EntityLivingBase)target, 1.7);
 				        } else if (projectileType == EntityProjectileBase.PRJTYPE_ICEBALL) {
 				        	//block = Block.ice;
 				        }

@@ -25,7 +25,6 @@ import CoroUtil.bt.selector.SelectorSequence;
 import CoroUtil.diplomacy.DiplomacyHelper;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
-import CoroUtil.forge.CoroAI;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.util.BlockCoord;
@@ -33,7 +32,6 @@ import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 
 public class AIBTAgent {
@@ -381,18 +379,20 @@ public class AIBTAgent {
 		profile.syncAbilitiesFull(true); //calling this here does not work for entities outside tracker range on client, see SkillMapping errors for more detail
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
-		ManagedLocation ml = getManagedLocation();
+		//TODO: readd 1.8.8
+		/*ManagedLocation ml = getManagedLocation();
 		if (ml != null) {
 			//unitType is mostly unused atm
 			ml.addEntity("member", ent);
 		} else {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
 			CoroAI.dbg("AIBTAgent Entitys home has been destroyed or never had one set!");
-		}
+		}*/
 		
 	}
 	
-	public ManagedLocation getManagedLocation() {
+	//TODO: readd 1.8.8
+	/*public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
@@ -409,7 +409,7 @@ public class AIBTAgent {
 	
 	public void setManagedLocation(ManagedLocation parLocation) {
 		coordsManagedLocation = parLocation.spawn;
-	}
+	}*/
 	
 	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
 		initPost(false);
@@ -515,9 +515,10 @@ public class AIBTAgent {
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-			if (ml != null && ml instanceof ManagedLocation) {
+			//TODO: readd 1.8.8
+			/*if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
-			}
+			}*/
 		}
 		ent = null;
 		ordersHandler = null;
