@@ -48,10 +48,10 @@ public class PacketHelper {
 
 	public static void writeTEntToPacket(TileEntity tEnt, NBTTagCompound nbt) {
 		try {
-			nbt.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-			nbt.setInteger("x", tEnt.xCoord);
-			nbt.setInteger("y", tEnt.yCoord);
-			nbt.setInteger("z", tEnt.zCoord);
+			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+			nbt.setInteger("x", tEnt.getPos().getX());
+			nbt.setInteger("y", tEnt.getPos().getY());
+			nbt.setInteger("z", tEnt.getPos().getZ());
 			/*buff.writeInt(tEnt.getWorldObj().provider.dimensionId);
 			buff.writeInt(tEnt.xCoord);
 	    	buff.writeInt(tEnt.yCoord);
@@ -148,10 +148,10 @@ public class PacketHelper {
         try
         {
         	nbtSendData.setString("command", "CoroAI_TEntCmd");
-        	nbtSendData.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-        	nbtSendData.setInteger("x", tEnt.xCoord);
-        	nbtSendData.setInteger("y", tEnt.yCoord);
-        	nbtSendData.setInteger("z", tEnt.zCoord);
+        	nbtSendData.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+        	nbtSendData.setInteger("x", tEnt.getPos().getX());
+        	nbtSendData.setInteger("y", tEnt.getPos().getY());
+        	nbtSendData.setInteger("z", tEnt.getPos().getZ());
         	nbtSendData.setTag("data", data);
         	//ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntCmd");
         	/*byteBuf.writeInt(tEnt.getWorldObj().provider.dimensionId);

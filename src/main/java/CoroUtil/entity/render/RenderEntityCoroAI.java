@@ -1,6 +1,7 @@
 package CoroUtil.entity.render;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -109,13 +110,13 @@ public class RenderEntityCoroAI extends RenderLiving {
             
             //Overlays.renderBlock(Block.anvil, 0, 0, 0, 0);
             
-            RenderManager.instance.itemRenderer.renderItem(par1EntityLiving, itemstack, 0);
+            Minecraft.getMinecraft().getRenderManager().itemRenderer.renderItem(par1EntityLiving, itemstack, 0);
 
             if (itemstack.getItem().requiresMultipleRenderPasses())
             {
                 for (int x = 1; x < itemstack.getItem().getRenderPasses(itemstack.getItemDamage()); x++)
                 {
-                	RenderManager.instance.itemRenderer.renderItem(par1EntityLiving, itemstack, x);
+                	Minecraft.getMinecraft().getRenderManager().itemRenderer.renderItem(par1EntityLiving, itemstack, x);
                 }
             }
             

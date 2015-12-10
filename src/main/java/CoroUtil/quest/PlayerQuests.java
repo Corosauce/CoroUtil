@@ -20,6 +20,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -69,7 +70,7 @@ public class PlayerQuests {
 	}
 	
 	public EntityPlayer getPlayer() {
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().func_152612_a(playerName);
+		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
 		//return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
 	}
 	
@@ -228,7 +229,7 @@ public class PlayerQuests {
 		int startY = 10;
 		
 		Minecraft mc = FMLClientHandler.instance().getClient();
-		mc.fontRenderer.drawStringWithShadow("Quests:", startX, startY, 0xFFFFFF);
+		mc.fontRendererObj.drawStringWithShadow("Quests:", startX, startY, 0xFFFFFF);
 		
 		startY += 20;
 		int questSpacing = 40;
@@ -253,9 +254,9 @@ public class PlayerQuests {
 				qStr = "Type: " + activeQuests.get(i).questType;
 			}*/
 			
-			mc.fontRenderer.drawStringWithShadow(EnumChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
-			mc.fontRenderer.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
-			mc.fontRenderer.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRendererObj.drawStringWithShadow(EnumChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRendererObj.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRendererObj.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
 		}
 	}
 	

@@ -100,7 +100,7 @@ public class BlockStaticDataMap {
 
 		addToMap(Blocks.leaves, plant);
 		
-		addToMap(Blocks.fence_gate, plank);
+		addToMap(Blocks.oak_fence_gate, plank);
 		addToMap(Blocks.planks, plank);
 		addToMap(Blocks.spruce_stairs, plank);
 		addToMap(Blocks.birch_stairs, plank);

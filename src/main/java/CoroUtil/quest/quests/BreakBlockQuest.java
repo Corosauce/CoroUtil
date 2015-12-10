@@ -3,6 +3,7 @@ package CoroUtil.quest.quests;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
@@ -62,17 +63,17 @@ public class BreakBlockQuest extends ActiveQuest {
 	}
 	
 	public void handleEvent(BreakEvent event) {
-		System.out.println("EVENT!: " + event.getPlayer() + " - " + event.x + " - " + event.y + " - " + event.z);
+		//System.out.println("EVENT!: " + event.getPlayer() + " - " + event.x + " - " + event.y + " - " + event.z);
 		if (event.getPlayer() == null || !CoroUtilEntity.getName(event.getPlayer()).equals(playerQuests.playerName)) {
 			return;
 		}
 		if (getBlock() != null) {
-			if (getBlock() != event.block) {
+			if (getBlock() != event.state.getBlock()) {
 				return;
 			}
 		}
 		if (blockCoords != null) {
-			if (blockCoords.posX != event.x || blockCoords.posY != event.y || blockCoords.posZ != event.z) {
+			if (blockCoords.posX != event.pos.getX() || blockCoords.posY != event.pos.getY() || blockCoords.posZ != event.pos.getZ()) {
 				return;
 			}
 		}

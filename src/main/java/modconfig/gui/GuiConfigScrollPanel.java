@@ -167,8 +167,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         //config.drawTexturedModalRect(xPosition, yPosition, 0, 46 + k * 20, width / 2, height);
         //config.drawTexturedModalRect(xPosition + width / 2, yPosition, 200 - width / 2, 46 + k * 20, width / 2, height);
-        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(config.getData().configData.get(index).name);
-        config.drawString(mc.fontRenderer, config.getData().configData.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
+        int stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(config.getData().configData.get(index).name);
+        config.drawString(mc.fontRendererObj, config.getData().configData.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
         /*for (int x = 0; x < options.keyBindings.length; x++)
@@ -184,7 +184,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         int maxWidth = (config.xSize / 2) - 45;
         //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
         
-        value = Minecraft.getMinecraft().fontRenderer.trimStringToWidth(value, maxWidth);
+        value = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(value, maxWidth);
 
         String str = (conflict ? EnumChatFormatting.RED : "") + value;//options.getOptionDisplayString(index);
         str = (index == selected ? EnumChatFormatting.WHITE + "> " + EnumChatFormatting.YELLOW + "??? " + EnumChatFormatting.WHITE + "<" : str);
@@ -209,11 +209,11 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-            int l2 = Minecraft.getMinecraft().fontRenderer.getStringWidth(s);
+            int l2 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(s);
             int i2 = hover_x_min;
             int k2 = hover_y_min - 10;
             drawGradientRect(i2 - 3, k2 - 3, i2 + l2 + 3, k2 + 8 + 3, 0xc0000000, 0xc0000000);
-            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
+            Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, i2, k2, -1);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
     }

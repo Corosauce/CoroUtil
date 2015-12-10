@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.TextureOffset;
 import net.minecraft.client.renderer.GLAllocation;
@@ -147,7 +148,7 @@ public class ModelRendererBones
     	//issues with rebinding texture lighting, hit damage overlay etc, should do items in another pass
     	
     	AnimationStateObject animData = agent.getAIBTAgent().profile.animationData.get(boxName);
-    	RenderEntityCoroAI render = (RenderEntityCoroAI) RenderManager.instance.entityRenderMap.get(agent.getClass());
+    	RenderEntityCoroAI render = (RenderEntityCoroAI) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.getClass());
     	
     	//top part is null :/
     	/*if (animData == null) {

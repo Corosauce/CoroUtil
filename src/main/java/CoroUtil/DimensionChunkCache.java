@@ -276,7 +276,7 @@ public class DimensionChunkCache implements IBlockAccess
     
     public int getLightBrightnessForSkyBlocks(int par1, int par2, int par3, int par4)
     {
-        int var5 = this.getSkyBlockTypeBrightness(EnumSkyBlock.Sky, par1, par2, par3);
+        int var5 = this.getSkyBlockTypeBrightness(EnumSkyBlock.SKY, par1, par2, par3);
         int var6 = this.getSkyBlockTypeBrightness(EnumSkyBlock.Block, par1, par2, par3);
 
         if (var6 < par4)
@@ -293,7 +293,7 @@ public class DimensionChunkCache implements IBlockAccess
      */
     public float getLightBrightness(int par1, int par2, int par3)
     {
-        return this.worldObj.provider.lightBrightnessTable[this.getBlockLightValue(par1, par2, par3)];
+        return this.worldObj.provider.getLightBrightnessTable()[this.getBlockLightValue(par1, par2, par3)];
     }
 
     /**
@@ -574,7 +574,7 @@ public class DimensionChunkCache implements IBlockAccess
 
         if (par3 >= 0 && par3 < 256 && par2 >= -30000000 && par4 >= -30000000 && par2 < 30000000 && par4 <= 30000000)
         {
-            if (par1EnumSkyBlock == EnumSkyBlock.Sky && this.worldObj.provider.hasNoSky)
+            if (par1EnumSkyBlock == EnumSkyBlock.SKY && this.worldObj.provider.getHasNoSky())
             {
                 return 0;
             }

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -98,7 +99,7 @@ public class PersonalityProfile {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
 			
-			Render renderObj = (Render) RenderManager.instance.entityRenderMap.get(agent.ent.getClass());
+			Render renderObj = (Render) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
 			if (renderObj instanceof RenderEntityCoroAI) {
 				
 				for (Map.Entry<String, ModelRendererBones> entry : ((RenderEntityCoroAI) renderObj).modelTechne.partsAllChildren.entrySet()) {

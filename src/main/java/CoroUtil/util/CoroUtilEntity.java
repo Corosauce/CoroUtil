@@ -34,9 +34,9 @@ public class CoroUtilEntity {
 	
 	public static double getDistance(Entity ent, TileEntity tEnt)
     {
-        double d3 = ent.posX - tEnt.xCoord;
-        double d4 = ent.posY - tEnt.yCoord;
-        double d5 = ent.posZ - tEnt.zCoord;
+        double d3 = ent.posX - tEnt.getPos().getX();
+        double d4 = ent.posY - tEnt.getPos().getY();
+        double d5 = ent.posZ - tEnt.getPos().getZ();
         return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
     }
 	

@@ -76,11 +76,11 @@ public class GuiSlotImpl extends GuiSlot
     protected void drawSlot(int i, int j, int k, int l, Tessellator tessellator) {
 	    IScrollingElement element = elements.get(i);
 	    int ySize = 12;
-	    mc.fontRenderer.drawStringWithShadow(element.getTitle(), j + 2, k + ySize * 0, 0xffffff);
-	    mc.fontRenderer.drawStringWithShadow(element.getExtraInfo(), j + 2, k + ySize * 1, 0xffffff);
+	    mc.fontRendererObj.drawStringWithShadow(element.getTitle(), j + 2, k + ySize * 0, 0xffffff);
+	    mc.fontRendererObj.drawStringWithShadow(element.getExtraInfo(), j + 2, k + ySize * 1, 0xffffff);
 	    List<String> listInfo = element.getExtraInfo2();
 	    for (int ii = 0; ii < listInfo.size(); ii++) {
-	    	mc.fontRenderer.drawStringWithShadow(listInfo.get(ii), j + 2, k + ySize * (ii + 2), 0xffffff);
+	    	mc.fontRendererObj.drawStringWithShadow(listInfo.get(ii), j + 2, k + ySize * (ii + 2), 0xffffff);
 	    }
 	    
     }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
 import CoroUtil.quest.PlayerQuests;
 

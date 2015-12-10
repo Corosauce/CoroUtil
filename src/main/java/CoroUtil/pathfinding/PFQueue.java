@@ -939,7 +939,7 @@ public class PFQueue implements Runnable {
     				parJob.source = bestCoords;
     			}
     		} else {
-    			parJob.source.getY()++;
+    			parJob.source.add(0, 1, 0);
     		}
     	}
     	

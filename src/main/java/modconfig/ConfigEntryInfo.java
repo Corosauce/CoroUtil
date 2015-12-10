@@ -32,7 +32,7 @@ public class ConfigEntryInfo {
 	public void initButton() {
 		int buttonWidth = 130;
         int buttonHeight = 16;
-		editBox = new GuiBetterTextField(Minecraft.getMinecraft().fontRenderer, 0, 0, buttonWidth, buttonHeight);
+		editBox = new GuiBetterTextField(Minecraft.getMinecraft().fontRendererObj, 0, 0, buttonWidth, buttonHeight);
 		editBox.setText(value.toString());
 	}
 }

@@ -37,7 +37,7 @@ public class BlockDataGrid
     
     public float getBlockStrength(int x, int y, int z) {
     	Block blockID = world.getBlockState(new BlockPos(x, y, z)).getBlock();
-    	int blockMeta = world.getBlockMetadata(x, y, z);
+    	//int blockMeta = world.getBlockMetadata(x, y, z);
     	
     	//use block id to weight lookup map
     	
