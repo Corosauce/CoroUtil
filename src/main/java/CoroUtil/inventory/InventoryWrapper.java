@@ -293,7 +293,7 @@ public class InventoryWrapper implements IInventory {
     }
 
 	@Override
-	public String getCommandSenderName() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -72,7 +72,7 @@ public class CoroUtilItem {
 
             if (p_146097_3_)
             {
-                entityitem.func_145799_b(parEnt.getCommandSenderName());
+                entityitem.func_145799_b(parEnt.getName());
             }
 
             float f = 0.1F;
