@@ -3,6 +3,7 @@ package extendedrenderer.particle.entity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,7 +12,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class EntityIconFX extends EntityRotFX
 {
-    public EntityIconFX(World par1World, double par2, double par4, double par6, IIcon par8Item)
+    public EntityIconFX(World par1World, double par2, double par4, double par6, TextureAtlasSprite par8Item)
     {
         super(par1World, par2, par4, par6, 0.0D, 0.0D, 0.0D);
         this.setParticleIcon(par8Item);
@@ -22,7 +23,7 @@ public class EntityIconFX extends EntityRotFX
         particleTextureJitterY = 3;
     }
 
-    public EntityIconFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, IIcon par14Item)
+    public EntityIconFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, TextureAtlasSprite par14Item)
     {
         this(par1World, par2, par4, par6, par14Item);
         this.motionX *= 0.10000000149011612D;

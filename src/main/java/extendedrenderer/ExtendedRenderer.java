@@ -23,6 +23,8 @@ public class ExtendedRenderer {
 	@Mod.Instance( value = "ExtendedRenderer" )
 	public static ExtendedRenderer instance;
 	public static String modid = "extendedrenderer";
+	//because assets used it this way, remove later
+	public static String modidCaps = "ExtendedRenderer";
     
     @SidedProxy(clientSide = "extendedrenderer.ClientProxy", serverSide = "extendedrenderer.CommonProxy")
     public static CommonProxy proxy;
