@@ -7,12 +7,12 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 
 public class ParticleRegistry {
 
-	/*public static TextureAtlasSprite squareGrey;
-	public static IIcon smoke;
-	public static IIcon cloud;
-	public static IIcon cloud256;
-	public static IIcon cloud256dark;
-	public static IIcon cloudDownfall;*/
+	public static TextureAtlasSprite squareGrey;
+	public static TextureAtlasSprite smoke;
+	public static TextureAtlasSprite cloud;
+	public static TextureAtlasSprite cloud256;
+	public static TextureAtlasSprite cloud256dark;
+	public static TextureAtlasSprite cloudDownfall;
 	
 	public static void init(TextureStitchEvent event) {
 		//type is gone now afaik, since items texture sheet doesnt exist now
@@ -21,22 +21,22 @@ public class ParticleRegistry {
 			ResourceLocation res;
 		
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/white");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));
+			event.map.setTextureEntry(res.toString(), squareGrey = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/smoke_00");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));
+			event.map.setTextureEntry(res.toString(), smoke = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/cloud64");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));
+			event.map.setTextureEntry(res.toString(), cloud = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/cloud256");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));
+			event.map.setTextureEntry(res.toString(), cloud256 = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/cloud256dark");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));
+			event.map.setTextureEntry(res.toString(), cloud256dark = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/downfall");
-			event.map.setTextureEntry(res.toString(), new TextureAtlasSpriteImpl(res.toString()));/*
+			event.map.setTextureEntry(res.toString(), cloudDownfall = new TextureAtlasSpriteImpl(res.toString()));/*
 			
 			ResourceLocation squareGrey2 = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/white");
 			event.map.setTextureEntry(squareGrey2.toString(), new TextureAtlasSpriteImpl(squareGrey2.toString()));
