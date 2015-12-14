@@ -64,9 +64,11 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			vec = vec.normalize();
 			vec2 = vec2.normalize();
 			
-			vec.xCoord *= amp;
+			/*vec.xCoord *= amp;
 			vec.yCoord *= amp;
-			vec.zCoord *= amp;
+			vec.zCoord *= amp;*/
+			
+			vec = new Vec3(vec.xCoord * amp, vec.yCoord * amp, vec.zCoord * amp);
 			
 			//vec.rotateAroundY((float) (Math.toRadians(10/*rotSpeed * amp*/)));
 			//vec.rotateAroundZ((float) (Math.toRadians(10/*rotSpeed * amp*/)));

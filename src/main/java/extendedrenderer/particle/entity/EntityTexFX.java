@@ -2,7 +2,10 @@ package extendedrenderer.particle.entity;
 
 import java.awt.Color;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -92,14 +95,8 @@ public class EntityTexFX extends EntityRotFX
     	return false;
     }
 
-    public void renderParticle(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7)
+    /*public void renderParticle(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7)
     {
-        //this.rotationYaw = ModLoader.getMinecraftInstance().thePlayer.rotationYaw;
-        //this.rotationPitch += this.rand.nextInt(4) - 2;//ModLoader.getMinecraftInstance().thePlayer.rotationPitch;
-        /*float var8 = (float)(this.getParticleTextureIndex() % 16) / 16.0F;
-        float var9 = var8 + 0.0624375F;
-        float var10 = (float)(this.getParticleTextureIndex() / 16) / 16.0F;
-        float var11 = var10 + 0.0624375F;*/
     	float framesX = 5;
     	float framesY = 1;
     	
@@ -117,12 +114,7 @@ public class EntityTexFX extends EntityRotFX
         float var13 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)var2 - interpPosX);
         float var14 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)var2 - interpPosY) + 0.0F;
         float var15 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)var2 - interpPosZ);
-        //var13 += i;//rand.nextInt(6)-3;
-        //var14 += j;
-        //var15 += k;
-        //System.out.println("!!!");
-        float var16 = /*this.getEntityBrightness(var2) * */brightness;
-        /*this.getBrightness(var2) * */
+        float var16 = brightness;
         var16 = (1F + FMLClientHandler.instance().getClient().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
         //var16 = 2f;
         var1.setColorOpaque_F(this.particleRed * var16, this.particleGreen * var16, this.particleBlue * var16);
@@ -130,9 +122,62 @@ public class EntityTexFX extends EntityRotFX
         var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12), (double)var9, (double)var10);
         var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12), (double)var8, (double)var10);
         var1.addVertexWithUV((double)(var13 + var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 + var5 * var12 - var7 * var12), (double)var8, (double)var11);
-        /*}
+    }*/
+    
+    @Override
+    public void renderParticle(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float par3, float par4, float par5, float par6, float par7) {
+    	float f6 = ((float)this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;
+        float f7 = f6 + 0.015609375F;
+        float f8 = ((float)this.particleTextureIndexY + this.particleTextureJitterY / 4.0F) / 16.0F;
+        float f9 = f8 + 0.015609375F;
+        float f10 = 0.1F * this.particleScale;
+
+        if (this.particleIcon != null)
+        {
+        	f6 = particleIcon.getMinU();
+            f7 = particleIcon.getMaxU();
+            f8 = particleIcon.getMinV();
+            f9 = particleIcon.getMaxV();
         }
+
+        float f11 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
+        float f12 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+        float f13 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+        
+        Minecraft mc = Minecraft.getMinecraft();
+        float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(partialTicks) * 0.01F)) * mc.theWorld.getSunBrightness(1F);
+        /*if (mc.theWorld.getTotalWorldTime() % 20 == 0) {
+        	System.out.println("brightness: " + br);
         }*/
+        
+        br = 0.55F * Math.max(0.01F, br) * (2F);
+        
+        float f14 = br;//brightness;
+        //par1Tessellator.setColorOpaque_F(f14 * this.particleRed, f14 * this.particleGreen, f14 * this.particleBlue);
+        /*par1Tessellator.setColorRGBA_F(this.particleRed * f14, this.particleGreen * f14, this.particleBlue * f14, Math.max(0F, this.particleAlpha));
+        worldRendererIn.pos((double)(f11 - par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 - par5 * f10 - par7 * f10), (double)f6, (double)f9);
+        worldRendererIn.func_181662_b((double)(f11 - par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 - par5 * f10 + par7 * f10), (double)f6, (double)f8);
+        worldRendererIn.func_181662_b((double)(f11 + par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 + par5 * f10 + par7 * f10), (double)f7, (double)f8);
+        worldRendererIn.func_181662_b((double)(f11 + par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 + par5 * f10 - par7 * f10), (double)f7, (double)f9);*/
+        
+        //TODO: verify this copied code from EntityFX will work for this, our brightness code is reverted atm
+        int i = this.getBrightnessForRender(partialTicks);
+        int j = i >> 16 & 65535;
+        int k = i & 65535;
+        
+        worldRendererIn.pos((double)(f11 - par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 - par5 * f10 - par7 * f10)).tex((double)f6, (double)f9)
+        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        
+        worldRendererIn.pos((double)(f11 - par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 - par5 * f10 + par7 * f10)).tex((double)f6, (double)f8)
+        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        
+        worldRendererIn.pos((double)(f11 + par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 + par5 * f10 + par7 * f10)).tex((double)f7, (double)f8)
+        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        
+        worldRendererIn.pos((double)(f11 + par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 + par5 * f10 - par7 * f10)).tex((double)f7, (double)f9)
+        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        
+        
     }
 
     public void onUpdate2()

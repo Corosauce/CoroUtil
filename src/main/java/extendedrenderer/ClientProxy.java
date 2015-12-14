@@ -40,9 +40,9 @@ public class ClientProxy extends CommonProxy
         super.init();
         
         //rr.registerEntityRenderingHandler(StormCluster.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityTexFX.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityRotFX.class, new RenderNull());
+        RenderingRegistry.registerEntityRenderingHandler(EntityTexFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
+        RenderingRegistry.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
+        RenderingRegistry.registerEntityRenderingHandler(EntityRotFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
         //rr.registerEntityRenderingHandler(EntityFallingRainFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntityWaterfallFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntitySnowFX.class, new RenderNull());

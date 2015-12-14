@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class RenderNull extends Render
 {
-    protected RenderNull(RenderManager renderManager) {
+    public RenderNull(RenderManager renderManager) {
 		super(renderManager);
 	}
 

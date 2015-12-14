@@ -2,27 +2,18 @@ package extendedrenderer.particle.entity;
 
 import java.awt.Color;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
-public class EntityTexBiomeColorFX extends EntityRotFX
+public class EntityTexBiomeColorFX extends EntityTexFX
 {
-    public int age;
-    public float brightness;
-    public int textureID;
-
-    //Types, for diff physics rules in wind code
-    //Leaves = 0
-    //Sand = 1
-    public int type = 0;
 
     public EntityTexBiomeColorFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int colorIndex, int texID, int meta, int x, int y, int z)
     {
-        super(var1, var2, var4, var6, var8, var10, var12);
+        super(var1, var2, var4, var6, var8, var10, var12, var14, colorIndex, texID);
         textureID = texID;
         this.motionX = var8 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
         this.motionY = var10 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
@@ -67,7 +58,7 @@ public class EntityTexBiomeColorFX extends EntityRotFX
         
         //biome color override
         //int meta = this.worldObj.getBlockMetadata((x, y, z)
-        color = new Color(Blocks.leaves.colorMultiplier(worldObj, x, y, z));
+        color = new Color(Blocks.leaves.colorMultiplier(worldObj, new BlockPos(x, y, z)));
 
         //BRIGHTNESS OVERRIDE! for textures
         this.particleRed = this.particleGreen = this.particleBlue = 0.7F;
@@ -99,62 +90,6 @@ public class EntityTexBiomeColorFX extends EntityRotFX
     protected boolean getFlag(int par1)
     {
     	return false;
-    }
-
-    public void renderParticle(Tessellator var1, float var2, float var3, float var4, float var5, float var6, float var7)
-    {
-        //this.rotationYaw = ModLoader.getMinecraftInstance().thePlayer.rotationYaw;
-        //this.rotationPitch += this.rand.nextInt(4) - 2;//ModLoader.getMinecraftInstance().thePlayer.rotationPitch;
-        /*float var8 = (float)(this.getParticleTextureIndex() % 16) / 16.0F;
-        float var9 = var8 + 0.0624375F;
-        float var10 = (float)(this.getParticleTextureIndex() / 16) / 16.0F;
-        float var11 = var10 + 0.0624375F;*/
-        
-        float framesX = 5;
-    	float framesY = 1;
-    	
-    	float index = this.getParticleTextureIndex();
-    	
-    	//test
-    	index = 0;
-    	
-    	float var8 = (float)index / framesX;
-        float var9 = var8 + (1F / framesX);
-        float var10 = (float)index / framesY;
-        float var11 = var10 + (1F / framesY);
-        
-        float var12 = 0.1F * this.particleScale;
-        float var13 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)var2 - interpPosX);
-        float var14 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)var2 - interpPosY) + 0.0F;
-        float var15 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)var2 - interpPosZ);
-        //var13 += i;//rand.nextInt(6)-3;
-        //var14 += j;
-        //var15 += k;
-        //System.out.println("!!!");
-        /*float var16 = this.getEntityBrightness(var2) * brightness;
-        
-        this.getBrightness(var2) * 
-        
-        float adjSubtracted = (this.worldObj.calculateSkylightSubtracted(var2) / 15F) * 0.5F;
-        
-        var16 = (1F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.13F);
-        
-        var16 = (-0.5F + ModLoader.getMinecraftInstance().gameSettings.gammaSetting) - (this.worldObj.calculateSkylightSubtracted(var2) * 0.17F);
-        
-        var16 = 0.4F - adjSubtracted + (ModLoader.getMinecraftInstance().gameSettings.gammaSetting * 0.7F);*/
-        
-        Minecraft mc = Minecraft.getMinecraft();
-        float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(var2) * 0.03F)) * mc.theWorld.getSunBrightness(1F);
-        br = 0.55F * Math.max(0.3F, br) * (2F);
-        
-        var1.setColorOpaque_F(this.particleRed * br, this.particleGreen * br, this.particleBlue * br);
-        var1.addVertexWithUV((double)(var13 - var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 - var5 * var12 - var7 * var12), (double)var9, (double)var11);
-        var1.addVertexWithUV((double)(var13 - var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 - var5 * var12 + var7 * var12), (double)var9, (double)var10);
-        var1.addVertexWithUV((double)(var13 + var3 * var12 + var6 * var12), (double)(var14 + var4 * var12), (double)(var15 + var5 * var12 + var7 * var12), (double)var8, (double)var10);
-        var1.addVertexWithUV((double)(var13 + var3 * var12 - var6 * var12), (double)(var14 - var4 * var12), (double)(var15 + var5 * var12 - var7 * var12), (double)var8, (double)var11);
-        /*}
-        }
-        }*/
     }
 
     public void onUpdate2()
