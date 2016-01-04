@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import modconfig.IConfigCategory;
 import CoroUtil.DimensionChunkCache;
+import CoroUtil.DimensionChunkCacheNew;
 
 public class ConfigCoroAI implements IConfigCategory {
 
@@ -31,11 +32,11 @@ public class ConfigCoroAI implements IConfigCategory {
 			String[] ids = chunkCacheDimensionBlacklist_IDs.split(",");
 			String[] names = chunkCacheDimensionBlacklist_Names.split(",");
 			
-			DimensionChunkCache.listBlacklistIDs.clear();
+			DimensionChunkCacheNew.listBlacklistIDs.clear();
 			for (int i = 0; i < ids.length; i++) {
-				DimensionChunkCache.listBlacklistIDs.add(Integer.valueOf(ids[i]));
+				DimensionChunkCacheNew.listBlacklistIDs.add(Integer.valueOf(ids[i]));
 			}
-			DimensionChunkCache.listBlacklistNamess = Arrays.asList(names);
+			DimensionChunkCacheNew.listBlacklistNamess = Arrays.asList(names);
 		} catch (Exception ex) {
 			//silence!
 		}

@@ -23,6 +23,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import CoroUtil.ChunkCoordinatesSize;
 import CoroUtil.DimensionChunkCache;
+import CoroUtil.DimensionChunkCacheNew;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
@@ -271,7 +272,7 @@ public class PFQueue implements Runnable {
 					    	        //Pathfind
 					    	        maxNodeIterations = queue.get(0).maxNodeIterations;
 					    	        //Multi world dimension pathfinding fix 
-					    	        worldMap = DimensionChunkCache.dimCacheLookup.get(queue.get(0).source.dimensionId);
+					    	        worldMap = DimensionChunkCacheNew.dimCacheLookup.get(queue.get(0).source.dimensionId);
 					    	        
 					    	        PathEntityEx pathEnt = null;
 					    	        
@@ -589,7 +590,7 @@ public class PFQueue implements Runnable {
 		
 		if (lastCacheUpdate < System.currentTimeMillis()) {
     		lastCacheUpdate = System.currentTimeMillis() + 10000;
-    		DimensionChunkCache.updateAllWorldCache();
+    		DimensionChunkCacheNew.updateAllWorldCache();
     	}
 		
 		int delay = 3000 + (queue.size() * 20);
@@ -706,7 +707,7 @@ public class PFQueue implements Runnable {
     	
     	if (lastCacheUpdate < System.currentTimeMillis()) {
     		lastCacheUpdate = System.currentTimeMillis() + 10000;
-    		DimensionChunkCache.updateAllWorldCache();
+    		DimensionChunkCacheNew.updateAllWorldCache();
     	}
     	
     	int delay = 3000 + (queue.size() * 20);
