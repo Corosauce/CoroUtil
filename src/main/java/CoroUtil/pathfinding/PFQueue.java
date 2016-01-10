@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -18,17 +20,18 @@ import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import CoroUtil.ChunkCoordinatesSize;
-import CoroUtil.DimensionChunkCache;
 import CoroUtil.DimensionChunkCacheNew;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
+import CoroUtil.util.Vector3f;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -373,7 +376,7 @@ public class PFQueue implements Runnable {
 						    			        	int offset = -5;
 							    			        
 							    			        while (tries < 30) {
-							    			        	if (CoroUtilBlock.isAir(block) || !block.isSideSolid(worldMap, gatherX, gatherY, gatherZ, ForgeDirection.UP)) {
+							    			        	if (CoroUtilBlock.isAir(block) || !block.isSideSolid(worldMap, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
 							    			        		break;
 							    			        	}
 							    			        	gatherY += offset++;
@@ -383,7 +386,7 @@ public class PFQueue implements Runnable {
 						    			        } else {
 						    			        	//int offset = 0;
 						    			        	while (tries < 30) {
-						    			        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(worldMap, gatherX, gatherY, gatherZ, ForgeDirection.UP)) break;
+						    			        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(worldMap, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) break;
 						    			        		gatherY -= 1;//offset++;
 						    			        		block = getBlock(gatherX, gatherY, gatherZ);
 							    			        	tries++;
@@ -396,7 +399,7 @@ public class PFQueue implements Runnable {
 						    			        	//retry path! found air
 						    			        	dbg(tries + "|" + queue.get(0).retryState + " partial path try: " + queue.get(0).sourceEntity);
 						    			        	
-						    			        	queue.get(0).dest = new ChunkCoordinatesSize(gatherX, gatherY, gatherZ, queue.get(0).source.dimensionId, queue.get(0).source.width, queue.get(0).source.height);
+						    			        	queue.get(0).dest = new BlockCoord(gatherX, gatherY, gatherZ);
 						    			        	queue.get(0).retryState++;
 						    			        	queue.add(queue.get(0)); //puts the job back in at the end.... but make sure code below doesnt remove all
 						    			        	
@@ -1104,7 +1107,7 @@ public class PFQueue implements Runnable {
             		if (parJob.mapOutPathfind) {
             			boolean proxFail = false;
             			for (int j = 0; j < parJob.listConnectablePoints.size(); j++) {
-                			if (Math.sqrt(parJob.listConnectablePoints.get(j).getDistanceSquared(nextBestPoint.xCoord, nextBestPoint.yCoord, nextBestPoint.zCoord)) < parJob.mapOutDistBetweenPoints) {
+                			if (Math.sqrt(parJob.listConnectablePoints.get(j).distanceSq(nextBestPoint.xCoord, nextBestPoint.yCoord, nextBestPoint.zCoord)) < parJob.mapOutDistBetweenPoints) {
                 				proxFail = true;
                 				break;
                 			}
@@ -1513,7 +1516,8 @@ public class PFQueue implements Runnable {
                             }
                             
                             //this is to replace isDoor open, this is the new more generic way to check for movement blockage
-                            if (var9.getBlocksMovement(worldMap, var6, var7, var8)) {
+                            //for 1.8 this went from getBlocksMovement to isPassable, logical inversion? didnt invert condition here, if bug, maybe invert it
+                            if (var9.isPassable(worldMap, new BlockPos(var6, var7, var8))) {
                             	return -2;
                             }
                             
@@ -1679,7 +1683,8 @@ public class PFQueue implements Runnable {
     
     private int getBlockMetadata(int x, int y, int z) {
     	//if (!worldMap.checkChunksExist(x, 0, z , x, 128, z)) return 0;
-    	return worldMap.getBlockMetadata(x, y, z);
+    	IBlockState state = worldMap.getBlockState(new BlockPos(x, y, z));
+    	return state.getBlock().getMetaFromState(state);
     }
     
     /*public static void renderPFLines(EntityLiving entityliving, double d, double d1, double d2, 
@@ -1860,7 +1865,7 @@ public class PFQueue implements Runnable {
     }
     
     public static boolean isFenceLike(Block block) {
-    	return block == Blocks.fence || block == Blocks.iron_bars || block == Blocks.fence_gate || block == Blocks.cobblestone_wall || block == Blocks.nether_brick_fence;
+    	return block instanceof BlockFence || block == Blocks.cobblestone_wall;
     }
     
     public static boolean isPressurePlate(Block block) {

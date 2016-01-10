@@ -54,5 +54,13 @@ public class BlockCoord {
     public int getZ() {
     	return posZ;
     }
+    
+    public double distanceSq(double toX, double toY, double toZ)
+    {
+        double d0 = (double)this.getX() - toX;
+        double d1 = (double)this.getY() - toY;
+        double d2 = (double)this.getZ() - toZ;
+        return d0 * d0 + d1 * d1 + d2 * d2;
+    }
 	
 }
