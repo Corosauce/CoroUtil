@@ -68,11 +68,13 @@ public class CoroUtilItem {
         else
         {
             EntityItem entityitem = new EntityItem(parEnt.worldObj, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
-            entityitem.delayBeforeCanPickup = 40;
+            //TODO: 1.8 fix if method is still used
+            System.out.println("TODO: missing added delay before pickup");
+            //entityitem.delayBeforeCanPickup = 40;
 
             if (p_146097_3_)
             {
-                entityitem.func_145799_b(parEnt.getName());
+                entityitem.setThrower(parEnt.getName());
             }
 
             float f = 0.1F;

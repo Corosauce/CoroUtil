@@ -8,11 +8,14 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
+import net.minecraft.world.pathfinder.WalkNodeProcessor;
 
 public class PathNavigateCustom
 {
@@ -60,12 +63,27 @@ public class PathNavigateCustom
     private boolean canSwimOnSurface;
     public boolean canSwimInWater; //used for navigating under the water without strait up float forcing (float code is elsewhere usually)
     public boolean canFly; //used for navigating flying paths
+    
+    
+    //1.8 added stuff
+    
+    private PathFinder pathFinder;
+    protected WalkNodeProcessor nodeProcessor;
+    
 
     public PathNavigateCustom(EntityLivingBase par1EntityLiving, World par2World)
     {
         this.theEntity = par1EntityLiving;
         this.worldObj = par2World;
         this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.followRange);
+        this.pathFinder = getPathFinder();
+    }
+    
+    protected PathFinder getPathFinder()
+    {
+        this.nodeProcessor = new WalkNodeProcessor();
+        this.nodeProcessor.setEnterDoors(true);
+        return new PathFinder(this.nodeProcessor);
     }
 
     public void setAvoidsWater(boolean par1)
@@ -134,9 +152,29 @@ public class PathNavigateCustom
     /**
      * Returns the path to the given coordinates
      */
-    public PathEntity getPathToXYZ(double par1, double par3, double par5)
+    public PathEntity getPathToXYZ(double x, double y, double z)
     {
-        return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(par1), (int)par3, MathHelper.floor_double(par5), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+    	return this.getPathToPos(new BlockPos(MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z)));
+        //return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+    }
+    
+    public PathEntity getPathToPos(BlockPos pos)
+    {
+        if (!this.canNavigate())
+        {
+            return null;
+        }
+        else
+        {
+            float f = this.getPathSearchRange();
+            this.worldObj.theProfiler.startSection("pathfind");
+            BlockPos blockpos = new BlockPos(this.theEntity);
+            int i = (int)(f + 8.0F);
+            ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
+            PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
+            this.worldObj.theProfiler.endSection();
+            return pathentity;
+        }
     }
 
     /**
@@ -153,7 +191,23 @@ public class PathNavigateCustom
      */
     public PathEntity getPathToEntityLiving(Entity par1Entity)
     {
-        return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+        //return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+    	
+    	if (!this.canNavigate())
+        {
+            return null;
+        }
+        else
+        {
+            float f = this.getPathSearchRange();
+            this.worldObj.theProfiler.startSection("pathfind");
+            BlockPos blockpos = (new BlockPos(this.theEntity)).up();
+            int i = (int)(f + 16.0F);
+            ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
+            PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
+            this.worldObj.theProfiler.endSection();
+            return pathentity;
+        }
     }
 
     /**
@@ -197,9 +251,7 @@ public class PathNavigateCustom
                 this.speed = par2;
                 Vec3 vec3 = this.getEntityPosition();
                 this.ticksAtLastPos = this.totalTicks;
-                this.lastPosCheck.xCoord = vec3.xCoord;
-                this.lastPosCheck.yCoord = vec3.yCoord;
-                this.lastPosCheck.zCoord = vec3.zCoord;
+                this.lastPosCheck = vec3;
                 return true;
             }
         }
@@ -322,9 +374,7 @@ public class PathNavigateCustom
             }
 
             this.ticksAtLastPos = this.totalTicks;
-            this.lastPosCheck.xCoord = vec3.xCoord;
-            this.lastPosCheck.yCoord = vec3.yCoord;
-            this.lastPosCheck.zCoord = vec3.zCoord;
+            this.lastPosCheck = vec3;
         }
     }
 
@@ -551,29 +601,22 @@ public class PathNavigateCustom
     }
 
     /**
-     * Returns true if an entity does not collide with any solid blocks at the position. Args: xOffset, yOffset,
-     * zOffset, entityXSize, entityYSize, entityZSize, originPosition, vecX, vecZ
+     * Returns true if an entity does not collide with any solid blocks at the position.
      */
-    private boolean isPositionClear(int par1, int par2, int par3, int par4, int par5, int par6, Vec3 par7Vec3, double par8, double par10)
+    private boolean isPositionClear(int p_179692_1_, int p_179692_2_, int p_179692_3_, int p_179692_4_, int p_179692_5_, int p_179692_6_, Vec3 p_179692_7_, double p_179692_8_, double p_179692_10_)
     {
-        for (int k1 = par1; k1 < par1 + par4; ++k1)
+        for (BlockPos blockpos : BlockPos.getAllInBox(new BlockPos(p_179692_1_, p_179692_2_, p_179692_3_), new BlockPos(p_179692_1_ + p_179692_4_ - 1, p_179692_2_ + p_179692_5_ - 1, p_179692_3_ + p_179692_6_ - 1)))
         {
-            for (int l1 = par2; l1 < par2 + par5; ++l1)
+            double d0 = (double)blockpos.getX() + 0.5D - p_179692_7_.xCoord;
+            double d1 = (double)blockpos.getZ() + 0.5D - p_179692_7_.zCoord;
+
+            if (d0 * p_179692_8_ + d1 * p_179692_10_ >= 0.0D)
             {
-                for (int i2 = par3; i2 < par3 + par6; ++i2)
+                Block block = this.worldObj.getBlockState(blockpos).getBlock();
+
+                if (!block.isPassable(this.worldObj, blockpos))
                 {
-                    double d2 = (double)k1 + 0.5D - par7Vec3.xCoord;
-                    double d3 = (double)i2 + 0.5D - par7Vec3.zCoord;
-
-                    if (d2 * par8 + d3 * par10 >= 0.0D)
-                    {
-                    	Block block = this.worldObj.getBlockState(new BlockPos(k1, l1, i2)).getBlock();
-
-                        if (!block.getBlocksMovement(this.worldObj, k1, l1, i2))
-                        {
-                            return false;
-                        }
-                    }
+                    return false;
                 }
             }
         }
