@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
@@ -80,7 +81,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, packetChannel/*CoroAI.eventChannelName*/);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), packetChannel/*CoroAI.eventChannelName*/);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWClient(TileEntity tEnt, String name, Object val) {
@@ -110,7 +111,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWServer(TileEntity tEnt) {
@@ -135,7 +136,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, NBTTagCompound data) {
@@ -172,7 +173,7 @@ public class PacketHelper {
         pkt.data = bos.toByteArray();
         pkt.length = bos.size();*/
         
-        return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+        return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
@@ -202,7 +203,7 @@ public class PacketHelper {
         	ex.printStackTrace();
         }
 
-        return new FMLProxyPacket(byteBuf, parChannel);
+        return new FMLProxyPacket(new PacketBuffer(byteBuf), parChannel);
     }
 	
 }

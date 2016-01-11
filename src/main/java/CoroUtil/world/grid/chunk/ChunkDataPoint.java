@@ -11,7 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ClassInheritanceMultiMap;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 
@@ -65,7 +65,8 @@ public class ChunkDataPoint
     	try {
 	    	updateCache();
 	    	
-	    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+	    	//if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+	    	if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
 		    	Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
 		    	
 		    	int countWater = 0;
@@ -108,7 +109,8 @@ public class ChunkDataPoint
 
     public void updateCache()
     {
-    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+    	//if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+    	if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
     		Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
     		List<Entity> listEntities = getEntitiesFromLoadedChunk(enemyClass, chunk);
     		countEntitiesEnemy = listEntities.size();

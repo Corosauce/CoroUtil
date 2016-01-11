@@ -9,6 +9,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 
 import com.google.common.collect.Multimap;
 
@@ -16,13 +17,13 @@ public class CoroUtilItem {
 
 	public static Item setUnlocalizedNameAndTexture(Item item, String nameTex) {
 		item.setUnlocalizedName(nameTex);
-		item.setTextureName(nameTex);
+		//item.setTextureName(nameTex);
     	return item;
     }
 	
 	public static Item getItemByName(String name) {
 		try {
-			Object obj = Item.itemRegistry.getObject(name);
+			Object obj = Item.itemRegistry.getObject(new ResourceLocation(name));
 			if (obj != null) {
 				return (Item) obj;
 			} else {
@@ -35,7 +36,7 @@ public class CoroUtilItem {
 	}
 	
 	public static String getNameByItem(Item item) {
-		return Item.itemRegistry.getNameForObject(item);
+		return Item.itemRegistry.getNameForObject(item).toString();
 	}
 	
 	public static float getLeftClickDamage(ItemStack is) {
