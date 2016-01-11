@@ -371,7 +371,7 @@ public class TileDataWatcher
                 p_151510_0_.writeFloat(((Float)p_151510_1_.getObject()).floatValue());
                 break;
             case 4:
-                p_151510_0_.writeStringToBuffer((String)p_151510_1_.getObject());
+                p_151510_0_.writeString((String)p_151510_1_.getObject());
                 break;
             case 5:
                 ItemStack itemstack = (ItemStack)p_151510_1_.getObject();

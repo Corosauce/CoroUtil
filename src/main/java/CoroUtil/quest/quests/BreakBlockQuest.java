@@ -2,6 +2,7 @@ package CoroUtil.quest.quests;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
@@ -31,7 +32,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		super.initCustomData();
 
 		blockCoords = parCoords;
-		blockType = Block.blockRegistry.getNameForObject(parBlock);
+		blockType = Block.blockRegistry.getNameForObject(parBlock).toString();
 		
 	}
 
@@ -86,7 +87,7 @@ public class BreakBlockQuest extends ActiveQuest {
 	}
 	
 	public Block getBlock() {
-		return (Block)Block.blockRegistry.getObject(blockType);
+		return (Block)Block.blockRegistry.getObject(new ResourceLocation(blockType));
 	}
 	
 	public void load(NBTTagCompound parNBT) {

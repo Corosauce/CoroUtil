@@ -87,14 +87,14 @@ public class InventoryWrapper implements IInventory {
         return stack;
     }
 
-    @Override
+    /*@Override
     public ItemStack getStackInSlotOnClosing(int slot) {
         ItemStack stack = getStackInSlot(slot);
         if (stack != null) {
                 setInventorySlotContents(slot, null);
         }
         return stack;
-    }
+    }*/
    
     @Override
     public int getInventoryStackLimit() {
@@ -342,6 +342,13 @@ public class InventoryWrapper implements IInventory {
 	public void clear() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	//TODO: 1.8 added
+	@Override
+	public ItemStack removeStackFromSlot(int index) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -3,7 +3,6 @@ package CoroUtil.config;
 import java.util.Arrays;
 
 import modconfig.IConfigCategory;
-import CoroUtil.DimensionChunkCache;
 import CoroUtil.DimensionChunkCacheNew;
 
 public class ConfigCoroAI implements IConfigCategory {

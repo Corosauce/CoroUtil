@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import CoroUtil.util.CoroUtilBlock;
 
 public class BlockStaticDataMap {
@@ -41,7 +42,7 @@ public class BlockStaticDataMap {
         int i = 0;
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	Block block = (Block) Block.blockRegistry.getObject(tagName);
+        	Block block = (Block) Block.blockRegistry.getObject(new ResourceLocation(tagName));
         	
         	if (block != null) {
         		String hash;// = block.getClass().toString() + "|" + block.getUnlocalizedName() + "|" + Block.lightValue[i];

@@ -19,7 +19,6 @@ import CoroUtil.OldUtil;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EntityTropicalFishHook;
-import CoroUtil.entity.ItemTropicalFishingRod;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilItem;
 
@@ -184,11 +183,11 @@ public class AIInventory {
 			Item item = is.getItem();
 			if (item != null) {
 				//special fishing exception
-				if (item instanceof ItemTropicalFishingRod) {
+				/*if (item instanceof ItemTropicalFishingRod) {
 					((ItemTropicalFishingRod)item).onItemRightClickSpecial(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj), entOwner);
-				} else {
+				} else {*/
 					item.onItemRightClick(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj));
-				}
+				//}
 			}
 		}
 	}

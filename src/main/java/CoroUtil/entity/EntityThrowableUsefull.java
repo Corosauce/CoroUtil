@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -253,7 +254,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         	if (temp != null) movingobjectposition = temp;
         }
 
-        if (movingobjectposition != null)
+        /*if (movingobjectposition != null)
         {
             if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK && this.worldObj.getBlock(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ) instanceof BlockPortal)
             {
@@ -263,7 +264,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             {
                 this.onImpact(movingobjectposition);
             }
-        }
+        }*/
 
         /*this.posX += this.motionX;
         this.posY += this.motionY;
@@ -309,7 +310,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             for (int k = 0; k < 4; ++k)
             {
                 float f4 = 0.25F;
-                this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
+                this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
             }
 
             f2 = 0.8F;

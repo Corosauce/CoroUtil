@@ -89,6 +89,7 @@ public class OldUtil {
     	return true;
     }
 	
+    //TODO: 1.8 needs the block pos for checking open fence gates, fix for ZC
 	public static boolean isNoPathBlock(Entity ent, Block parBlock, int meta) {
 		if (ent instanceof EntityPlayer) {
 			//barricades
@@ -107,8 +108,10 @@ public class OldUtil {
 				return true;
 			}
 			
+			//force no pass for now till fixed above message
 			if (block != null && block instanceof BlockFenceGate) {
-				return !BlockFenceGate.isFenceGateOpen(meta);
+				return true;
+				//return !BlockFenceGate.isFenceGateOpen(meta);
 			}
 			
 			
@@ -425,7 +428,7 @@ public class OldUtil {
     public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor_double(ent.posX), MathHelper.floor_double(ent.posY), MathHelper.floor_double(ent.posZ)); }
     public static double getDistance(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
-    public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.getDistanceSquared(coords2.posX, coords.posY, coords2.posZ)); }
+    public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.distanceSq(coords2.posX, coords.posY, coords2.posZ)); }
     public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(new Vec3(parVec.xCoord, parVec.yCoord, parVec.zCoord), new Vec3(posX, posY, posZ)) == null; }
     public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3(posX, posY, posZ)) == null; }
     public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(new Vec3(posX, posY, posZ), new Vec3(posX2, posY2, posZ2)) == null; }

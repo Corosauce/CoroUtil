@@ -190,9 +190,7 @@ public class PathNavigateFormation
                 this.speed = par2;
                 Vec3 vec3 = this.getEntityPosition();
                 this.ticksAtLastPos = this.totalTicks;
-                this.lastPosCheck.xCoord = vec3.xCoord;
-                this.lastPosCheck.yCoord = vec3.yCoord;
-                this.lastPosCheck.zCoord = vec3.zCoord;
+                this.lastPosCheck = vec3;
                 return true;
             }
         }
@@ -283,9 +281,7 @@ public class PathNavigateFormation
             }
 
             this.ticksAtLastPos = this.totalTicks;
-            this.lastPosCheck.xCoord = vec3.xCoord;
-            this.lastPosCheck.yCoord = vec3.yCoord;
-            this.lastPosCheck.zCoord = vec3.zCoord;
+            this.lastPosCheck = vec3;
         }
     }
 
@@ -480,29 +476,22 @@ public class PathNavigateFormation
     }
 
     /**
-     * Returns true if an entity does not collide with any solid blocks at the position. Args: xOffset, yOffset,
-     * zOffset, entityXSize, entityYSize, entityZSize, originPosition, vecX, vecZ
+     * Returns true if an entity does not collide with any solid blocks at the position.
      */
-    private boolean isPositionClear(int par1, int par2, int par3, int par4, int par5, int par6, Vec3 par7Vec3, double par8, double par10)
+    private boolean isPositionClear(int p_179692_1_, int p_179692_2_, int p_179692_3_, int p_179692_4_, int p_179692_5_, int p_179692_6_, Vec3 p_179692_7_, double p_179692_8_, double p_179692_10_)
     {
-        for (int k1 = par1; k1 < par1 + par4; ++k1)
+        for (BlockPos blockpos : BlockPos.getAllInBox(new BlockPos(p_179692_1_, p_179692_2_, p_179692_3_), new BlockPos(p_179692_1_ + p_179692_4_ - 1, p_179692_2_ + p_179692_5_ - 1, p_179692_3_ + p_179692_6_ - 1)))
         {
-            for (int l1 = par2; l1 < par2 + par5; ++l1)
+            double d0 = (double)blockpos.getX() + 0.5D - p_179692_7_.xCoord;
+            double d1 = (double)blockpos.getZ() + 0.5D - p_179692_7_.zCoord;
+
+            if (d0 * p_179692_8_ + d1 * p_179692_10_ >= 0.0D)
             {
-                for (int i2 = par3; i2 < par3 + par6; ++i2)
+                Block block = this.worldObj.getBlockState(blockpos).getBlock();
+
+                if (!block.isPassable(this.worldObj, blockpos))
                 {
-                    double d2 = (double)k1 + 0.5D - par7Vec3.xCoord;
-                    double d3 = (double)i2 + 0.5D - par7Vec3.zCoord;
-
-                    if (d2 * par8 + d3 * par10 >= 0.0D)
-                    {
-                        Block j2 = this.worldObj.getBlockState(new BlockPos(k1, l1, i2)).getBlock();
-
-                        if (j2.getBlocksMovement(this.worldObj, k1, l1, i2))
-                        {
-                            return false;
-                        }
-                    }
+                    return false;
                 }
             }
         }

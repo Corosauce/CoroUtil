@@ -299,7 +299,8 @@ public class WorldEvent {
 	                    if (entP instanceof EntityLivingBase)
 	                    {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
-	                        f1 = EnchantmentHelper.getEnchantmentModifierLiving(entP, (EntityLivingBase)entP);
+	                    	//TODO: update for 1.8 somehow... 
+	                        //f1 = EnchantmentHelper.getEnchantmentModifierLiving(entP, (EntityLivingBase)entP);
 	                        //i += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)par1Entity);
 	                    }
 	                    

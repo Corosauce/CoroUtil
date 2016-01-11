@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ClassInheritanceMultiMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 
@@ -226,11 +227,13 @@ public class ChunkDataPoint
     	grid = null;
     }
     
+    //TODO: fix for 1.8
     public List<Entity> getEntitiesFromLoadedChunk(Class filterClass, Chunk chunk) {
+    	
     	List list = new ArrayList<Entity>();
-    	for (int k = 0; k < chunk.entityLists.length; ++k)
+    	/*for (int k = 0; k < chunk.getEntityLists().length; ++k)
         {
-            List list1 = chunk.entityLists[k];
+            ClassInheritanceMultiMap<Entity> list1 = chunk.getEntityLists()[k];
 
             for (int l = 0; l < list1.size(); ++l)
             {
@@ -241,7 +244,7 @@ public class ChunkDataPoint
                     list.add(entity);
                 }
             }
-        }
+        }*/
     	return list;
     }
     
