@@ -178,7 +178,8 @@ public class PacketHelper {
 	
 	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
     {
-        short short1 = fullBuffer.readShort();//par0DataInput.readShort();
+		return ByteBufUtils.readTag(fullBuffer);
+        /*short short1 = fullBuffer.readShort();//par0DataInput.readShort();
 
         if (short1 < 0)
         {
@@ -190,7 +191,7 @@ public class PacketHelper {
             fullBuffer.readBytes(abyte);
             return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
             //return CompressedStreamTools.decompress(abyte);
-        }
+        }*/
     }
 	
 	public static FMLProxyPacket getNBTPacket(NBTTagCompound parNBT, String parChannel) {

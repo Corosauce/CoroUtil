@@ -44,7 +44,10 @@ public class SelectorMoveToPathClose extends Selector {
 	@Override
 	public EnumBehaviorState tick() {
 
-		int pathfindRange = blackboard.distMed.getValue() + 8;
+		
+		//TODO: 1.8, CARE ABOUT FIXING THIS 
+		
+		/*int pathfindRange = blackboard.distMed.getValue() + 8;
 		
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
@@ -111,7 +114,7 @@ public class SelectorMoveToPathClose extends Selector {
 				//entInt.getAIBTAgent().pathNav.setCanSwim(true);
 				entInt.getAIBTAgent().pathNav.onUpdateNavigation();
 			}
-		}
+		}*/
 		
 		return EnumBehaviorState.SUCCESS;
 		
