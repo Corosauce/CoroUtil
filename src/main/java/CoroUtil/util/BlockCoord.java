@@ -55,6 +55,10 @@ public class BlockCoord {
     	return posZ;
     }
     
+    public double getDistanceSquared(double toX, double toY, double toZ) {
+    	return distanceSq(toX, toY, toZ);
+    }
+    
     public double distanceSq(double toX, double toY, double toZ)
     {
         double d0 = (double)this.getX() - toX;

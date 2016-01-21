@@ -53,7 +53,7 @@ public class ParticleRegistry {
 	
 	public static class TextureAtlasSpriteImpl extends TextureAtlasSprite {
 
-		protected TextureAtlasSpriteImpl(String spriteName) {
+		public TextureAtlasSpriteImpl(String spriteName) {
 			super(spriteName);
 		}
 		
