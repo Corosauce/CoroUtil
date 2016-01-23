@@ -2,7 +2,7 @@ package extendedrenderer.particle.behavior;
 
 import java.util.Random;
 
-import net.minecraft.util.Vec3;
+import CoroUtil.util.Vec3;
 import extendedrenderer.particle.entity.EntityRotFX;
 
 public class ParticleBehaviorTrail extends ParticleBehaviors {

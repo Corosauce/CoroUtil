@@ -15,11 +15,11 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.util.CoroUtilEntity;
+import CoroUtil.util.Vec3;
 
 public abstract class EntityThrowableUsefull extends Entity implements IProjectile
 {
@@ -239,7 +239,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
         Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
+        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
         vec3 = new Vec3(this.posX, this.posY, this.posZ);
         vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -425,11 +425,11 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             {
                 float f = 0.3F;
                 AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
-                MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3, vec31);
+                MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
 
                 if (movingobjectposition1 != null)
                 {
-                    double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+                    double d1 = vec3.toMCVec().distanceTo(movingobjectposition1.hitVec);
 
                     if (d1 < d0 || d0 == 0.0D)
                     {

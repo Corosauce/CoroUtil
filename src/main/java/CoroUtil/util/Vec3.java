@@ -252,4 +252,8 @@ public class Vec3
         double d2 = this.zCoord;
         this.setComponents(d0, d1, d2);
     }
+    
+    public net.minecraft.util.Vec3 toMCVec() {
+    	return new net.minecraft.util.Vec3(this.xCoord, this.yCoord, this.zCoord);
+    }
 }
