@@ -1,6 +1,7 @@
 package extendedrenderer.particle.entity;
 
 import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -107,6 +108,24 @@ public class EntityRotFX extends EntityFX
         super(var1, var2, var4, var6, var8, var10, var12);
         setSize(0.3F, 0.3F);
         this.isImmuneToFire = true;
+    }
+    
+    @Override
+    public void setParticleIcon(TextureAtlasSprite p_110125_1_)
+    {
+        if (this.getFXLayer() == 1)
+        {
+            this.particleIcon = p_110125_1_;
+        }
+        else
+        {
+            if (this.getFXLayer() != 2)
+            {
+                throw new RuntimeException("Invalid call to Particle.setTex, use coordinate methods");
+            }
+
+            this.particleIcon = p_110125_1_;
+        }
     }
 
     public void spawnAsWeatherEffect()

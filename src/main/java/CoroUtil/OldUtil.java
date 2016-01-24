@@ -162,7 +162,8 @@ public class OldUtil {
 	public static void check() {
 		checkforMCP = false;
 		try {
-			runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "tickables") != null;
+			//runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "tickables") != null;
+			runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "motd") != null;
 		} catch (Exception e) {
 			runningMCP = false;
 			System.out.println("CoroAI: 'tickables' field not found, mcp mode disabled");
