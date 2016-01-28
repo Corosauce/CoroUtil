@@ -132,7 +132,7 @@ public class RotatingEffectRenderer
                     if (var8 == 2 || var8 == 3)
                     {
                     	//TODO: verify
-                    	System.out.println("trying to render particles that used to depend on item texture sheet, do these work?");
+                    	//System.out.println("trying to render particles that used to depend on item texture sheet, do these work?");
                         //this.renderer.bindTexture(TextureMap.locationItemsTexture);
                     	this.renderer.bindTexture(TextureMap.locationBlocksTexture);
                     }

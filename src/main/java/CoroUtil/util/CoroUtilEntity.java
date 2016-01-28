@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 
 public class CoroUtilEntity {
 
@@ -78,4 +79,57 @@ public class CoroUtilEntity {
         
         return null;
 	}
+	
+	/**
+     * Returns the closest vulnerable player to this entity within the given radius, or null if none is found
+     */
+    public static EntityPlayer getClosestVulnerablePlayerToEntity(World world, Entity p_72856_1_, double p_72856_2_)
+    {
+        return getClosestVulnerablePlayer(world, p_72856_1_.posX, p_72856_1_.posY, p_72856_1_.posZ, p_72856_2_);
+    }
+
+    /**
+     * Returns the closest vulnerable player within the given radius, or null if none is found.
+     */
+    public static EntityPlayer getClosestVulnerablePlayer(World world, double p_72846_1_, double p_72846_3_, double p_72846_5_, double p_72846_7_)
+    {
+        double d4 = -1.0D;
+        EntityPlayer entityplayer = null;
+
+        for (int i = 0; i < world.playerEntities.size(); ++i)
+        {
+            EntityPlayer entityplayer1 = (EntityPlayer)world.playerEntities.get(i);
+
+            if (!entityplayer1.capabilities.disableDamage && entityplayer1.isEntityAlive())
+            {
+                double d5 = entityplayer1.getDistanceSq(p_72846_1_, p_72846_3_, p_72846_5_);
+                double d6 = p_72846_7_;
+
+                if (entityplayer1.isSneaking())
+                {
+                    d6 = p_72846_7_ * 0.800000011920929D;
+                }
+
+                if (entityplayer1.isInvisible())
+                {
+                    float f = entityplayer1.getArmorVisibility();
+
+                    if (f < 0.1F)
+                    {
+                        f = 0.1F;
+                    }
+
+                    d6 *= (double)(0.7F * f);
+                }
+
+                if ((p_72846_7_ < 0.0D || d5 < d6 * d6) && (d4 == -1.0D || d5 < d4))
+                {
+                    d4 = d5;
+                    entityplayer = entityplayer1;
+                }
+            }
+        }
+
+        return entityplayer;
+    }
 }
