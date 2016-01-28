@@ -119,6 +119,8 @@ public class RotatingEffectRenderer
 
                 if (this.fxLayers[var8].size() != 0)
                 {
+                	
+                	
                     if (var8 == 0)
                     {
                         this.renderer.bindTexture(particleTextures);
