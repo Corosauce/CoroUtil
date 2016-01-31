@@ -318,7 +318,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                   --this.ticksCatchable;
                } else {
                   short var28 = 500;
-                  if(this.worldObj.canLightningStrike(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ)))) {
+                  if(this.worldObj.isRainingAt(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ)))) {
                      var28 = 300;
                   }
 
