@@ -147,6 +147,7 @@ public class RotatingEffectRenderer
                     if (var8 == 5)
                     {
                         this.renderer.bindTexture(resLayer5);
+                        //this.renderer.bindTexture(TextureMap.locationBlocksTexture);
                     }
 
                     Tessellator var10 = Tessellator.getInstance();

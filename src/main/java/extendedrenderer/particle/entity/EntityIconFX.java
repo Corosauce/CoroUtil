@@ -76,21 +76,21 @@ public class EntityIconFX extends EntityRotFX
         worldRendererIn.func_181662_b((double)(f11 + par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 + par5 * f10 - par7 * f10), (double)f7, (double)f9);*/
         
         //TODO: verify this copied code from EntityFX will work for this, our brightness code is reverted atm
-        int i = this.getBrightnessForRender(partialTicks);
+        int i = 0;//this.getBrightnessForRender(partialTicks);
         int j = i >> 16 & 65535;
         int k = i & 65535;
         
         worldRendererIn.pos((double)(f11 - par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 - par5 * f10 - par7 * f10)).tex((double)f6, (double)f9)
-        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        .color(this.particleRed * f14, this.particleGreen * f14, this.particleBlue * f14, this.particleAlpha).lightmap(j, k).endVertex();
         
         worldRendererIn.pos((double)(f11 - par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 - par5 * f10 + par7 * f10)).tex((double)f6, (double)f8)
-        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        .color(this.particleRed * f14, this.particleGreen * f14, this.particleBlue * f14, this.particleAlpha).lightmap(j, k).endVertex();
         
         worldRendererIn.pos((double)(f11 + par3 * f10 + par6 * f10), (double)(f12 + par4 * f10), (double)(f13 + par5 * f10 + par7 * f10)).tex((double)f7, (double)f8)
-        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        .color(this.particleRed * f14, this.particleGreen * f14, this.particleBlue * f14, this.particleAlpha).lightmap(j, k).endVertex();
         
         worldRendererIn.pos((double)(f11 + par3 * f10 - par6 * f10), (double)(f12 - par4 * f10), (double)(f13 + par5 * f10 - par7 * f10)).tex((double)f7, (double)f9)
-        .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        .color(this.particleRed * f14, this.particleGreen * f14, this.particleBlue * f14, this.particleAlpha).lightmap(j, k).endVertex();
         
         
     }
