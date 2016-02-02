@@ -65,6 +65,11 @@ public class CommandCoroUtil extends CommandBase {
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(player.worldObj, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
+					
+					/*TaskDigTowardsTarget task = new TaskDigTowardsTarget();
+					
+					System.out.println("ENHANCE!");
+					BehaviorModifier.enhanceZombiesToDig(DimensionManager.getWorld(0), new Vec3(player.posX, player.posY, player.posZ), new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class }, 5, 0.8F);*/
 				} else if (var2[0].equalsIgnoreCase("spawn")) {
 					
 					String prefix = "";

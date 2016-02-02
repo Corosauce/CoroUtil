@@ -239,6 +239,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
         {
             int i = (pos.getX() >> 4) - this.chunkX;
             int j = (pos.getZ() >> 4) - this.chunkZ;
+            //TODO: 1.8 this line is saying our cache is too big? array sizes are beyond acceptable sizes or something
+            System.out.println("PFQUEUE FIX ME IM BROKEN");
             if (i < 0 || i >= chunkArray.length || j < 0 || i >= chunkArray[i].length) return Blocks.air.getDefaultState();
 
             if (i >= 0 && i < this.chunkArray.length && j >= 0 && j < this.chunkArray[i].length)

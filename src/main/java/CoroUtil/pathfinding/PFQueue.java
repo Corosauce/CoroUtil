@@ -1861,7 +1861,7 @@ public class PFQueue implements Runnable {
     }*/
     
     public void dbg(Object obj) {
-    	//if (debug) System.out.println(obj);
+    	if (debug) System.out.println(obj);
     }
     
     public static boolean isFenceLike(Block block) {
