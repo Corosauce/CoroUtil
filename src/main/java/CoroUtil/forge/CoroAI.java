@@ -1,9 +1,18 @@
 package CoroUtil.forge;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.google.common.collect.BiMap;
+
 import modconfig.ConfigMod;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -13,6 +22,8 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
@@ -20,7 +31,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.WorldDirectorManager;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
+@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.4")
 public class CoroAI {
 	
 	@Mod.Instance( value = "CoroAI" )
@@ -61,7 +72,31 @@ public class CoroAI {
     
     @Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-    	
+    	boolean debugOutputEntityRegistrations = false;
+    	if (debugOutputEntityRegistrations) {
+	    	try {
+	    		BiMap<Class<? extends Entity>, EntityRegistration> entityClassRegistrations = ObfuscationReflectionHelper.getPrivateValue(EntityRegistry.class, EntityRegistry.instance(), "entityClassRegistrations");
+	    		
+	    		Iterator<EntityRegistration> it = entityClassRegistrations.values().iterator();
+	    		while (it.hasNext()) {
+	    			EntityRegistration entReg = it.next();
+	    			
+	    			//System.out.println(entReg.getEntityName());
+	    			
+	    			
+	    		}
+	    		
+	    		//Iterator<Class<? extends Entity>> it2 = EntityList.stringToClassMapping.values().iterator();
+	    		Iterator<Map.Entry<String, Class<? extends Entity>>> it2 = EntityList.stringToClassMapping.entrySet().iterator();
+	    		while (it2.hasNext()) {
+	    			Entry<String, Class<? extends Entity>> entReg = it2.next();
+	    			
+	    			System.out.println(entReg.getKey() + " - " + entReg.getValue());
+	    		}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
 	}
     
     public CoroAI() {
