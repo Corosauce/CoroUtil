@@ -58,15 +58,30 @@ public class DimensionChunkCache implements IBlockAccess
     			skip = true;
     		}
     		
-    		if (listBlacklistIDs.contains(i)) {
-    			skip = true;
+    		if (ConfigCoroAI.useBlackListsAsWhitelist) {
+	    		if (!listBlacklistIDs.contains(i)) {
+	    			skip = true;
+	    		}
+    		} else {
+    			if (listBlacklistIDs.contains(i)) {
+	    			skip = true;
+	    		}
     		}
     		
-    		for (int j = 0; j < listBlacklistNamess.size(); j++) {
-    			if (world != null && world.provider.getDimensionName().contains(listBlacklistNamess.get(j))) {
-        			skip = true;
-        			break;
-        		}
+    		if (ConfigCoroAI.useBlackListsAsWhitelist) {
+	    		for (int j = 0; j < listBlacklistNamess.size(); j++) {
+	    			if (world != null && !world.provider.getDimensionName().contains(listBlacklistNamess.get(j))) {
+	        			skip = true;
+	        			break;
+	        		}
+	    		}
+    		} else {
+    			for (int j = 0; j < listBlacklistNamess.size(); j++) {
+	    			if (world != null && world.provider.getDimensionName().contains(listBlacklistNamess.get(j))) {
+	        			skip = true;
+	        			break;
+	        		}
+	    		}
     		}
     		
     		

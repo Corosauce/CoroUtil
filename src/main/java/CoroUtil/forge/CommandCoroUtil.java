@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.ICoroAI;
@@ -199,9 +200,11 @@ public class CommandCoroUtil extends CommandBase {
 	public HashMap<String, Integer> listEntities(String entName, int dim) {
 		HashMap<String, Integer> entNames = new HashMap<String, Integer>();
         
-        for (int var33 = 0; var33 < DimensionManager.getWorld(dim).loadedEntityList.size(); ++var33)
+		World world = DimensionManager.getWorld(dim);
+		
+        for (int var33 = 0; var33 < world.loadedEntityList.size(); ++var33)
         {
-            Entity ent = (Entity)DimensionManager.getWorld(dim).loadedEntityList.get(var33);
+            Entity ent = (Entity)world.loadedEntityList.get(var33);
             
             if (EntityList.getEntityString(ent) != null && (entName == null || EntityList.getEntityString(ent).toLowerCase().contains(entName.toLowerCase()))) {
 	            int val = 1;
@@ -212,6 +215,9 @@ public class CommandCoroUtil extends CommandBase {
             }
             
         }
+        
+        entNames.put("!ALL", world.loadedEntityList.size());
+        
         return entNames;
 	}
 	

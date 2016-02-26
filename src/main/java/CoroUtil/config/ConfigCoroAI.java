@@ -15,6 +15,8 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean trackPlayerData = false;
 	
+	public static boolean useBlackListsAsWhitelist = false;
+	
 	@Override
 	public String getConfigFileName() {
 		return "CoroUtil";
