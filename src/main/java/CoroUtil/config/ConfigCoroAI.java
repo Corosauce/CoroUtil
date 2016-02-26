@@ -17,6 +17,8 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean useBlackListsAsWhitelist = false;
 	
+	public static boolean PFQueueDebug = false;
+	
 	@Override
 	public String getConfigFileName() {
 		return "CoroUtil";

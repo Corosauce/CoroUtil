@@ -28,6 +28,7 @@ import CoroUtil.IChunkLoader;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlock;
 
 //import org.lwjgl.opengl.GL11;
@@ -81,7 +82,7 @@ public class PFQueue implements Runnable {
     public static int pfDelayScale = 5;
     public static int pfDelayMax = 500;
     
-    public static boolean debug = true;
+    //public static boolean debug = true;
     
     /*private static class PFQueueItem {
     	public int x;
@@ -160,7 +161,7 @@ public class PFQueue implements Runnable {
     			manageQueue();
     			//Thread.sleep(50);
     		} catch (Exception ex) {
-    			System.out.println("Serious PFQueue crash, reinitializing");
+    			if (ConfigCoroAI.PFQueueDebug) System.out.println("Serious PFQueue crash, reinitializing");
     			//ex.printStackTrace();
     			instance = null;
     		}
@@ -309,8 +310,10 @@ public class PFQueue implements Runnable {
 						    	        		dbg("PF SUCCESS: " + queue.get(0).retryState + "|" + queue.get(0).maxNodeIterations);
 						    	        	}
 					    				} catch (Exception ex) {
-					    					System.out.println("this error happens a lot, new bug?");
-					    					ex.printStackTrace();
+					    					if (ConfigCoroAI.PFQueueDebug) {
+						    					System.out.println("this error happens a lot, new bug?");
+						    					ex.printStackTrace();
+					    					}
 					    				}
 					    				//System.out.println("set path");
 					    			} else {
@@ -431,7 +434,9 @@ public class PFQueue implements Runnable {
 					    				
 					    				
 				    	        } catch (Exception ex) {
-				    	        	ex.printStackTrace();
+				    	        	if (ConfigCoroAI.PFQueueDebug) {
+				    	        		ex.printStackTrace();
+				    	        	}
 				    	        	//do nothing
 				    	        }
 				    	       
