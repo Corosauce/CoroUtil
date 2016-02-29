@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import modconfig.ConfigMod;
 import net.minecraftforge.common.MinecraftForge;
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
@@ -43,6 +44,7 @@ public class CoroAI {
     public void preInit(FMLPreInitializationEvent event)
     {
     	ConfigMod.addConfigFile(event, "coroai", new ConfigCoroAI());
+    	ConfigMod.addConfigFile(event, "coroutildd", new ConfigDynamicDifficulty());
     	
     	eventChannel.register(new EventHandlerPacket());
     }

@@ -7,6 +7,14 @@ import java.util.Map;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+/**
+ * Old design, just use entity.getEntityData() nbt
+ * 
+ * @author Corosus
+ *
+ */
+
+@Deprecated
 public class PlayerDataObject {
 
 	public String username;

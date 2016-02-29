@@ -2,6 +2,14 @@ package CoroUtil.playerdata;
 
 import net.minecraft.nbt.NBTTagCompound;
 
+/**
+ * Old design, just use entity.getEntityData() nbt
+ * 
+ * @author Corosus
+ *
+ */
+
+@Deprecated
 public interface IPlayerData {
 
 	public void init(String parUsername);
