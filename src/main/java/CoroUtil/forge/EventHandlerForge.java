@@ -14,6 +14,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
+import CoroUtil.world.player.DynamicDifficulty;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -56,6 +57,7 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void breakBlockHarvest(HarvestDropsEvent event) {
 		PlayerQuestManager.i().onEvent(event);
+		DynamicDifficulty.handleHarvest(event);
 	}
 	
 	@SubscribeEvent

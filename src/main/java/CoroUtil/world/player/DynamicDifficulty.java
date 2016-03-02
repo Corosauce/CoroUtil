@@ -1,10 +1,18 @@
 package CoroUtil.world.player;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLog;
+import net.minecraft.block.BlockOre;
+import net.minecraft.block.BlockSapling;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.oredict.OreDictionary;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.UtilPlayer;
@@ -14,6 +22,9 @@ public class DynamicDifficulty {
 	
 	public static String dataPlayerServerTicks = "HW_dataPlayerServerTicks";
 	public static String dataPlayerLastCacheEquipmentRating = "HW_dataPlayerLastCacheEquipmentRating";
+	public static String dataPlayerHarvestOre = "HW_dataPlayerHarvestOre";
+	public static String dataPlayerHarvestLog = "HW_dataPlayerHarvestLog";
+	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
 	
 	private int tickRate = 20;
 
@@ -156,6 +167,96 @@ public class DynamicDifficulty {
 	public static float convertInhabTimeToDifficultyScale(long inhabTime) {
 		float scale = (float)inhabTime / (float)ConfigDynamicDifficulty.difficulty_MaxTicksInChunk;
 		return scale;
+	}
+	
+	public static void handleHarvest(HarvestDropsEvent event) {
+		if (event.harvester != null) {
+			if (event.world.playerEntities.contains(event.harvester)) {
+				
+				NBTTagCompound nbt = event.harvester.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(event.harvester));
+				if (event.block instanceof BlockOre) {
+					int curVal = nbt.getInteger(dataPlayerHarvestOre);
+					curVal++;
+					nbt.setInteger(dataPlayerHarvestOre, curVal);
+					//System.out.println("increment!");
+				} else if (event.block instanceof BlockLog) {
+					int curVal = nbt.getInteger(dataPlayerHarvestLog);
+					curVal++;
+					nbt.setInteger(dataPlayerHarvestLog, curVal);
+				}
+				
+				/*float curVal = nbt.getFloat(dataPlayerHarvestRating);
+				curVal += getBlockImportanceValue(event.block);
+				nbt.setFloat(dataPlayerHarvestRating, curVal);*/
+				increaseInvadeRating(event.harvester, getBlockImportanceValue(event.block));
+				
+				//System.out.println("harvested block for " + event.harvester.username + " - " + event.block);
+			}
+		}
+	}
+	
+	public static void increaseInvadeRating(EntityPlayer parPlayer, float parVal) {
+		NBTTagCompound nbt = parPlayer.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(parPlayer));
+		float curVal = nbt.getFloat(dataPlayerHarvestRating);
+		curVal += parVal;
+		nbt.setFloat(dataPlayerHarvestRating, curVal);
+		
+		//System.out.println("curVal: " + curVal);
+	}
+	
+	public static void decreaseInvadeRating(EntityPlayer parPlayer, float parVal) {
+		NBTTagCompound nbt = parPlayer.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(parPlayer));
+		float curVal = nbt.getFloat(dataPlayerHarvestRating);
+		curVal -= parVal;
+		nbt.setFloat(dataPlayerHarvestRating, curVal);
+	}
+	
+	public static float getHarvestRatingInvadeThreshold() {
+		return 30F;
+	}
+	
+	public static boolean isInvadeable(EntityPlayer parPlayer) {
+		return parPlayer.getEntityData().getFloat(dataPlayerHarvestRating) >= getHarvestRatingInvadeThreshold();
+	}
+	
+	public static float getBlockImportanceValue(Block block) {
+		
+		boolean test = false;
+		if (test) {
+			System.out.println("TEST INVADE IS ON!");
+			return 30;
+		}
+		
+		float scaleBase = 1F;
+		float defaultIron = scaleBase * 0.3F;
+		
+		if (block instanceof BlockLog) {
+			return scaleBase * 0.1F;
+		} else if (block instanceof BlockSapling) {
+			return scaleBase * 0.3F;
+		} else if (block instanceof BlockOre) {
+			if (block == Blocks.coal_ore) {
+				return scaleBase * 0.2F;
+			} else if (block == Blocks.iron_ore) {
+				return defaultIron;
+			} else if (block == Blocks.gold_ore) {
+				return scaleBase * 0.4F;
+			} else if (block == Blocks.lit_redstone_ore || block == Blocks.redstone_ore) {
+				return scaleBase * 0.5F;
+			} else if (block == Blocks.lapis_ore) {
+				return scaleBase * 0.6F;
+			} else if (block == Blocks.diamond_ore) {
+				return scaleBase * 1F;
+			} else if (block == Blocks.emerald_ore) {
+				return scaleBase * 1.2F;
+			} else {
+				return defaultIron;
+			}
+		} else if (OreDictionary.getOres(Block.blockRegistry.getNameForObject(block)).size() > 0) {
+			return defaultIron;
+		} else {
+			return 0;
+		}
 	}
 	
 }
