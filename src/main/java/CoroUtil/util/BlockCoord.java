@@ -1,6 +1,8 @@
 package CoroUtil.util;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 
 public class BlockCoord extends ChunkCoordinates {
 
@@ -16,6 +18,14 @@ public class BlockCoord extends ChunkCoordinates {
         this.posX = p_i1355_1_.posX;
         this.posY = p_i1355_1_.posY;
         this.posZ = p_i1355_1_.posZ;
+    }
+    
+    public BlockCoord(Entity ent) {
+    	
+    	this.posX = MathHelper.floor_double(ent.posX);
+    	this.posY = MathHelper.floor_double(ent.posY);
+    	this.posZ = MathHelper.floor_double(ent.posZ);
+    	
     }
     
     public boolean equals(Object p_equals_1_)

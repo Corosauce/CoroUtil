@@ -89,6 +89,13 @@ public class DynamicDifficulty {
 		return (float)curRating / (float)bestRating;
 	}
 	
+	public static float getDifficultyScaleForHealth(EntityPlayer player) {
+		float baseMax = 20F;
+		float curMax = player.getMaxHealth();
+		float scale = curMax / baseMax;
+		return scale;
+	}
+	
 	public static float getDifficultyScaleForPos(World world, BlockCoord pos) {
 		/**
 		 * 1 chunk calc
@@ -257,6 +264,13 @@ public class DynamicDifficulty {
 		} else {
 			return 0;
 		}
+	}
+	
+	public static EntityPlayer getBestPlayerForArea(World world, BlockCoord pos) {
+		
+		EntityPlayer player = world.getClosestPlayer(pos.posX, pos.posY, pos.posZ, -1);
+		
+		return player;
 	}
 	
 }

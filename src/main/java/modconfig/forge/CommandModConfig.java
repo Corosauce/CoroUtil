@@ -61,7 +61,9 @@ public class CommandModConfig extends CommandBase {
 					} else if (var2[cmd].equalsIgnoreCase("set")) {
 						if (var2.length > 2) {
 							
-							String val = "";
+							parseSetCommand((EntityPlayerMP) var1, var2);
+							
+							/*String val = "";
 							for (int i = vall; i < var2.length; i++) val += var2[i] + (i != var2.length-1 ? " " : "");
 							if (ConfigMod.updateField(var2[modid], var2[field], val)) {
 								CoroUtil.sendPlayerMsg(playerMP, "set " + var2[field] + " to " + val);
@@ -75,7 +77,7 @@ public class CommandModConfig extends CommandBase {
 								//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
 							} else {
 								CoroUtil.sendPlayerMsg(playerMP, "failed to set " + var2[field]);
-							}
+							}*/
 						} else {
 							CoroUtil.sendPlayerMsg(playerMP, "set requires 3+ parameters");
 						}
@@ -98,6 +100,29 @@ public class CommandModConfig extends CommandBase {
 			ex.printStackTrace();
 		}
 		
+	}
+	
+	public static void parseSetCommand(EntityPlayerMP playerMP, String[] var2) {
+		int cmd = 0;
+		int modid = 1;
+		int field = 2;
+		int vall = 3;
+		
+		String val = "";
+		for (int i = vall; i < var2.length; i++) val += var2[i] + (i != var2.length-1 ? " " : "");
+		if (ConfigMod.updateField(var2[modid], var2[field], val)) {
+			CoroUtil.sendPlayerMsg(playerMP, "set " + var2[field] + " to " + val);
+			
+			List blah = new ArrayList();
+			
+			blah.add((String)var2[field]);
+			blah.add((String)val);
+			
+			ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), playerMP);
+			//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
+		} else {
+			CoroUtil.sendPlayerMsg(playerMP, "failed to set " + var2[field]);
+		}
 	}
 	
 	@Override

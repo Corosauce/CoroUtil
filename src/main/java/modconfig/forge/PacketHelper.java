@@ -36,6 +36,28 @@ public class PacketHelper {
     	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
     }
     
+    public static FMLProxyPacket getModConfigPacketForClientToServer(String data) {
+    	NBTTagCompound nbt = new NBTTagCompound();
+    	
+    	nbt.setString("command", "setData");
+    	//nbt.setString("modID", modid);
+    	nbt.setString("data", data);
+    	//ConfigMod.populateData(modid);
+    	
+    	/*NBTTagCompound nbtEntries = new NBTTagCompound();
+    	
+    	for (int i = 0; i < ConfigMod.configLookup.get(modid).configData.size(); i++) {
+    		NBTTagCompound nbtEntry = new NBTTagCompound();
+    		nbtEntry.setString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
+    		nbtEntry.setString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
+    		nbtEntries.setTag("entry_" + i, nbtEntry);
+    	}
+    	
+    	nbt.setTag("entries", nbtEntries);*/
+    	
+    	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
+    }
+    
     //REVISE ME TO NBT AND SUB COMPOUND FOR ENTRIES and the entries themselves are nbt compounds
     /*public static Packet250CustomPayload getModConfigPacket(String modid, int count, List entries) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(Integer.SIZE + Character.SIZE * 64 * configLookup.get(modid).configData.size());

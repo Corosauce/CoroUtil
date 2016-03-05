@@ -1,13 +1,13 @@
 package modconfig.forge;
 
 import java.util.Iterator;
-import java.util.Map;
 
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
 import modconfig.gui.GuiConfigEditor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import CoroUtil.packet.PacketHelper;
@@ -60,6 +60,23 @@ public class EventHandlerPacket {
 	@SubscribeEvent
 	public void onPacketFromClient(FMLNetworkEvent.ServerCustomPacketEvent event) {
 		EntityPlayer entP = ((NetHandlerPlayServer)event.handler).playerEntity;
+		
+		try {
+			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.packet.payload());
+			String command = nbt.getString("command");
+			
+			System.out.println("command: " + command);
+			
+			if (command.equals("setData")) {
+				String data = nbt.getString("data");
+				
+				if (entP instanceof EntityPlayerMP) {
+					CommandModConfig.parseSetCommand((EntityPlayerMP)entP, data.split(" "));
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 }

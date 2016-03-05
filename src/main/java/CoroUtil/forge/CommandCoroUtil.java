@@ -138,9 +138,19 @@ public class CommandCoroUtil extends CommandBase {
 	        	} else if (var2[0].equalsIgnoreCase("list")) {
 	        		String param = null;
 	        		int dim = ((EntityPlayer)var1).dimension;
-	        		if (var2.length > 1) dim = Integer.valueOf(var2[1]);
-	        		if (var2.length > 2) param = var2[2];
-	        		HashMap<String, Integer> entNames = listEntities(param, dim);
+	        		
+	        		String fullCommand = "";
+	        		for (String entry : var2) {
+	        			fullCommand += entry + " ";
+	        		}
+	        		boolean simple = false;
+	        		if (fullCommand.contains(" simple")) {
+	        			simple = true;
+	        		} else {
+	        			if (var2.length > 1) dim = Integer.valueOf(var2[1]);
+		        		if (var2.length > 2) param = var2[2];
+	        		}
+	        		HashMap<String, Integer> entNames = listEntities(param, dim, simple);
 	                
 	        		CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "List for dimension id: " + dim);
 	        		
@@ -197,7 +207,7 @@ public class CommandCoroUtil extends CommandBase {
 		return entNames;
 	}
 	
-	public HashMap<String, Integer> listEntities(String entName, int dim) {
+	public HashMap<String, Integer> listEntities(String entName, int dim, boolean simpleNames) {
 		HashMap<String, Integer> entNames = new HashMap<String, Integer>();
         
 		World world = DimensionManager.getWorld(dim);
@@ -206,17 +216,24 @@ public class CommandCoroUtil extends CommandBase {
         {
             Entity ent = (Entity)world.loadedEntityList.get(var33);
             
-            if (EntityList.getEntityString(ent) != null && (entName == null || EntityList.getEntityString(ent).toLowerCase().contains(entName.toLowerCase()))) {
+            String entClass = ent.getClass().getCanonicalName();
+            
+            if (simpleNames) {
+            	entClass = EntityList.getEntityString(ent);
+            }
+            
+            if (entClass != null && (entName == null || /*EntityList.getEntityString(ent)*/entClass.toLowerCase().contains(entName.toLowerCase()))) {
 	            int val = 1;
-	            if (entNames.containsKey(EntityList.getEntityString(ent))) {
-	            	val = entNames.get(EntityList.getEntityString(ent))+1;
+	            
+	            if (entNames.containsKey(entClass)) {
+	            	val = entNames.get(entClass)+1;
 	            }
-	            entNames.put(EntityList.getEntityString(ent), val);
+	            entNames.put(entClass, val);
             }
             
         }
         
-        entNames.put("!ALL", world.loadedEntityList.size());
+        //entNames.put("Total count: ", world.loadedEntityList.size());
         
         return entNames;
 	}

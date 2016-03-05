@@ -5,11 +5,13 @@ import java.util.Iterator;
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
 import modconfig.ModConfigData;
+import modconfig.forge.PacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
@@ -203,7 +205,8 @@ public class GuiConfigEditor extends GuiScreen
     			//HostileWorlds.dbg("difference for " + info.name);
     			
     			if (!clientMode) {
-    				this.mc.thePlayer.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
+    				//this.mc.thePlayer.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
+    				ConfigMod.eventChannel.sendToServer(PacketHelper.getModConfigPacketForClientToServer("set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text));
     			} else {
     				if (ConfigMod.updateField(getCategory(), getData().configData.get(i).name, getData().configData.get(i).editBox.text)) {
     					System.out.println("Updated config settings in client mode");
