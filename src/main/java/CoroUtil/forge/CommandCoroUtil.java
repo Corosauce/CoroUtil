@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -247,7 +248,10 @@ public class CommandCoroUtil extends CommandBase {
             
             if (EntityList.getEntityString(ent) != null && (EntityList.getEntityString(ent).equals(entName) || (!exact && EntityList.getEntityString(ent).toLowerCase().contains(entName.toLowerCase())))) {
             	count++;
-            	if (killEntities) ent.setDead();
+            	if (killEntities) {
+            		//ent.attackEntityFrom(DamageSource.generic, 60);
+            		ent.setDead();
+            	}
             }
         }
         

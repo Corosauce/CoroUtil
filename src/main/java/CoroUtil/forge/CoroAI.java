@@ -22,7 +22,7 @@ import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.0")
+@Mod(modid = "CoroAI", name="CoroAI", version="v1.0", acceptableRemoteVersions="*")
 public class CoroAI {
 	
 	@Mod.Instance( value = "CoroAI" )
@@ -93,7 +93,7 @@ public class CoroAI {
     		System.out.println("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
-	    	PetsManager.instance().nbtReadFromDisk();
+	    	//PetsManager.instance().nbtReadFromDisk();
 	    	
 	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
 	    	WorldDirectorManager.instance().reset();
@@ -102,8 +102,8 @@ public class CoroAI {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-    		PetsManager.instance().nbtWriteToDisk();
-	    	if (unloadInstances) PetsManager.instance().reset();
+    		//PetsManager.instance().nbtWriteToDisk();
+	    	//if (unloadInstances) PetsManager.instance().reset();
 	    	PlayerQuestManager.i().saveData(false, unloadInstances);
 	    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     	} catch (Exception ex) {

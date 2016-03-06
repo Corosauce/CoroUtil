@@ -1,21 +1,31 @@
 package CoroUtil.world.player;
 
+import java.util.HashMap;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.UtilPlayer;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 public class DynamicDifficulty {
@@ -27,6 +37,8 @@ public class DynamicDifficulty {
 	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
 	
 	private int tickRate = 20;
+	
+	public static HashMap<Integer, DamageLog> lookupEntToDamageLog = new HashMap<Integer, DamageLog>();
 
 	public void tickServer(ServerTickEvent event) {
 		World world = DimensionManager.getWorld(0);
@@ -271,6 +283,160 @@ public class DynamicDifficulty {
 		EntityPlayer player = world.getClosestPlayer(pos.posX, pos.posY, pos.posZ, -1);
 		
 		return player;
+	}
+	
+	public static void logDamage(LivingHurtEvent event) {
+		if (event.entity.worldObj.isRemote) return;
+		if (ConfigDynamicDifficulty.trackChunkData) {
+			
+			Entity ent = event.entity;
+			World world = ent.worldObj;
+			
+			if (ent instanceof IMob && ent instanceof EntityCreature) {
+				EntityCreature entC = (EntityCreature) ent;
+				
+				//dont log common occuring damages, sun burning, random wall glitching
+				if (event.source == DamageSource.inWall || 
+						event.source == DamageSource.inFire || 
+						event.source == DamageSource.onFire || 
+						event.source == DamageSource.drown/* || event.source == DamageSource.lava*/) {
+					return;
+				}
+				
+				
+				
+				DamageLog log = null;
+				if (!lookupEntToDamageLog.containsKey(ent.getEntityId())) {
+					log = new DamageLog(entC);
+					lookupEntToDamageLog.put(ent.getEntityId(), log);
+				} else {
+					int lastLogTimeThreshold = 20*5;
+					log = lookupEntToDamageLog.get(ent.getEntityId());
+					if (log.getLastLogTime() + lastLogTimeThreshold < world.getTotalWorldTime()) {
+						logToChunk(log);
+						log.cleanup();
+						log = new DamageLog(entC);
+						lookupEntToDamageLog.put(ent.getEntityId(), log);
+					} else {
+						
+					}
+				}
+				
+				float damageToLog = event.ammount;
+				if (log.getLastDamage() > 0) {
+					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
+					float timeDiffSeconds = (float)timeDiff / 20F;
+					if (timeDiff > 0) {
+						float damage = log.getLastDamage() / timeDiffSeconds;
+						
+						log.getListDPSs().add(damage);
+						
+						System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
+						
+						
+					} else {
+						//if no time passed, just add last entry onto current entry
+						damageToLog += log.getLastDamage();
+					}
+					
+					
+				}
+				
+				log.setLastDamage(damageToLog);
+				log.setLastLogTime(world.getTotalWorldTime());
+			}
+			
+			
+		}
+		
+	}
+	
+	public static void logDeath(LivingDeathEvent event) {
+		if (event.entity.worldObj.isRemote) return;
+		if (ConfigDynamicDifficulty.trackChunkData) {
+			
+			Entity ent = event.entity;
+			World world = ent.worldObj;
+			
+			if (ent instanceof IMob && ent instanceof EntityCreature) {
+				if (lookupEntToDamageLog.containsKey(ent.getEntityId())) {
+					DamageLog log = lookupEntToDamageLog.get(ent.getEntityId());
+					logToChunk(log);
+					log.cleanup();
+					lookupEntToDamageLog.remove(ent.getEntityId());
+				}
+				
+			}
+			
+		}
+	}
+	
+	public static void logToChunk(DamageLog log) {
+		int maxShortTermSize = 50;
+		int maxLongTermSize = 50;
+		int recalcRate = 20*2;
+		
+		EntityCreature ent = log.getEnt();
+		World world = ent.worldObj;
+		int chunkX = MathHelper.floor_double(ent.posX / 16);
+		int chunkZ = MathHelper.floor_double(ent.posZ / 16);
+		ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(chunkX, chunkZ);
+		
+		if (log.getListDPSs().size() == 0 && log.getLastDamage() > 0) {
+			//add an insta kill dps that assumes can be done every half second
+			float instaKillDPSCalc = log.getLastDamage() * 2;
+			log.getListDPSs().add(instaKillDPSCalc);
+		}
+		
+		if (log.getListDPSs().size() > 0) {
+			float avgDPS = 0;
+			for (float val : log.getListDPSs()) {
+				avgDPS += val;
+			}
+			avgDPS /= log.getListDPSs().size();
+			cdp.listDPSAveragesShortTerm.add(avgDPS);
+		}
+		
+		//trim list
+		if (cdp.listDPSAveragesShortTerm.size() > maxShortTermSize) {
+			cdp.listDPSAveragesShortTerm.remove(0);
+		}
+		
+		//if time to do a full recalc
+		if (cdp.lastDPSRecalc + recalcRate < world.getTotalWorldTime()) {
+			
+			if (cdp.listDPSAveragesShortTerm.size() > 0) {
+				float avgDPS2 = 0;
+				for (float val : cdp.listDPSAveragesShortTerm) {
+					avgDPS2 += val;
+				}
+				avgDPS2 /= cdp.listDPSAveragesShortTerm.size();
+				cdp.listDPSAveragesLongTerm.add(avgDPS2);
+			}
+			if (cdp.listDPSAveragesLongTerm.size() > maxLongTermSize) {
+				cdp.listDPSAveragesLongTerm.remove(0);
+			}
+			
+			if (cdp.listDPSAveragesLongTerm.size() > 0) {
+				float avgDPS3 = 0;
+				for (float val : cdp.listDPSAveragesLongTerm) {
+					avgDPS3 += val;
+				}
+				avgDPS3 /= cdp.listDPSAveragesLongTerm.size();
+				
+				cdp.averageDPS = avgDPS3;
+				
+				System.out.println("average of the average of the average: " + avgDPS3);
+				
+				if (avgDPS3 > 0) {
+					
+				} else {
+					System.out.println("wat");
+				}
+			}
+			
+			cdp.lastDPSRecalc = world.getTotalWorldTime();
+		}
 	}
 	
 }

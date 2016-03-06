@@ -2,6 +2,7 @@ package CoroUtil.forge;
 
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
@@ -83,4 +84,16 @@ public class EventHandlerForge {
 			}
 		}
 	}
+	
+	@SubscribeEvent
+	public void entityHurt(LivingHurtEvent event) {
+		DynamicDifficulty.logDamage(event);
+	}
+	
+	@SubscribeEvent
+	public void entityKilled(LivingDeathEvent event) {
+		DynamicDifficulty.logDeath(event);
+	}
+	
+	
 }

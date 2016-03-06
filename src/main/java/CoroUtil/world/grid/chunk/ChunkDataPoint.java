@@ -49,6 +49,11 @@ public class ChunkDataPoint
     
     public Class enemyClass = EntityMob.class;
     
+    //dynamic difficulty code
+    public List<Float> listDPSAveragesShortTerm = new ArrayList<Float>();
+    public List<Float> listDPSAveragesLongTerm = new ArrayList<Float>();
+    public long lastDPSRecalc = 0;
+    public float averageDPS;
 
     public ChunkDataPoint(ChunkDataGrid parGrid, int i, int k)
     {
@@ -178,6 +183,20 @@ public class ChunkDataPoint
     	}
     	
     	playerDataForAll.nbtRead(nbt.getCompoundTag("playerDataForAll"));
+    	
+    	lastDPSRecalc = nbt.getLong("lastDPSRecalc");
+    	averageDPS = nbt.getFloat("averageDPS");
+    	
+    	
+    	NBTTagCompound nbtDPSs = nbt.getCompoundTag("listDPSAveragesLongTerm");
+    	it = nbtDPSs.func_150296_c().iterator();
+    	while (it.hasNext()) {
+    		String entryName = (String) it.next();
+    		
+    		listDPSAveragesLongTerm.add(nbtDPSs.getFloat(entryName));
+    	}
+    	
+    	int test = 0;
     	/*xCoord = nbt.getInteger("xCoord");
     	yCoord = nbt.getInteger("yCoord");  -- read in from init
     	zCoord = nbt.getInteger("zCoord");*/
@@ -210,6 +229,14 @@ public class ChunkDataPoint
     	nbt.setInteger("zCoord", zCoord);
     	
     	//System.out.println("countEntitiesEnemy: " + countEntitiesEnemy + " - " + xCoord + ", " + zCoord);
+    	
+    	nbt.setLong("lastDPSRecalc", lastDPSRecalc);
+    	nbt.setFloat("averageDPS", averageDPS);
+    	NBTTagCompound nbtDPSs = new NBTTagCompound();
+    	for (int i = 0; i < listDPSAveragesLongTerm.size(); i++) {
+    		nbtDPSs.setFloat("entry_" + i, listDPSAveragesLongTerm.get(i));
+    	}
+    	nbt.setTag("listDPSAveragesLongTerm", nbtDPSs);
     	
     	return nbt;
     }

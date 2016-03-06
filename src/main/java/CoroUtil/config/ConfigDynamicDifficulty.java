@@ -15,6 +15,9 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static int difficulty_MaxTicksInChunk = 20*60*60*50;
 	//public static int difficulty_MaxInventoryRating = 60;
 	
+	@ConfigComment("Track chunk bound data required for some difficulty calculations, disable if issues with server stability relating to CoroUtil")
+	public static boolean trackChunkData = true;
+	
 	@Override
 	public String getConfigFileName() {
 		return "CoroUtil_DynamicDifficulty";
