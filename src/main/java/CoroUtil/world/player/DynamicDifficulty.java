@@ -331,7 +331,7 @@ public class DynamicDifficulty {
 						
 						log.getListDPSs().add(damage);
 						
-						System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
+						//System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
 						
 						
 					} else {
@@ -426,13 +426,7 @@ public class DynamicDifficulty {
 				
 				cdp.averageDPS = avgDPS3;
 				
-				System.out.println("average of the average of the average: " + avgDPS3);
-				
-				if (avgDPS3 > 0) {
-					
-				} else {
-					System.out.println("wat");
-				}
+				//System.out.println("average of the average of the average: " + avgDPS3);
 			}
 			
 			cdp.lastDPSRecalc = world.getTotalWorldTime();
