@@ -1,53 +1,18 @@
-package CoroUtil.world.player;
+package CoroUtil.entity.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.EntityCreature;
 
-public class DamageLog {
-
-	private EntityCreature ent;
-	
-	private float totalDamage;
-	private int totalTime;
-	
+public class AttackData extends EntityData {
 	private long lastLogTime;
 	private float lastDamage;
 	
 	private List<Float> listDPSs = new ArrayList<Float>();
 	
-	public DamageLog(EntityCreature ent) {
-		this.ent = ent;
-	}
-	
-	@Override
-	public int hashCode() {
-		return ent.getEntityId();
-	}
-
-	public EntityCreature getEnt() {
-		return ent;
-	}
-
-	public void setEnt(EntityCreature ent) {
-		this.ent = ent;
-	}
-
-	public float getTotalDamage() {
-		return totalDamage;
-	}
-
-	public void setTotalDamage(float totalDamage) {
-		this.totalDamage = totalDamage;
-	}
-
-	public int getTotalTime() {
-		return totalTime;
-	}
-
-	public void setTotalTime(int totalTime) {
-		this.totalTime = totalTime;
+	public AttackData(EntityCreature ent) {
+		super(ent);
 	}
 
 	public long getLastLogTime() {
@@ -75,7 +40,7 @@ public class DamageLog {
 	}
 	
 	public void cleanup() {
-		ent = null;
+		super.cleanup();
 		listDPSs.clear();
 	}
 	

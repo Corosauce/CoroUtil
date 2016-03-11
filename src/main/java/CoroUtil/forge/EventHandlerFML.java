@@ -11,6 +11,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
 import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.player.DynamicDifficulty;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
@@ -93,6 +94,8 @@ public class EventHandlerFML {
 				FMLInterModComms.sendRuntimeMessage("weather2", "weather2", "weather.raining", nbt);
 				
 			}
+			
+			DynamicDifficulty.tickServer(event);
 		}
 		
 	}

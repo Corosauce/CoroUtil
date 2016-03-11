@@ -19,7 +19,7 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean PFQueueDebug = false;
 	
-	@Override
+	@Override	
 	public String getConfigFileName() {
 		return "CoroUtil";
 	}

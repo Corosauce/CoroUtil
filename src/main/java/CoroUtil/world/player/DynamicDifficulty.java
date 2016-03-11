@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import CoroUtil.config.ConfigDynamicDifficulty;
+import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.UtilPlayer;
 import CoroUtil.world.WorldDirectorManager;
@@ -36,11 +37,11 @@ public class DynamicDifficulty {
 	public static String dataPlayerHarvestLog = "HW_dataPlayerHarvestLog";
 	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
 	
-	private int tickRate = 20;
+	private static int tickRate = 20;
 	
-	public static HashMap<Integer, DamageLog> lookupEntToDamageLog = new HashMap<Integer, DamageLog>();
+	public static HashMap<Integer, AttackData> lookupEntToDamageLog = new HashMap<Integer, AttackData>();
 
-	public void tickServer(ServerTickEvent event) {
+	public static void tickServer(ServerTickEvent event) {
 		World world = DimensionManager.getWorld(0);
 		if (world != null) {
 			if (world.getTotalWorldTime() % tickRate == 0) {
@@ -53,7 +54,7 @@ public class DynamicDifficulty {
 		}
 	}
 	
-	public void tickPlayer(EntityPlayer player) {
+	public static void tickPlayer(EntityPlayer player) {
 		long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
 		ticksPlayed += 20;
 		//3 hour start debug
@@ -66,36 +67,58 @@ public class DynamicDifficulty {
 
 	
 	public static float getDifficultyScaleAverage(World world, EntityPlayer player, BlockCoord pos) {
-		float difficultyPos = getDifficultyScaleForPos(world, pos);
-		float difficultyPlayerEquipment = getDifficultyScaleForPlayerEquipment(player);
-		float difficultyPlayerServerTime = getDifficultyScaleForPlayerServerTime(player);
-		float val = (difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
+		
+		//difficulties designed for stuff only mods are capable of should be a flat out plus to the rating such as:
+		//- max health
+		//- ???
+		
+		float weightPosOccupy = 1F;
+		float weightPlayerEquipment = 1.5F;
+		float weightPlayerServerTime = 1F;
+		float weightDPS = 1.5F;
+		float weightHealth = 1F;
+		float weightDistFromSpawn = 1F;
+		
+		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn;
+		
+		float difficultyPosOccupy = getDifficultyScaleForPosOccupyTime(world, pos) * weightPosOccupy;
+		float difficultyPlayerEquipment = getDifficultyScaleForPlayerEquipment(player) * weightPlayerEquipment;
+		float difficultyPlayerServerTime = getDifficultyScaleForPlayerServerTime(player) * weightPlayerServerTime;
+		float difficultyDPS = getDifficultyScaleForPosDPS(world, pos) * weightDPS;
+		float difficultyHealth = getDifficultyScaleForHealth(player) * weightHealth;
+		float difficultyDistFromSpawn = getDifficultyScaleForDistFromSpawn(player) * weightDistFromSpawn;
+		
+		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn;
+		
+		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
-		if (val > 1F) val = 1F;
+		//let it go past 1F now
+		//if (val > 1F) val = 1F;
 		return val;
 	}
 	
 	public static float getDifficultyScaleForPlayerServerTime(EntityPlayer player) {
 		long maxServerTime = ConfigDynamicDifficulty.difficulty_MaxTicksOnServer;
 		long curServerTime = player.getEntityData().getLong(dataPlayerServerTicks);
-		return MathHelper.clamp_float((float)curServerTime / (float)maxServerTime, 0F, 1F);
+		return Math.round(MathHelper.clamp_float((float)curServerTime / (float)maxServerTime, 0F, 1F) * 1000F) / 1000F;
 	}
 	
 	public static float getDifficultyScaleForPlayerEquipment(EntityPlayer player) {
+		boolean calcWeapon = false;
 		int curRating = 0;
 		if (player.getEntityData().hasKey(dataPlayerLastCacheEquipmentRating)) {
 			if (player.worldObj.getTotalWorldTime() % 200 == 0) {
-				curRating = UtilPlayer.getPlayerRating(player);
+				curRating = UtilPlayer.getPlayerRating(player, calcWeapon);
 				player.getEntityData().setInteger(dataPlayerLastCacheEquipmentRating, curRating);
 			} else {
 				curRating = player.getEntityData().getInteger(dataPlayerLastCacheEquipmentRating);
 			}
 		} else {
-			curRating = UtilPlayer.getPlayerRating(player);
+			curRating = UtilPlayer.getPlayerRating(player, calcWeapon);
 			player.getEntityData().setInteger(dataPlayerLastCacheEquipmentRating, curRating);
 		}
 		
-		int bestRating = UtilPlayer.getBestPlayerRatingPossible();
+		int bestRating = getBestPlayerRatingPossibleVanilla(calcWeapon);
 		
 		//allow a scale value over 1F, means theres equipment in play beyond vanilla stuff, or i miscalculated some things
 		return (float)curRating / (float)bestRating;
@@ -105,10 +128,79 @@ public class DynamicDifficulty {
 		float baseMax = 20F;
 		float curMax = player.getMaxHealth();
 		float scale = curMax / baseMax;
+		return scale - 1F;
+	}
+	
+	public static float getDifficultyScaleForDistFromSpawn(EntityPlayer player) {
+		
+		float distX = (float) (player.worldObj.getSpawnPoint().posX - player.posX);
+		float distZ = (float) (player.worldObj.getSpawnPoint().posZ - player.posZ);
+		
+		float dist = (float) Math.sqrt(distX * distX + distZ * distZ);
+		
+		dist = Math.min(dist, ConfigDynamicDifficulty.difficulty_DistFromSpawnMax);
+		
+		return (float)dist / (float)ConfigDynamicDifficulty.difficulty_DistFromSpawnMax;
+		
+	}
+	
+	public static int getBestPlayerRatingPossibleVanilla(boolean calcWeapon) {
+		//diamond armor
+		int bestArmor = 20;
+		//protection 5 on diamond armor (there is randomization)
+		int bestArmorEnchant = 25;
+		int bestWeapon = 8;
+		//6.25 for sharpness 5
+		int bestWeaponEnchant = 6;
+		
+		if (!calcWeapon) {
+			bestWeapon = 0;
+			bestWeaponEnchant = 0;
+		}
+		
+		//best for vanilla stuff is about 60?
+		int bestVal = bestArmor + bestArmorEnchant + bestWeapon + bestWeaponEnchant;
+		return bestVal;
+	}
+	
+	public static float getBestPlayerDPSRatingPossibleVanilla() {
+		//just a guess based on me going around with a plain diamond sword, guessing with enchanted extra
+		return 20F;
+	}
+	
+	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos) {
+		int chunkRange = 4;
+		int chunkX = pos.getX() / 16;
+		int chunkZ = pos.getZ() / 16;
+		//int count = 0;
+		float bestDPS = 0;
+		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
+			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
+				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
+				if (world.checkChunksExist(checkPos.posX, checkPos.posY, checkPos.posZ, checkPos.posX, checkPos.posY, checkPos.posZ)) {
+					Chunk chunk = world.getChunkFromBlockCoords(checkPos.posX, checkPos.posZ);
+					if (chunk != null) {
+						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
+						
+						if (cdp.averageDPS > bestDPS) {
+							bestDPS = cdp.averageDPS;
+						}
+					}
+				}
+			}
+		}
+		//long averageTime = bestTime / count;
+		
+		float scale = convertInhabTimeToDifficultyScale(bestDPS);
 		return scale;
 	}
 	
-	public static float getDifficultyScaleForPos(World world, BlockCoord pos) {
+	public static float convertInhabTimeToDifficultyScale(float dps) {
+		float scale = (float)dps / (float)getBestPlayerDPSRatingPossibleVanilla();
+		return scale;
+	}
+	
+	public static float getDifficultyScaleForPosOccupyTime(World world, BlockCoord pos) {
 		/**
 		 * 1 chunk calc
 		 */
@@ -131,7 +223,7 @@ public class DynamicDifficulty {
 		long totalTime = 0;
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
-				BlockCoord checkPos = new BlockCoord(chunkX * 16 + 8, 128, chunkZ * 16 + 8);
+				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.checkChunksExist(checkPos.posX, checkPos.posY, checkPos.posZ, checkPos.posX, checkPos.posY, checkPos.posZ)) {
 					Chunk chunk = world.getChunkFromBlockCoords(checkPos.posX, checkPos.posZ);
 					if (chunk != null) {
@@ -147,7 +239,7 @@ public class DynamicDifficulty {
 		}
 		
 		float scale = convertInhabTimeToDifficultyScale(averageTime);
-		return scale;
+		return Math.round(scale * 1000F) / 1000F;
 		
 		/**
 		 * best chunk count
@@ -159,7 +251,7 @@ public class DynamicDifficulty {
 		long bestTime = 0;
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
-				BlockCoord checkPos = new BlockCoord(chunkX * 16 + 8, 128, chunkZ * 16 + 8);
+				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos)) {
 					Chunk chunk = world.getChunkFromBlockCoords(checkPos);
 					if (chunk != null) {
@@ -305,9 +397,9 @@ public class DynamicDifficulty {
 				
 				
 				
-				DamageLog log = null;
+				AttackData log = null;
 				if (!lookupEntToDamageLog.containsKey(ent.getEntityId())) {
-					log = new DamageLog(entC);
+					log = new AttackData(entC);
 					lookupEntToDamageLog.put(ent.getEntityId(), log);
 				} else {
 					int lastLogTimeThreshold = 20*5;
@@ -315,7 +407,7 @@ public class DynamicDifficulty {
 					if (log.getLastLogTime() + lastLogTimeThreshold < world.getTotalWorldTime()) {
 						logToChunk(log);
 						log.cleanup();
-						log = new DamageLog(entC);
+						log = new AttackData(entC);
 						lookupEntToDamageLog.put(ent.getEntityId(), log);
 					} else {
 						
@@ -360,7 +452,7 @@ public class DynamicDifficulty {
 			
 			if (ent instanceof IMob && ent instanceof EntityCreature) {
 				if (lookupEntToDamageLog.containsKey(ent.getEntityId())) {
-					DamageLog log = lookupEntToDamageLog.get(ent.getEntityId());
+					AttackData log = lookupEntToDamageLog.get(ent.getEntityId());
 					logToChunk(log);
 					log.cleanup();
 					lookupEntToDamageLog.remove(ent.getEntityId());
@@ -371,7 +463,7 @@ public class DynamicDifficulty {
 		}
 	}
 	
-	public static void logToChunk(DamageLog log) {
+	public static void logToChunk(AttackData log) {
 		int maxShortTermSize = 50;
 		int maxLongTermSize = 50;
 		int recalcRate = 20*2;
@@ -432,5 +524,7 @@ public class DynamicDifficulty {
 			cdp.lastDPSRecalc = world.getTotalWorldTime();
 		}
 	}
+	
+	
 	
 }
