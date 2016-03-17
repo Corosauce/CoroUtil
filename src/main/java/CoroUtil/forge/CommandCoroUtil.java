@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -162,6 +163,29 @@ public class CommandCoroUtil extends CommandBase {
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
 	                }
+	        	} else if (var2[0].equalsIgnoreCase("location")) {
+	        		String param = null;
+	        		int dim = ((EntityPlayer)var1).dimension;
+	        		int indexStart = 0;
+	        		
+	        		String fullCommand = "";
+	        		for (String entry : var2) {
+	        			fullCommand += entry + " ";
+	        		}
+	        		boolean simple = true;
+	        		/*if (fullCommand.contains(" simple")) {
+	        			simple = true;
+	        		} else {*/
+	        			//using index start instead of dimension
+	        			if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
+		        		if (var2.length > 2) param = var2[2];
+	        		//}
+	        		List<String> data = listEntitiesLocations(param, dim, simple, indexStart);
+	                
+	        		CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "Location list for dimension id: " + dim);
+	        		for (String entry : data) {
+	        			CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, entry);
+	        		}
 	        	}
 			}
 		} catch (Exception ex) {
@@ -237,6 +261,49 @@ public class CommandCoroUtil extends CommandBase {
         //entNames.put("Total count: ", world.loadedEntityList.size());
         
         return entNames;
+	}
+	
+	public List<String> listEntitiesLocations(String entName, int dim, boolean simpleNames, int indexStart) {
+		//HashMap<String, Integer> entNames = new HashMap<String, Integer>();
+		List<String> listData = new ArrayList<String>();
+        
+		World world = DimensionManager.getWorld(dim);
+		
+		int matches = 0;
+		
+        for (int var33 = 0; var33 < world.loadedEntityList.size(); ++var33)
+        {
+            Entity ent = (Entity)world.loadedEntityList.get(var33);
+            
+            String entClass = ent.getClass().getCanonicalName();
+            
+            if (simpleNames) {
+            	entClass = EntityList.getEntityString(ent);
+            }
+            
+            if (entClass != null && (entName == null || /*EntityList.getEntityString(ent)*/entClass.toLowerCase().contains(entName.toLowerCase()))) {
+            	
+            	if (indexStart <= matches) {
+            		listData.add("pos: " + MathHelper.floor_double(ent.posX) + ", " + MathHelper.floor_double(ent.posY) + ", " + MathHelper.floor_double(ent.posZ) + ", " + entClass);
+            		if (listData.size() >= 10) {
+            			return listData;
+            		}
+            	}
+            	
+	            /*int val = 1;
+	            
+	            if (entNames.containsKey(entClass)) {
+	            	val = entNames.get(entClass)+1;
+	            }
+	            entNames.put(entClass, val);*/
+            	matches++;
+            }
+            
+        }
+        
+        //entNames.put("Total count: ", world.loadedEntityList.size());
+        
+        return listData;
 	}
 	
 	public int getEntityCount(String entName, boolean killEntities, boolean exact, int dim) {

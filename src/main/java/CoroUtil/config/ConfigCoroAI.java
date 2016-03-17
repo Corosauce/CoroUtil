@@ -3,6 +3,7 @@ package CoroUtil.config;
 import java.util.Arrays;
 
 import CoroUtil.DimensionChunkCache;
+import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 
 public class ConfigCoroAI implements IConfigCategory {
@@ -18,6 +19,13 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean useBlackListsAsWhitelist = false;
 	
 	public static boolean PFQueueDebug = false;
+	
+	@ConfigComment("Test admin thing for kcauldron issues, kills zombies a bit after sunrise every cleanupStrayMobsDayRate days")
+	public static boolean cleanupStrayMobs = false;
+	
+	public static int cleanupStrayMobsDayRate = 5;
+	
+	public static int cleanupStrayMobsTimeOfDay = 2000;
 	
 	@Override	
 	public String getConfigFileName() {

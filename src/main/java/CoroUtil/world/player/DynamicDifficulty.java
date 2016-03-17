@@ -6,8 +6,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.BlockSapling;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -21,6 +23,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
@@ -36,6 +39,7 @@ public class DynamicDifficulty {
 	public static String dataPlayerHarvestOre = "HW_dataPlayerHarvestOre";
 	public static String dataPlayerHarvestLog = "HW_dataPlayerHarvestLog";
 	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
+	public static String dataPlayerDetectInAirTime = "HW_dataPlayerDetectInAirTime";
 	
 	private static int tickRate = 20;
 	
@@ -44,10 +48,25 @@ public class DynamicDifficulty {
 	public static void tickServer(ServerTickEvent event) {
 		World world = DimensionManager.getWorld(0);
 		if (world != null) {
-			if (world.getTotalWorldTime() % tickRate == 0) {
-				for (Object player : world.playerEntities) {
-					if (player instanceof EntityPlayer) {
-						tickPlayer((EntityPlayer)player);
+			for (Object player : world.playerEntities) {
+				if (player instanceof EntityPlayer) {
+					tickPlayer((EntityPlayer)player);
+				}
+			}
+			
+			
+			if (ConfigCoroAI.cleanupStrayMobs) {
+				long dayNumber = (world.getWorldTime() / 24000) + 1;
+				if (dayNumber % ConfigCoroAI.cleanupStrayMobsDayRate == 0) {
+					long timeOfDay = world.getWorldTime() % 24000;
+					int killTimeRange = 10;
+					if (timeOfDay >= (long)ConfigCoroAI.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
+						System.out.println("KILLING ALL ZOMBIES!");
+						for (Object obj : world.getLoadedEntityList()) {
+							if (obj instanceof EntityZombie) {
+								((EntityZombie) obj).setDead();
+							}
+						}
 					}
 				}
 			}
@@ -55,12 +74,53 @@ public class DynamicDifficulty {
 	}
 	
 	public static void tickPlayer(EntityPlayer player) {
-		long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
-		ticksPlayed += 20;
-		//3 hour start debug
-		//ticksPlayed = 20*60*60*3;
-		player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
+		World world = player.worldObj;
+		if (world.getTotalWorldTime() % tickRate == 0) {
+			
+			long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
+			ticksPlayed += 20;
+			//3 hour start debug
+			//ticksPlayed = 20*60*60*3;
+			player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
+			
+		}
 		
+		boolean autoAttackTest = true;
+		boolean isInAir = false;
+		
+		if ((!player.capabilities.isCreativeMode || autoAttackTest)) {
+    		if ((player.capabilities.isFlying || (!player.onGround && !player.isInWater() && !player.isInsideOfMaterial(Material.lava)))) {
+    			if (player.ridingEntity == null) {
+    				Block block = null;
+    				int pX = MathHelper.floor_double(player.posX);
+    				int pY = MathHelper.floor_double(player.boundingBox.minY);
+    				int pZ = MathHelper.floor_double(player.posZ);
+    				boolean foundWall = false;
+    				for (int x = -1; !foundWall && x <= 1; x++) {
+    					for (int z = -1; !foundWall && z <= 1; z++) {
+    						for (int y = -1; !foundWall && y <= 1; y++) {
+    							if (world.getBlock(pX+x, pY+y, pZ+z) != Blocks.air) {
+    								foundWall = true;
+    								break;
+    							}
+    						}
+    						
+    					}
+    				}
+    				
+    				if (!foundWall) {
+    					isInAir = true;
+    				}
+    			}
+    		}
+		}
+		
+		if (isInAir) {
+			long airTime = player.getEntityData().getLong(dataPlayerDetectInAirTime);
+			player.getEntityData().setLong(dataPlayerDetectInAirTime, airTime+1);
+		} else {
+			player.getEntityData().setLong(dataPlayerDetectInAirTime, 0);
+		}
 		
 	}
 	
@@ -68,16 +128,19 @@ public class DynamicDifficulty {
 	
 	public static float getDifficultyScaleAverage(World world, EntityPlayer player, BlockCoord pos) {
 		
+		//test
+		//if (true) return 2F;
+		
 		//difficulties designed for stuff only mods are capable of should be a flat out plus to the rating such as:
 		//- max health
 		//- ???
 		
-		float weightPosOccupy = 1F;
-		float weightPlayerEquipment = 1.5F;
-		float weightPlayerServerTime = 1F;
-		float weightDPS = 1.5F;
-		float weightHealth = 1F;
-		float weightDistFromSpawn = 1F;
+		float weightPosOccupy = (float) ConfigDynamicDifficulty.weightPosOccupy;
+		float weightPlayerEquipment = (float) ConfigDynamicDifficulty.weightPlayerEquipment;
+		float weightPlayerServerTime = (float) ConfigDynamicDifficulty.weightPlayerServerTime;
+		float weightDPS = (float) ConfigDynamicDifficulty.weightDPS;
+		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
+		float weightDistFromSpawn = (float) ConfigDynamicDifficulty.weightDistFromSpawn;
 		
 		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn;
 		
@@ -165,11 +228,11 @@ public class DynamicDifficulty {
 	
 	public static float getBestPlayerDPSRatingPossibleVanilla() {
 		//just a guess based on me going around with a plain diamond sword, guessing with enchanted extra
-		return 20F;
+		return (float)ConfigDynamicDifficulty.difficulty_BestVanillaDPS;
 	}
 	
 	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos) {
-		int chunkRange = 4;
+		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSRadius;
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
 		//int count = 0;
@@ -191,12 +254,15 @@ public class DynamicDifficulty {
 		}
 		//long averageTime = bestTime / count;
 		
-		float scale = convertInhabTimeToDifficultyScale(bestDPS);
+		float scale = convertDPSToDifficultyScale(bestDPS);
 		return scale;
 	}
 	
-	public static float convertInhabTimeToDifficultyScale(float dps) {
+	public static float convertDPSToDifficultyScale(float dps) {
 		float scale = (float)dps / (float)getBestPlayerDPSRatingPossibleVanilla();
+		if (scale > ConfigDynamicDifficulty.difficulty_MaxDPSRatingAllowed) {
+			scale = (float) ConfigDynamicDifficulty.difficulty_MaxDPSRatingAllowed;
+		}
 		return scale;
 	}
 	
@@ -421,6 +487,10 @@ public class DynamicDifficulty {
 					if (timeDiff > 0) {
 						float damage = log.getLastDamage() / timeDiffSeconds;
 						
+						if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && damage > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
+							damage = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
+						}
+						
 						log.getListDPSs().add(damage);
 						
 						//System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
@@ -477,6 +547,11 @@ public class DynamicDifficulty {
 		if (log.getListDPSs().size() == 0 && log.getLastDamage() > 0) {
 			//add an insta kill dps that assumes can be done every half second
 			float instaKillDPSCalc = log.getLastDamage() * 2;
+			
+			if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && instaKillDPSCalc > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
+				instaKillDPSCalc = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
+			}
+			
 			log.getListDPSs().add(instaKillDPSCalc);
 		}
 		

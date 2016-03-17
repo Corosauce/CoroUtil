@@ -23,8 +23,20 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	/*@ConfigComment("How fast it increases difficulty to max distance")
 	public static double difficulty_ScaleRate = 1D;*/
 	
-	@ConfigComment("Maximum speed buff allowed for max difficulty, scales based on current difficulty")
-	public static double difficulty_SpeedBuffMaxMultiplier = 1.3;
+	public static int difficulty_BestDPSRadius = 4;
+	
+	public static int difficulty_BestVanillaDPS = 20;
+	
+	public static double difficulty_MaxDPSLoggable = 500;
+	
+	public static double difficulty_MaxDPSRatingAllowed = 5;
+	
+	public static double weightPosOccupy = 1D;
+	public static double weightPlayerEquipment = 1.5D;
+	public static double weightPlayerServerTime = 1D;
+	public static double weightDPS = 1.5D;
+	public static double weightHealth = 1D;
+	public static double weightDistFromSpawn = 1D;
 	
 	@Override
 	public String getConfigFileName() {
