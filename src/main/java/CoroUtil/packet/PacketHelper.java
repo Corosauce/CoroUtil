@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 
 import java.io.IOException;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
@@ -204,5 +205,15 @@ public class PacketHelper {
 
         return new FMLProxyPacket(byteBuf, parChannel);
     }
+	
+	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {
+		NBTTagCompound data = new NBTTagCompound();
+		data.setString("command", "Ent_Motion");
+		data.setInteger("entityID", ent.getEntityId());
+		data.setDouble("motionX", motionX);
+		data.setDouble("motionY", motionY);
+		data.setDouble("motionZ", motionZ);
+		return getNBTPacket(data, CoroAI.eventChannelName);
+	}
 	
 }

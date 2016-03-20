@@ -110,6 +110,16 @@ public class EventHandlerPacket {
 				//clear quests since we reload fully to sync
 				quests.reset();
 				quests.nbtLoad(data);
+			} else if (command.equals("Ent_Motion")) {
+				
+				int entID = nbt.getInteger("entityID");
+				
+				Entity entity = getClientWorld().getEntityByID(entID);
+				if (entity != null) {
+					entity.motionX += nbt.getDouble("motionX");
+					entity.motionY += nbt.getDouble("motionY");
+					entity.motionZ += nbt.getDouble("motionZ");
+				}
 			}
 			
 		} catch (Exception ex) {
