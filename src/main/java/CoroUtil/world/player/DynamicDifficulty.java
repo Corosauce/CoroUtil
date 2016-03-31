@@ -1,6 +1,8 @@
 package CoroUtil.world.player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
@@ -88,9 +90,16 @@ public class DynamicDifficulty {
 		boolean autoAttackTest = true;
 		boolean isInAir = false;
 		
+		boolean dbg = false;
+		
+		if (dbg) System.out.println("player tick");
+		
 		if ((!player.capabilities.isCreativeMode || autoAttackTest)) {
+			if (dbg) System.out.println("1");
     		if ((player.capabilities.isFlying || (!player.onGround && !player.isInWater() && !player.isInsideOfMaterial(Material.lava)))) {
+    			if (dbg) System.out.println("2");
     			if (player.ridingEntity == null) {
+    				if (dbg) System.out.println("3");
     				Block block = null;
     				int pX = MathHelper.floor_double(player.posX);
     				int pY = MathHelper.floor_double(player.boundingBox.minY);
@@ -99,9 +108,16 @@ public class DynamicDifficulty {
     				for (int x = -1; !foundWall && x <= 1; x++) {
     					for (int z = -1; !foundWall && z <= 1; z++) {
     						for (int y = -1; !foundWall && y <= 1; y++) {
-    							if (world.getBlock(pX+x, pY+y, pZ+z) != Blocks.air) {
-    								foundWall = true;
-    								break;
+    							block = world.getBlock(pX+x, pY+y, pZ+z);
+    							if (block != Blocks.air) {
+    								List<Object> list = new ArrayList<Object>();
+    								block.addCollisionBoxesToList(world, pX+x, pY+y, pZ+z, player.boundingBox, list, player);
+    								if (list.size() > 0) {
+    									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
+        								foundWall = true;
+        								break;
+    								}
+    								
     							}
     						}
     						
@@ -109,6 +125,7 @@ public class DynamicDifficulty {
     				}
     				
     				if (!foundWall) {
+    					if (dbg) System.out.println("no wall found");
     					isInAir = true;
     				}
     			}
@@ -116,17 +133,27 @@ public class DynamicDifficulty {
 		}
 		
 		if (isInAir) {
+			if (dbg) System.out.println("in air");
 			long airTime = player.getEntityData().getLong(dataPlayerDetectInAirTime);
 			player.getEntityData().setLong(dataPlayerDetectInAirTime, airTime+1);
 		} else {
+			if (dbg) System.out.println("not in air");
 			player.getEntityData().setLong(dataPlayerDetectInAirTime, 0);
 		}
 		
 	}
 	
-
+	public static float getDifficultyScaleAverage(EntityPlayer player, int x, int y, int z) {
+		return getDifficultyScaleAverage(player, new BlockCoord(x, y, z));
+	}
 	
 	public static float getDifficultyScaleAverage(World world, EntityPlayer player, BlockCoord pos) {
+		return getDifficultyScaleAverage(player, pos);
+	}
+	
+	public static float getDifficultyScaleAverage(EntityPlayer player, BlockCoord pos) {
+		
+		World world = player.worldObj;
 		
 		//test
 		//if (true) return 2F;
@@ -155,8 +182,11 @@ public class DynamicDifficulty {
 		
 		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
-		//let it go past 1F now
-		//if (val > 1F) val = 1F;
+		if (ConfigDynamicDifficulty.difficulty_Max != -1) {
+			if (val > ConfigDynamicDifficulty.difficulty_Max) {
+				val = (float) ConfigDynamicDifficulty.difficulty_Max;
+			}
+		}
 		return val;
 	}
 	

@@ -28,6 +28,7 @@ public class CoroAI {
 	@Mod.Instance( value = "CoroAI" )
 	public static CoroAI instance;
 	public static String modID = "coroutil";
+	public static String modIDForge = "CoroAI";
     
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")

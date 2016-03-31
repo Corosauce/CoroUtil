@@ -38,6 +38,22 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static double weightHealth = 1D;
 	public static double weightDistFromSpawn = 1D;
 	
+	@ConfigComment("-1 = dont cap it")
+	public static double difficulty_Max = -1;
+	
+	public static boolean difficulty_InfernalMobsOverride = false;
+	
+	@ConfigComment("what level of difficulty is required to count as 100% chance")
+	public static double difficulty_Infernal_Elite_Max = 5F;
+	@ConfigComment("what level of difficulty is required to count as 100% chance")
+	public static double difficulty_Infernal_Ultra_Max = 5F;
+	@ConfigComment("what level of difficulty is required to count as 100% chance")
+	public static double difficulty_Infernal_Infernal_Max = 5F;
+	
+	public static double difficulty_Infernal_Elite_ScaleRate = 1F;
+	public static double difficulty_Infernal_Ultra_ScaleRate = 1F;
+	public static double difficulty_Infernal_Infernal_ScaleRate = 1F;
+	
 	@Override
 	public String getConfigFileName() {
 		return "CoroUtil_DynamicDifficulty";
