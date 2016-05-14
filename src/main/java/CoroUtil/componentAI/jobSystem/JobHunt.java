@@ -125,7 +125,7 @@ public class JobHunt extends JobBase {
 				boolean found = false;
 				Entity clEnt = null;
 				float closest = 9999F;
-		    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		    	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(huntRange, huntRange/2, huntRange));
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
@@ -177,7 +177,7 @@ public class JobHunt extends JobBase {
 			}*/
 			
 		//}
-		ent.prevHealth = ent.getHealth();
+		//ent.prevHealth = ent.getHealth();
 	}
 	
 	public boolean sanityCheckHelp(Entity caller, Entity target) {

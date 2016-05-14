@@ -10,6 +10,8 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import CoroUtil.ability.Ability;
 import CoroUtil.ability.IAbilityUser;
@@ -26,11 +28,6 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
 		
 		initAIProfile();
     	agent.initBTTemplate();
-	}
-
-	@Override
-	protected boolean isAIEnabled() {
-		return true;
 	}
 	
 	@Override
@@ -65,10 +62,11 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
 	}
 	
 	@Override
-    public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1EntityLivingData) {
-        initRPGStats();
-        return super.onSpawnWithEgg(getAIBTAgent().onSpawnEvent(par1EntityLivingData));
-    }
+	public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty,
+			IEntityLivingData livingdata) {
+		initRPGStats();
+		return super.onInitialSpawn(difficulty, getAIBTAgent().onSpawnEvent(livingdata));
+	}
 
 	@Override
 	public ConcurrentHashMap getAbilities() {
@@ -181,14 +179,13 @@ public class EntityAnimalBase extends EntityAnimal implements IBTAgent, IAbility
 		String command = par1nbtTagCompound.getString("command");
 		
 		if (command.equals("tamed")) {
-			String s = "heart";
 
 	        for (int i = 0; i < 7; ++i)
 	        {
 	            double d0 = this.rand.nextGaussian() * 0.02D;
 	            double d1 = this.rand.nextGaussian() * 0.02D;
 	            double d2 = this.rand.nextGaussian() * 0.02D;
-	            this.worldObj.spawnParticle(s, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2);
+	            this.worldObj.spawnParticle(EnumParticleTypes.HEART, this.posX + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2.0F) - (double)this.width, d0, d1, d2);
 	        }
 		}
 		

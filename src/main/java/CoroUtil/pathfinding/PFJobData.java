@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import CoroUtil.ChunkCoordinatesSize;
+import CoroUtil.util.BlockCoord;
 
 public class PFJobData {
 
 	//Mandatory fields
 	public ChunkCoordinatesSize source;
 	public Entity sourceEntity;
-	public ChunkCoordinates dest;
+	public BlockCoord dest;
 	public float distMax;
 	
 	//Configurable settings
@@ -32,7 +32,7 @@ public class PFJobData {
 	//Extra data usage
 	public boolean mapOutPathfind = false;
 	public float mapOutDistBetweenPoints = 8;
-	public List<ChunkCoordinates> listConnectablePoints = new ArrayList<ChunkCoordinates>();
+	public List<BlockCoord> listConnectablePoints = new ArrayList<BlockCoord>();
 	
 	public boolean fixFloatingStartPosition = false;
 	public boolean fixFloatingEndPosition = false;
@@ -45,15 +45,15 @@ public class PFJobData {
 	
 	public PFJobData(ChunkCoordinatesSize coordSize, int x, int y, int z, float var2) {
 		source = coordSize;
-		dest = new ChunkCoordinates(x, y, z);
+		dest = new BlockCoord(x, y, z);
 		distMax = var2;
 		timeCreated = System.currentTimeMillis();
 	}
 	
 	public PFJobData(Entity parEnt, int x, int y, int z, float var2) {
-		source = new ChunkCoordinatesSize(MathHelper.floor_double(parEnt.posX), MathHelper.floor_double(parEnt.posY), MathHelper.floor_double(parEnt.posZ), parEnt.worldObj.provider.dimensionId, parEnt.width, parEnt.height);
+		source = new ChunkCoordinatesSize(MathHelper.floor_double(parEnt.posX), MathHelper.floor_double(parEnt.posY), MathHelper.floor_double(parEnt.posZ), parEnt.worldObj.provider.getDimensionId(), parEnt.width, parEnt.height);
 		sourceEntity = parEnt;
-		dest = new ChunkCoordinates(x, y, z);
+		dest = new BlockCoord(x, y, z);
 		distMax = var2;
 		timeCreated = System.currentTimeMillis();
 	}
@@ -74,7 +74,7 @@ public class PFJobData {
 		//System.out.println("listConnectablePoints size: " + listConnectablePoints.size());
 	}
 	
-	public void addMapOutPoint(ChunkCoordinates parCoords) {
+	public void addMapOutPoint(BlockCoord parCoords) {
 		
 	}
 	

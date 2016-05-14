@@ -10,13 +10,14 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.forge.CoroAI;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class PacketHelper {
 	
@@ -49,10 +50,10 @@ public class PacketHelper {
 
 	public static void writeTEntToPacket(TileEntity tEnt, NBTTagCompound nbt) {
 		try {
-			nbt.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-			nbt.setInteger("x", tEnt.xCoord);
-			nbt.setInteger("y", tEnt.yCoord);
-			nbt.setInteger("z", tEnt.zCoord);
+			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+			nbt.setInteger("x", tEnt.getPos().getX());
+			nbt.setInteger("y", tEnt.getPos().getY());
+			nbt.setInteger("z", tEnt.getPos().getZ());
 			/*buff.writeInt(tEnt.getWorldObj().provider.dimensionId);
 			buff.writeInt(tEnt.xCoord);
 	    	buff.writeInt(tEnt.yCoord);
@@ -81,7 +82,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, packetChannel/*CoroAI.eventChannelName*/);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), packetChannel/*CoroAI.eventChannelName*/);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWClient(TileEntity tEnt, String name, Object val) {
@@ -111,7 +112,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWServer(TileEntity tEnt) {
@@ -136,7 +137,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, NBTTagCompound data) {
@@ -149,10 +150,10 @@ public class PacketHelper {
         try
         {
         	nbtSendData.setString("command", "CoroAI_TEntCmd");
-        	nbtSendData.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-        	nbtSendData.setInteger("x", tEnt.xCoord);
-        	nbtSendData.setInteger("y", tEnt.yCoord);
-        	nbtSendData.setInteger("z", tEnt.zCoord);
+        	nbtSendData.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+        	nbtSendData.setInteger("x", tEnt.getPos().getX());
+        	nbtSendData.setInteger("y", tEnt.getPos().getY());
+        	nbtSendData.setInteger("z", tEnt.getPos().getZ());
         	nbtSendData.setTag("data", data);
         	//ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntCmd");
         	/*byteBuf.writeInt(tEnt.getWorldObj().provider.dimensionId);
@@ -173,12 +174,13 @@ public class PacketHelper {
         pkt.data = bos.toByteArray();
         pkt.length = bos.size();*/
         
-        return new FMLProxyPacket(byteBuf, CoroAI.eventChannelName);
+        return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
 	}
 	
 	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
     {
-        short short1 = fullBuffer.readShort();//par0DataInput.readShort();
+		return ByteBufUtils.readTag(fullBuffer);
+        /*short short1 = fullBuffer.readShort();//par0DataInput.readShort();
 
         if (short1 < 0)
         {
@@ -190,7 +192,7 @@ public class PacketHelper {
             fullBuffer.readBytes(abyte);
             return CompressedStreamTools.func_152457_a(abyte, new NBTSizeTracker(2097152L));
             //return CompressedStreamTools.decompress(abyte);
-        }
+        }*/
     }
 	
 	public static FMLProxyPacket getNBTPacket(NBTTagCompound parNBT, String parChannel) {
@@ -203,7 +205,7 @@ public class PacketHelper {
         	ex.printStackTrace();
         }
 
-        return new FMLProxyPacket(byteBuf, parChannel);
+        return new FMLProxyPacket(new PacketBuffer(byteBuf), parChannel);
     }
 	
 	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {

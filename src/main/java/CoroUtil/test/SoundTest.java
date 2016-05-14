@@ -11,7 +11,6 @@ import javax.sound.midi.Synthesizer;
 
 import CoroUtil.music.Melody;
 import CoroUtil.music.MusicPlayer;
-import CoroUtil.music.NoteEntry;
 import CoroUtil.music.NoteHelper;
 import CoroUtil.music.Sequencer;
 

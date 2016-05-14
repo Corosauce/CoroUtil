@@ -7,13 +7,12 @@ import java.io.FileOutputStream;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class CoroUtilFile {
 	public static String lastWorldFolder = "";
@@ -94,15 +93,15 @@ public class CoroUtilFile {
 		return FMLClientHandler.instance().getClient().mcDataDir/*getAppDir("minecraft")*/.getPath();
 	}
     
-    public static void writeCoords(String name, ChunkCoordinates coords, NBTTagCompound nbt) {
+    public static void writeCoords(String name, BlockCoord coords, NBTTagCompound nbt) {
     	nbt.setInteger(name + "X", coords.posX);
     	nbt.setInteger(name + "Y", coords.posY);
     	nbt.setInteger(name + "Z", coords.posZ);
     }
     
-    public static ChunkCoordinates readCoords(String name, NBTTagCompound nbt) {
+    public static BlockCoord readCoords(String name, NBTTagCompound nbt) {
     	if (nbt.hasKey(name + "X")) {
-    		return new ChunkCoordinates(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
+    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
     	} else {
     		return null;
     	}

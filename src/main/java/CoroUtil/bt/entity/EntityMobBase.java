@@ -9,6 +9,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.World;
 import CoroUtil.ability.Ability;
 import CoroUtil.ability.IAbilityUser;
@@ -26,11 +27,6 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
 		initAIProfile();
     	agent.initBTTemplate();
     	initExtraAI();
-	}
-
-	@Override
-	protected boolean isAIEnabled() {
-		return true;
 	}
 
 	@Override
@@ -59,10 +55,11 @@ public class EntityMobBase extends EntityMob implements IBTAgent, IAbilityUser, 
 	}
 	
 	@Override
-    public IEntityLivingData onSpawnWithEgg(IEntityLivingData par1EntityLivingData) {
-        initRPGStats();
-        return super.onSpawnWithEgg(getAIBTAgent().onSpawnEvent(par1EntityLivingData));
-    }
+	public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty,
+			IEntityLivingData livingdata) {
+		initRPGStats();
+		return super.onInitialSpawn(difficulty, getAIBTAgent().onSpawnEvent(livingdata));
+	}
 
 	@Override
 	public ConcurrentHashMap getAbilities() {

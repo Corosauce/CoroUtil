@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 
@@ -69,7 +70,8 @@ public class ChunkDataPoint
     	try {
 	    	updateCache();
 	    	
-	    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+	    	//if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+	    	if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
 		    	Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
 		    	
 		    	int countWater = 0;
@@ -112,7 +114,8 @@ public class ChunkDataPoint
 
     public void updateCache()
     {
-    	if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+    	//if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
+    	if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
     		Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
     		List<Entity> listEntities = getEntitiesFromLoadedChunk(enemyClass, chunk);
     		countEntitiesEnemy = listEntities.size();
@@ -170,7 +173,7 @@ public class ChunkDataPoint
     	spawnableType = nbt.getInteger("spawnableType");
     	countEntitiesEnemy = nbt.getInteger("countEntitiesEnemy");
     	NBTTagCompound nbtListPlayers = nbt.getCompoundTag("listPlayers");
-    	Iterator it = nbtListPlayers.func_150296_c().iterator();
+    	Iterator it = nbtListPlayers.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
     		NBTTagCompound entry = nbtListPlayers.getCompoundTag(entryName);
@@ -253,11 +256,13 @@ public class ChunkDataPoint
     	grid = null;
     }
     
+    //TODO: fix for 1.8
     public List<Entity> getEntitiesFromLoadedChunk(Class filterClass, Chunk chunk) {
+    	
     	List list = new ArrayList<Entity>();
-    	for (int k = 0; k < chunk.entityLists.length; ++k)
+    	/*for (int k = 0; k < chunk.getEntityLists().length; ++k)
         {
-            List list1 = chunk.entityLists[k];
+            ClassInheritanceMultiMap<Entity> list1 = chunk.getEntityLists()[k];
 
             for (int l = 0; l < list1.size(); ++l)
             {
@@ -268,7 +273,7 @@ public class ChunkDataPoint
                     list.add(entity);
                 }
             }
-        }
+        }*/
     	return list;
     }
     

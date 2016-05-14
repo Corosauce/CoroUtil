@@ -1,10 +1,10 @@
 package CoroUtil.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.MathHelper;
-
-public class BlockCoord extends ChunkCoordinates {
+public class BlockCoord {
+	
+	public int posX;
+	public int posY;
+	public int posZ;
 
 	public BlockCoord(int p_i1354_1_, int p_i1354_2_, int p_i1354_3_)
     {
@@ -20,14 +20,6 @@ public class BlockCoord extends ChunkCoordinates {
         this.posZ = p_i1355_1_.posZ;
     }
     
-    public BlockCoord(Entity ent) {
-    	
-    	this.posX = MathHelper.floor_double(ent.posX);
-    	this.posY = MathHelper.floor_double(ent.posY);
-    	this.posZ = MathHelper.floor_double(ent.posZ);
-    	
-    }
-    
     public boolean equals(Object p_equals_1_)
     {
         if (!(p_equals_1_ instanceof BlockCoord))
@@ -36,8 +28,8 @@ public class BlockCoord extends ChunkCoordinates {
         }
         else
         {
-        	BlockCoord chunkcoordinates = (BlockCoord)p_equals_1_;
-            return this.posX == chunkcoordinates.posX && this.posY == chunkcoordinates.posY && this.posZ == chunkcoordinates.posZ;
+        	BlockCoord BlockCoord = (BlockCoord)p_equals_1_;
+            return this.posX == BlockCoord.posX && this.posY == BlockCoord.posY && this.posZ == BlockCoord.posZ;
         }
     }
 
@@ -61,6 +53,18 @@ public class BlockCoord extends ChunkCoordinates {
     
     public int getZ() {
     	return posZ;
+    }
+    
+    public double getDistanceSquared(double toX, double toY, double toZ) {
+    	return distanceSq(toX, toY, toZ);
+    }
+    
+    public double distanceSq(double toX, double toY, double toZ)
+    {
+        double d0 = (double)this.getX() - toX;
+        double d1 = (double)this.getY() - toY;
+        double d2 = (double)this.getZ() - toZ;
+        return d0 * d0 + d1 * d1 + d2 * d2;
     }
 	
 }

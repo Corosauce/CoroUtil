@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
@@ -16,6 +15,7 @@ import CoroUtil.pathfinding.IPFCallback;
 import CoroUtil.pathfinding.PFCallbackItem;
 import CoroUtil.pathfinding.PFJobData;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 
 public class BlackboardBase implements IPFCallback {
 
@@ -62,7 +62,7 @@ public class BlackboardBase implements IPFCallback {
 	public MutableBoolean shouldFollowOrders = new MutableBoolean(false);
 	
 	
-	public ChunkCoordinates fleeToCoords = new ChunkCoordinates();
+	public BlockCoord fleeToCoords = new BlockCoord(0, 0, 0);
 	public long lastTickSafetyCheck = 0;
 	
 	public MutableInt distMed = new MutableInt(18);
@@ -120,7 +120,7 @@ public class BlackboardBase implements IPFCallback {
 	public void trackTarget(boolean resetPathData) {
 		if (target != null) {
 			//System.out.println("tracking target");
-			setMoveTo(Vec3.createVectorHelper(target.posX, target.posY, target.posZ), resetPathData);
+			setMoveTo(new Vec3(target.posX, target.posY, target.posZ), resetPathData);
 		}
 	}
 	

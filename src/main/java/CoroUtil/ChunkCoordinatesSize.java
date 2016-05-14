@@ -1,8 +1,9 @@
 package CoroUtil;
 
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 
-public class ChunkCoordinatesSize extends ChunkCoordinates {
+
+public class ChunkCoordinatesSize extends BlockPos {
 	
 	public int dimensionId;
 	

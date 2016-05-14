@@ -8,10 +8,11 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.util.BlockCoord;
 
 public class Formation {
 
@@ -120,18 +121,18 @@ public class Formation {
     {
         if (par1 == 1.0F)
         {
-            return Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+            return new Vec3(ent.posX, ent.posY, ent.posZ);
         }
         else
         {
             double d0 = ent.prevPosX + (ent.posX - ent.prevPosX) * (double)par1;
             double d1 = ent.prevPosY + (ent.posY - ent.prevPosY) * (double)par1;
             double d2 = ent.prevPosZ + (ent.posZ - ent.prevPosZ) * (double)par1;
-            return Vec3.createVectorHelper(d0, d1, d2);
+            return new Vec3(d0, d1, d2);
         }
     }
 	
-	public void setDestination(ChunkCoordinates coords) {
+	public void setDestination(BlockCoord coords) {
 		System.out.println("TODO");
 	}
 	
@@ -172,9 +173,9 @@ public class Formation {
 				double posY = (pos.yCoord/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 				posZ = pos.zCoord + posZ;
 				
-				Vec3 tryPos = Vec3.createVectorHelper(posX, posY, posZ);
+				Vec3 tryPos = new Vec3(posX, posY, posZ);
 				
-				Block tryID = ent.worldObj.getBlock((int)tryPos.xCoord, (int)tryPos.yCoord + 1, (int)tryPos.zCoord);
+				Block tryID = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(tryPos.xCoord), (int)tryPos.yCoord + 1, MathHelper.floor_double(tryPos.zCoord))).getBlock();
 				
 				//if clear (check ent height too), if not return center formation for safety
 				if (!tryID.getMaterial().isSolid()) {
@@ -186,7 +187,7 @@ public class Formation {
 				}
 				
 				//to fix movehelper trying to make them jump, might need a better fix
-				tryPos = Vec3.createVectorHelper(posX, ent.posY, posZ);
+				tryPos = new Vec3(posX, ent.posY, posZ);
 				return tryPos;
 			} else {
 				//System.out.println("DO I REPEAT FOR SAME ENT?!" + ent);

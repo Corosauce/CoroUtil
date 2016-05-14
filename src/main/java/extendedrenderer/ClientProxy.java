@@ -1,10 +1,10 @@
 package extendedrenderer;
 
 import net.minecraft.client.Minecraft;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.EntityTexBiomeColorFX;
 import extendedrenderer.particle.entity.EntityTexFX;
@@ -40,9 +40,9 @@ public class ClientProxy extends CommonProxy
         super.init();
         
         //rr.registerEntityRenderingHandler(StormCluster.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityTexFX.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderNull());
-        RenderingRegistry.registerEntityRenderingHandler(EntityRotFX.class, new RenderNull());
+        RenderingRegistry.registerEntityRenderingHandler(EntityTexFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
+        RenderingRegistry.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
+        RenderingRegistry.registerEntityRenderingHandler(EntityRotFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
         //rr.registerEntityRenderingHandler(EntityFallingRainFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntityWaterfallFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntitySnowFX.class, new RenderNull());

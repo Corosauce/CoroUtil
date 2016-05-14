@@ -8,8 +8,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.IEntityPacket;
 import CoroUtil.packet.INBTPacketHandler;
@@ -19,10 +24,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.tile.ITilePacket;
 import CoroUtil.util.CoroUtilEntity;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class EventHandlerPacket {
 	
@@ -148,7 +149,7 @@ public class EventHandlerPacket {
 				
 				World world = DimensionManager.getWorld(dimID);
 				if (world != null) {
-					TileEntity tEnt = world.getTileEntity(x, y, z);
+					TileEntity tEnt = world.getTileEntity(new BlockPos(x, y, z));
 					if (tEnt instanceof ITilePacket) {
 						System.out.println("CONFIRM THIS SHOULD BE nbtData and not just nbt var");
 						((ITilePacket) tEnt).handleClientSentNBT(CoroUtilEntity.getName(entP), nbtData);

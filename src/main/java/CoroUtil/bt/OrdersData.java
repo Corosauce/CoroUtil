@@ -2,7 +2,6 @@ package CoroUtil.bt;
 
 import net.minecraft.nbt.NBTTagCompound;
 import CoroUtil.bt.selector.Selector;
-import CoroUtil.componentAI.ICoroAI;
 
 public class OrdersData {
 

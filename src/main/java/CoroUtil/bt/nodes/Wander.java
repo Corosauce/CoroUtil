@@ -3,7 +3,6 @@ package CoroUtil.bt.nodes;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Vec3;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.Behavior;
@@ -11,6 +10,7 @@ import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import CoroUtil.util.BlockCoord;
 
 public class Wander extends Selector {
 
@@ -22,7 +22,7 @@ public class Wander extends Selector {
 	
 	public float wanderRange = 16;
 	
-	public Vec3 lastWanderPos = Vec3.createVectorHelper(0, 0, 0);
+	public Vec3 lastWanderPos = new Vec3(0, 0, 0);
 	
 	public Wander(Behavior parParent, IBTAgent parEnt, BlackboardBase parBB, float parRange) {
 		super(parParent);
@@ -92,7 +92,7 @@ public class Wander extends Selector {
 						i = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posX;
 						j = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posY;
 						k = (float) entInt.getAIBTAgent().tamable.getPlayerCached().posZ;
-						entInt.getAIBTAgent().tamable.occupyCoord = new ChunkCoordinates((int)i, (int)j, (int)k);
+						entInt.getAIBTAgent().tamable.occupyCoord = new BlockCoord((int)i, (int)j, (int)k);
 						//i = occupyCoord.
 						//job.ai.walkTo(job.ent, occupyCoord, job.ai.maxPFRange, 600);
 						//int randsize = 8;
@@ -104,7 +104,7 @@ public class Wander extends Selector {
         
         if (flag)
         {
-        	lastWanderPos = Vec3.createVectorHelper(i, j, k);
+        	lastWanderPos = new Vec3(i, j, k);
         	entInt.getAIBTAgent().blackboard.setMoveTo(lastWanderPos);
         	//System.out.println("wander - " + i + " - " + j + " - " + k);
         	

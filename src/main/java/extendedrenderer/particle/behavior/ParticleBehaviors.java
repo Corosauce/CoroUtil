@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import CoroUtil.util.Vec3;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.entity.EntityIconFX;
 import extendedrenderer.particle.entity.EntityIconWindFX;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -49,7 +49,7 @@ public class ParticleBehaviors {
 	public void tickUpdate(EntityRotFX particle) {
 		
 		if (sourceEntity != null) {
-			coordSource = Vec3.createVectorHelper(sourceEntity.posX, sourceEntity.posY, sourceEntity.posZ);
+			coordSource = new Vec3(sourceEntity.posX, sourceEntity.posY, sourceEntity.posZ);
 		}
 		
 		tickUpdateAct(particle);
@@ -157,17 +157,17 @@ public class ParticleBehaviors {
 		}
 	}
 	
-	public EntityRotFX spawnNewParticleWindFX(World world, IIcon icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
+	public EntityRotFX spawnNewParticleWindFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
 		EntityRotFX entityfx = new EntityIconWindFX(world, x, y, z, vecX, vecY, vecZ, icon);
 		entityfx.pb = this;
 		return entityfx;
 	}
 	
-	public EntityRotFX spawnNewParticleIconFX(World world, IIcon icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
+	public EntityRotFX spawnNewParticleIconFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
 		return spawnNewParticleIconFX(world, icon, x, y, z, vecX, vecY, vecZ, -1);
 	}
 	
-	public EntityRotFX spawnNewParticleIconFX(World world, IIcon icon, double x, double y, double z, double vecX, double vecY, double vecZ, int renderOrder) {
+	public EntityRotFX spawnNewParticleIconFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ, int renderOrder) {
 		EntityRotFX entityfx = new EntityIconFX(world, x, y, z, vecX, vecY, vecZ, icon);
 		entityfx.pb = this;
 		entityfx.renderOrder = renderOrder;

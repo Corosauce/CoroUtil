@@ -34,10 +34,11 @@ public class EventHandlerPacket {
 				//int entryCount = nbt.getInteger("entryCount");
 				int pos = 0;
 				ConfigMod.dbg("modconfig packet, size: " + "derp");
-				if (!GuiConfigEditor.clientMode || ConfigMod.configLookup.get(modID).configData.size() == 0) {
+				//TODO: readd GUI
+				if (/*!GuiConfigEditor.clientMode || */ConfigMod.configLookup.get(modID).configData.size() == 0) {
 	                ConfigMod.configLookup.get(modID).configData.clear();
 	                //Iterator it = nbtEntries.getTagList(p_150295_1_, p_150295_2_)
-	                Iterator it = nbtEntries.func_150296_c().iterator();
+	                Iterator it = nbtEntries.getKeySet().iterator();
 	                while (it.hasNext()) {
 	                	String tagName = (String) it.next();
 	                	NBTTagCompound entry = nbtEntries.getCompoundTag(tagName);
@@ -48,7 +49,8 @@ public class EventHandlerPacket {
 	                }
                 }
 			} else if (command.equals("openGUI")) {
-				Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
+				//TODO: readd GUI
+				//Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
 			}
 			
 		} catch (Exception ex) {

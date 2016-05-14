@@ -1,8 +1,8 @@
 package CoroUtil.componentAI.jobSystem;
 
+import net.minecraft.entity.player.EntityPlayer;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.util.CoroUtilEntity;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class JobProtect extends JobBase {
 	

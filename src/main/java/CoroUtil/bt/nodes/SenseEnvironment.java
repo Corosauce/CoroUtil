@@ -44,7 +44,7 @@ public class SenseEnvironment extends LeafAction {
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
 			
-			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
+			boolean canSeeCoord = this.blackboard.agent.ent.worldObj.rayTraceBlocks(new Vec3(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), new Vec3(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
 			
 			if (!canSeeCoord || (target != null && !this.blackboard.agent.ent.canEntityBeSeen(target)) || distToPos > blackboard.distMed.getValue()) {
 				distLevel = 2;
@@ -70,7 +70,7 @@ public class SenseEnvironment extends LeafAction {
 				//boolean sanityAborted = false;
 				Entity clEnt = null;
 				float closest = 9999F;
-		    	List list = blackboard.agent.ent.worldObj.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.boundingBox.expand(huntRange, huntRange/2, huntRange));
+		    	List list = blackboard.agent.ent.worldObj.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.getEntityBoundingBox().expand(huntRange, huntRange/2, huntRange));
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
@@ -163,15 +163,15 @@ public class SenseEnvironment extends LeafAction {
 	
 	public boolean canPosBeSeen(Vec3 parPos)
     {
-		boolean entCheck = this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
-		//boolean topCheck = this.blackboard.agent.ent.worldObj.clip(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.maxY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
-		//boolean bottomCheck = this.blackboard.agent.ent.worldObj.clip(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.minY + 0.3, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+		boolean entCheck = this.blackboard.agent.ent.worldObj.rayTraceBlocks(new Vec3(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), new Vec3(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+		//boolean topCheck = this.blackboard.agent.ent.worldObj.clip(new Vec3(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.maxY, this.blackboard.agent.ent.posZ), new Vec3(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
+		//boolean bottomCheck = this.blackboard.agent.ent.worldObj.clip(new Vec3(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.boundingBox.minY + 0.3, this.blackboard.agent.ent.posZ), new Vec3(parPos.xCoord, parPos.yCoord, parPos.zCoord)) == null;
         return entCheck;
     }
 	
 	public boolean canEntityBeSeen(Entity par1Entity)
     {
-        return this.blackboard.agent.ent.worldObj.rayTraceBlocks(Vec3.createVectorHelper(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), Vec3.createVectorHelper(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
+        return this.blackboard.agent.ent.worldObj.rayTraceBlocks(new Vec3(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY, this.blackboard.agent.ent.posZ), new Vec3(par1Entity.posX, par1Entity.posY + (double)par1Entity.getEyeHeight(), par1Entity.posZ)) == null;
     }
 
 }

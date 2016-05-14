@@ -65,7 +65,31 @@ public class CoroAI {
     
     @Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-    	
+    	boolean debugOutputEntityRegistrations = false;
+    	if (debugOutputEntityRegistrations) {
+	    	try {
+	    		BiMap<Class<? extends Entity>, EntityRegistration> entityClassRegistrations = ObfuscationReflectionHelper.getPrivateValue(EntityRegistry.class, EntityRegistry.instance(), "entityClassRegistrations");
+	    		
+	    		Iterator<EntityRegistration> it = entityClassRegistrations.values().iterator();
+	    		while (it.hasNext()) {
+	    			EntityRegistration entReg = it.next();
+	    			
+	    			//System.out.println(entReg.getEntityName());
+	    			
+	    			
+	    		}
+	    		
+	    		//Iterator<Class<? extends Entity>> it2 = EntityList.stringToClassMapping.values().iterator();
+	    		Iterator<Map.Entry<String, Class<? extends Entity>>> it2 = EntityList.stringToClassMapping.entrySet().iterator();
+	    		while (it2.hasNext()) {
+	    			Entry<String, Class<? extends Entity>> entReg = it2.next();
+	    			
+	    			System.out.println(entReg.getKey() + " - " + entReg.getValue());
+	    		}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
 	}
     
     public CoroAI() {

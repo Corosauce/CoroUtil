@@ -10,7 +10,7 @@ import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import CoroUtil.bt.actions.Delay;
 import CoroUtil.bt.actions.OrdersUser;
@@ -25,14 +25,13 @@ import CoroUtil.bt.selector.SelectorSequence;
 import CoroUtil.diplomacy.DiplomacyHelper;
 import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
-import CoroUtil.forge.CoroAI;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 
 public class AIBTAgent {
@@ -55,10 +54,10 @@ public class AIBTAgent {
 
   	public OrdersHandler ordersHandler;
   	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
-  	public ChunkCoordinates coordsManagedLocation;
+  	public BlockCoord coordsManagedLocation;
   	
   	//for respawning and other misc things
-  	public ChunkCoordinates coordsHome;
+  	public BlockCoord coordsHome;
 	
   	public AIBTTamable tamable;
   	
@@ -284,7 +283,7 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		Block block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY, MathHelper.floor_double(ent.posZ));
+		Block block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor_double(ent.posZ))).getBlock();
 		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -292,7 +291,7 @@ public class AIBTAgent {
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			block = ent.worldObj.getBlock(MathHelper.floor_double(ent.posX), (int)ent.boundingBox.minY-1, MathHelper.floor_double(ent.posZ));
+			block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor_double(ent.posZ))).getBlock();
 			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -380,18 +379,20 @@ public class AIBTAgent {
 		profile.syncAbilitiesFull(true); //calling this here does not work for entities outside tracker range on client, see SkillMapping errors for more detail
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
-		ManagedLocation ml = getManagedLocation();
+		//TODO: readd 1.8.8
+		/*ManagedLocation ml = getManagedLocation();
 		if (ml != null) {
 			//unitType is mostly unused atm
 			ml.addEntity("member", ent);
 		} else {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
 			CoroAI.dbg("AIBTAgent Entitys home has been destroyed or never had one set!");
-		}
+		}*/
 		
 	}
 	
-	public ManagedLocation getManagedLocation() {
+	//TODO: readd 1.8.8
+	/*public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
@@ -402,13 +403,13 @@ public class AIBTAgent {
 		return null;
 	}
 	
-	public void setManagedLocation(ChunkCoordinates parLocation) {
+	public void setManagedLocation(BlockCoord parLocation) {
 		coordsManagedLocation = parLocation;
 	}
 	
 	public void setManagedLocation(ManagedLocation parLocation) {
 		coordsManagedLocation = parLocation.spawn;
-	}
+	}*/
 	
 	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
 		initPost(false);
@@ -514,9 +515,10 @@ public class AIBTAgent {
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-			if (ml != null && ml instanceof ManagedLocation) {
+			//TODO: readd 1.8.8
+			/*if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
-			}
+			}*/
 		}
 		ent = null;
 		ordersHandler = null;

@@ -38,7 +38,7 @@ public class EventHandlerForge {
 		//this is called for every dimension
 		//check server side because some mods invoke saving client side (bad standard)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			if (((WorldServer)event.world).provider.dimensionId == 0) {
+			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
 				CoroAI.writeOutData(false);
 			}
 		}
@@ -47,7 +47,7 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void worldLoad(Load event) {
 		if (!event.world.isRemote) {
-			if (((WorldServer)event.world).provider.dimensionId == 0) {
+			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
 				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.world) == null) {
 					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroAI.modID, event.world);
 				}
@@ -75,7 +75,7 @@ public class EventHandlerForge {
 				if (event.action == Action.RIGHT_CLICK_AIR) return;
 				
 				if (ConfigCoroAI.trackPlayerData) {
-					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.x / 16, event.z / 16);
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.pos.getX() / 16, event.pos.getZ() / 16);
 					cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
 				}
 				

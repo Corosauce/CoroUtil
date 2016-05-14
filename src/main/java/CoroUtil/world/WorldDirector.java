@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
@@ -17,18 +15,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.event.WorldEvent;
 import CoroUtil.pathfinding.PathPointEx;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import CoroUtil.world.grid.chunk.PlayerDataGrid;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 public class WorldDirector implements Runnable {
 
@@ -103,7 +101,7 @@ public class WorldDirector implements Runnable {
 	
 	//required for reading in, etc
 	public void initData(String parModID, World parWorld) {
-		dimID = parWorld.provider.dimensionId;
+		dimID = parWorld.provider.getDimensionId();
 		modID = parModID;
 		
 		if (useThreading) {
@@ -191,7 +189,7 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
-	public ISimulationTickable getTickingSimluationByLocation(ChunkCoordinates parCoords) {
+	public ISimulationTickable getTickingSimluationByLocation(BlockCoord parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}
@@ -237,11 +235,11 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public boolean isCoordAndNearAreaNaturalBlocks(World parWorld, int x, int y, int z, int range) {
-		if (isNaturalSurfaceBlock(parWorld.getBlock(x, y, z)) && 
-				isNaturalSurfaceBlock(parWorld.getBlock(x+range, y, z)) && 
-				isNaturalSurfaceBlock(parWorld.getBlock(x-range, y, z)) &&
-				isNaturalSurfaceBlock(parWorld.getBlock(x, y, z+range)) &&
-				isNaturalSurfaceBlock(parWorld.getBlock(x, y, z-range))) {
+		if (isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z)).getBlock()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x+range, y, z)).getBlock()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x-range, y, z)).getBlock()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z+range)).getBlock()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z-range)).getBlock())) {
 			return true;
 		}
 		return false;
@@ -269,7 +267,7 @@ public class WorldDirector implements Runnable {
 		int curY = startY;
 		int safetyCount = 0;
 		while (curY > 0 && safetyCount++ < 300) {
-			Block id = world.getBlock(x, curY, z);
+			Block id = world.getBlockState(new BlockPos(x, curY, z)).getBlock();
 			
 			if (isNaturalSurfaceBlock(id)) {
 				return curY;
@@ -345,7 +343,7 @@ public class WorldDirector implements Runnable {
 		
 		NBTTagCompound tickingLocations = parData.getCompoundTag("tickingLocations");
 		
-		Iterator it = tickingLocations.func_150296_c().iterator();
+		Iterator it = tickingLocations.getKeySet().iterator();
 		
 		
 		while (it.hasNext()) {

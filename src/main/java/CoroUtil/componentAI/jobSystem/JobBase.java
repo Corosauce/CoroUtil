@@ -11,12 +11,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -28,6 +27,7 @@ import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilInventory;
 import CoroUtil.util.CoroUtilItem;
@@ -103,9 +103,9 @@ public class JobBase {
 	
 	public void onTickChestScan() {
 		if (ai.scanForHomeChest && ent.worldObj.getWorldTime() % 100 == 0) {
-			if (!CoroUtilInventory.isChest(ent.worldObj.getBlock(ai.homeX, ai.homeY, ai.homeZ))) {
+			if (!CoroUtilInventory.isChest(ent.worldObj.getBlockState(new BlockPos(ai.homeX, ai.homeY, ai.homeZ)).getBlock())) {
 				//System.out.println("scanning for chests or allies - " + ent);
-				ChunkCoordinates tryCoords = getChestNearby();
+				BlockCoord tryCoords = getChestNearby();
 				if (tryCoords != null) {
 					//System.out.println("discovered a chest to call home! - " + ent);
 					ai.homeX = tryCoords.posX;
@@ -113,13 +113,13 @@ public class JobBase {
 					ai.homeZ = tryCoords.posZ;
 				} else {
 					int range = 30;
-					List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+					List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(range, range/2, range));
 			        for(int j = 0; j < list.size(); j++)
 			        {
 			            Entity entity1 = (Entity)list.get(j);
 			            
 			            if (entity1 instanceof ICoroAI) {
-			            	if (CoroUtilInventory.isChest(ent.worldObj.getBlock(((ICoroAI) entity1).getAIAgent().homeX, ((ICoroAI) entity1).getAIAgent().homeY, ((ICoroAI) entity1).getAIAgent().homeZ))) {
+			            	if (CoroUtilInventory.isChest(ent.worldObj.getBlockState(new BlockPos(((ICoroAI) entity1).getAIAgent().homeX, ((ICoroAI) entity1).getAIAgent().homeY, ((ICoroAI) entity1).getAIAgent().homeZ)).getBlock())) {
 			            		ai.homeX = ((ICoroAI) entity1).getAIAgent().homeX;
 			            		ai.homeY = ((ICoroAI) entity1).getAIAgent().homeY;
 			            		ai.homeZ = ((ICoroAI) entity1).getAIAgent().homeZ;
@@ -133,17 +133,17 @@ public class JobBase {
 		}
 	}
 	
-	public ChunkCoordinates getChestNearby() {
+	public BlockCoord getChestNearby() {
 		
 		int range = 30;
 		
 		for (int xx = (int)Math.floor(ent.posX - range/2); xx < ent.posX + range/2; xx++) {
 			for (int yy = (int)Math.max(1, Math.floor(ent.posY - 2)); yy < ent.posY + 2; yy++) {
 				for (int zz = (int)Math.floor(ent.posZ - range/2); zz < ent.posZ + range/2; zz++) {
-					Block id = ent.worldObj.getBlock(xx, yy, zz);
+					Block id = ent.worldObj.getBlockState(new BlockPos(xx, yy, zz)).getBlock();
 					
 					if (CoroUtilInventory.isChest(id)) {
-						return new ChunkCoordinates(xx, yy, zz);
+						return new BlockCoord(xx, yy, zz);
 					}
 				}
 			}
@@ -157,8 +157,8 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
-				if (pe.getPosition(ent).distanceTo(Vec3.createVectorHelper(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
+			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+				if (pe.getPosition(ent).distanceTo(new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
 				//System.out.println("next path!");
@@ -166,7 +166,7 @@ public class JobBase {
 			
 			/*int pIndex = pe.pathIndex+1;
 			if (pIndex < this.pathToEntity.points.length) {
-				if (this.worldObj.rayTraceBlocks(Vec3.createVectorHelper((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), Vec3.createVectorHelper(posX, posY + (double)getEyeHeight(), posZ)) == null) {
+				if (this.worldObj.rayTraceBlocks(new Vec3((double)pathToEntity.points[pIndex].xCoord + 0.5D, (double)pathToEntity.points[pIndex].yCoord + 1.5D, (double)pathToEntity.points[pIndex].zCoord + 0.5D), new Vec3(posX, posY + (double)getEyeHeight(), posZ)) == null) {
 					this.pathToEntity.pathIndex++;
 				}
 			}*/
@@ -222,7 +222,7 @@ public class JobBase {
     	if (itemLookDelay < System.currentTimeMillis()) {
     		itemLookDelay = System.currentTimeMillis() + 500;
     	
-	    	List var3 = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(itemSearchRange*1.0D, itemSearchRange*1.0D, itemSearchRange*1.0D));
+	    	List var3 = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(itemSearchRange*1.0D, itemSearchRange*1.0D, itemSearchRange*1.0D));
 	
 	        if(var3 != null) {
 	            for(int var4 = 0; var4 < var3.size(); ++var4) {
@@ -326,7 +326,7 @@ public class JobBase {
 		float range = 15F;
 		
             {
-            	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(range, range/2, range));
+            	List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(range, range/2, range));
             	for(int j = 0; j < list.size(); j++)
             	{
             		Entity entity1 = (Entity)list.get(j);
@@ -405,7 +405,7 @@ public class JobBase {
         gatherX = (int)(ent.posX - (d / f * dist));
         gatherZ = (int)(ent.posZ - (d1 / f * dist));
         
-        Block id = ent.worldObj.getBlock(gatherX, gatherY, gatherZ);
+        Block id = ent.worldObj.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
         
         int offset = -10;
         
@@ -414,7 +414,7 @@ public class JobBase {
         		break;
         	}
         	
-        	id = ent.worldObj.getBlock(gatherX, gatherY+offset++, gatherZ);
+        	id = ent.worldObj.getBlockState(new BlockPos(gatherX, gatherY+offset++, gatherZ)).getBlock();
         }
         
         double homeDist = ent.getDistance(ai.homeX, ai.homeY, ai.homeZ);
@@ -451,12 +451,12 @@ public class JobBase {
 			tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
 			i = tryY + ai.rand.nextInt(scanSizeY)-scanSizeY/2;
 			tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
-			if (ent.worldObj.getBlock(tryX, i, tryZ).getMaterial() == Material.water) {
+			if (ent.worldObj.getBlockState(new BlockPos(tryX, i, tryZ)).getBlock().getMaterial() == Material.water) {
 				//System.out.println("found water");
 				
 				int newY = i;
 				
-				while (!CoroUtilBlock.isAir(ent.worldObj.getBlock(tryX, newY, tryZ))) {
+				while (!CoroUtilBlock.isAir(ent.worldObj.getBlockState(new BlockPos(tryX, newY, tryZ)).getBlock())) {
 					newY++;
 				}
 				
@@ -495,7 +495,7 @@ public class JobBase {
 		
 		//System.out.println(this.worldObj.getBlockId(tryX, tryY, tryZ));
 		for (int i = tryY; i > tryY - 10; i--) {
-			Block block = ent.worldObj.getBlock(tryX, i, tryZ);
+			Block block = ent.worldObj.getBlockState(new BlockPos(tryX, i, tryZ)).getBlock();
 			if (!CoroUtilBlock.isAir(block) && block.getMaterial() != Material.water) {
 				//System.out.println("found water");
 				
@@ -647,7 +647,7 @@ public class JobBase {
 			ticksBeforeCloseCombatRetry--;
 			return false;
 		} else {
-			return ent.canEntityBeSeen(targ) && (ent.getDistanceToEntity(targ) < 12.0F) && ent.boundingBox.minY - targ.boundingBox.minY <= 2.5D && ent.boundingBox.minY - targ.boundingBox.minY > -2.5D;
+			return ent.canEntityBeSeen(targ) && (ent.getDistanceToEntity(targ) < 12.0F) && ent.getEntityBoundingBox().minY - targ.getEntityBoundingBox().minY <= 2.5D && ent.getEntityBoundingBox().minY - targ.getEntityBoundingBox().minY > -2.5D;
 		}
 	}
 	
@@ -849,7 +849,7 @@ public class JobBase {
 				dist = lookAheadDist;
 				
 				double posX = (center.posX - Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
-				double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+				double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 				double posZ = (center.posZ + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 				
 				int xx = (int)posX;
@@ -861,8 +861,8 @@ public class JobBase {
 				int zz = (int)posZ;
 				
 				if (checkThreats) {
-					Block lookAheadIDDrop = ent.worldObj.getBlock(xx, yy, zz);
-					Block lookAheadIDCollide = ent.worldObj.getBlock(xx, legsAheadY, zz);
+					Block lookAheadIDDrop = ent.worldObj.getBlockState(new BlockPos(xx, yy, zz)).getBlock();
+					Block lookAheadIDCollide = ent.worldObj.getBlockState(new BlockPos(xx, legsAheadY, zz)).getBlock();
 					if (ent.onGround && (lookAheadIDDrop.getMaterial() == Material.lava || lookAheadIDDrop.getMaterial() == Material.cactus) || 
 							(lookAheadIDCollide.getMaterial() == Material.lava || lookAheadIDCollide.getMaterial() == Material.cactus)) {
 						safe = false;
@@ -876,8 +876,8 @@ public class JobBase {
 				}
 				
 				if (checkDrops) {
-					Block lookAheadIDDrop0 = ent.worldObj.getBlock(xx, yy, zz);
-					Block lookAheadIDDrop1 = ent.worldObj.getBlock(xx, yy-1, zz);
+					Block lookAheadIDDrop0 = ent.worldObj.getBlockState(new BlockPos(xx, yy, zz)).getBlock();
+					Block lookAheadIDDrop1 = ent.worldObj.getBlockState(new BlockPos(xx, yy-1, zz)).getBlock();
 					if (CoroUtilBlock.isAir(lookAheadIDDrop0) && CoroUtilBlock.isAir(lookAheadIDDrop1)) {
 						safe = false;
 						break;
@@ -885,7 +885,7 @@ public class JobBase {
 				}
 				
 				if (checkWalls/* && adjAngle == 0 && lookAheadDist == 0.5D*/) {
-					Block lookAheadIDCollideTooHigh = ent.worldObj.getBlock(xx, headAheadY, zz);
+					Block lookAheadIDCollideTooHigh = ent.worldObj.getBlockState(new BlockPos(xx, headAheadY, zz)).getBlock();
 					//System.out.println("id " + lookAheadIDCollideTooHigh + " - " + xx + ", " + headAheadY + ", " + zz);
 					//System.out.println(center.rotationYaw);
 					//System.out.println("X-: " + Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
@@ -902,7 +902,7 @@ public class JobBase {
 		}
 		
 		double posX = (center.posX - Math.cos((-center.rotationYaw) * 0.01745329D) * 1D);
-		double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+		double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 		double posZ = (center.posZ + Math.sin((-center.rotationYaw) * 0.01745329D) * 1D);
 		
 		//this might not work yet....
@@ -927,7 +927,7 @@ public class JobBase {
 				dist = lookAheadDist;
 				
 				double posX = (center.posX - Math.sin((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
-				double posY = (center.boundingBox.minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
+				double posY = (center.getEntityBoundingBox().minY/* - 0.3D - Math.sin((center.rotationPitch) / 180.0F * 3.1415927F) * dist*/);
 				double posZ = (center.posZ + Math.cos((-center.rotationYaw + adjAngle) * 0.01745329D) * dist);
 				
 				int xx = (int)posX;
@@ -938,14 +938,14 @@ public class JobBase {
 				yy = (int)(posY - 0.5D);
 				int zz = (int)posZ;
 				
-				Block lookAheadIDDrop0 = ent.worldObj.getBlock(xx, yy, zz);
+				Block lookAheadIDDrop0 = ent.worldObj.getBlockState(new BlockPos(xx, yy, zz)).getBlock();
 				
 				if (lookAheadIDDrop0.getMaterial() == Material.water) return true;
 				
 				if (CoroUtilBlock.isAir(lookAheadIDDrop0)) {
 					int scanDownY = yy - 1;
 					for (int tries = 0; tries < 8; tries++) {
-						Block tryID = ent.worldObj.getBlock(xx, scanDownY--, zz);
+						Block tryID = ent.worldObj.getBlockState(new BlockPos(xx, scanDownY--, zz)).getBlock();
 						if (!CoroUtilBlock.isAir(tryID)) {
 							if (tryID.getMaterial() == Material.water) {
 								return true;

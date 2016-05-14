@@ -5,32 +5,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.nodes.AttackMeleeBest;
 import CoroUtil.bt.nodes.AttackRangedBest;
 import CoroUtil.bt.nodes.CombatLogic;
 import CoroUtil.bt.nodes.Flee;
 import CoroUtil.bt.nodes.TrackTarget;
-import CoroUtil.bt.nodes.Wander;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.bt.selector.SelectorConcurrent;
 import CoroUtil.entity.render.AnimationStateObject;
-import CoroUtil.entity.render.ModelRendererBones;
-import CoroUtil.entity.render.RenderEntityCoroAI;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilAbility;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.internal.FMLProxyPacket;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class PersonalityProfile {
 
@@ -99,8 +96,9 @@ public class PersonalityProfile {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
 			
-			Render renderObj = (Render) RenderManager.instance.entityRenderMap.get(agent.ent.getClass());
-			if (renderObj instanceof RenderEntityCoroAI) {
+			Render renderObj = (Render) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
+			//TODO: readd 1.8.8
+			/*if (renderObj instanceof RenderEntityCoroAI) {
 				
 				for (Map.Entry<String, ModelRendererBones> entry : ((RenderEntityCoroAI) renderObj).modelTechne.partsAllChildren.entrySet()) {
 					AnimationStateObject obj = new AnimationStateObject(entry.getKey());
@@ -113,7 +111,7 @@ public class PersonalityProfile {
 				}
 				//((RenderCoroAIEntity) renderObj).modelTechne.parts.get("top")
 				animationData.put("top", new AnimationStateObject("top"));
-			}
+			}*/
 		}
 	}
 	
@@ -308,10 +306,10 @@ public class PersonalityProfile {
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		if (rangeOverride) {
-			CoroAI.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.dimensionId);
+			CoroAI.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.getDimensionId());
 			//PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.worldObj.provider.dimensionId);
 		} else {
-			CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.dimensionId, agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+			CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimensionId(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
 			//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 		}
 	}
@@ -323,7 +321,7 @@ public class PersonalityProfile {
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
 		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);
-		CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.dimensionId, agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+		CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimensionId(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
 		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 	}
 	

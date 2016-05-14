@@ -1,0 +1,16 @@
+***************
+*** 14,19 ****
+  import net.minecraft.entity.player.EntityPlayer;
+  import net.minecraft.entity.player.EntityPlayerMP;
+  import net.minecraft.init.Items;
+  import net.minecraftforge.common.DimensionManager;
+  import CoroUtil.OldUtil;
+  import CoroUtil.componentAI.ICoroAI;
+--- 14,20 ----
+  import net.minecraft.entity.player.EntityPlayer;
+  import net.minecraft.entity.player.EntityPlayerMP;
+  import net.minecraft.init.Items;
++ import net.minecraft.util.BlockPos;
+  import net.minecraftforge.common.DimensionManager;
+  import CoroUtil.OldUtil;
+  import CoroUtil.componentAI.ICoroAI;

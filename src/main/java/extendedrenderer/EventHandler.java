@@ -4,9 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
 
 public class EventHandler {
@@ -31,7 +31,7 @@ public class EventHandler {
         }
 
         //Rotating particles hook
-        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.renderViewEntity, (float)event.partialTicks);
+        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.partialTicks);
     }
 	
 	@SideOnly(Side.CLIENT)
@@ -42,7 +42,7 @@ public class EventHandler {
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(TextureStitchEvent event) {
+	public void registerIcons(TextureStitchEvent.Pre event) {
 		ParticleRegistry.init(event);
 	}
 

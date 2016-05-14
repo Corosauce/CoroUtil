@@ -7,14 +7,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.Vec3;
 import CoroUtil.bt.AIBTAgent;
 import CoroUtil.bt.Behavior;
-import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import CoroUtil.util.BlockCoord;
 
 public class TargetEnemy extends Selector {
 
@@ -25,12 +23,12 @@ public class TargetEnemy extends Selector {
 	public EntityLiving ent;
 	
 	public float rangeHunt = 16;
-	public ChunkCoordinates holdPos = null; //if not null, center scan and best target scan is based from this instead of entity, shouldnt cancel active target, and should have a range higher than enemy projectile ranges
+	public BlockCoord holdPos = null; //if not null, center scan and best target scan is based from this instead of entity, shouldnt cancel active target, and should have a range higher than enemy projectile ranges
 	//public float rangeStray = 8;
 	public int scanRate = -1;
 	public int randRate = -1;
 	
-	public TargetEnemy(Behavior parParent, IBTAgent parEnt, float parRange, ChunkCoordinates parHoldPos, int parScanRate, int parRandRate) {
+	public TargetEnemy(Behavior parParent, IBTAgent parEnt, float parRange, BlockCoord parHoldPos, int parScanRate, int parRandRate) {
 		super(parParent);
 		entInt = parEnt;
 		ent = (EntityLiving)parEnt;
@@ -68,9 +66,9 @@ public class TargetEnemy extends Selector {
 			float closest = 9999F;
 	    	List list = null;
 	    	if (holdPos != null) {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, AxisAlignedBB.getBoundingBox(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	} else {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.boundingBox.expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	}
 	        for(int j = 0; j < list.size(); j++)
 	        {

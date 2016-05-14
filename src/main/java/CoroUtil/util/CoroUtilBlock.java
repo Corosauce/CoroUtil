@@ -2,15 +2,15 @@ package CoroUtil.util;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 
 public class CoroUtilBlock {
 
-	public static Block setUnlocalizedNameAndTexture(Block block, String nameTex) {
+	/*public static Block setUnlocalizedNameAndTexture(Block block, String nameTex) {
 		block.setBlockName(nameTex);
 		//block.setTextureName(nameTex);
     	return block;
-    }
+    }*/
 	
 	public static boolean isAir(Block parBlock) {
 		Material mat = parBlock.getMaterial();
@@ -31,7 +31,7 @@ public class CoroUtilBlock {
 	
 	public static Block getBlockByName(String name) {
 		try {
-			return (Block) Block.blockRegistry.getObject(name);
+			return (Block) Block.blockRegistry.getObject(new ResourceLocation(name));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -43,7 +43,7 @@ public class CoroUtilBlock {
 	}*/
 	
 	public static String getNameByBlock(Block item) {
-		return Block.blockRegistry.getNameForObject(item);
+		return Block.blockRegistry.getNameForObject(item).toString();
 	}
 	
 }

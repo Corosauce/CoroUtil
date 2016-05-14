@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import CoroUtil.util.CoroUtilBlock;
-import build.world.Build;
 
 public class BlockStaticDataMap {
 	public static HashMap<String, Float> mapBlockWeight;
@@ -43,7 +42,7 @@ public class BlockStaticDataMap {
         int i = 0;
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	Block block = (Block) Block.blockRegistry.getObject(tagName);
+        	Block block = (Block) Block.blockRegistry.getObject(new ResourceLocation(tagName));
         	
         	if (block != null) {
         		String hash;// = block.getClass().toString() + "|" + block.getUnlocalizedName() + "|" + Block.lightValue[i];
@@ -102,7 +101,7 @@ public class BlockStaticDataMap {
 
 		addToMap(Blocks.leaves, plant);
 		
-		addToMap(Blocks.fence_gate, plank);
+		addToMap(Blocks.oak_fence_gate, plank);
 		addToMap(Blocks.planks, plank);
 		addToMap(Blocks.spruce_stairs, plank);
 		addToMap(Blocks.birch_stairs, plank);

@@ -54,7 +54,7 @@ public class CommandCoroUtil extends CommandBase {
 					if (aq != null) {
 						aq.initCreateObject(plQuests);
 						
-						aq.initFirstTime(player.worldObj.provider.dimensionId);
+						aq.initFirstTime(player.worldObj.provider.getDimensionId());
 						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.diamond), 5, false);
 						
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);
@@ -67,6 +67,11 @@ public class CommandCoroUtil extends CommandBase {
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(player.worldObj, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
+					
+					/*TaskDigTowardsTarget task = new TaskDigTowardsTarget();
+					
+					System.out.println("ENHANCE!");
+					BehaviorModifier.enhanceZombiesToDig(DimensionManager.getWorld(0), new Vec3(player.posX, player.posY, player.posZ), new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class }, 5, 0.8F);*/
 				} else if (var2[0].equalsIgnoreCase("spawn")) {
 					
 					String prefix = "";
@@ -209,10 +214,11 @@ public class CommandCoroUtil extends CommandBase {
 		
 		//temp
 		//ent.setPosition(69, player.worldObj.getHeightValue(69, 301), 301);
-		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new ChunkCoordinates(44, player.worldObj.getHeightValue(44, 301), 301);
+		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.worldObj.getHeightValue(44, 301), 301);
 		
 		player.worldObj.spawnEntityInWorld(ent);
-		if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.worldObj.getDifficultyForLocation(new BlockPos(ent)), null);
 		if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
 	}
 	

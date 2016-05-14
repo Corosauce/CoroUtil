@@ -1,15 +1,7 @@
 package CoroUtil.bt.nodes;
 
-import java.util.List;
-import java.util.Random;
-
-import org.apache.commons.io.filefilter.AgeFileFilter;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -58,7 +50,7 @@ public class Flee extends Selector {
 				Vec3 vec = getTargetVector(blackboard.lastFleeTarget);
 				double dist = 3D;
 				//if (!ent.onGround) dist = 3D;
-				Vec3 dest = Vec3.createVectorHelper(ent.posX - vec.xCoord*dist, ent.posY/* + vec.xCoord*dist*/, ent.posZ - vec.zCoord*dist);
+				Vec3 dest = new Vec3(ent.posX - vec.xCoord*dist, ent.posY/* + vec.xCoord*dist*/, ent.posZ - vec.zCoord*dist);
 				//blackboard.setMoveTo(dest);
 				blackboard.setMoveAndPathTo(dest); //clears out old path
 				entInt.getAIBTAgent().setMoveTo(dest.xCoord, dest.yCoord, dest.zCoord);
@@ -72,7 +64,7 @@ public class Flee extends Selector {
 				//System.out.println("flee home");
 				//if (ent.worldObj.getTotalWorldTime() % 20 == 0) {
 					if (blackboard.fleeToCoords != null) {
-						blackboard.setMoveTo(Vec3.createVectorHelper(blackboard.fleeToCoords.posX, blackboard.fleeToCoords.posY, blackboard.fleeToCoords.posZ));
+						blackboard.setMoveTo(new Vec3(blackboard.fleeToCoords.posX, blackboard.fleeToCoords.posY, blackboard.fleeToCoords.posZ));
 						//entInt.getAIBTAgent().setMoveTo(blackboard.fleeToCoords.posX, blackboard.fleeToCoords.posY, blackboard.fleeToCoords.posZ);
 					}
 				//}
@@ -87,7 +79,7 @@ public class Flee extends Selector {
     	double vecY = target.posY - ent.posY;
     	double vecZ = target.posZ - ent.posZ;
     	double dist = Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-    	Vec3 vec3 = Vec3.createVectorHelper(vecX / dist, vecY / dist, vecZ / dist);
+    	Vec3 vec3 = new Vec3(vecX / dist, vecY / dist, vecZ / dist);
     	return vec3;
     }
 	

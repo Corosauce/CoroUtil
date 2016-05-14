@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
 
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.forge.CoroAI;
 import CoroUtil.world.grid.block.BlockDataGrid;
 import CoroUtil.world.grid.chunk.ChunkDataGrid;
@@ -63,7 +60,7 @@ public class WorldDirectorManager {
 	}
 	
 	public WorldDirector getWorldDirector(String parModID, World world) {
-		int dimID = world.provider.dimensionId;
+		int dimID = world.provider.getDimensionId();
 		if (lookupWorldDirectors.containsKey(parModID)) {
 			HashMap<Integer, WorldDirector> lookup = lookupWorldDirectors.get(parModID);
 			if (lookup.containsKey(dimID)) {
@@ -91,7 +88,7 @@ public class WorldDirectorManager {
 	
 	/* registers and attempts to read in any data for it */
 	public void registerWorldDirector(WorldDirector worldDirector, String parModID, World world) {
-		int dimID = world.provider.dimensionId;
+		int dimID = world.provider.getDimensionId();
 		HashMap<Integer, WorldDirector> lookup = lookupWorldDirectors.get(parModID);
 		if (lookup == null) {
 			lookup = new HashMap<Integer, WorldDirector>();
@@ -134,12 +131,12 @@ public class WorldDirectorManager {
 	}
 	
 	public BlockDataGrid getBlockDataGrid(World world) {
-		if (lookupGridsBlockData.containsKey(world.provider.dimensionId)) {
-			return lookupGridsBlockData.get(world.provider.dimensionId);
+		if (lookupGridsBlockData.containsKey(world.provider.getDimensionId())) {
+			return lookupGridsBlockData.get(world.provider.getDimensionId());
 		} else {
 			BlockDataGrid grid = new BlockDataGrid(world);
 			grid.readFromFile();
-			addGridBlockData(world.provider.dimensionId, grid);
+			addGridBlockData(world.provider.getDimensionId(), grid);
 			return grid;
 		}
 		/*if (blockDataGrid == null && DimensionManager.getWorld(RPGMod.epochDimID) != null) {
@@ -155,12 +152,12 @@ public class WorldDirectorManager {
 	}
 	
 	public ChunkDataGrid getChunkDataGrid(World world) {
-		if (lookupGridsChunkData.containsKey(world.provider.dimensionId)) {
-			return lookupGridsChunkData.get(world.provider.dimensionId);
+		if (lookupGridsChunkData.containsKey(world.provider.getDimensionId())) {
+			return lookupGridsChunkData.get(world.provider.getDimensionId());
 		} else {
 			ChunkDataGrid grid = new ChunkDataGrid(world);
 			grid.readFromFile();
-			addGridChunkData(world.provider.dimensionId, grid);
+			addGridChunkData(world.provider.getDimensionId(), grid);
 			return grid;
 		}
 	}
@@ -190,7 +187,7 @@ public class WorldDirectorManager {
 	}
 	
 	public void initDynamicDimData(World world) {
-		initDynamicDimData(world.provider.dimensionId);
+		initDynamicDimData(world.provider.getDimensionId());
 	}
 	
 	

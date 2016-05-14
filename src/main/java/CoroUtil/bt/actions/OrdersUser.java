@@ -1,6 +1,5 @@
 package CoroUtil.bt.actions;
 
-import net.minecraft.entity.EntityLivingBase;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.OrdersHandler;

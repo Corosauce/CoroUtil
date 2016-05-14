@@ -13,11 +13,11 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.entity.EnumJobState;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilFile;
 
@@ -26,8 +26,8 @@ public class WorldEvent {
 	//WIP shared WorldEvent base class, needs more refactoring
 	
 	public int dimensionID;
-	public ChunkCoordinates coordSource;
-	public ChunkCoordinates coordDestination;
+	public BlockCoord coordSource;
+	public BlockCoord coordDestination;
 	public String mainPlayerName = "";
 	
 	public boolean invasionActive = true;
@@ -71,7 +71,7 @@ public class WorldEvent {
 		state = EnumJobState.IDLE;
 	}
 	
-	public WorldEvent(int parDim, String parName, EnumWorldEventType parType, ChunkCoordinates source, ChunkCoordinates dest) {
+	public WorldEvent(int parDim, String parName, EnumWorldEventType parType, BlockCoord source, BlockCoord dest) {
 		this();
 		type = parType;
 		coordSource = source;
@@ -187,10 +187,10 @@ public class WorldEvent {
     }*/
     
     public EntityPlayer tryGetCursedPlayer(String username) {
-    	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().func_152612_a(username);
+    	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
-    	if (entP != null && entP.worldObj.provider.dimensionId == DimensionManager.getWorld(dimensionID).provider.dimensionId) {
+    	if (entP != null && entP.worldObj.provider.getDimensionId() == DimensionManager.getWorld(dimensionID).provider.getDimensionId()) {
     		return entP;
     	}
     	
@@ -299,7 +299,8 @@ public class WorldEvent {
 	                    if (entP instanceof EntityLivingBase)
 	                    {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
-	                        f1 = EnchantmentHelper.getEnchantmentModifierLiving(entP, (EntityLivingBase)entP);
+	                    	//TODO: update for 1.8 somehow... 
+	                        //f1 = EnchantmentHelper.getEnchantmentModifierLiving(entP, (EntityLivingBase)entP);
 	                        //i += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)par1Entity);
 	                    }
 	                    

@@ -2,26 +2,21 @@ package CoroUtil.ability.abilities;
 
 import java.util.Random;
 
-import javax.vecmath.Vector2d;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Vec3;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.entity.projectile.EntityArrow;
 import CoroUtil.entity.projectile.EntityProjectileBase;
 import CoroUtil.inventory.AIInventory;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 import extendedrenderer.particle.entity.EntityRotFX;
 
 public class AbilityShootArrow extends Ability {
@@ -114,7 +109,7 @@ public class AbilityShootArrow extends Ability {
 		        	double speedInheritFactor = 0.5D;
 		        	
 		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().theWorld, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
-		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.getEntityBoundingBox().minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
 		        	particleBehavior.initParticle(entityfx);
 		        	float f = 0.0F + (rand.nextFloat() * 0.4F);
 		        	entityfx.setRBGColorF(f, f, f);
@@ -177,7 +172,7 @@ public class AbilityShootArrow extends Ability {
 						EntityProjectileBase prj = null;
 						
 						if (projectileType == EntityProjectileBase.PRJTYPE_FIREBALL) {
-				        	prj = new EntityArrow(owner.worldObj, owner, (EntityLivingBase)target, 1.7);
+				        	//prj = new EntityArrow(owner.worldObj, owner, (EntityLivingBase)target, 1.7);
 				        } else if (projectileType == EntityProjectileBase.PRJTYPE_ICEBALL) {
 				        	//block = Block.ice;
 				        }

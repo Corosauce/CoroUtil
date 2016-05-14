@@ -15,7 +15,6 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
@@ -26,15 +25,14 @@ import CoroUtil.diplomacy.TeamInstance;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.entity.EnumActState;
 import CoroUtil.entity.EnumJobState;
-import CoroUtil.forge.CoroAI;
 import CoroUtil.formation.Formation;
 import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilNBT;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
-import CoroUtil.world.location.ManagedLocation;
 
 public class AIAgent {
 
@@ -128,7 +126,7 @@ public class AIAgent {
 	public boolean wasInWater = false;
 	
 	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
-  	public ChunkCoordinates coordsManagedLocation;
+  	public BlockCoord coordsManagedLocation;
   	public int locationMemberID = -1;
 	
 	//Diplomatic fields
@@ -245,7 +243,8 @@ public class AIAgent {
 		}
 		
 		//by this point ManagedLocations SHOULD be loaded via first firing WorldLoad event, no race condition issues should exist
-		ManagedLocation ml = getManagedLocation();
+		//TODO: readd 1.8.8
+		/*ManagedLocation ml = getManagedLocation();
 		if (ml != null) {
 			//unitType is mostly unused atm
 			ml.addEntity("member", ent);
@@ -253,10 +252,11 @@ public class AIAgent {
 			//this should be expected, remove this sysout once you are sure this only happens at expected times
 			//removing without being sure, months in between development
 			//CoroAI.dbg("AIAgent Entitys home has been destroyed or never had one set!");
-		}
+		}*/
 	}
 	
-	public ManagedLocation getManagedLocation() {
+	//TODO: readd 1.8.8
+	/*public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
@@ -267,13 +267,13 @@ public class AIAgent {
 		return null;
 	}
 	
-	public void setManagedLocation(ChunkCoordinates parLocation) {
+	public void setManagedLocation(BlockCoord parLocation) {
 		coordsManagedLocation = parLocation;
 	}
 	
 	public void setManagedLocation(ManagedLocation parLocation) {
 		coordsManagedLocation = parLocation.spawn;
-	}
+	}*/
 	
 	public void setLocationMemberID(int parID) {
 		locationMemberID = parID;
@@ -498,12 +498,12 @@ public class AIAgent {
 		
 		//No movement on x z
 		if (!ent.getNavigator().noPath()) {
-			Vec3 curPos = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+			Vec3 curPos = new Vec3(ent.posX, ent.posY, ent.posZ);
 			if (prevPos == null) {
 				prevPos = curPos;
 			} else {
 				//make y not count
-				prevPos = Vec3.createVectorHelper(prevPos.xCoord, ent.posY, prevPos.zCoord);
+				prevPos = new Vec3(prevPos.xCoord, ent.posY, prevPos.zCoord);
 			}
 			
 			if (curPos.distanceTo(prevPos) < 0.01) {
@@ -534,7 +534,7 @@ public class AIAgent {
 				ent.motionZ *= 1.2F;
 			}
 			
-		} else if (ent.handleLavaMovement()) {
+		} else if (ent.isNotColliding()) {
 			ent.motionY += 0.07D;
 			float speed = 1.2F;
 			if (lastSafeSpot != null) {
@@ -547,7 +547,7 @@ public class AIAgent {
 			wasInLava = true;
 		}
 		
-		if (wasInLava && !ent.handleLavaMovement()) {
+		if (wasInLava && !ent.isNotColliding()) {
 			wasInLava = false;
 			ent.extinguish();
 		}
@@ -568,7 +568,7 @@ public class AIAgent {
 			}
 		}
 		
-		if (ent.onGround && ent.getNavigator().noPath()) lastSafeSpot = Vec3.createVectorHelper(ent.posX, ent.posY, ent.posZ);
+		if (ent.onGround && ent.getNavigator().noPath()) lastSafeSpot = new Vec3(ent.posX, ent.posY, ent.posZ);
 		
 		if (shouldFixBadYPathing) fixBadYPathing();
 	}
@@ -594,7 +594,7 @@ public class AIAgent {
             {
             	//fast water pathing
             	//this.getMoveHelper().setMoveTo(var1.xCoord, var1.yCoord, var1.zCoord, 0.53F);
-            	double dist = ent.getDistance(var1.xCoord, ent.boundingBox.minY, var1.zCoord);
+            	double dist = ent.getDistance(var1.xCoord, ent.getEntityBoundingBox().minY, var1.zCoord);
             	//System.out.println(dist);
             	if (dist <= 0.5F) {
             		ent.getNavigator().getPath().incrementPathIndex();
@@ -760,7 +760,7 @@ public class AIAgent {
 			float closest = 9999F;
 			Entity clEnt = null;
 			
-			List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.boundingBox.expand(checkRange, checkRange/2, checkRange));
+			List list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, ent.getEntityBoundingBox().expand(checkRange, checkRange/2, checkRange));
 	        for(int j = 0; j < list.size(); j++)
 	        {
 	            Entity entity1 = (Entity)list.get(j);
@@ -808,7 +808,7 @@ public class AIAgent {
         }
         else
         {
-            d2 = (par1Entity.boundingBox.minY + par1Entity.boundingBox.maxY) / 2.0D - (ent.posY + (double)ent.getEyeHeight());
+            d2 = (par1Entity.getEntityBoundingBox().minY + par1Entity.getEntityBoundingBox().maxY) / 2.0D - (ent.posY + (double)ent.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
@@ -831,7 +831,7 @@ public class AIAgent {
 		float prevRotYaw = ent.rotationYaw;
 		float prevRotPitch = ent.rotationPitch;
 		
-    	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.boundingBox.maxY > ent.boundingBox.minY && var1.boundingBox.minY < ent.boundingBox.maxY) {
+    	if ((!rangedInUse || meleeOverridesRangedInUse) && var2 < maxReach_Melee && var1.getEntityBoundingBox().maxY > ent.getEntityBoundingBox().minY && var1.getEntityBoundingBox().minY < ent.getEntityBoundingBox().maxY) {
     		if (curCooldown_Melee <= 0) {
     			if (rangedInUse) rangedUsageCancelCharge();
     			
@@ -945,7 +945,7 @@ public class AIAgent {
         pathAvailable = true;
     }
 	
-	public void walkTo(Entity var1, ChunkCoordinates coords, float var2, int timeout) {
+	public void walkTo(Entity var1, BlockCoord coords, float var2, int timeout) {
 		walkTo(var1, coords.posX, coords.posY, coords.posZ, var2, timeout, 0);
 	}
 	
@@ -972,7 +972,7 @@ public class AIAgent {
 		targZ = pe.getFinalPathPoint().zCoord;
 	}
 	
-	public void walkToMark(Entity var1, ChunkCoordinates coords, int timeout) {
+	public void walkToMark(Entity var1, BlockCoord coords, int timeout) {
 		//PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
 		setState(EnumActState.WALKING);
 		jobMan.getPrimaryJob().walkingTimeout = timeout;
@@ -1010,12 +1010,12 @@ public class AIAgent {
 		huntTarget(parEnt, 0);
 	}
 	
-	public void moveTo(ChunkCoordinates coords) {
+	public void moveTo(BlockCoord coords) {
 		PFQueue.getPath(ent, coords.posX, coords.posY, coords.posZ, maxPFRange, 0);
 		walkToMark(null, coords, 600);
 	}
 	
-	public void faceCoord(ChunkCoordinates coord, float f, float f1) {
+	public void faceCoord(BlockCoord coord, float f, float f1) {
 		faceCoord(coord.posX, coord.posY, coord.posZ, f, f1);
 	}
 	
@@ -1053,7 +1053,7 @@ public class AIAgent {
     {
 		float partialTick = 1F;
 		
-        Vec3 var4 = Vec3.createVectorHelper(ent.posX, ent.posY+yOffset, ent.posZ);
+        Vec3 var4 = new Vec3(ent.posX, ent.posY+yOffset, ent.posZ);
         Vec3 var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
         Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
@@ -1110,9 +1110,10 @@ public class AIAgent {
 			if (coordsManagedLocation != null) {
 				WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 				ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-				if (ml != null && ml instanceof ManagedLocation) {
+				//TODO: readd 1.8.8
+				/*if (ml != null && ml instanceof ManagedLocation) {
 					((ManagedLocation) ml).hookEntityDied(ent);
-				}
+				}*/
 			}
 		}
 	}
@@ -1137,9 +1138,10 @@ public class AIAgent {
 		if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
-			if (ml != null && ml instanceof ManagedLocation) {
+			//TODO: readd 1.8.8
+			/*if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);
-			}
+			}*/
 		}
 		
 		jobMan.cleanup();

@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
@@ -43,7 +44,10 @@ public class SelectorMoveToPathClose extends Selector {
 	@Override
 	public EnumBehaviorState tick() {
 
-		int pathfindRange = blackboard.distMed.getValue() + 8;
+		
+		//TODO: 1.8, CARE ABOUT FIXING THIS 
+		
+		/*int pathfindRange = blackboard.distMed.getValue() + 8;
 		
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
@@ -60,7 +64,7 @@ public class SelectorMoveToPathClose extends Selector {
 								//PFQueue based retry code goes here
 								//System.out.println("trying partial pf - " + ent);
 								Random rand = new Random();
-								Vec3 vec = Vec3.createVectorHelper(blackboard.posMoveTo.xCoord - ent.posX, blackboard.posMoveTo.yCoord - ent.posY, blackboard.posMoveTo.zCoord - ent.posZ);
+								Vec3 vec = new Vec3(blackboard.posMoveTo.xCoord - ent.posX, blackboard.posMoveTo.yCoord - ent.posY, blackboard.posMoveTo.zCoord - ent.posZ);
 								vec = vec.normalize();
 								float dist = 16;//+rand.nextInt(10);
 								float distY = retryStage;
@@ -68,11 +72,11 @@ public class SelectorMoveToPathClose extends Selector {
 								int coordX = MathHelper.floor_double(ent.posX+(vec.xCoord*dist));
 								int coordY = MathHelper.floor_double(ent.posY+((vec.yCoord*dist) + randY));
 								int coordZ = MathHelper.floor_double(ent.posZ+(vec.zCoord*dist));
-		    			        Block id = ent.worldObj.getBlock(coordX, coordY, coordZ);
+		    			        Block id = ent.worldObj.getBlockState(new BlockPos(coordX, coordY, coordZ)).getBlock();
 		    			        int tries = 0;
 		    			        if (CoroUtilBlock.isAir(id)) {
-		    			        	Block idUp = ent.worldObj.getBlock(coordX, coordY+1, coordZ);
-		    			        	Block idDown = ent.worldObj.getBlock(coordX, coordY-1, coordZ);
+		    			        	Block idUp = ent.worldObj.getBlockState(new BlockPos(coordX, coordY+1, coordZ)).getBlock();
+		    			        	Block idDown = ent.worldObj.getBlockState(new BlockPos(coordX, coordY-1, coordZ)).getBlock();
 		    			        	if (CoroUtilBlock.isAir(idDown) && CoroUtilBlock.isAir(idUp)) {
 		    			        		//System.out.println("trying partial");
 		    			        		PathEntity result = ent.worldObj.getEntityPathToXYZ(ent, coordX, coordY, coordZ, pathfindRange, false, false, true, true);
@@ -110,7 +114,7 @@ public class SelectorMoveToPathClose extends Selector {
 				//entInt.getAIBTAgent().pathNav.setCanSwim(true);
 				entInt.getAIBTAgent().pathNav.onUpdateNavigation();
 			}
-		}
+		}*/
 		
 		return EnumBehaviorState.SUCCESS;
 		

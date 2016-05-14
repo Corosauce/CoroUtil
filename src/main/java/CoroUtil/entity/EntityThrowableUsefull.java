@@ -10,14 +10,16 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.util.CoroUtilEntity;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import CoroUtil.util.Vec3;
 
 public abstract class EntityThrowableUsefull extends Entity implements IProjectile
 {
@@ -60,7 +62,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      */
     public boolean isInRangeToRenderDist(double par1)
     {
-        double d1 = this.boundingBox.getAverageEdgeLength() * 4.0D;
+        double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
         d1 *= 64.0D;
         return par1 < d1 * d1;
     }
@@ -103,7 +105,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.posY -= 0.10000000149011612D;
         this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
         this.setPosition(this.posX, this.posY, this.posZ);
-        this.yOffset = 0.0F;
+        //this.yOffset = 0.0F;
         float f = 0.4F;
         this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI) * f);
         this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI) * f);
@@ -113,13 +115,18 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, (float)parSpeed, 0.0F);
     }
+    
+    @Override
+    public double getYOffset() {
+    	return super.getYOffset();
+    }
 
     public EntityThrowableUsefull(World par1World, double par2, double par4, double par6)
     {
         super(par1World);
         this.setSize(0.25F, 0.25F);
         this.setPosition(par2, par4, par6);
-        this.yOffset = 0.0F;
+        //this.yOffset = 0.0F;
     }
     
     public Vec3 getTargetVector(EntityLivingBase target) {
@@ -127,7 +134,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     	double vecY = target.posY - thrower.posY;
     	double vecZ = target.posZ - thrower.posZ;
     	double dist = Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-    	Vec3 vec3 = Vec3.createVectorHelper(vecX / dist, vecY / dist, vecZ / dist);
+    	Vec3 vec3 = new Vec3(vecX / dist, vecY / dist, vecZ / dist);
     	return vec3;
     }
 
@@ -200,7 +207,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         if (this.inGround)
         {
-            Block i = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+            Block i = this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
 
             if (i == this.inTile)
             {
@@ -230,15 +237,15 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         	setDead();
         }
 
-        Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
-        vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-        vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+        Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
+        Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
+        vec3 = new Vec3(this.posX, this.posY, this.posZ);
+        vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
         if (movingobjectposition != null)
         {
-            vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+            vec31 = new Vec3(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
         }
 
         if (!this.worldObj.isRemote)
@@ -247,7 +254,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         	if (temp != null) movingobjectposition = temp;
         }
 
-        if (movingobjectposition != null)
+        /*if (movingobjectposition != null)
         {
             if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK && this.worldObj.getBlock(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ) instanceof BlockPortal)
             {
@@ -257,7 +264,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             {
                 this.onImpact(movingobjectposition);
             }
-        }
+        }*/
 
         /*this.posX += this.motionX;
         this.posY += this.motionY;
@@ -303,7 +310,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             for (int k = 0; k < 4; ++k)
             {
                 float f4 = 0.25F;
-                this.worldObj.spawnParticle("bubble", this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
+                this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
             }
 
             f2 = 0.8F;
@@ -374,7 +381,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
         else
         {
-            d1 = (p_70625_1_.boundingBox.minY + p_70625_1_.boundingBox.maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
+            d1 = (p_70625_1_.getEntityBoundingBox().minY + p_70625_1_.getEntityBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d2 * d2);
@@ -406,7 +413,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public MovingObjectPosition tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -417,12 +424,12 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             if (entity1.canBeCollidedWith() && (entity1 != entityliving || this.ticksInAir >= 5))
             {
                 float f = 0.3F;
-                AxisAlignedBB axisalignedbb = entity1.boundingBox.expand((double)f, (double)f, (double)f);
-                MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3, vec31);
+                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
+                MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
 
                 if (movingobjectposition1 != null)
                 {
-                    double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+                    double d1 = vec3.toMCVec().distanceTo(movingobjectposition1.hitVec);
 
                     if (d1 < d0 || d0 == 0.0D)
                     {

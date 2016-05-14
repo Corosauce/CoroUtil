@@ -1,9 +1,8 @@
 package CoroUtil.util;
 
 import net.minecraft.block.Block;
-import net.minecraft.util.ChunkCoordinates;
 
-public class ChunkCoordinatesBlock extends ChunkCoordinates {
+public class ChunkCoordinatesBlock extends BlockCoord {
 
 	public Block block = null;
 	public int meta = 0;
@@ -20,14 +19,14 @@ public class ChunkCoordinatesBlock extends ChunkCoordinates {
         meta = parMeta;
     }
 	
-	public ChunkCoordinatesBlock(ChunkCoordinates par1ChunkCoordinates, Block parBlockID)
+	public ChunkCoordinatesBlock(BlockCoord par1BlockCoord, Block parBlockID)
 	{
-		this(par1ChunkCoordinates, parBlockID, 0);
+		this(par1BlockCoord, parBlockID, 0);
 	}
 
-    public ChunkCoordinatesBlock(ChunkCoordinates par1ChunkCoordinates, Block parBlockID, int parMeta)
+    public ChunkCoordinatesBlock(BlockCoord par1BlockCoord, Block parBlockID, int parMeta)
     {
-        super(par1ChunkCoordinates);
+        super(par1BlockCoord);
         block = parBlockID;
         meta = parMeta;
     }

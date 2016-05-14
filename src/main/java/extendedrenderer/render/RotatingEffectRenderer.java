@@ -6,18 +6,20 @@ import java.util.Random;
 
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.entity.EntityRotFX;
 @SideOnly(Side.CLIENT)
@@ -117,6 +119,8 @@ public class RotatingEffectRenderer
 
                 if (this.fxLayers[var8].size() != 0)
                 {
+                	
+                	
                     if (var8 == 0)
                     {
                         this.renderer.bindTexture(particleTextures);
@@ -129,7 +133,10 @@ public class RotatingEffectRenderer
 
                     if (var8 == 2 || var8 == 3)
                     {
-                        this.renderer.bindTexture(TextureMap.locationItemsTexture);
+                    	//TODO: verify
+                    	//System.out.println("trying to render particles that used to depend on item texture sheet, do these work?");
+                        //this.renderer.bindTexture(TextureMap.locationItemsTexture);
+                    	this.renderer.bindTexture(TextureMap.locationBlocksTexture);
                     }
 
                     if (var8 == 4)
@@ -140,9 +147,10 @@ public class RotatingEffectRenderer
                     if (var8 == 5)
                     {
                         this.renderer.bindTexture(resLayer5);
+                        //this.renderer.bindTexture(TextureMap.locationBlocksTexture);
                     }
 
-                    Tessellator var10 = Tessellator.instance;
+                    Tessellator var10 = Tessellator.getInstance();
                     GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                     
                     GL11.glDepthMask(false);
@@ -153,7 +161,9 @@ public class RotatingEffectRenderer
                     
                     GL11.glDisable(GL11.GL_CULL_FACE);
                     
-                    var10.startDrawingQuads();
+                    //var10.startDrawingQuads();
+                    WorldRenderer worldrenderer = var10.getWorldRenderer();
+                    worldrenderer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
                     for (int var11 = this.fxLayers[var8].size()-1; var11 >= 0; --var11)
                     {
@@ -177,7 +187,7 @@ public class RotatingEffectRenderer
 	                        float var5 = -var4 * MathHelper.sin(var12.rotationPitch * (float)Math.PI / 180.0F);
 	                        float var6 = var3 * MathHelper.sin(var12.rotationPitch * (float)Math.PI / 180.0F);
 	                        float var7 = MathHelper.cos(var12.rotationPitch * (float)Math.PI / 180.0F);
-	                        var12.renderParticle(var10, var2, var3, var7, var4, var5, var6);
+	                        var12.renderParticle(worldrenderer, var1, var2, var3, var7, var4, var5, var6);
                         }
                     }
 

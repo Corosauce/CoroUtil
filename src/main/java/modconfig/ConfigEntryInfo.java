@@ -1,10 +1,8 @@
 package modconfig;
 
-import modconfig.gui.GuiBetterTextField;
-import net.minecraft.client.Minecraft;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConfigEntryInfo {
 	public int index;
@@ -16,8 +14,9 @@ public class ConfigEntryInfo {
 	
 	public boolean markForUpdate = false;
 	
-	@SideOnly(Side.CLIENT)
-	public GuiBetterTextField editBox;
+	//TODO: readd GUI
+	/*@SideOnly(Side.CLIENT)
+	public GuiBetterTextField editBox;*/
 	
 	public ConfigEntryInfo(int parIndex, String parName, Object parVal, String parComment) {
 		index = parIndex;
@@ -32,7 +31,8 @@ public class ConfigEntryInfo {
 	public void initButton() {
 		int buttonWidth = 130;
         int buttonHeight = 16;
-		editBox = new GuiBetterTextField(Minecraft.getMinecraft().fontRenderer, 0, 0, buttonWidth, buttonHeight);
-		editBox.setText(value.toString());
+        //TODO: readd GUI
+		/*editBox = new GuiBetterTextField(Minecraft.getMinecraft().fontRendererObj, 0, 0, buttonWidth, buttonHeight);
+		editBox.setText(value.toString());*/
 	}
 }

@@ -8,11 +8,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.bt.IBTAgent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import CoroUtil.util.Vec3;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.behavior.ParticleBehaviorTrail;
@@ -81,7 +81,7 @@ public class EntityFireBall extends EntityProjectileBase
 			}
         } else {
         	if (particleBehavior == null) {
-        		particleBehavior = new ParticleBehaviorTrail(Vec3.createVectorHelper(posX, posY, posZ));
+        		particleBehavior = new ParticleBehaviorTrail(new Vec3(posX, posY, posZ));
         		particleBehavior.sourceEntity = this;
         		//particleBehaviors.rateAlpha = 0.02F;
         		//particleBehaviors.rateBrighten = 0.02F;
@@ -101,7 +101,7 @@ public class EntityFireBall extends EntityProjectileBase
 		MovingObjectPosition movingobjectposition = null;
 		
         Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
+        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 

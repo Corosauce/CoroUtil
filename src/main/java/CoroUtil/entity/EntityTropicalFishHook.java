@@ -10,24 +10,21 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.componentAI.ICoroAI;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class EntityTropicalFishHook extends Entity implements IEntityAdditionalSpawnData {
 
@@ -59,7 +56,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    /*@Override
    public boolean isInRangeToRenderVec3D(Vec3 asd)
    {
-	   return asd.distanceTo(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)) < 80; 
+	   return asd.distanceTo(new Vec3(this.posX, this.posY, this.posZ)) < 80; 
        
    }*/
    
@@ -74,7 +71,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
    {
 	   
 	   if (!inGround) {
-		   AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, this.boundingBox.minY, this.boundingBox.minZ, this.boundingBox.maxX, this.boundingBox.maxY, this.boundingBox.maxZ);
+		   AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, this.getEntityBoundingBox().minY, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, this.getEntityBoundingBox().maxY, this.getEntityBoundingBox().maxZ);
            if(!this.worldObj.isAABBInMaterial(var18, Material.water)) {
         	   int sdfsdf = 0;
            }
@@ -94,12 +91,12 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
     	  setFishEntity(this);
       }
       this.setSize(0.25F, 0.25F);
-      this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.yOffset, var2.posZ, var2.rotationYaw, var2.rotationPitch);
+      this.setLocationAndAngles(var2.posX, var2.posY + 1.62D - (double)var2.getYOffset(), var2.posZ, var2.rotationYaw, var2.rotationPitch);
       this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
       this.posY -= 0.10000000149011612D;
       this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
       this.setPosition(this.posX, this.posY, this.posZ);
-      this.yOffset = 0.0F;
+      //this.yOffset = 0.0F;
       float var3 = 0.4F;
       this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
       this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F) * var3);
@@ -195,7 +192,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             if(this.bobber != null) {
                if(!this.bobber.isDead) {
                   this.posX = this.bobber.posX;
-                  this.posY = this.bobber.boundingBox.minY + (double)this.bobber.height * 0.8D;
+                  this.posY = this.bobber.getEntityBoundingBox().minY + (double)this.bobber.height * 0.8D;
                   this.posZ = this.bobber.posZ;
                   return;
                }
@@ -209,7 +206,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          }
 
          if(this.inGround) {
-            Block var19 = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+            Block var19 = this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
             if(var19 == this.inTile) {
                ++this.ticksInGround;
                if(this.ticksInGround == 1200) {
@@ -229,17 +226,17 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             ++this.ticksInAir;
          }
 
-         Vec3 var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-         Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         Vec3 var20 = new Vec3(this.posX, this.posY, this.posZ);
+         Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var20, var2);
-         var20 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-         var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         var20 = new Vec3(this.posX, this.posY, this.posZ);
+         var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          if(var3 != null) {
-            var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+            var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
          }
 
          Entity var4 = null;
-         List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+         List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
          double var6 = 0.0D;
 
          double var13;
@@ -247,7 +244,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             Entity var9 = (Entity)var5.get(var8);
             if(var9.canBeCollidedWith() && /*!(var9 instanceof c_PlayerProxy) &&*/ !(var9 instanceof ICoroAI) && (var9 != this.angler || this.ticksInAir >= 10)) {
                float var10 = 0.3F;
-               AxisAlignedBB var11 = var9.boundingBox.expand((double)var10, (double)var10, (double)var10);
+               AxisAlignedBB var11 = var9.getEntityBoundingBox().expand((double)var10, (double)var10, (double)var10);
                MovingObjectPosition var12 = var11.calculateIntercept(var20, var2);
                if(var12 != null) {
                   var13 = var20.distanceTo(var12.hitVec);
@@ -306,9 +303,9 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             double var26 = 0.0D;
 
             for(int var29 = 0; var29 < var27; ++var29) {
-               double var14 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var29 + 0) / (double)var27 - 0.125D + 0.125D;
-               double var16 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
-               AxisAlignedBB var18 = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, var14, this.boundingBox.minZ, this.boundingBox.maxX, var16, this.boundingBox.maxZ);
+               double var14 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 0) / (double)var27 - 0.125D + 0.125D;
+               double var16 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
+               AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, var14, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, var16, this.getEntityBoundingBox().maxZ);
                if(this.worldObj.isAABBInMaterial(var18, Material.water)) {
                   var26 += 0.6D / (double)var27;
                } else {
@@ -321,7 +318,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                   --this.ticksCatchable;
                } else {
                   short var28 = 500;
-                  if(this.worldObj.canLightningStrikeAt(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ))) {
+                  if(this.worldObj.isRainingAt(new BlockPos(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY) + 1, MathHelper.floor_double(this.posZ)))) {
                      var28 = 300;
                   }
 
@@ -329,7 +326,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                      this.ticksCatchable = this.rand.nextInt(30) + 10;
                      this.motionY -= 0.20000000298023224D;
                      this.worldObj.playSoundAtEntity(this, "random.splash", 0.25F, 1.0F + (this.rand.nextFloat() - this.rand.nextFloat()) * 0.4F);
-                     float var30 = (float)MathHelper.floor_double(this.boundingBox.minY);
+                     float var30 = (float)MathHelper.floor_double(this.getEntityBoundingBox().minY);
 
                      int var15;
                      float var17;
@@ -337,13 +334,13 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                      for(var15 = 0; (float)var15 < 1.0F + this.width * 20.0F; ++var15) {
                         var31 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
                         var17 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                        this.worldObj.spawnParticle("bubble", this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
+                        this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY - (double)(this.rand.nextFloat() * 0.2F), this.motionZ);
                      }
 
                      for(var15 = 0; (float)var15 < 1.0F + this.width * 20.0F; ++var15) {
                         var31 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
                         var17 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width;
-                        this.worldObj.spawnParticle("splash", this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY, this.motionZ);
+                        this.worldObj.spawnParticle(EnumParticleTypes.WATER_SPLASH, this.posX + (double)var31, (double)(var30 + 1.0F), this.posZ + (double)var17, this.motionX, this.motionY, this.motionZ);
                      }
                   }
                }

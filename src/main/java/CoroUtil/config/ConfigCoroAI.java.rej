@@ -1,0 +1,19 @@
+***************
+*** 2,9 ****
+  
+  import java.util.Arrays;
+  
+- import CoroUtil.DimensionChunkCache;
+  import modconfig.IConfigCategory;
+  
+  public class ConfigCoroAI implements IConfigCategory {
+  
+--- 2,9 ----
+  
+  import java.util.Arrays;
+  
+  import modconfig.IConfigCategory;
++ import CoroUtil.DimensionChunkCacheNew;
+  
+  public class ConfigCoroAI implements IConfigCategory {
+  

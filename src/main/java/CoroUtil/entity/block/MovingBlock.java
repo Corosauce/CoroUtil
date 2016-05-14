@@ -10,14 +10,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.registry.IEntityAdditionalSpawnData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.util.BlockCoord;
 
 public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 {
@@ -46,7 +47,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	public float rotationPitchVel = 0;
 	
 	public int state = 0; //generic state var
-	public ChunkCoordinates coordsLastAir;
+	public BlockCoord coordsLastAir;
 	public boolean blockToEntCollision = true;
 	
 	public boolean firstTick = true;
@@ -88,11 +89,6 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     @Override
-    public AxisAlignedBB getBoundingBox() {
-    	return super.getBoundingBox();
-    }
-    
-    @Override
     public float getCollisionBorderSize() {
     	return super.getCollisionBorderSize();
     }
@@ -124,12 +120,6 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     public boolean isInRangeToRenderDist(double var1)
     {
         return true;
-    }
-
-    @Override
-    public float getShadowSize()
-    {
-        return 0.0F;
     }
     
     @Override
@@ -230,7 +220,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         	int curX = MathHelper.floor_double(posX);
 	    	int curY = MathHelper.floor_double(posY);
 	    	int curZ = MathHelper.floor_double(posZ);
-	    	Block idCurPos = worldObj.getBlock(curX, curY, curZ);
+	    	Block idCurPos = worldObj.getBlockState(new BlockPos(curX, curY, curZ)).getBlock();
         	
 	        if (blockifyDelay != -1 && age > blockifyDelay) {
 		    	
@@ -240,11 +230,11 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	int aheadEndY = MathHelper.floor_double(posY + (motionY));
 		    	int aheadEndZ = MathHelper.floor_double(posZ + (motionZ));
 		    	
-		    	Block id = worldObj.getBlock(aheadEndX, aheadEndY, aheadEndZ);
+		    	Block id = worldObj.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ)).getBlock();
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
-		    		Vec3 motion = Vec3.createVectorHelper(motionX, motionY, motionZ);
+		    		Vec3 motion = new Vec3(motionX, motionY, motionZ);
 			    	double aheadDistEnd = motion.lengthVector();
 			    	motion = motion.normalize();
 			    	
@@ -252,7 +242,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    		int aheadX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 				    	int aheadY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 				    	int aheadZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    	Block idCheck = worldObj.getBlock(aheadX, aheadY, aheadZ);
+				    	Block idCheck = worldObj.getBlockState(new BlockPos(aheadX, aheadY, aheadZ)).getBlock();
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -268,7 +258,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			int tryX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 					    	int tryY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 					    	int tryZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    		Block idTry = worldObj.getBlock(tryX, tryY, tryZ);
+				    		Block idTry = worldObj.getBlockState(new BlockPos(tryX, tryY, tryZ)).getBlock();
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);
@@ -290,7 +280,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	        }
 	        
 	    	/*if (idCurPos == 0 || Block.blocksList[idCurPos].blockMaterial == Material.snow || Block.blocksList[idCurPos].blockMaterial == Material.plants) {
-	    		coordsLastAir = new ChunkCoordinates(curX, curY, curZ);
+	    		coordsLastAir = new BlockCoord(curX, curY, curZ);
 	    	}
 	    	
 	    	if (blockifyDelay != -1) {
@@ -331,7 +321,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	
     	if (blockToEntCollision) {
         	double size = 0.5D;
-	        List entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.expand(size, size, size));
+	        List entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(size, size, size));
 	        
 	        for (int i = 0; entities != null && i < entities.size(); ++i)
 	        {
@@ -368,7 +358,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         this.prevRotationYaw = this.rotationYaw = this.rotationYawB = par7;
         this.prevRotationPitch = this.rotationPitch = this.rotationPitchB = par8;
         this.prevRotationRoll = this.rotationRoll = parRoll;
-        this.ySize = 0.0F;
+        //this.ySize = 0.0F;
         double d3 = (double)(this.prevRotationYaw - par7);
 
         if (d3 < -180.0D)
@@ -398,7 +388,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	float vecZ = (float) (ent.posZ - targ.posZ);
 
     	float dist2 = (float)Math.sqrt(vecX * vecX + vecY * vecY + vecZ * vecZ);
-		return Vec3.createVectorHelper(vecX / dist2, vecY / dist2, vecZ / dist2);
+		return new Vec3(vecX / dist2, vecY / dist2, vecZ / dist2);
     }
     
     /*public Vector3f getMoveAwayVector3f(Entity ent, Entity targ) {
@@ -442,7 +432,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public void blockify(int x, int y, int z) {
-    	worldObj.setBlock(x, y, z, Block.getBlockById(blockID));
+    	worldObj.setBlockState(new BlockPos(x, y, z), Block.getBlockById(blockID).getDefaultState(), 3);
     	setDead();
     }
     
