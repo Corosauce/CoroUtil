@@ -31,7 +31,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.WorldDirectorManager;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.4")
+@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.5", acceptableRemoteVersions="*")
 public class CoroAI {
 	
 	@Mod.Instance( value = "CoroAI" )

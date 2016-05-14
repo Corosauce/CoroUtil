@@ -42,7 +42,7 @@ public class EventHandler {
 	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void registerIcons(TextureStitchEvent event) {
+	public void registerIcons(TextureStitchEvent.Pre event) {
 		ParticleRegistry.init(event);
 	}
 
