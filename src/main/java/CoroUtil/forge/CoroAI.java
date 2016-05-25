@@ -1,7 +1,29 @@
 package CoroUtil.forge;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import com.google.common.collect.BiMap;
+
 import modconfig.ConfigMod;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
+import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.diplomacy.TeamTypes;
@@ -9,20 +31,8 @@ import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.WorldDirectorManager;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import cpw.mods.fml.common.network.FMLEventChannel;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.relauncher.Side;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.0", acceptableRemoteVersions="*")
+@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.5", acceptableRemoteVersions="*")
 public class CoroAI {
 	
 	@Mod.Instance( value = "CoroAI" )
@@ -118,7 +128,7 @@ public class CoroAI {
     		System.out.println("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
-	    	//PetsManager.instance().nbtReadFromDisk();
+	    	PetsManager.instance().nbtReadFromDisk();
 	    	
 	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
 	    	WorldDirectorManager.instance().reset();
@@ -127,8 +137,8 @@ public class CoroAI {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-    		//PetsManager.instance().nbtWriteToDisk();
-	    	//if (unloadInstances) PetsManager.instance().reset();
+    		PetsManager.instance().nbtWriteToDisk();
+	    	if (unloadInstances) PetsManager.instance().reset();
 	    	PlayerQuestManager.i().saveData(false, unloadInstances);
 	    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     	} catch (Exception ex) {

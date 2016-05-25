@@ -21,6 +21,7 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.OldUtil;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.pathfinding.PFQueue;
 

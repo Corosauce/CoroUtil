@@ -254,6 +254,6 @@ public class Vec3
     }
     
     public net.minecraft.util.Vec3 toMCVec() {
-    	return net.minecraft.util.Vec3.createVectorHelper(this.xCoord, this.yCoord, this.zCoord);
+    	return new net.minecraft.util.Vec3(this.xCoord, this.yCoord, this.zCoord);
     }
 }

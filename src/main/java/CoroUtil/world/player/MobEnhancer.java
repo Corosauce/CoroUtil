@@ -1,10 +1,9 @@
 package CoroUtil.world.player;
 
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityZombie;
-import CoroUtil.util.BlockCoord;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class MobEnhancer {
 

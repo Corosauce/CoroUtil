@@ -9,15 +9,14 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public class CoroUtilPath {
 
-	public static PathEntity getSingleNodePath(ChunkCoordinates coords) {
+	public static PathEntity getSingleNodePath(BlockCoord coords) {
 		PathPoint points[] = new PathPoint[1];
         points[0] = new PathPoint(coords.posX, coords.posY, coords.posZ);
 		PathEntity pe = new PathEntity(points);
@@ -25,7 +24,7 @@ public class CoroUtilPath {
 	}
 	
 	public static boolean tryMoveToEntityLivingLongDist(EntityCreature entSource, Entity entityTo, double moveSpeedAmp) {
-		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.boundingBox.minY, entityTo.posZ, moveSpeedAmp);
+		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
 	}
 	
 	public static boolean tryMoveToXYZLongDist(EntityCreature ent, double x, double y, double z, double moveSpeedAmp) {
@@ -71,25 +70,25 @@ public class CoroUtilPath {
 		        int gatherY = (int)center.posY;//Math.floor(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
 		        int gatherZ = (int)Math.floor(center.posZ + ((double)(Math.cos((rotationYaw+randLook) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
 		        
-		        Block block = world.getBlock(gatherX, gatherY, gatherZ);
+		        Block block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
 		        int tries = 0;
 		        if (!CoroUtilBlock.isAir(block)) {
 		        	int offset = -5;
 			        
 			        while (tries < 30) {
-			        	if (CoroUtilBlock.isAir(block) || !block.isSideSolid(world, gatherX, gatherY, gatherZ, ForgeDirection.UP)) {
+			        	if (CoroUtilBlock.isAir(block) || !block.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
 			        		break;
 			        	}
 			        	gatherY += offset++;
-			        	block = world.getBlock(gatherX, gatherY, gatherZ);
+			        	block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
 			        	tries++;
 			        }
 		        } else {
 		        	//int offset = 0;
 		        	while (tries < 30) {
-		        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(world, gatherX, gatherY, gatherZ, ForgeDirection.UP)) break;
+		        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) break;
 		        		gatherY -= 1;//offset++;
-		        		block = world.getBlock(gatherX, gatherY, gatherZ);
+		        		block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
 			        	tries++;
 		        	}
 		        }

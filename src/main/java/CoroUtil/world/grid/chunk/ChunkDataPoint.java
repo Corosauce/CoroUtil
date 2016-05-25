@@ -192,7 +192,7 @@ public class ChunkDataPoint
     	
     	
     	NBTTagCompound nbtDPSs = nbt.getCompoundTag("listDPSAveragesLongTerm");
-    	it = nbtDPSs.func_150296_c().iterator();
+    	it = nbtDPSs.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
     		

@@ -19,19 +19,20 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 import CoroUtil.ChunkCoordinatesSize;
-import CoroUtil.DimensionChunkCache;
-import CoroUtil.IChunkLoader;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
+import CoroUtil.util.DimensionChunkCacheNew;
+import CoroUtil.util.Vector3f;
+import CoroUtil.config.ConfigCoroAI;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -84,7 +85,7 @@ public class PFQueue implements Runnable {
     public static int pfDelayScale = 5;
     public static int pfDelayMax = 500;
     
-    //public static boolean debug = true;
+    public static boolean debug = true;
     
     /*private static class PFQueueItem {
     	public int x;
