@@ -9,6 +9,7 @@ import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOre;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.monster.EntityZombie;
@@ -16,6 +17,8 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -24,6 +27,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.config.ConfigDynamicDifficulty;
@@ -32,7 +36,6 @@ import CoroUtil.util.BlockCoord;
 import CoroUtil.util.UtilPlayer;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 
 public class DynamicDifficulty {
 	
@@ -102,16 +105,17 @@ public class DynamicDifficulty {
     				if (dbg) System.out.println("3");
     				Block block = null;
     				int pX = MathHelper.floor_double(player.posX);
-    				int pY = MathHelper.floor_double(player.boundingBox.minY);
+    				int pY = MathHelper.floor_double(player.getEntityBoundingBox().minY);
     				int pZ = MathHelper.floor_double(player.posZ);
     				boolean foundWall = false;
     				for (int x = -1; !foundWall && x <= 1; x++) {
     					for (int z = -1; !foundWall && z <= 1; z++) {
     						for (int y = -1; !foundWall && y <= 1; y++) {
-    							block = world.getBlock(pX+x, pY+y, pZ+z);
+    							IBlockState state = world.getBlockState(new BlockPos(pX+x, pY+y, pZ+z));
+    							block = state.getBlock();
     							if (block != Blocks.air) {
-    								List<Object> list = new ArrayList<Object>();
-    								block.addCollisionBoxesToList(world, pX+x, pY+y, pZ+z, player.boundingBox, list, player);
+    								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
+    								block.addCollisionBoxesToList(world, new BlockPos(pX+x, pY+y, pZ+z), state, player.getEntityBoundingBox(), list, player);
     								if (list.size() > 0) {
     									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
         								foundWall = true;
@@ -226,8 +230,8 @@ public class DynamicDifficulty {
 	
 	public static float getDifficultyScaleForDistFromSpawn(EntityPlayer player) {
 		
-		float distX = (float) (player.worldObj.getSpawnPoint().posX - player.posX);
-		float distZ = (float) (player.worldObj.getSpawnPoint().posZ - player.posZ);
+		float distX = (float) (player.worldObj.getSpawnPoint().getX() - player.posX);
+		float distZ = (float) (player.worldObj.getSpawnPoint().getZ() - player.posZ);
 		
 		float dist = (float) Math.sqrt(distX * distX + distZ * distZ);
 		
@@ -270,14 +274,12 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				if (world.checkChunksExist(checkPos.posX, checkPos.posY, checkPos.posZ, checkPos.posX, checkPos.posY, checkPos.posZ)) {
-					Chunk chunk = world.getChunkFromBlockCoords(checkPos.posX, checkPos.posZ);
-					if (chunk != null) {
-						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
-						
-						if (cdp.averageDPS > bestDPS) {
-							bestDPS = cdp.averageDPS;
-						}
+				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+				if (chunk != null && chunk.isLoaded()) {
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
+					
+					if (cdp.averageDPS > bestDPS) {
+						bestDPS = cdp.averageDPS;
 					}
 				}
 			}
@@ -320,10 +322,10 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				if (world.checkChunksExist(checkPos.posX, checkPos.posY, checkPos.posZ, checkPos.posX, checkPos.posY, checkPos.posZ)) {
-					Chunk chunk = world.getChunkFromBlockCoords(checkPos.posX, checkPos.posZ);
+				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+				if (chunk.isLoaded()) {
 					if (chunk != null) {
-						totalTime += chunk.inhabitedTime;
+						totalTime += chunk.getInhabitedTime();
 						count++;
 					}
 				}
@@ -381,12 +383,12 @@ public class DynamicDifficulty {
 			if (event.world.playerEntities.contains(event.harvester)) {
 				
 				NBTTagCompound nbt = event.harvester.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(event.harvester));
-				if (event.block instanceof BlockOre) {
+				if (event.state != null && event.state.getBlock() instanceof BlockOre) {
 					int curVal = nbt.getInteger(dataPlayerHarvestOre);
 					curVal++;
 					nbt.setInteger(dataPlayerHarvestOre, curVal);
 					//System.out.println("increment!");
-				} else if (event.block instanceof BlockLog) {
+				} else if (event.state != null && event.state.getBlock() instanceof BlockLog) {
 					int curVal = nbt.getInteger(dataPlayerHarvestLog);
 					curVal++;
 					nbt.setInteger(dataPlayerHarvestLog, curVal);
@@ -395,7 +397,7 @@ public class DynamicDifficulty {
 				/*float curVal = nbt.getFloat(dataPlayerHarvestRating);
 				curVal += getBlockImportanceValue(event.block);
 				nbt.setFloat(dataPlayerHarvestRating, curVal);*/
-				increaseInvadeRating(event.harvester, getBlockImportanceValue(event.block));
+				increaseInvadeRating(event.harvester, getBlockImportanceValue(event.state.getBlock()));
 				
 				//System.out.println("harvested block for " + event.harvester.username + " - " + event.block);
 			}
@@ -459,7 +461,7 @@ public class DynamicDifficulty {
 			} else {
 				return defaultIron;
 			}
-		} else if (OreDictionary.getOres(Block.blockRegistry.getNameForObject(block)).size() > 0) {
+		} else if (OreDictionary.getOres(Block.blockRegistry.getNameForObject(block).toString()).size() > 0) {
 			return defaultIron;
 		} else {
 			return 0;
