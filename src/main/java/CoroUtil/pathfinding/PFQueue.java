@@ -17,22 +17,21 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IntHashMap;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import CoroUtil.ChunkCoordinatesSize;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.IAdvPF;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.DimensionChunkCacheNew;
-import CoroUtil.util.Vector3f;
-import CoroUtil.config.ConfigCoroAI;
 
 //import org.lwjgl.opengl.GL11;
 
@@ -846,7 +845,7 @@ public class PFQueue implements Runnable {
     	}
     }
     
-    public PathEntity convertToPathEntity(PathEntityEx pathEx) {
+    public Path convertToPathEntity(PathEntityEx pathEx) {
     	
     	if (pathEx != null) {
 	    	PathPoint points[] = new PathPoint[pathEx.pathLength];
@@ -856,7 +855,7 @@ public class PFQueue implements Runnable {
 	    		
 	    		points[i] = new PathPoint(pathEx.points[i].xCoord, y, pathEx.points[i].zCoord);
 	    	}
-	    	return new PathEntity(points);
+	    	return new Path(points);
     	}
     	return null;
     }
@@ -1508,7 +1507,7 @@ public class PFQueue implements Runnable {
                             }
                             
                             //note, vanilla Pathfinder uses different values for this now, might cause issues alternating between 2 pathfinders...
-                            if(var11 == Material.water) {
+                            if(var11 == Material.WATER) {
                             	if (parJob.useSwimPathfinding) {
                             		return 1;
                             	} else {
@@ -1870,15 +1869,15 @@ public class PFQueue implements Runnable {
     }
     
     public static boolean isFenceLike(Block block) {
-    	return block instanceof BlockFence || block == Blocks.cobblestone_wall;
+    	return block instanceof BlockFence || block == Blocks.COBBLESTONE_WALL;
     }
     
     public static boolean isPressurePlate(Block block) {
-    	return block == Blocks.light_weighted_pressure_plate || block == Blocks.heavy_weighted_pressure_plate || block == Blocks.stone_pressure_plate || block == Blocks.wooden_pressure_plate;
+    	return block == Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE || block == Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE || block == Blocks.STONE_PRESSURE_PLATE || block == Blocks.WOODEN_PRESSURE_PLATE;
     }
     
     //in 1.6.4 PFQueue, BlockFlowing was considered a -2 return..... it was probably an attempt to stop mobs from pathing into flowing water that stops their pathing progress, lets remove it for now
     public static boolean isNotPathable(Block block) {
-    	return block == Blocks.enchanting_table/* || block == Blocks.flowing_water*/;
+    	return block == Blocks.ENCHANTING_TABLE/* || block == Blocks.flowing_water*/;
     }
 }

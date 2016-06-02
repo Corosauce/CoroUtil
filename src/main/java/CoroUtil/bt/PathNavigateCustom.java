@@ -7,15 +7,16 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.init.Blocks;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.pathfinding.WalkNodeProcessor;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
-import net.minecraft.world.pathfinder.WalkNodeProcessor;
+import CoroUtil.util.Vec3;
 
 public class PathNavigateCustom
 {
@@ -23,7 +24,7 @@ public class PathNavigateCustom
     private World worldObj;
 
     /** The PathEntity being followed. */
-    private PathEntity currentPath;
+    private Path currentPath;
     private double speed;
 
     /**
@@ -152,13 +153,13 @@ public class PathNavigateCustom
     /**
      * Returns the path to the given coordinates
      */
-    public PathEntity getPathToXYZ(double x, double y, double z)
+    public Path getPathToXYZ(double x, double y, double z)
     {
     	return this.getPathToPos(new BlockPos(MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z)));
         //return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     }
     
-    public PathEntity getPathToPos(BlockPos pos)
+    public Path getPathToPos(BlockPos pos)
     {
         if (!this.canNavigate())
         {
@@ -171,7 +172,7 @@ public class PathNavigateCustom
             BlockPos blockpos = new BlockPos(this.theEntity);
             int i = (int)(f + 8.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
-            PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
+            Path pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
             this.worldObj.theProfiler.endSection();
             return pathentity;
         }
@@ -182,14 +183,14 @@ public class PathNavigateCustom
      */
     public boolean tryMoveToXYZ(double par1, double par3, double par5, double par7)
     {
-        PathEntity pathentity = this.getPathToXYZ((double)MathHelper.floor_double(par1), (double)((int)par3), (double)MathHelper.floor_double(par5));
+    	Path pathentity = this.getPathToXYZ((double)MathHelper.floor_double(par1), (double)((int)par3), (double)MathHelper.floor_double(par5));
         return this.setPath(pathentity, par7);
     }
 
     /**
      * Returns the path to the given EntityLiving
      */
-    public PathEntity getPathToEntityLiving(Entity par1Entity)
+    public Path getPathToEntityLiving(Entity par1Entity)
     {
         //return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     	
@@ -204,7 +205,7 @@ public class PathNavigateCustom
             BlockPos blockpos = (new BlockPos(this.theEntity)).up();
             int i = (int)(f + 16.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
-            PathEntity pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
+            Path pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
             this.worldObj.theProfiler.endSection();
             return pathentity;
         }
@@ -215,7 +216,7 @@ public class PathNavigateCustom
      */
     public boolean tryMoveToEntityLiving(Entity par1Entity, double par2)
     {
-        PathEntity pathentity = this.getPathToEntityLiving(par1Entity);
+    	Path pathentity = this.getPathToEntityLiving(par1Entity);
         return pathentity != null ? this.setPath(pathentity, par2) : false;
     }
 
@@ -223,7 +224,7 @@ public class PathNavigateCustom
      * sets the active path data if path is 100% unique compared to old path, checks to adjust path for sun avoiding
      * ents and stores end coords
      */
-    public boolean setPath(PathEntity par1PathEntity, double par2)
+    public boolean setPath(Path par1PathEntity, double par2)
     {
         if (par1PathEntity == null)
         {
@@ -260,7 +261,7 @@ public class PathNavigateCustom
     /**
      * gets the actively used PathEntity
      */
-    public PathEntity getPath()
+    public Path getPath()
     {
         return this.currentPath;
     }
@@ -280,7 +281,7 @@ public class PathNavigateCustom
 
             if (!this.noPath())
             {
-                Vec3 vec3 = this.currentPath.getPosition(this.theEntity);
+                Vec3d vec3 = this.currentPath.getPosition(this.theEntity);
 
                 if (vec3 != null)
                 {
@@ -310,7 +311,7 @@ public class PathNavigateCustom
         	Block block = this.theEntity.worldObj.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
         	//System.out.println("block type for next node: " + block);
         	
-        	if (block.getMaterial() == Material.water || block.getMaterial() == Material.lava) {
+        	if (block.getMaterial() == Material.WATER || block.getMaterial() == Material.lava) {
         		//System.out.println("adjusting water based node pos");
         		adjY = 1;
         	}
@@ -412,7 +413,7 @@ public class PathNavigateCustom
 
             do
             {
-            	if (block != Blocks.flowing_water && block != Blocks.water)
+            	if (block != Blocks.flowing_water && block != Blocks.WATER)
                 {
                     return i;
                 }
@@ -583,7 +584,7 @@ public class PathNavigateCustom
                             return false;
                         }
 
-                        if (material == Material.water && !this.theEntity.isInWater())
+                        if (material == Material.WATER && !this.theEntity.isInWater())
                         {
                             return false;
                         }

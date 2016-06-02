@@ -1,19 +1,11 @@
 package CoroUtil.bt.nodes;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
-import CoroUtil.util.CoroUtilBlock;
 
 public class SelectorMoveToPathClose extends Selector {
 

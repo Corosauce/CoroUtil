@@ -3,7 +3,6 @@ package CoroUtil.bt.nodes;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.Vec3;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -11,6 +10,7 @@ import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.util.BlockCoord;
+import CoroUtil.util.Vec3;
 
 public class Wander extends Selector {
 

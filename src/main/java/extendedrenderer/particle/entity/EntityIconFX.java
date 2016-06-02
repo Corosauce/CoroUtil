@@ -1,8 +1,6 @@
 package extendedrenderer.particle.entity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
@@ -26,12 +24,12 @@ public class EntityIconFX extends EntityRotFX
     public EntityIconFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, TextureAtlasSprite par14Item)
     {
         this(par1World, par2, par4, par6, par14Item);
-        this.motionX *= 0.10000000149011612D;
-        this.motionY *= 0.10000000149011612D;
-        this.motionZ *= 0.10000000149011612D;
-        this.motionX += par8;
-        this.motionY += par10;
-        this.motionZ += par12;
+        this.setMotionX(this.getMotionX() * 0.10000000149011612D);
+        this.setMotionY(this.getMotionY() * 0.10000000149011612D);
+        this.setMotionZ(this.getMotionZ() * 0.10000000149011612D);
+        this.setMotionX(this.getMotionX() + par8);
+        this.setMotionY(this.getMotionY() + par10);
+        this.setMotionZ(this.getMotionZ() + par12);
     }
 
     public int getFXLayer()
@@ -55,9 +53,9 @@ public class EntityIconFX extends EntityRotFX
             f9 = particleIcon.getMaxV();
         }
 
-        float f11 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
-        float f12 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
-        float f13 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+        float f11 = (float)(this.getPrevPosX() + (this.getPosX() - this.getPrevPosX()) * (double)partialTicks - interpPosX);
+        float f12 = (float)(this.getPrevPosY() + (this.getPosY() - this.getPrevPosY()) * (double)partialTicks - interpPosY);
+        float f13 = (float)(this.getPrevPosZ() + (this.getPosZ() - this.getPrevPosZ()) * (double)partialTicks - interpPosZ);
         
         Minecraft mc = Minecraft.getMinecraft();
         float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(partialTicks) * 0.01F)) * mc.theWorld.getSunBrightness(1F);

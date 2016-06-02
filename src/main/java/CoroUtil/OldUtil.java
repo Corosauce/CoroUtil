@@ -15,16 +15,15 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.FoodStats;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.pathfinding.PathEntityEx;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
+import CoroUtil.util.Vec3;
 
 public class OldUtil {
 	

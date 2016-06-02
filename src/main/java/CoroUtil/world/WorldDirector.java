@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
@@ -17,8 +15,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.config.ConfigCoroAI;
@@ -103,7 +101,7 @@ public class WorldDirector implements Runnable {
 	
 	//required for reading in, etc
 	public void initData(String parModID, World parWorld) {
-		dimID = parWorld.provider.getDimensionId();
+		dimID = parWorld.provider.getDimension();
 		modID = parModID;
 		
 		if (useThreading) {
@@ -258,9 +256,9 @@ public class WorldDirector implements Runnable {
 	public boolean isLogOrLeafBlock(Block id) {
 		Block block = id;
 		if (block == null) return false;
-		if (block.getMaterial() == Material.leaves) return true;
-		if (block.getMaterial() == Material.plants) return true;
-		if (block.getMaterial() == Material.wood) return true;
+		if (block.getMaterial() == Material.LEAVES) return true;
+		if (block.getMaterial() == Material.PLANTS) return true;
+		if (block.getMaterial() == Material.WOOD) return true;
 		return false;
 	}
 	

@@ -2,12 +2,12 @@ package CoroUtil.bt.actions;
 
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.leaf.LeafAction;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.util.BlockCoord;
+import CoroUtil.util.Vec3;
 
 public class ActionMoveToCoords extends LeafAction {
 

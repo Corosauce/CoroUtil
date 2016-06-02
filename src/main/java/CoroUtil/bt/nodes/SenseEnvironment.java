@@ -4,11 +4,11 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.leaf.LeafAction;
+import CoroUtil.util.Vec3;
 
 public class SenseEnvironment extends LeafAction {
 

@@ -3,18 +3,16 @@ package CoroUtil.entity;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.MovingObjectPosition.MovingObjectType;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -239,7 +237,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
         Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
+        RayTraceResult movingobjectposition = this.worldObj.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
         vec3 = new Vec3(this.posX, this.posY, this.posZ);
         vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -250,7 +248,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         if (!this.worldObj.isRemote)
         {
-        	MovingObjectPosition temp = tickEntityCollision(vec3, vec31);
+        	RayTraceResult temp = tickEntityCollision(vec3, vec31);
         	if (temp != null) movingobjectposition = temp;
         }
 
@@ -411,7 +409,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         return p_70663_1_ + f3;
     }
     
-    public MovingObjectPosition tickEntityCollision(Vec3 vec3, Vec3 vec31) {
+    public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
         List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
@@ -425,7 +423,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             {
                 float f = 0.3F;
                 AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
-                MovingObjectPosition movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
+                RayTraceResult movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
 
                 if (movingobjectposition1 != null)
                 {
@@ -442,7 +440,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         if (entity != null)
         {
-            return new MovingObjectPosition(entity);
+            return new RayTraceResult(entity);
         }
         return null;
     }
@@ -458,7 +456,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     /**
      * Called when this EntityThrowable hits a block or entity.
      */
-    protected void onImpact(MovingObjectPosition movingobjectposition) {
+    protected void onImpact(RayTraceResult movingobjectposition) {
     	setDead();
     }
 

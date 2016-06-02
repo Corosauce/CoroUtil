@@ -2,12 +2,12 @@ package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.util.Vec3;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import CoroUtil.util.Vec3;
 
 public class Flee extends Selector {
 

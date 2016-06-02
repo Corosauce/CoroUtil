@@ -32,7 +32,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 		particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
 		particle.setScale(0.1F + rand.nextFloat() * 0.9F);
-		particle.spawnY = (float) particle.posY;
+		particle.spawnY = (float) particle.getPosY();
 		particle.noClip = true;
 		//entityfx.spawnAsWeatherEffect();
 		
@@ -49,9 +49,9 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			double centerY = coordSource.yCoord + 0.0D;
 			double centerZ = coordSource.zCoord + 0.0D;
 			
-			double vecX = centerX - particle.posX;
-			double vecY = centerY - particle.posY;
-			double vecZ = centerZ - particle.posZ;
+			double vecX = centerX - particle.getPosX();
+			double vecY = centerY - particle.getPosY();
+			double vecZ = centerZ - particle.getPosZ();
 			Vec3 vec = new Vec3(vecX, vecY, vecZ);
 			
 			double radius = 1.6D;
@@ -88,9 +88,9 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			
 			double randRange = 0.01D;
 			
-			particle.motionX += rand.nextDouble() * randRange - randRange/2;
-			particle.motionY += rand.nextDouble() * randRange - randRange/2;
-			particle.motionZ += rand.nextDouble() * randRange - randRange/2;
+			particle.setMotionX(particle.getMotionX() + (rand.nextDouble() * randRange - randRange/2));
+			particle.setMotionY(particle.getMotionY() + (rand.nextDouble() * randRange - randRange/2));
+			particle.setMotionZ(particle.getMotionZ() + (rand.nextDouble() * randRange - randRange/2));
 			
 			double rotYaw = (float)(Math.atan2(vecZ, vecX) * 180.0D / Math.PI);
 			double rotPitch = (float)(Math.atan2(vecY, vecX) * 180.0D / Math.PI);

@@ -6,8 +6,6 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTSizeTracker;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
@@ -50,7 +48,7 @@ public class PacketHelper {
 
 	public static void writeTEntToPacket(TileEntity tEnt, NBTTagCompound nbt) {
 		try {
-			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimension());
 			nbt.setInteger("x", tEnt.getPos().getX());
 			nbt.setInteger("y", tEnt.getPos().getY());
 			nbt.setInteger("z", tEnt.getPos().getZ());
@@ -150,7 +148,7 @@ public class PacketHelper {
         try
         {
         	nbtSendData.setString("command", "CoroAI_TEntCmd");
-        	nbtSendData.setInteger("dimID", tEnt.getWorld().provider.getDimensionId());
+        	nbtSendData.setInteger("dimID", tEnt.getWorld().provider.getDimension());
         	nbtSendData.setInteger("x", tEnt.getPos().getX());
         	nbtSendData.setInteger("y", tEnt.getPos().getY());
         	nbtSendData.setInteger("z", tEnt.getPos().getZ());

@@ -14,11 +14,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.AIAgent;
@@ -31,6 +30,7 @@ import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilInventory;
 import CoroUtil.util.CoroUtilItem;
+import CoroUtil.util.Vec3;
 
 public class JobBase {
 	
@@ -153,7 +153,7 @@ public class JobBase {
 	
 	public void onLowHealth() {
 		if (hitAndRunDelay > 0) hitAndRunDelay--;
-		PathEntity pe = ent.getNavigator().getPath();
+		Path pe = ent.getNavigator().getPath();
 		
 		if (pe != null && !pe.isFinished()) {
 			
@@ -241,7 +241,7 @@ public class JobBase {
 	                	}*/
 	                } else if (var5 instanceof EntityXPOrb) {
 	                	if (ent.canEntityBeSeen(var5)) {
-	                		if (!var5.isInsideOfMaterial(Material.water)) {
+	                		if (!var5.isInsideOfMaterial(Material.WATER)) {
 	                			//targetItem(var5);
 	                			PFQueue.getPath(ent, var5, itemSearchRange+2F);
 	                		}
@@ -347,7 +347,7 @@ public class JobBase {
             	}
             }
         }
-        PathEntity path = ent.getNavigator().getPath();
+        Path path = ent.getNavigator().getPath();
         //System.out.println("koa " + ent.name + " health: " + ent.getHealth());
         if (clEnt != null) {
         	if (clEnt != ai.lastFleeEnt || (ent.getNavigator().noPath())) {
@@ -451,7 +451,7 @@ public class JobBase {
 			tryX = ((int)ent.posX) + ai.rand.nextInt(scanSize)-scanSize/2;
 			i = tryY + ai.rand.nextInt(scanSizeY)-scanSizeY/2;
 			tryZ = ((int)ent.posZ) + ai.rand.nextInt(scanSize)-scanSize/2;
-			if (ent.worldObj.getBlockState(new BlockPos(tryX, i, tryZ)).getBlock().getMaterial() == Material.water) {
+			if (ent.worldObj.getBlockState(new BlockPos(tryX, i, tryZ)).getBlock().getMaterial() == Material.WATER) {
 				//System.out.println("found water");
 				
 				int newY = i;
@@ -496,7 +496,7 @@ public class JobBase {
 		//System.out.println(this.worldObj.getBlockId(tryX, tryY, tryZ));
 		for (int i = tryY; i > tryY - 10; i--) {
 			Block block = ent.worldObj.getBlockState(new BlockPos(tryX, i, tryZ)).getBlock();
-			if (!CoroUtilBlock.isAir(block) && block.getMaterial() != Material.water) {
+			if (!CoroUtilBlock.isAir(block) && block.getMaterial() != Material.WATER) {
 				//System.out.println("found water");
 				
 				PFQueue.getPath(ent, tryX, tryY, tryZ, scanSize/2+6);
@@ -715,7 +715,7 @@ public class JobBase {
 		} else {
 			ticksBeforeFormationRetry = 60;
 			if (vec != null) {
-				ent.getNavigator().clearPathEntity();
+				ent.getNavigator().clearPath();
 				if (ent.getNavigator().noPath() || ent.worldObj.getWorldTime() % 10 == 0) {
 					PFQueue.getPath(ent, (int)vec.xCoord, (int)vec.yCoord, (int)vec.zCoord, ai.maxPFRange);
 				}
@@ -783,7 +783,7 @@ public class JobBase {
 		double dist = ent.getDistanceToEntity(ai.entityToAttack);
 		if (dist <= 3D || isMovementSafe()) {
 			
-			//ent.getNavigator().clearPathEntity();
+			//ent.getNavigator().clearPath();
 			if (dist > 1D) {
 				ent.getMoveHelper().setMoveTo(ai.entityToAttack.posX + vecX, ai.entityToAttack.posY, ai.entityToAttack.posZ + vecZ, speed);
 			} else {
@@ -940,14 +940,14 @@ public class JobBase {
 				
 				Block lookAheadIDDrop0 = ent.worldObj.getBlockState(new BlockPos(xx, yy, zz)).getBlock();
 				
-				if (lookAheadIDDrop0.getMaterial() == Material.water) return true;
+				if (lookAheadIDDrop0.getMaterial() == Material.WATER) return true;
 				
 				if (CoroUtilBlock.isAir(lookAheadIDDrop0)) {
 					int scanDownY = yy - 1;
 					for (int tries = 0; tries < 8; tries++) {
 						Block tryID = ent.worldObj.getBlockState(new BlockPos(xx, scanDownY--, zz)).getBlock();
 						if (!CoroUtilBlock.isAir(tryID)) {
-							if (tryID.getMaterial() == Material.water) {
+							if (tryID.getMaterial() == Material.WATER) {
 								return true;
 							} else {
 								return false;
@@ -967,9 +967,9 @@ public class JobBase {
 	
 	// Job shared functions //
 	
-	public void setPathToEntity(PathEntity pathentity)
+	public void setPathToEntity(Path Path)
     {
-		entInt.getAIAgent().setPathToEntityForce(pathentity);
+		entInt.getAIAgent().setPathToEntityForce(Path);
     }
 	
 	public boolean isEnemy(Entity ent) {

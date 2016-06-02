@@ -79,7 +79,7 @@ public class ActiveQuest {
 	}
 	
 	public boolean isPlayerInOriginalDimension() {
-		return dimIDCreatedIn == playerQuests.getWorld().provider.getDimensionId();
+		return dimIDCreatedIn == playerQuests.getWorld().provider.getDimension();
 	}
 	
 	public boolean isComplete() {

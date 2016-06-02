@@ -32,7 +32,7 @@ public class ParticleBehaviorCharge extends ParticleBehaviors {
 		particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
 		particle.setScale(0.1F + rand.nextFloat() * 0.5F);
-		particle.spawnY = (float) particle.posY;
+		particle.spawnY = (float) particle.getPosY();
 		particle.noClip = true;
 		//entityfx.spawnAsWeatherEffect();
 		
@@ -52,13 +52,13 @@ public class ParticleBehaviorCharge extends ParticleBehaviors {
 				double centerY = coordSource.yCoord + 0.5D;
 				double centerZ = coordSource.zCoord + 0.0D;
 				
-				double vecX = centerX - particle.posX;
-				double vecZ = centerZ - particle.posZ;
+				double vecX = centerX - particle.getPosX();
+				double vecZ = centerZ - particle.getPosZ();
 				double rotYaw = (float)(Math.atan2(vecZ, vecX) * 180.0D / Math.PI);
 				rotYaw -= 75D;// + (15D * curTickCharge / ticksToCharge);
 				double speed = 0.01D + (0.50D * curTick / ticksMax);
-				particle.motionX = Math.cos(rotYaw * 0.017453D) * speed;
-				particle.motionZ = Math.sin(rotYaw * 0.017453D) * speed;
+				particle.setMotionX(Math.cos(rotYaw * 0.017453D) * speed);
+				particle.setMotionZ(Math.sin(rotYaw * 0.017453D) * speed);
 				int cycle = 60;
 				
 				if (/*curTickCharge > 100 && */curTick + 20 < ticksMax) {
@@ -68,7 +68,7 @@ public class ParticleBehaviorCharge extends ParticleBehaviors {
 						particle.setGravity(0.09F);
 					}
 				} else {
-					if (particle.posY > (double)coordSource.yCoord + 1D) {
+					if (particle.getPosY() > (double)coordSource.yCoord + 1D) {
 						particle.setGravity(0.15F);
 					} else {
 						particle.setGravity(-0.15F);

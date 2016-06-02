@@ -8,8 +8,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIArrowAttack;
-import net.minecraft.entity.ai.EntityAIAttackOnCollide;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks;
@@ -137,7 +135,7 @@ public class Behaviors {
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {
-		           if(var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.wheat) {
+		           if(var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.WHEAT) {
 		        	  found = true;
 		              setTarget(me, var5);
 		              
@@ -153,7 +151,7 @@ public class Behaviors {
         		Entity target = (Entity)getData(me, DataTypes.followTarg);
         		if (target instanceof EntityPlayer) {
         			EntityPlayer var5 = (EntityPlayer)target;
- 	           		if(var5.getCurrentEquippedItem() == null || (var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.wheat)) {
+ 	           		if(var5.getCurrentEquippedItem() == null || (var5.getCurrentEquippedItem() != null && var5.getCurrentEquippedItem().getItem() == Items.WHEAT)) {
  	           			setTarget(me, null);
  	           		}
         		}

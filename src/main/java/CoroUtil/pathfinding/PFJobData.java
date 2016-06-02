@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 import CoroUtil.ChunkCoordinatesSize;
 import CoroUtil.util.BlockCoord;
 
@@ -51,7 +51,7 @@ public class PFJobData {
 	}
 	
 	public PFJobData(Entity parEnt, int x, int y, int z, float var2) {
-		source = new ChunkCoordinatesSize(MathHelper.floor_double(parEnt.posX), MathHelper.floor_double(parEnt.posY), MathHelper.floor_double(parEnt.posZ), parEnt.worldObj.provider.getDimensionId(), parEnt.width, parEnt.height);
+		source = new ChunkCoordinatesSize(MathHelper.floor_double(parEnt.posX), MathHelper.floor_double(parEnt.posY), MathHelper.floor_double(parEnt.posZ), parEnt.worldObj.provider.getDimension(), parEnt.width, parEnt.height);
 		sourceEntity = parEnt;
 		dest = new BlockCoord(x, y, z);
 		distMax = var2;

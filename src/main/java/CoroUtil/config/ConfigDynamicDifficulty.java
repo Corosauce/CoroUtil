@@ -1,7 +1,5 @@
 package CoroUtil.config;
 
-import java.util.Arrays;
-
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 

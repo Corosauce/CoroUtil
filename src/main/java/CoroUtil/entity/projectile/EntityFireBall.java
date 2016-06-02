@@ -6,8 +6,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -97,8 +97,8 @@ public class EntityFireBall extends EntityProjectileBase
 	}
 	
 	@Override
-	public MovingObjectPosition tickEntityCollision(Vec3 vec3, Vec3 vec31) {
-		MovingObjectPosition movingobjectposition = null;
+	public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
+		RayTraceResult movingobjectposition = null;
 		
         Entity entity = null;
         List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
@@ -118,7 +118,7 @@ public class EntityFireBall extends EntityProjectileBase
 
         if (entity != null)
         {
-            movingobjectposition = new MovingObjectPosition(entity);
+            movingobjectposition = new RayTraceResult(entity);
             /*if (movingobjectposition != null) {
             	this.onImpact(movingobjectposition);
             	setDead();
@@ -128,7 +128,7 @@ public class EntityFireBall extends EntityProjectileBase
 	}
 
 	@Override
-	protected void onImpact(MovingObjectPosition movingobjectposition)
+	protected void onImpact(RayTraceResult movingobjectposition)
 	{
 		
 		try {

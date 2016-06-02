@@ -3,11 +3,8 @@ package extendedrenderer.particle.entity;
 import java.awt.Color;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
@@ -26,9 +23,9 @@ public class EntityTexFX extends EntityRotFX
     {
         super(var1, var2, var4, var6, var8, var10, var12);
         textureID = texID;
-        this.motionX = var8 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
-        this.motionY = var10 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
-        this.motionZ = var12 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
+        this.setMotionX(var8 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
+        this.setMotionY(var10 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
+        this.setMotionZ(var12 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
         //Color IDS
         //0 = black/regular/default
         //1 = dirt
@@ -146,9 +143,9 @@ public class EntityTexFX extends EntityRotFX
         //f8 = 0;
         //f9 = 1F;
         
-        float f11 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
-        float f12 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
-        float f13 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+        float f11 = (float)(this.getPrevPosX() + (this.getPosX() - this.getPrevPosX()) * (double)partialTicks - interpPosX);
+        float f12 = (float)(this.getPrevPosY() + (this.getPosY() - this.getPrevPosY()) * (double)partialTicks - interpPosY);
+        float f13 = (float)(this.getPrevPosZ() + (this.getPosZ() - this.getPrevPosZ()) * (double)partialTicks - interpPosZ);
         
         Minecraft mc = Minecraft.getMinecraft();
         float br = ((0.9F + (mc.gameSettings.gammaSetting * 0.1F)) - (mc.theWorld.calculateSkylightSubtracted(partialTicks) * 0.01F)) * mc.theWorld.getSunBrightness(1F);
@@ -189,16 +186,16 @@ public class EntityTexFX extends EntityRotFX
     @Override
     public void onUpdate()
     {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
+        this.setPrevPosX(this.getPosX());
+        this.setPrevPosY(this.getPosY());
+        this.setPrevPosZ(this.getPosZ());
 
         if (this.particleAge++ >= this.particleMaxAge)
         {
             this.setDead();
         }
 
-        if (this.motionX > 0.01F && this.motionZ > 0.01F)
+        if (this.getMotionX() > 0.01F && this.getMotionZ() > 0.01F)
         {
             this.rotationPitch += this.rand.nextInt(6) - 3;
         }
@@ -207,13 +204,13 @@ public class EntityTexFX extends EntityRotFX
         //this.particleTextureIndex = 7 - this.particleAge * 8 / this.particleMaxAge;
         setParticleTextureIndex(textureID);//mod_EntMover.effWindID;
         //this.motionY += 0.0040D;
-        this.motionY -= (0.04D * this.rand.nextFloat()) * (double)this.particleGravity;
+        this.setMotionY(this.getMotionY() - (0.04D * this.rand.nextFloat()) * (double)this.particleGravity);
         //this.motionY -= 0.05000000074505806D;
         float var20 = 1F - (0.08F * this.rand.nextFloat());
-        this.motionX *= (double)var20;
-        this.motionY *= (double)var20;
-        this.motionZ *= (double)var20;
-        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+        this.setMotionX(this.getMotionX() * (double)var20);
+        this.setMotionY(this.getMotionY() * (double)var20);
+        this.setMotionZ(this.getMotionZ() * (double)var20);
+        this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
         /*this.motionX *= 0.8999999761581421D;
         this.motionY *= 0.8999999761581421D;
         this.motionZ *= 0.8999999761581421D;

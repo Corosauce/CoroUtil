@@ -60,7 +60,7 @@ public class WorldDirectorManager {
 	}
 	
 	public WorldDirector getWorldDirector(String parModID, World world) {
-		int dimID = world.provider.getDimensionId();
+		int dimID = world.provider.getDimension();
 		if (lookupWorldDirectors.containsKey(parModID)) {
 			HashMap<Integer, WorldDirector> lookup = lookupWorldDirectors.get(parModID);
 			if (lookup.containsKey(dimID)) {
@@ -88,7 +88,7 @@ public class WorldDirectorManager {
 	
 	/* registers and attempts to read in any data for it */
 	public void registerWorldDirector(WorldDirector worldDirector, String parModID, World world) {
-		int dimID = world.provider.getDimensionId();
+		int dimID = world.provider.getDimension();
 		HashMap<Integer, WorldDirector> lookup = lookupWorldDirectors.get(parModID);
 		if (lookup == null) {
 			lookup = new HashMap<Integer, WorldDirector>();
@@ -131,12 +131,12 @@ public class WorldDirectorManager {
 	}
 	
 	public BlockDataGrid getBlockDataGrid(World world) {
-		if (lookupGridsBlockData.containsKey(world.provider.getDimensionId())) {
-			return lookupGridsBlockData.get(world.provider.getDimensionId());
+		if (lookupGridsBlockData.containsKey(world.provider.getDimension())) {
+			return lookupGridsBlockData.get(world.provider.getDimension());
 		} else {
 			BlockDataGrid grid = new BlockDataGrid(world);
 			grid.readFromFile();
-			addGridBlockData(world.provider.getDimensionId(), grid);
+			addGridBlockData(world.provider.getDimension(), grid);
 			return grid;
 		}
 		/*if (blockDataGrid == null && DimensionManager.getWorld(RPGMod.epochDimID) != null) {
@@ -152,12 +152,12 @@ public class WorldDirectorManager {
 	}
 	
 	public ChunkDataGrid getChunkDataGrid(World world) {
-		if (lookupGridsChunkData.containsKey(world.provider.getDimensionId())) {
-			return lookupGridsChunkData.get(world.provider.getDimensionId());
+		if (lookupGridsChunkData.containsKey(world.provider.getDimension())) {
+			return lookupGridsChunkData.get(world.provider.getDimension());
 		} else {
 			ChunkDataGrid grid = new ChunkDataGrid(world);
 			grid.readFromFile();
-			addGridChunkData(world.provider.getDimensionId(), grid);
+			addGridChunkData(world.provider.getDimension(), grid);
 			return grid;
 		}
 	}
@@ -187,7 +187,7 @@ public class WorldDirectorManager {
 	}
 	
 	public void initDynamicDimData(World world) {
-		initDynamicDimData(world.provider.getDimensionId());
+		initDynamicDimData(world.provider.getDimension());
 	}
 	
 	

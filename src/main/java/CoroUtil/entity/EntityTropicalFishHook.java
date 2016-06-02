@@ -12,19 +12,20 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.componentAI.ICoroAI;
+import CoroUtil.util.Vec3;
 
 public class EntityTropicalFishHook extends Entity implements IEntityAdditionalSpawnData {
 
@@ -72,7 +73,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
 	   
 	   if (!inGround) {
 		   AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, this.getEntityBoundingBox().minY, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, this.getEntityBoundingBox().maxY, this.getEntityBoundingBox().maxZ);
-           if(!this.worldObj.isAABBInMaterial(var18, Material.water)) {
+           if(!this.worldObj.isAABBInMaterial(var18, Material.WATER)) {
         	   int sdfsdf = 0;
            }
 		   
@@ -226,13 +227,13 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             ++this.ticksInAir;
          }
 
-         Vec3 var20 = new Vec3(this.posX, this.posY, this.posZ);
-         Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-         MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var20, var2);
-         var20 = new Vec3(this.posX, this.posY, this.posZ);
-         var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         Vec3d var20 = new Vec3d(this.posX, this.posY, this.posZ);
+         Vec3d var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+         RayTraceResult var3 = this.worldObj.rayTraceBlocks(var20, var2);
+         var20 = new Vec3d(this.posX, this.posY, this.posZ);
+         var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
          if(var3 != null) {
-            var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+            var2 = new Vec3d(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
          }
 
          Entity var4 = null;
@@ -245,7 +246,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
             if(var9.canBeCollidedWith() && /*!(var9 instanceof c_PlayerProxy) &&*/ !(var9 instanceof ICoroAI) && (var9 != this.angler || this.ticksInAir >= 10)) {
                float var10 = 0.3F;
                AxisAlignedBB var11 = var9.getEntityBoundingBox().expand((double)var10, (double)var10, (double)var10);
-               MovingObjectPosition var12 = var11.calculateIntercept(var20, var2);
+               RayTraceResult var12 = var11.calculateIntercept(var20, var2);
                if(var12 != null) {
                   var13 = var20.distanceTo(var12.hitVec);
                   if(var13 < var6 || var6 == 0.0D) {
@@ -257,7 +258,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          }
 
          if(var4 != null) {
-            var3 = new MovingObjectPosition(var4);
+            var3 = new RayTraceResult(var4);
          }
 
          if(var3 != null) {
@@ -306,7 +307,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
                double var14 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 0) / (double)var27 - 0.125D + 0.125D;
                double var16 = this.getEntityBoundingBox().minY + (this.getEntityBoundingBox().maxY - this.getEntityBoundingBox().minY) * (double)(var29 + 1) / (double)var27 - 0.125D + 0.125D;
                AxisAlignedBB var18 = new AxisAlignedBB(this.getEntityBoundingBox().minX, var14, this.getEntityBoundingBox().minZ, this.getEntityBoundingBox().maxX, var16, this.getEntityBoundingBox().maxZ);
-               if(this.worldObj.isAABBInMaterial(var18, Material.water)) {
+               if(this.worldObj.isAABBInMaterial(var18, Material.WATER)) {
                   var26 += 0.6D / (double)var27;
                } else {
             	   //if (ticksExisted > 20) var26 -= 0.5D;

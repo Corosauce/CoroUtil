@@ -9,16 +9,16 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.util.BlockCoord;
+import CoroUtil.util.Vec3;
 
 public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 {
@@ -347,7 +347,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public boolean isSolid(Block id) {
-    	return (id.getMaterial() != Material.water && id.getMaterial() != Material.circuits && id.getMaterial() != Material.snow && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
+    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.circuits && id.getMaterial() != Material.snow && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
     }
     
     public void setPositionAndRotation(double par1, double par3, double par5, float par7, float par8, float parRoll)

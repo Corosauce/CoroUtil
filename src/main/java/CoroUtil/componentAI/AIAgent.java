@@ -14,11 +14,11 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.jobSystem.JobManager;
 import CoroUtil.diplomacy.TeamInstance;
@@ -30,6 +30,7 @@ import CoroUtil.inventory.AIInventory;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilNBT;
+import CoroUtil.util.Vec3;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
@@ -47,7 +48,7 @@ public class AIAgent {
 	//Path
 	public boolean pathAvailable; //marks that the callback fired
 	public boolean pathRequested; //marks that the ai is already waiting for a path (prevents redundant path requests flooding up the queue)
-	public PathEntity pathToEntity;
+	public Path pathToEntity;
 	
 	// AI fields \\
 	
@@ -468,12 +469,12 @@ public class AIAgent {
 				//pathfollow fix
 				if (true) {
 					if (ent.getNavigator().getPath() != null) {
-						PathEntity pEnt = ent.getNavigator().getPath();
+						Path pEnt = ent.getNavigator().getPath();
 						int index = pEnt.getCurrentPathIndex()+1;
 						//index--;
 						if (index < 0) index = 0;
 						if (index > pEnt.getCurrentPathLength()) index = pEnt.getCurrentPathLength()-1;
-						Vec3 var1 = null;
+						Vec3d var1 = null;
 						try {
 							var1 = pEnt.getVectorFromIndex(ent, pEnt.getCurrentPathIndex());
 						} catch (Exception ex) {
@@ -555,7 +556,7 @@ public class AIAgent {
 		//if (true) return;
 		//fix for last node being too high
 		if (!ent.worldObj.isRemote) {
-			PathEntity pe = ent.getNavigator().getPath();
+			Path pe = ent.getNavigator().getPath();
 			if (pe != null) {
 				if (pe.getCurrentPathLength() == 1) {
 					//if (job.priJob == EnumJob.TRADING) {
@@ -576,12 +577,12 @@ public class AIAgent {
 	public void fixBadYPathing() {
 		
 		if (ent.getNavigator().getPath() != null) {
-			PathEntity pEnt = ent.getNavigator().getPath();
+			Path pEnt = ent.getNavigator().getPath();
 			int index = pEnt.getCurrentPathIndex();
 			//index--;
 			if (index < 0) index = 0;
 			if (index >= pEnt.getCurrentPathLength()) index = pEnt.getCurrentPathLength()-1;
-			Vec3 var1 = null;
+			Vec3d var1 = null;
 			try {
 				var1 = pEnt.getVectorFromIndex(ent, index);
 			} catch (Exception ex) {
@@ -933,12 +934,12 @@ public class AIAgent {
 		}
 	}
 	
-	public void setPathToEntity(PathEntity pathentity)
+	public void setPathToEntity(Path pathentity)
     {
 		jobMan.getPrimaryJob().setPathToEntity(pathentity);
     }
 	
-	public void setPathToEntityForce(PathEntity pathentity)
+	public void setPathToEntityForce(Path pathentity)
     {
 		//System.out.println("force set path");
         pathToEntity = pathentity;
@@ -963,7 +964,7 @@ public class AIAgent {
 		targZ = z;
 	}
 	
-	public void walkToMark(Entity var1, PathEntity pe, int timeout) {
+	public void walkToMark(Entity var1, Path pe, int timeout) {
 		//PFQueue.getPath(ent, x, y, z, maxPFRange, priority);
 		setState(EnumActState.WALKING);
 		jobMan.getPrimaryJob().walkingTimeout = timeout;
@@ -1049,14 +1050,14 @@ public class AIAgent {
         return f + f3;
     }
 	
-	public MovingObjectPosition rayTrace(double reachDist, float yOffset, Vec3 randLook)
+	public RayTraceResult rayTrace(double reachDist, float yOffset, Vec3 randLook)
     {
 		float partialTick = 1F;
 		
-        Vec3 var4 = new Vec3(ent.posX, ent.posY+yOffset, ent.posZ);
-        Vec3 var5 = ent.getLook(partialTick);
+        Vec3d var4 = new Vec3d(ent.posX, ent.posY+yOffset, ent.posZ);
+        Vec3d var5 = ent.getLook(partialTick);
         if (randLook != null) var5.addVector(randLook.xCoord, randLook.yCoord, randLook.zCoord);
-        Vec3 var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
+        Vec3d var6 = var4.addVector(var5.xCoord * reachDist, var5.yCoord * reachDist, var5.zCoord * reachDist);
         return ent.worldObj.rayTraceBlocks(var4, var6);
     }
 	

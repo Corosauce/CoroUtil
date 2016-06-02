@@ -3,9 +3,8 @@ package CoroUtil.bt;
 import java.util.ArrayList;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.util.math.MathHelper;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -16,6 +15,7 @@ import CoroUtil.pathfinding.PFCallbackItem;
 import CoroUtil.pathfinding.PFJobData;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.util.BlockCoord;
+import CoroUtil.util.Vec3;
 
 public class BlackboardBase implements IPFCallback {
 
@@ -30,8 +30,8 @@ public class BlackboardBase implements IPFCallback {
 	//public Vec3 posMoveToPath;
 	//public Vec3 posMoveToPathFar;
 	
-	public PathEntity pathMoveToPath; //instant return data
-	public PathEntity pathMoveToPathFar; //threaded return data
+	public Path pathMoveToPath; //instant return data
+	public Path pathMoveToPathFar; //threaded return data
 	public MutableBoolean isWaitingForPath = new MutableBoolean(false); //set to true when request sent, set to false when callback has path
 	public MutableBoolean isPathReceived = new MutableBoolean(false); //set to true when callback has path, set to false when movement bt puts it to use
 	
@@ -147,7 +147,7 @@ public class BlackboardBase implements IPFCallback {
 		}
 	}
 	
-	public void setPathFar(PathEntity parPath) {
+	public void setPathFar(Path parPath) {
 		//System.out.println("callback pf set: " + parPath);
 		pathMoveToPathFar = parPath;
 		isWaitingForPath.setValue(false);

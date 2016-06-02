@@ -1,22 +1,22 @@
 package CoroUtil.pathfinding;
 
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 
 public class PFCallbackItem {
 	
-	public PathEntity pe;
+	public Path pe;
 	public EntityLiving ent;
 	public float speed;
 	public boolean foundEnd = false;
 	
-	public PFCallbackItem(PathEntity parPE, EntityLiving parEnt, float parSpeed) {
+	public PFCallbackItem(Path parPE, EntityLiving parEnt, float parSpeed) {
 		pe = parPE;
 		ent = parEnt;
 		speed = parSpeed;
 	}
 
-	public PFCallbackItem(PathEntity parPE, EntityLiving parEnt, float parSpeed, boolean parFound) {
+	public PFCallbackItem(Path parPE, EntityLiving parEnt, float parSpeed, boolean parFound) {
 		this(parPE, parEnt, parSpeed);
 		foundEnd = parFound;
 	}

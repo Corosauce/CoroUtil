@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.common.collect.BiMap;
-
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -31,6 +29,8 @@ import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.util.CoroUtilFile;
 import CoroUtil.world.WorldDirectorManager;
+
+import com.google.common.collect.BiMap;
 
 @Mod(modid = "CoroAI", name="CoroAI", version="v1.1.5", acceptableRemoteVersions="*")
 public class CoroAI {

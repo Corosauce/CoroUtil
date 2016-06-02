@@ -26,12 +26,12 @@ public class EntityBreakingRotFX extends EntityRotFX
     public EntityBreakingRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12, Item par14Item)
     {
         this(par1World, par2, par4, par6, par14Item);
-        this.motionX *= 0.10000000149011612D;
-        this.motionY *= 0.10000000149011612D;
-        this.motionZ *= 0.10000000149011612D;
-        this.motionX += par8;
-        this.motionY += par10;
-        this.motionZ += par12;
+        this.setMotionX(this.getMotionX() * 0.10000000149011612D);
+        this.setMotionY(this.getMotionY() * 0.10000000149011612D);
+        this.setMotionZ(this.getMotionZ() * 0.10000000149011612D);
+        this.setMotionX(this.getMotionX() + par8);
+        this.setMotionY(this.getMotionY() + par10);
+        this.setMotionZ(this.getMotionZ() + par12);
     }
 
     public int getFXLayer()

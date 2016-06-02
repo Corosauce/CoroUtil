@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import CoroUtil.util.Vec3;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.util.Vec3;
 import extendedrenderer.particle.entity.EntityIconFX;
 import extendedrenderer.particle.entity.EntityIconWindFX;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -59,9 +59,9 @@ public class ParticleBehaviors {
 	public void tickUpdateAct(EntityRotFX particle) {
 		
 			
-		double centerX = particle.posX;
+		double centerX = particle.getPosX();
 		//double centerY = particle.posY;
-		double centerZ = particle.posZ;
+		double centerZ = particle.getPosZ();
 		
 		if (coordSource != null) {
 			centerX = coordSource.xCoord/* + 0.5D*/;
@@ -69,8 +69,8 @@ public class ParticleBehaviors {
 			centerZ = coordSource.zCoord/* + 0.5D*/;
 		}
 		
-		double vecX = centerX - particle.posX;
-		double vecZ = centerZ - particle.posZ;
+		double vecX = centerX - particle.getPosX();
+		double vecZ = centerZ - particle.getPosZ();
 		double distToCenter = Math.sqrt(vecX * vecX + vecZ * vecZ);
 		double rotYaw = (float)(Math.atan2(vecZ, vecX) * 180.0D / Math.PI);
 		double adjYaw = Math.min(360, 45+particle.getAge());
@@ -80,24 +80,24 @@ public class ParticleBehaviors {
 		//rotYaw += 20D;
 		double speed = 0.1D;
 		if (particle.getAge() < 25 && distToCenter > 0.05D) {
-			particle.motionX = Math.cos(rotYaw * 0.017453D) * speed;
-			particle.motionZ = Math.sin(rotYaw * 0.017453D) * speed;
+			particle.setMotionX(Math.cos(rotYaw * 0.017453D) * speed);
+			particle.setMotionZ(Math.sin(rotYaw * 0.017453D) * speed);
 		} else {
 			double speed2 = 0.008D;
 			
-			double pSpeed = Math.sqrt(particle.motionX * particle.motionX + particle.motionZ * particle.motionZ);
+			double pSpeed = Math.sqrt(particle.getMotionX() * particle.getMotionX() + particle.getMotionZ() * particle.getMotionZ());
 			
 			//cheap air search code
-			if (pSpeed < 0.2 && particle.motionY < 0.01) {
+			if (pSpeed < 0.2 && particle.getMotionY() < 0.01) {
 				speed2 = 0.08D;
 			}
 			
-			if (pSpeed < 0.002 && Math.abs(particle.motionY) < 0.02) {
-				particle.motionY -= 0.15D;
+			if (pSpeed < 0.002 && Math.abs(particle.getMotionY()) < 0.02) {
+				particle.setMotionY(particle.getMotionY() - 0.15D);
 			}
 			
-			particle.motionX += (rand.nextDouble() - rand.nextDouble()) * speed2;
-			particle.motionZ += (rand.nextDouble() - rand.nextDouble()) * speed2;
+			particle.setMotionX(particle.getMotionX() + (rand.nextDouble() - rand.nextDouble()) * speed2);
+			particle.setMotionZ(particle.getMotionZ() + (rand.nextDouble() - rand.nextDouble()) * speed2);
 			
 		}
 		
@@ -176,12 +176,12 @@ public class ParticleBehaviors {
 	
 	public EntityRotFX initParticle(EntityRotFX particle) {
 		
-		particle.prevPosX = particle.posX;
-		particle.prevPosY = particle.posY;
-		particle.prevPosZ = particle.posZ;
-		particle.lastTickPosX = particle.posX;
-		particle.lastTickPosY = particle.posY;
-		particle.lastTickPosZ = particle.posZ;
+		particle.setPrevPosX(particle.getPosX());
+		particle.setPrevPosY(particle.getPosY());
+		particle.setPrevPosZ(particle.getPosZ());
+		particle.lastTickPosX = particle.getPosX();
+		particle.lastTickPosY = particle.getPosY();
+		particle.lastTickPosZ = particle.getPosZ();
 		
 		//keep AABB small, very important to performance
 		particle.setSize(0.01F, 0.01F);

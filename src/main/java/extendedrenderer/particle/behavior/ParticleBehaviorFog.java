@@ -99,25 +99,25 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 				double moveSpeed = 0.001D;
 				if (particle.onGround) {
 					moveSpeed = 0.012D;
-					particle.motionY += 0.01D;
+					particle.setMotionY(particle.getMotionY() + 0.01D);
 				}
 				
 				if (particle.isCollidedHorizontally) {
 					particle.rotationYaw += 0.1;
 				}
 				
-				particle.motionX -= Math.sin(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed;
-				particle.motionZ += Math.cos(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed;
+				particle.setMotionX(particle.getMotionX() - Math.sin(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);
+				particle.setMotionZ(particle.getMotionZ() + Math.cos(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);
 				
 				double moveSpeedRand = 0.005D;
 				
-				particle.motionX += rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand;
-				particle.motionZ += rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand;
+				particle.setMotionX(particle.getMotionX() + (rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand));
+				particle.setMotionZ(particle.getMotionZ() + (rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand));
 				
 				particle.setScale(particle.getScale() - 0.1F);
 				
 				if (particle.spawnY != -1) {
-					particle.setPosition(particle.posX, particle.spawnY, particle.posZ);
+					particle.setPosition(particle.getPosX(), particle.spawnY, particle.getPosZ());
 					//particle.posY = particle.spawnY;
 				}
 				

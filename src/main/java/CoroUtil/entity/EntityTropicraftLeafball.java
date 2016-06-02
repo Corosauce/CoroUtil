@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import CoroUtil.componentAI.ICoroAI;
 
@@ -39,7 +39,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
 			
 			ticksInAir++;
 			
-			MovingObjectPosition movingobjectposition = null;
+			RayTraceResult movingobjectposition = null;
 			
             Entity entity = null;
             List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
@@ -71,7 +71,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
 
             if (entity != null)
             {
-                movingobjectposition = new MovingObjectPosition(entity);
+                movingobjectposition = new RayTraceResult(entity);
                 if (movingobjectposition != null) {
                 	this.onImpact(movingobjectposition);
                 	setDead();
@@ -81,7 +81,7 @@ public class EntityTropicraftLeafball extends EntityThrowable
     }
 
 	@Override
-	protected void onImpact(MovingObjectPosition movingobjectposition)
+	protected void onImpact(RayTraceResult movingobjectposition)
 	{
 		if (movingobjectposition.entityHit != null)
 		{

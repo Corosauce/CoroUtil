@@ -1,7 +1,7 @@
 package CoroUtil.pathfinding;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.Vec3;
+import CoroUtil.util.Vec3;
 
 public class PathEntityEx/* extends PathEntity*/
 {

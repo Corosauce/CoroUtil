@@ -1,6 +1,6 @@
 package CoroUtil.util;
 
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.MathHelper;
 
 public class Vec3
 {
@@ -253,7 +253,7 @@ public class Vec3
         this.setComponents(d0, d1, d2);
     }
     
-    public net.minecraft.util.Vec3 toMCVec() {
-    	return new net.minecraft.util.Vec3(this.xCoord, this.yCoord, this.zCoord);
+    public net.minecraft.util.math.Vec3d toMCVec() {
+    	return new net.minecraft.util.math.Vec3d(this.xCoord, this.yCoord, this.zCoord);
     }
 }

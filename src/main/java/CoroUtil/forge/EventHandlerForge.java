@@ -5,7 +5,6 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
@@ -38,7 +37,7 @@ public class EventHandlerForge {
 		//this is called for every dimension
 		//check server side because some mods invoke saving client side (bad standard)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
+			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
 				CoroAI.writeOutData(false);
 			}
 		}
@@ -46,10 +45,10 @@ public class EventHandlerForge {
 	
 	@SubscribeEvent
 	public void worldLoad(Load event) {
-		if (!event.world.isRemote) {
-			if (((WorldServer)event.world).provider.getDimensionId() == 0) {
-				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.world) == null) {
-					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroAI.modID, event.world);
+		if (!event.getWorld().isRemote) {
+			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
+				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.getWorld()) == null) {
+					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroAI.modID, event.getWorld());
 				}
 			}
 		}
@@ -68,15 +67,15 @@ public class EventHandlerForge {
 	
 	@SubscribeEvent
 	public void blockPlayerInteract(PlayerInteractEvent event) {
-		if (!event.world.isRemote) {
+		if (!event.getWorld().isRemote) {
 			try {
 				
 				//an event is fired where its air and has no chunk X or Z, cancel this
 				if (event.action == Action.RIGHT_CLICK_AIR) return;
 				
 				if (ConfigCoroAI.trackPlayerData) {
-					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.world).getChunkData(event.pos.getX() / 16, event.pos.getZ() / 16);
-					cdp.addToPlayerActivityInteract(event.entityPlayer.getGameProfile().getId(), 1);
+					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.getWorld()).getChunkData(event.getPos().getX() / 16, event.getPos().getZ() / 16);
+					cdp.addToPlayerActivityInteract(event.getEntityPlayer().getGameProfile().getId(), 1);
 				}
 				
 			} catch (Exception ex) {

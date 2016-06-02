@@ -1,6 +1,6 @@
 package extendedrenderer.particle.entity;
 
-import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -9,7 +9,7 @@ import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 
 @SideOnly(Side.CLIENT)
-public class EntityRotFX extends EntityFX
+public class EntityRotFX extends Particle
 {
     public boolean weatherEffect = false;
 
@@ -53,17 +53,17 @@ public class EntityRotFX extends EntityFX
     @Override
     public void onUpdate() {
     	if (callUpdateSuper) super.onUpdate();
-    	this.lastTickPosX = this.posX;
-        this.lastTickPosY = this.posY;
-        this.lastTickPosZ = this.posZ;
+    	this.lastTickPosX = this.getPosX();
+        this.lastTickPosY = this.getPosY();
+        this.lastTickPosZ = this.getPosZ();
         
         if (callUpdatePB && pb != null) pb.tickUpdate(this);
         
         //calling required stuff the super did
         if (!callUpdateSuper) {
-        	this.prevPosX = this.posX;
-            this.prevPosY = this.posY;
-            this.prevPosZ = this.posZ;
+        	this.setPrevPosX(this.getPosX());
+            this.setPrevPosY(this.getPosY());
+            this.setPrevPosZ(this.getPosZ());
 
             if (this.particleAge++ >= this.particleMaxAge)
             {
@@ -71,10 +71,10 @@ public class EntityRotFX extends EntityFX
             }
             
             if (spawnY != -1) {
-            	setPosition(posX, spawnY, posZ);
+            	setPosition(getPosX(), spawnY, getPosZ());
             }
             
-            this.moveEntity(this.motionX, this.motionY, this.motionZ);
+            this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
         }
     }
     
@@ -170,4 +170,76 @@ public class EntityRotFX extends EntityFX
     public float getScale() {
     	return particleScale;
     }
+
+	public double getPosX() {
+		return posX;
+	}
+
+	public void setPosX(double posX) {
+		this.posX = posX;
+	}
+
+	public double getPosY() {
+		return posY;
+	}
+
+	public void setPosY(double posY) {
+		this.posY = posY;
+	}
+
+	public double getPosZ() {
+		return posZ;
+	}
+
+	public void setPosZ(double posZ) {
+		this.posZ = posZ;
+	}
+
+	public double getMotionX() {
+		return motionX;
+	}
+
+	public void setMotionX(double motionX) {
+		this.motionX = motionX;
+	}
+
+	public double getMotionY() {
+		return motionY;
+	}
+
+	public void setMotionY(double motionY) {
+		this.motionY = motionY;
+	}
+
+	public double getMotionZ() {
+		return motionZ;
+	}
+
+	public void setMotionZ(double motionZ) {
+		this.motionZ = motionZ;
+	}
+
+	public double getPrevPosX() {
+		return prevPosX;
+	}
+
+	public void setPrevPosX(double prevPosX) {
+		this.prevPosX = prevPosX;
+	}
+
+	public double getPrevPosY() {
+		return prevPosY;
+	}
+
+	public void setPrevPosY(double prevPosY) {
+		this.prevPosY = prevPosY;
+	}
+
+	public double getPrevPosZ() {
+		return prevPosZ;
+	}
+
+	public void setPrevPosZ(double prevPosZ) {
+		this.prevPosZ = prevPosZ;
+	}
 }

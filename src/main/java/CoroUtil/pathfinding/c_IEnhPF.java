@@ -1,6 +1,5 @@
 package CoroUtil.pathfinding;
 
-import net.minecraft.pathfinding.PathEntity;
 
 
 

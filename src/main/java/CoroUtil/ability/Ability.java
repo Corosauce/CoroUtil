@@ -1,6 +1,5 @@
 package CoroUtil.ability;
 
-import CoroUtil.util.Vec3;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
@@ -9,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.util.Vec3;
 import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 
 

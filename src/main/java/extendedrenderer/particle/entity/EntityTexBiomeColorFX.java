@@ -3,7 +3,7 @@ package extendedrenderer.particle.entity;
 import java.awt.Color;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,9 +15,9 @@ public class EntityTexBiomeColorFX extends EntityTexFX
     {
         super(var1, var2, var4, var6, var8, var10, var12, var14, colorIndex, texID);
         textureID = texID;
-        this.motionX = var8 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
-        this.motionY = var10 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
-        this.motionZ = var12 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F);
+        this.setMotionX(var8 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
+        this.setMotionY(var10 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
+        this.setMotionZ(var12 + (double)((float)(Math.random() * 2.0D - 1.0D) * 0.05F));
         //Color IDS
         //0 = black/regular/default
         //1 = dirt
@@ -94,9 +94,9 @@ public class EntityTexBiomeColorFX extends EntityTexFX
 
     public void onUpdate2()
     {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
+        this.setPrevPosX(this.getPosX());
+        this.setPrevPosY(this.getPosY());
+        this.setPrevPosZ(this.getPosZ());
 
         if (this.particleAge++ >= this.particleMaxAge)
         {
@@ -107,13 +107,13 @@ public class EntityTexBiomeColorFX extends EntityTexFX
         //this.particleTextureIndex = 7 - this.particleAge * 8 / this.particleMaxAge;
         this.setParticleTextureIndex(textureID);//mod_EntMover.effWindID;
         //this.motionY += 0.0040D;
-        this.motionY -= 0.04D * (double)this.particleGravity;
+        this.setMotionY(this.getMotionY() - 0.04D * (double)this.particleGravity);
         //this.motionY -= 0.05000000074505806D;
         float var20 = 0.98F;
-        this.motionX *= (double)var20;
-        this.motionY *= (double)var20;
-        this.motionZ *= (double)var20;
-        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+        this.setMotionX(this.getMotionX() * (double)var20);
+        this.setMotionY(this.getMotionY() * (double)var20);
+        this.setMotionZ(this.getMotionZ() * (double)var20);
+        this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
         /*this.motionX *= 0.8999999761581421D;
         this.motionY *= 0.8999999761581421D;
         this.motionZ *= 0.8999999761581421D;
@@ -125,16 +125,16 @@ public class EntityTexBiomeColorFX extends EntityTexFX
 
     public void onUpdate()
     {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
+        this.setPrevPosX(this.getPosX());
+        this.setPrevPosY(this.getPosY());
+        this.setPrevPosZ(this.getPosZ());
 
         if (this.particleAge++ >= this.particleMaxAge)
         {
             this.setDead();
         }
 
-        double speed = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+        double speed = Math.sqrt(this.getMotionX() * this.getMotionX() + this.getMotionY() * this.getMotionY() + this.getMotionZ() * this.getMotionZ());
         
         if (speed > 0.04F)
         {
@@ -147,17 +147,17 @@ public class EntityTexBiomeColorFX extends EntityTexFX
         //this.particleTextureIndex = 7 - this.particleAge * 8 / this.particleMaxAge;
         setParticleTextureIndex(textureID);//mod_EntMover.effWindID;
         //this.motionY += 0.0040D;
-        this.motionY -= (0.04D * this.rand.nextFloat()) * (double)this.particleGravity;
+        this.setMotionY(this.getMotionY() - (0.04D * this.rand.nextFloat()) * (double)this.particleGravity);
         //this.motionY -= 0.05000000074505806D;
         float var20 = 1F - (0.08F * this.rand.nextFloat());
-        this.motionX *= (double)var20;
-        this.motionY *= (double)var20;
-        this.motionZ *= (double)var20;
-        this.moveEntity(this.motionX, this.motionY, this.motionZ);
-        this.setPosition(posX, posY, posZ);
-        this.lastTickPosX = this.posX;
-        this.lastTickPosY = this.posY;
-        this.lastTickPosZ = this.posZ;
+        this.setMotionX(this.getMotionX() * (double)var20);
+        this.setMotionY(this.getMotionY() * (double)var20);
+        this.setMotionZ(this.getMotionZ() * (double)var20);
+        this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
+        this.setPosition(getPosX(), getPosY(), getPosZ());
+        this.lastTickPosX = this.getPosX();
+        this.lastTickPosY = this.getPosY();
+        this.lastTickPosZ = this.getPosZ();
         //this.boundingBox. = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
         /*this.motionX *= 0.8999999761581421D;
         this.motionY *= 0.8999999761581421D;

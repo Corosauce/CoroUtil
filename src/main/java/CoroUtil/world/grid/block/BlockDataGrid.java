@@ -10,7 +10,7 @@ import java.util.Iterator;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilFile;
@@ -108,8 +108,8 @@ public class BlockDataGrid
 			
 			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "epoch" + File.separator;
 			
-			if ((new File(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat"));
+			if ((new File(saveFolder + "EpochBlockDataDim_" + world.provider.getDimension() + ".dat")).exists()) {
+				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimension() + ".dat"));
 				
 				//Collection playerDataCl = data.getTags();
 				Iterator it = data.getKeySet().iterator();//playerDataCl.iterator();
@@ -150,7 +150,7 @@ public class BlockDataGrid
     		
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
-    		FileOutputStream fos = new FileOutputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimensionId() + ".dat");
+    		FileOutputStream fos = new FileOutputStream(saveFolder + "EpochBlockDataDim_" + world.provider.getDimension() + ".dat");
 	    	CompressedStreamTools.writeCompressed(data, fos);
 	    	fos.close();
 			

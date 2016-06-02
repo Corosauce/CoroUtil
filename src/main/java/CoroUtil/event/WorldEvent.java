@@ -190,7 +190,7 @@ public class WorldEvent {
     	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
-    	if (entP != null && entP.worldObj.provider.getDimensionId() == DimensionManager.getWorld(dimensionID).provider.getDimensionId()) {
+    	if (entP != null && entP.worldObj.provider.getDimension() == DimensionManager.getWorld(dimensionID).provider.getDimension()) {
     		return entP;
     	}
     	

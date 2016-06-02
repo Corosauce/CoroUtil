@@ -2,8 +2,7 @@ package CoroUtil.forge;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.IWorldAccess;
+import net.minecraft.util.math.BlockPos;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.componentAI.ICoroAI;
 

@@ -14,8 +14,8 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -54,7 +54,7 @@ public class CommandCoroUtil extends CommandBase {
 					if (aq != null) {
 						aq.initCreateObject(plQuests);
 						
-						aq.initFirstTime(player.worldObj.provider.getDimensionId());
+						aq.initFirstTime(player.worldObj.provider.getDimension());
 						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.diamond), 5, false);
 						
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);

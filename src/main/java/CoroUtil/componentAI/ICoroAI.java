@@ -1,7 +1,7 @@
 package CoroUtil.componentAI;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 
 
 
@@ -9,8 +9,8 @@ public abstract interface ICoroAI
 {
 	public AIAgent getAIAgent();
 	
-	public void setPathResultToEntity(PathEntity pathentity); //named this way to prevent mcp obfuscating it (matched a method signature)
-	//public PathEntity getPath();
+	public void setPathResultToEntity(Path Path); //named this way to prevent mcp obfuscating it (matched a method signature)
+	//public Path getPath();
 	public boolean isBreaking();
 	public boolean isEnemy(Entity ent);
 	

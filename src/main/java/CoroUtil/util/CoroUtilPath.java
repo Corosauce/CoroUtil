@@ -7,19 +7,19 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.pathfinding.PathEntity;
+import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class CoroUtilPath {
 
-	public static PathEntity getSingleNodePath(BlockCoord coords) {
+	public static Path getSingleNodePath(BlockCoord coords) {
 		PathPoint points[] = new PathPoint[1];
         points[0] = new PathPoint(coords.posX, coords.posY, coords.posZ);
-		PathEntity pe = new PathEntity(points);
+		Path pe = new Path(points);
 		return pe;
 	}
 	

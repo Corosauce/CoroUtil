@@ -3,12 +3,12 @@ package CoroUtil.formation;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.pathfinding.PathEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilBlock;
+import CoroUtil.util.Vec3;
 
 public class PathNavigateFormation
 {
@@ -21,7 +21,7 @@ public class PathNavigateFormation
     public EntityMoveHelper moveHelper;
 
     /** The PathEntity being followed. */
-    private PathEntity currentPath;
+    private Path currentPath;
     private float speed;
 
     /**
@@ -162,7 +162,7 @@ public class PathNavigateFormation
      * sets the active path data if path is 100% unique compared to old path, checks to adjust path for sun avoiding
      * ents and stores end coords
      */
-    public boolean setPath(PathEntity par1PathEntity, float par2)
+    public boolean setPath(Path par1PathEntity, float par2)
     {
         if (par1PathEntity == null)
         {
