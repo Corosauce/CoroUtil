@@ -347,7 +347,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public boolean isSolid(Block id) {
-    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.circuits && id.getMaterial() != Material.snow && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
+    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.circuits && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
     }
     
     public void setPositionAndRotation(double par1, double par3, double par5, float par7, float par8, float parRoll)

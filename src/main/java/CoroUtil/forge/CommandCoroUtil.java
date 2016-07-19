@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -37,7 +38,7 @@ public class CommandCoroUtil extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender var1, String[] var2) {
+	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
 		try {
 			if(var1 instanceof EntityPlayerMP)

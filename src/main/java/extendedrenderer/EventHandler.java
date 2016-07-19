@@ -31,7 +31,7 @@ public class EventHandler {
         }
 
         //Rotating particles hook
-        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.partialTicks);
+        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
     }
 	
 	@SideOnly(Side.CLIENT)

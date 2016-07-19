@@ -37,12 +37,12 @@ public class BlockStaticDataMap {
         	}
         }*/
         
-        Iterator it = Block.blockRegistry.getKeys().iterator();
+        Iterator it = Block.REGISTRY.getKeys().iterator();
         
         int i = 0;
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	Block block = (Block) Block.blockRegistry.getObject(new ResourceLocation(tagName));
+        	Block block = (Block) Block.REGISTRY.getObject(new ResourceLocation(tagName));
         	
         	if (block != null) {
         		String hash;// = block.getClass().toString() + "|" + block.getUnlocalizedName() + "|" + Block.lightValue[i];
@@ -93,71 +93,71 @@ public class BlockStaticDataMap {
 		//in future, even vanilla ids might not be reliable, so use objects name for vanilla
 		
 
-		addToMap(Blocks.grass, lightlyPacked);
-		addToMap(Blocks.dirt, lightlyPacked);
-		addToMap(Blocks.sand, lightlyPacked);
+		addToMap(Blocks.GRASS, lightlyPacked);
+		addToMap(Blocks.DIRT, lightlyPacked);
+		addToMap(Blocks.SAND, lightlyPacked);
 		//addToMap(Blocks.slowSand, lightlyPacked);
-		addToMap(Blocks.gravel, lightlyPacked);
+		addToMap(Blocks.GRAVEL, lightlyPacked);
 
-		addToMap(Blocks.leaves, plant);
+		addToMap(Blocks.LEAVES, plant);
 		
-		addToMap(Blocks.oak_fence_gate, plank);
-		addToMap(Blocks.planks, plank);
-		addToMap(Blocks.spruce_stairs, plank);
-		addToMap(Blocks.birch_stairs, plank);
-		addToMap(Blocks.jungle_stairs, plank);
-		addToMap(Blocks.sandstone_stairs, plank);
+		addToMap(Blocks.OAK_FENCE_GATE, plank);
+		addToMap(Blocks.PLANKS, plank);
+		addToMap(Blocks.SPRUCE_STAIRS, plank);
+		addToMap(Blocks.BIRCH_STAIRS, plank);
+		addToMap(Blocks.JUNGLE_STAIRS, plank);
+		addToMap(Blocks.SANDSTONE_STAIRS, plank);
 		
 		
-		addToMap(Blocks.glass, glass);
-		addToMap(Blocks.ice, glass);
-		addToMap(Blocks.glass_pane, glass);
+		addToMap(Blocks.GLASS, glass);
+		addToMap(Blocks.ICE, glass);
+		addToMap(Blocks.GLASS_PANE, glass);
 		
-		addToMap(Blocks.sandstone, stoneWeak);
-		addToMap(Blocks.cobblestone, stoneWeak);
-		addToMap(Blocks.mossy_cobblestone, stoneWeak);
-		addToMap(Blocks.cobblestone_wall, stoneWeak);
-		addToMap(Blocks.coal_ore, stoneWeak);
-		addToMap(Blocks.diamond_ore, stoneWeak);
-		addToMap(Blocks.emerald_ore, stoneWeak);
-		addToMap(Blocks.gold_ore, stoneWeak);
-		addToMap(Blocks.iron_ore, stoneWeak);
-		addToMap(Blocks.lapis_ore, stoneWeak);
-		addToMap(Blocks.quartz_ore, stoneWeak);
-		addToMap(Blocks.redstone_ore, stoneWeak);
+		addToMap(Blocks.SANDSTONE, stoneWeak);
+		addToMap(Blocks.COBBLESTONE, stoneWeak);
+		addToMap(Blocks.MOSSY_COBBLESTONE, stoneWeak);
+		addToMap(Blocks.COBBLESTONE_WALL, stoneWeak);
+		addToMap(Blocks.COAL_ORE, stoneWeak);
+		addToMap(Blocks.DIAMOND_ORE, stoneWeak);
+		addToMap(Blocks.EMERALD_ORE, stoneWeak);
+		addToMap(Blocks.GOLD_ORE, stoneWeak);
+		addToMap(Blocks.IRON_ORE, stoneWeak);
+		addToMap(Blocks.LAPIS_ORE, stoneWeak);
+		addToMap(Blocks.QUARTZ_ORE, stoneWeak);
+		addToMap(Blocks.REDSTONE_ORE, stoneWeak);
 		//addToMap(Blocks.oreRedstoneGlowing, stoneWeak);
-		addToMap(Blocks.clay, stoneWeak);
-		addToMap(Blocks.netherrack, stoneWeak);
-		addToMap(Blocks.nether_brick_fence, stoneWeak);
-		addToMap(Blocks.hardened_clay, stoneWeak);
+		addToMap(Blocks.CLAY, stoneWeak);
+		addToMap(Blocks.NETHERRACK, stoneWeak);
+		addToMap(Blocks.NETHER_BRICK_FENCE, stoneWeak);
+		addToMap(Blocks.HARDENED_CLAY, stoneWeak);
 		
 		
-		addToMap(Blocks.log, treeWood);
-		addToMap(Blocks.log2, treeWood);
+		addToMap(Blocks.LOG, treeWood);
+		addToMap(Blocks.LOG2, treeWood);
 		
-		addToMap(Blocks.dispenser, stoneMachine);
-		addToMap(Blocks.sticky_piston, stoneMachine);
-		addToMap(Blocks.piston, stoneMachine);
-		addToMap(Blocks.piston_extension, stoneMachine);
-		addToMap(Blocks.piston_head, stoneMachine);
-		addToMap(Blocks.dispenser, stoneMachine);
+		addToMap(Blocks.DISPENSER, stoneMachine);
+		addToMap(Blocks.STICKY_PISTON, stoneMachine);
+		addToMap(Blocks.PISTON, stoneMachine);
+		addToMap(Blocks.PISTON_EXTENSION, stoneMachine);
+		addToMap(Blocks.PISTON_HEAD, stoneMachine);
+		addToMap(Blocks.DISPENSER, stoneMachine);
 		
-		addToMap(Blocks.brick_block, stoneReinforced);
-		addToMap(Blocks.stonebrick, stoneReinforced);
-		addToMap(Blocks.iron_bars, stoneReinforced);
-		addToMap(Blocks.nether_brick, stoneReinforced);
-		addToMap(Blocks.nether_brick_stairs, stoneReinforced);
-		addToMap(Blocks.brick_stairs, stoneReinforced);
-		addToMap(Blocks.stone_brick_stairs, stoneReinforced);
+		addToMap(Blocks.BRICK_BLOCK, stoneReinforced);
+		addToMap(Blocks.STONEBRICK, stoneReinforced);
+		addToMap(Blocks.IRON_BARS, stoneReinforced);
+		addToMap(Blocks.NETHER_BRICK, stoneReinforced);
+		addToMap(Blocks.NETHER_BRICK_STAIRS, stoneReinforced);
+		addToMap(Blocks.BRICK_STAIRS, stoneReinforced);
+		addToMap(Blocks.STONE_BRICK_STAIRS, stoneReinforced);
 		
-		addToMap(Blocks.stone, stoneNatural);
+		addToMap(Blocks.STONE, stoneNatural);
 		
-		addToMap(Blocks.obsidian, obsidian);
-		addToMap(Blocks.diamond_block, diamond);
+		addToMap(Blocks.OBSIDIAN, obsidian);
+		addToMap(Blocks.DIAMOND_BLOCK, diamond);
 		
-		addToMap(Blocks.fire, iron);
+		addToMap(Blocks.FIRE, iron);
 		
-		addToMap(Blocks.bedrock, unbreakable);
+		addToMap(Blocks.BEDROCK, unbreakable);
 	}
 	
 	public static void addToMap(Block block, float strength) {

@@ -76,7 +76,7 @@ public class PathNavigateCustom
     {
         this.theEntity = par1EntityLiving;
         this.worldObj = par2World;
-        this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.followRange);
+        this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
         this.pathFinder = getPathFinder();
     }
     
@@ -413,7 +413,7 @@ public class PathNavigateCustom
 
             do
             {
-            	if (block != Blocks.flowing_water && block != Blocks.WATER)
+            	if (block != Blocks.FLOWING_WATER && block != Blocks.WATER)
                 {
                     return i;
                 }
@@ -579,7 +579,7 @@ public class PathNavigateCustom
                     	Block block = this.worldObj.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
                         Material material = block.getMaterial();
 
-                        if (material == Material.air)
+                        if (material == Material.AIR)
                         {
                             return false;
                         }

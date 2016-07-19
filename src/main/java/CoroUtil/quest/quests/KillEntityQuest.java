@@ -53,8 +53,8 @@ public class KillEntityQuest extends ActiveQuest {
 	}
 	
 	public void deathEvent(LivingDeathEvent event) {
-		Entity source = event.source.getEntity();
-		if (source != null && source.equals(playerQuests.getPlayer()) && event.entityLiving.getClass().equals(neededMob)) {
+		Entity source = event.getSource().getEntity();
+		if (source != null && source.equals(playerQuests.getPlayer()) && event.getEntityLiving().getClass().equals(neededMob)) {
 			curKillCount++;
 			saveAndSync();
 			System.out.println("quest kill inc");

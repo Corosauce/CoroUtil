@@ -15,6 +15,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
@@ -66,7 +67,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     		}
     		
     		for (int j = 0; j < listBlacklistNamess.size(); j++) {
-    			if (world != null && world.provider.getDimensionName().contains(listBlacklistNamess.get(j))) {
+    			if (world != null && world.provider.getDimensionType().getName().contains(listBlacklistNamess.get(j))) {
         			skip = true;
         			break;
         		}
@@ -108,7 +109,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
     				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
     			} else {
-    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getDimensionName());
+    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getDimensionType().getName());
     			}
     		}
 	    	
@@ -241,7 +242,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
             int j = (pos.getZ() >> 4) - this.chunkZ;
             //TODO: 1.8 this line is saying our cache is too big? array sizes are beyond acceptable sizes or something
             System.out.println("PFQUEUE FIX ME IM BROKEN");
-            if (i < 0 || i >= chunkArray.length || j < 0 || i >= chunkArray[i].length) return Blocks.air.getDefaultState();
+            if (i < 0 || i >= chunkArray.length || j < 0 || i >= chunkArray[i].length) return Blocks.AIR.getDefaultState();
 
             if (i >= 0 && i < this.chunkArray.length && j >= 0 && j < this.chunkArray[i].length)
             {
@@ -254,7 +255,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
             }
         }
 
-        return Blocks.air.getDefaultState();
+        return Blocks.AIR.getDefaultState();
 	}
 
 	@Override
@@ -264,7 +265,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public BiomeGenBase getBiomeGenForCoords(BlockPos pos) {
+	public Biome getBiomeGenForCoords(BlockPos pos) {
 		return this.worldObj.getBiomeGenForCoords(pos);
 	}
 

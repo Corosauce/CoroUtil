@@ -108,7 +108,7 @@ public class ConfigMod {
     }
     
     public static String getSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;

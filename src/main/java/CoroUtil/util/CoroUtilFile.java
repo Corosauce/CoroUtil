@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -64,7 +65,7 @@ public class CoroUtilFile {
 	}
 	
 	public static String getSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;
@@ -73,7 +74,7 @@ public class CoroUtilFile {
     }
 	
 	public static String getMinecraftSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "config" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator + "config" + File.separator;
@@ -81,7 +82,7 @@ public class CoroUtilFile {
     }
 	
 	public static String getWorldSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "saves" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;

@@ -103,7 +103,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			rotRoll -= rot;
 			
 			amp = 0.01D;
-			double ampYaw = amp + amp * Math.sin(Math.toRadians(90+((particle.worldObj.getTotalWorldTime() * 5) % 180)));
+			double ampYaw = amp + amp * Math.sin(Math.toRadians(90+((particle.getWorld().getTotalWorldTime() * 5) % 180)));
 			double ampPitch = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//Math.cos(Math.toRadians(90+((particle.worldObj.getTotalWorldTime() * 5) % 180)));
 			double ampRoll = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//amp + amp * Math.sin(Math.toRadians(((particle.worldObj.getTotalWorldTime() * 15F) % 180)));
 			

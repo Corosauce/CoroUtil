@@ -14,7 +14,7 @@ public class CoroUtilBlock {
 	
 	public static boolean isAir(Block parBlock) {
 		Material mat = parBlock.getMaterial();
-		if (mat == Material.air) {
+		if (mat == Material.AIR) {
 			return true;
 		} else {
 			return false;
@@ -31,7 +31,7 @@ public class CoroUtilBlock {
 	
 	public static Block getBlockByName(String name) {
 		try {
-			return (Block) Block.blockRegistry.getObject(new ResourceLocation(name));
+			return (Block) Block.REGISTRY.getObject(new ResourceLocation(name));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -43,7 +43,7 @@ public class CoroUtilBlock {
 	}*/
 	
 	public static String getNameByBlock(Block item) {
-		return Block.blockRegistry.getNameForObject(item).toString();
+		return Block.REGISTRY.getNameForObject(item).toString();
 	}
 	
 }

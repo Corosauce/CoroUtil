@@ -72,14 +72,14 @@ public class UtilPlayer {
 					}
 	                
 	                //get val
-	                float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
+	                float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 	                float f1 = 0.0F;
 	
 	                if (entP instanceof EntityLivingBase)
 	                {
 	                	if (itemstack != null) {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
-	                        f1 = EnchantmentHelper.func_152377_a(itemstack, EnumCreatureAttribute.UNDEFINED);
+	                        f1 = EnchantmentHelper.getModifierForCreature(itemstack, EnumCreatureAttribute.UNDEFINED);
 	                        //i += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)par1Entity);
 	                	}
 	                }

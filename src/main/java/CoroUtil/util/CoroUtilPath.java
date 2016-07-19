@@ -37,7 +37,7 @@ public class CoroUtilPath {
 			
 			double distToPlayer = ent.getDistance(x, y, z);//ent.getDistanceToEntity(player);
 			
-			double followDist = ent.getEntityAttribute(SharedMonsterAttributes.followRange).getAttributeValue();
+			double followDist = ent.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).getAttributeValue();
 			
 			if (distToPlayer <= followDist) {
 				//boolean success = ent.getNavigator().tryMoveToEntityLiving(player, moveSpeedAmp);

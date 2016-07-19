@@ -10,18 +10,20 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class CoroUtilEntity {
 
 	public static boolean canCoordBeSeen(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
     public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3(x, y, z)) == null;
+        return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
     public static double getDistance(Entity ent, BlockCoord coords)
@@ -65,7 +67,7 @@ public class CoroUtilEntity {
 	}
 	
 	public static EntityPlayer getPlayerByUUID(UUID uuid) {
-		Iterator iterator = MinecraftServer.getServer().getConfigurationManager().playerEntityList.iterator();
+		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().playerEntityList.iterator();
         EntityPlayerMP entityplayermp;
         
         while (iterator.hasNext()) {

@@ -10,6 +10,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 public class CommandCoroUtilClient extends CommandBase {
@@ -20,7 +21,7 @@ public class CommandCoroUtilClient extends CommandBase {
 	}
 
 	@Override
-	public void processCommand(ICommandSender var1, String[] var2) {
+	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
 		try {
 			

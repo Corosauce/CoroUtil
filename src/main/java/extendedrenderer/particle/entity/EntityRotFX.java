@@ -30,6 +30,39 @@ public class EntityRotFX extends Particle
     //used in RotatingEffectRenderer to assist in solving some transparency ordering issues, eg, tornado funnel before clouds
     public int renderOrder = -1;
     
+    //not a real entity ID now, just used for making rendering of entities slightly unique
+    private int entityID = 0;
+    
+    public float rotationYaw;
+    public float rotationPitch;
+    
+    public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
+    {
+        super(par1World, par2, par4, par6, par8, par10, par12);
+        setSize(0.3F, 0.3F);
+        //this.isImmuneToFire = true;
+        
+        this.entityID = par1World.rand.nextInt(100000);
+    }/*
+
+    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int colorIndex)
+    {
+        super(var1, var2, var4, var6, var8, var10, var12);
+        setSize(0.3F, 0.3F);
+        this.isImmuneToFire = true;
+    }
+
+    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int texIDs[])
+    {
+        super(var1, var2, var4, var6, var8, var10, var12);
+        setSize(0.3F, 0.3F);
+        this.isImmuneToFire = true;
+    }
+    
+    public EntityRotFX(World worldIn, double posXIn, double posYIn, double posZIn) {
+    	super(worldIn, posXIn, posYIn, posZIn);
+	}*/
+    
     public int getParticleTextureIndex()
     {
         return this.particleTextureIndexInt;
@@ -87,27 +120,6 @@ public class EntityRotFX extends Particle
     public int getFXLayer()
     {
         return 5;
-    }
-
-    public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
-    {
-        super(par1World, par2, par4, par6, par8, par10, par12);
-        setSize(0.3F, 0.3F);
-        this.isImmuneToFire = true;
-    }
-
-    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int colorIndex)
-    {
-        super(var1, var2, var4, var6, var8, var10, var12);
-        setSize(0.3F, 0.3F);
-        this.isImmuneToFire = true;
-    }
-
-    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int texIDs[])
-    {
-        super(var1, var2, var4, var6, var8, var10, var12);
-        setSize(0.3F, 0.3F);
-        this.isImmuneToFire = true;
     }
     
     @Override
@@ -241,5 +253,13 @@ public class EntityRotFX extends Particle
 
 	public void setPrevPosZ(double prevPosZ) {
 		this.prevPosZ = prevPosZ;
+	}
+
+	public int getEntityId() {
+		return entityID;
+	}
+	
+	public World getWorld() {
+		return this.worldObj;
 	}
 }

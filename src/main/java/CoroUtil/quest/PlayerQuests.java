@@ -95,7 +95,7 @@ public class PlayerQuests {
 	}
 	
 	public void sync() {
-		if (MinecraftServer.getServer() != null)
+		if (FMLCommonHandler.instance().getMinecraftServerInstance() != null)
         {
 			
 			NBTTagCompound nbt = new NBTTagCompound();

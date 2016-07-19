@@ -8,6 +8,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -68,7 +69,7 @@ public class ExtendedRenderer {
 	}
 	
 	public static String getSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;
@@ -77,7 +78,7 @@ public class ExtendedRenderer {
     }
 	
 	public static String getWorldSaveFolderPath() {
-    	if (MinecraftServer.getServer() == null || MinecraftServer.getServer().isSinglePlayer()) {
+    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "saves" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;

@@ -402,7 +402,7 @@ public class EntityTropicalFishHook extends Entity implements IEntityAdditionalS
          this.bobber.motionZ += var6 * var10;
          var1 = 3;
       } else if(this.ticksCatchable > 0) {
-         EntityItem var13 = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Items.fish));
+         EntityItem var13 = new EntityItem(this.worldObj, this.posX, this.posY, this.posZ, new ItemStack(Items.FISH));
          double var3 = this.angler.posX - this.posX;
          double var5 = this.angler.posY - this.posY;
          double var7 = this.angler.posZ - this.posZ;

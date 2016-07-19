@@ -1,6 +1,7 @@
 package CoroUtil.bt.selector;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.math.Vec3d;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
@@ -52,7 +53,7 @@ public class SelectorMoveToCoords extends Selector {
 			//closeDist = 10;
 			
 			//dbg("moveto dist: " + dist);
-			if (dist < closeDist && (!useSight || canBeSeen(new Vec3(coordsRef[0].posX, coordsRef[0].posY+1.1D, coordsRef[0].posZ)))) {
+			if (dist < closeDist && (!useSight || canBeSeen(new Vec3d(coordsRef[0].posX, coordsRef[0].posY+1.1D, coordsRef[0].posZ)))) {
 				
 				noMoveTicks = 0;
 				//keep in mind, having this set to clear really broke the ai when job hunt is firing....
@@ -97,10 +98,10 @@ public class SelectorMoveToCoords extends Selector {
 		}
 	}
 	
-	public boolean canBeSeen(Vec3 pos)
+	public boolean canBeSeen(Vec3d pos)
     {
 		EntityLivingBase entL = ((EntityLivingBase)ent);
-        return entL.worldObj.rayTraceBlocks(new Vec3(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
+        return entL.worldObj.rayTraceBlocks(new Vec3d(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	
 }

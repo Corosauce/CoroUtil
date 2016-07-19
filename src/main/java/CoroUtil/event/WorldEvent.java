@@ -16,6 +16,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import CoroUtil.entity.EnumJobState;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
@@ -187,7 +188,7 @@ public class WorldEvent {
     }*/
     
     public EntityPlayer tryGetCursedPlayer(String username) {
-    	EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerByUsername(username);
+    	EntityPlayer entP = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
     	if (entP != null && entP.worldObj.provider.getDimension() == DimensionManager.getWorld(dimensionID).provider.getDimension()) {
@@ -293,7 +294,7 @@ public class WorldEvent {
 	                    }
 	                    
 	                    //get val
-	                    float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.attackDamage).getAttributeValue();
+	                    float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 	                    float f1 = 0.0F;
 
 	                    if (entP instanceof EntityLivingBase)

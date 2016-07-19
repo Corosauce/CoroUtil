@@ -1490,7 +1490,7 @@ public class PFQueue implements Runnable {
                             
                             //note...... an entity was unable to use stairs with tallgrass on it, even with this code here, wtf?
                             //adding isSideSolid checks to the partial pathing part possible fixed this, saw an entity path through 2 high tallgrass this time
-                            if (var11 == Material.circuits || var11 == Material.snow || var11 == Material.plants) {
+                            if (var11 == Material.circuits || var11 == Material.SNOW || var11 == Material.plants) {
                             	return 1;
                             }
                             

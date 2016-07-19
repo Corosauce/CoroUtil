@@ -33,9 +33,9 @@ public class JobTamable extends JobBase {
 	
 	@Override
 	public boolean hookInteract(EntityPlayer par1EntityPlayer) {
-		if (par1EntityPlayer.getCurrentEquippedItem() != null) {
+		if (par1EntityPlayer.getActiveItemStack() != null) {
 			if (!ent.worldObj.isRemote) {
-				if (par1EntityPlayer.getCurrentEquippedItem().isItemEqual(tameItem)) {
+				if (par1EntityPlayer.getActiveItemStack().isItemEqual(tameItem)) {
 					AITamable tamable = entInt.getAIAgent().jobMan.getPrimaryJob().tamable;
 					if (!tamable.isTame()) tamable.tameBy(CoroUtilEntity.getName(par1EntityPlayer));
 					incTameTime();
@@ -47,7 +47,7 @@ public class JobTamable extends JobBase {
 			    		ai.entInv.rightClickItem();
 			    		ai.entInv.inventory.setInventorySlotContents(0, null);
 					} else {*/
-						par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = par1EntityPlayer.getCurrentEquippedItem().copy();
+						par1EntityPlayer.inventory.mainInventory[par1EntityPlayer.inventory.currentItem] = par1EntityPlayer.getActiveItemStack().copy();
 					//}
 		    		
 		    		

@@ -246,7 +246,7 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public boolean isNaturalSurfaceBlock(Block id) {
-		if (id == Blocks.snow || id == Blocks.grass || id == Blocks.dirt || id == Blocks.sand || id == Blocks.stone || id == Blocks.gravel || id == Blocks.tallgrass) {
+		if (id == Blocks.SNOW || id == Blocks.GRASS || id == Blocks.DIRT || id == Blocks.SAND || id == Blocks.STONE || id == Blocks.GRAVEL || id == Blocks.TALLGRASS) {
 			return true;
 		}
 		if (isLogOrLeafBlock(id)) return true;

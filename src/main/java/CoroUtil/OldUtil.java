@@ -17,7 +17,9 @@ import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.pathfinding.PathEntityEx;
@@ -162,7 +164,7 @@ public class OldUtil {
 		checkforMCP = false;
 		try {
 			//runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "tickables") != null;
-			runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "motd") != null;
+			runningMCP = getPrivateValue(MinecraftServer.class, FMLCommonHandler.instance().getMinecraftServerInstance(), "motd") != null;
 		} catch (Exception e) {
 			runningMCP = false;
 			System.out.println("CoroAI: 'tickables' field not found, mcp mode disabled");
@@ -419,7 +421,7 @@ public class OldUtil {
     //public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
     //public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
     //public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
-    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue(); }
+    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue(); }
     //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
     public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
@@ -429,8 +431,8 @@ public class OldUtil {
     public static double getDistance(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.distanceSq(coords2.posX, coords.posY, coords2.posZ)); }
-    public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(new Vec3(parVec.xCoord, parVec.yCoord, parVec.zCoord), new Vec3(posX, posY, posZ)) == null; }
-    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(new Vec3(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3(posX, posY, posZ)) == null; }
-    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(new Vec3(posX, posY, posZ), new Vec3(posX2, posY2, posZ2)) == null; }
+    public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(new Vec3d(parVec.xCoord, parVec.yCoord, parVec.zCoord), new Vec3d(posX, posY, posZ)) == null; }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(posX, posY, posZ)) == null; }
+    public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(new Vec3d(posX, posY, posZ), new Vec3d(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }

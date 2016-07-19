@@ -3,10 +3,11 @@ package CoroUtil.forge;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldEventListener;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.componentAI.ICoroAI;
 
-public class CoroAIWorldAccess implements IWorldAccess {
+public class CoroAIWorldAccess implements IWorldEventListener {
 
 	@Override
 	public void markBlockForUpdate(BlockPos pos) {

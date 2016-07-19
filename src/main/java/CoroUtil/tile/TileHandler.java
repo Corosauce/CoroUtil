@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import CoroUtil.packet.PacketHelper;
 
 public class TileHandler {
@@ -64,7 +65,7 @@ public class TileHandler {
 	public void tickUpdate() {
 		if (tileDataWatcher.hasChanges()) {
 			//System.out.println("server side detects changes! packets go go go!");
-			MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayersInDimension(PacketHelper.createPacketForTEntDWServer(tEnt), tEnt.getWorld().provider.getDimension());
+			FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().sendPacketToAllPlayersInDimension(PacketHelper.createPacketForTEntDWServer(tEnt), tEnt.getWorld().provider.getDimension());
 		}
 	}
 	

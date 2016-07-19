@@ -18,6 +18,7 @@ import net.minecraft.pathfinding.Path;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import CoroUtil.OldUtil;
 import CoroUtil.componentAI.AIAgent;
@@ -157,8 +158,8 @@ public class JobBase {
 		
 		if (pe != null && !pe.isFinished()) {
 			
-			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
-				if (pe.getPosition(ent).distanceTo(new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
+			if (ent.worldObj.rayTraceBlocks(pe.getPosition(ent), new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) == null) {
+				if (pe.getPosition(ent).distanceTo(new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)) < 3F) {
 					pe.incrementPathIndex();
 				}
 				//System.out.println("next path!");

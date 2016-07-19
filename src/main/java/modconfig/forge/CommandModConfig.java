@@ -9,6 +9,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import CoroUtil.util.CoroUtil;
 
@@ -34,7 +35,7 @@ public class CommandModConfig extends CommandBase {
     }
 
 	@Override
-	public void processCommand(ICommandSender var1, String[] var2) {
+	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
 		try {
 			if(var1 instanceof EntityPlayerMP)

@@ -32,7 +32,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		super.initCustomData();
 
 		blockCoords = parCoords;
-		blockType = Block.blockRegistry.getNameForObject(parBlock).toString();
+		blockType = Block.REGISTRY.getNameForObject(parBlock).toString();
 		
 	}
 
@@ -87,7 +87,7 @@ public class BreakBlockQuest extends ActiveQuest {
 	}
 	
 	public Block getBlock() {
-		return (Block)Block.blockRegistry.getObject(new ResourceLocation(blockType));
+		return (Block)Block.REGISTRY.getObject(new ResourceLocation(blockType));
 	}
 	
 	public void load(NBTTagCompound parNBT) {

@@ -113,7 +113,7 @@ public class DynamicDifficulty {
     						for (int y = -1; !foundWall && y <= 1; y++) {
     							IBlockState state = world.getBlockState(new BlockPos(pX+x, pY+y, pZ+z));
     							block = state.getBlock();
-    							if (block != Blocks.air) {
+    							if (block != Blocks.AIR) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
     								block.addCollisionBoxesToList(world, new BlockPos(pX+x, pY+y, pZ+z), state, player.getEntityBoundingBox(), list, player);
     								if (list.size() > 0) {
@@ -444,24 +444,24 @@ public class DynamicDifficulty {
 		} else if (block instanceof BlockSapling) {
 			return scaleBase * 0.3F;
 		} else if (block instanceof BlockOre) {
-			if (block == Blocks.coal_ore) {
+			if (block == Blocks.COAL_ORE) {
 				return scaleBase * 0.2F;
-			} else if (block == Blocks.iron_ore) {
+			} else if (block == Blocks.IRON_ORE) {
 				return defaultIron;
-			} else if (block == Blocks.gold_ore) {
+			} else if (block == Blocks.GOLD_ORE) {
 				return scaleBase * 0.4F;
-			} else if (block == Blocks.lit_redstone_ore || block == Blocks.redstone_ore) {
+			} else if (block == Blocks.LIT_REDSTONE_ORE || block == Blocks.REDSTONE_ORE) {
 				return scaleBase * 0.5F;
-			} else if (block == Blocks.lapis_ore) {
+			} else if (block == Blocks.LAPIS_ORE) {
 				return scaleBase * 0.6F;
-			} else if (block == Blocks.diamond_ore) {
+			} else if (block == Blocks.DIAMOND_ORE) {
 				return scaleBase * 1F;
-			} else if (block == Blocks.emerald_ore) {
+			} else if (block == Blocks.EMERALD_ORE) {
 				return scaleBase * 1.2F;
 			} else {
 				return defaultIron;
 			}
-		} else if (OreDictionary.getOres(Block.blockRegistry.getNameForObject(block).toString()).size() > 0) {
+		} else if (OreDictionary.getOres(Block.REGISTRY.getNameForObject(block).toString()).size() > 0) {
 			return defaultIron;
 		} else {
 			return 0;
@@ -476,20 +476,20 @@ public class DynamicDifficulty {
 	}
 	
 	public static void logDamage(LivingHurtEvent event) {
-		if (event.entity.worldObj.isRemote) return;
+		if (event.getEntity().worldObj.isRemote) return;
 		if (ConfigDynamicDifficulty.trackChunkData) {
 			
-			Entity ent = event.entity;
+			Entity ent = event.getEntity();
 			World world = ent.worldObj;
 			
 			if (ent instanceof IMob && ent instanceof EntityCreature) {
 				EntityCreature entC = (EntityCreature) ent;
 				
 				//dont log common occuring damages, sun burning, random wall glitching
-				if (event.source == DamageSource.inWall || 
-						event.source == DamageSource.inFire || 
-						event.source == DamageSource.onFire || 
-						event.source == DamageSource.drown/* || event.source == DamageSource.lava*/) {
+				if (event.getSource() == DamageSource.inWall || 
+						event.getSource() == DamageSource.inFire || 
+						event.getSource() == DamageSource.onFire || 
+						event.getSource() == DamageSource.drown/* || event.source == DamageSource.lava*/) {
 					return;
 				}
 				
@@ -512,7 +512,7 @@ public class DynamicDifficulty {
 					}
 				}
 				
-				float damageToLog = event.ammount;
+				float damageToLog = event.getAmount();
 				if (log.getLastDamage() > 0) {
 					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
 					float timeDiffSeconds = (float)timeDiff / 20F;
@@ -546,10 +546,10 @@ public class DynamicDifficulty {
 	}
 	
 	public static void logDeath(LivingDeathEvent event) {
-		if (event.entity.worldObj.isRemote) return;
+		if (event.getEntity().worldObj.isRemote) return;
 		if (ConfigDynamicDifficulty.trackChunkData) {
 			
-			Entity ent = event.entity;
+			Entity ent = event.getEntity();
 			World world = ent.worldObj;
 			
 			if (ent instanceof IMob && ent instanceof EntityCreature) {

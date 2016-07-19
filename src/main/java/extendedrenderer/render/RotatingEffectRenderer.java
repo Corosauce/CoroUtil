@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -54,7 +55,7 @@ public class RotatingEffectRenderer
         }
     }
 
-    public void addEffect(EntityFX var1)
+    public void addEffect(Particle var1)
     {
         int var2 = var1.getFXLayer();
 
@@ -72,7 +73,7 @@ public class RotatingEffectRenderer
         {
             for (int var2 = 0; var2 < this.fxLayers[var1].size(); ++var2)
             {
-                EntityFX var3 = (EntityFX)this.fxLayers[var1].get(var2);
+            	Particle var3 = (Particle)this.fxLayers[var1].get(var2);
 
                 if (var3 == null)
                 {
@@ -106,9 +107,9 @@ public class RotatingEffectRenderer
 
     public void renderParticles(Entity var1, float var2)
     {
-        EntityFX.interpPosX = var1.lastTickPosX + (var1.posX - var1.lastTickPosX) * (double)var2;
-        EntityFX.interpPosY = var1.lastTickPosY + (var1.posY - var1.lastTickPosY) * (double)var2;
-        EntityFX.interpPosZ = var1.lastTickPosZ + (var1.posZ - var1.lastTickPosZ) * (double)var2;
+    	Particle.interpPosX = var1.lastTickPosX + (var1.posX - var1.lastTickPosX) * (double)var2;
+    	Particle.interpPosY = var1.lastTickPosY + (var1.posY - var1.lastTickPosY) * (double)var2;
+    	Particle.interpPosZ = var1.lastTickPosZ + (var1.posZ - var1.lastTickPosZ) * (double)var2;
 
         try
         {
@@ -165,7 +166,7 @@ public class RotatingEffectRenderer
 
                     for (int var11 = this.fxLayers[var8].size()-1; var11 >= 0; --var11)
                     {
-                        EntityFX var12 = (EntityFX)this.fxLayers[var8].get(var11);
+                    	Particle var12 = (Particle)this.fxLayers[var8].get(var11);
 
                         if (var12 == null)
                         {
