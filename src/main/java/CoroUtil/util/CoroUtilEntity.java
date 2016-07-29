@@ -67,7 +67,7 @@ public class CoroUtilEntity {
 	}
 	
 	public static EntityPlayer getPlayerByUUID(UUID uuid) {
-		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().playerEntityList.iterator();
+		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerList().iterator();
         EntityPlayerMP entityplayermp;
         
         while (iterator.hasNext()) {

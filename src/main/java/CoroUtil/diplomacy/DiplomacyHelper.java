@@ -1,7 +1,6 @@
 package CoroUtil.diplomacy;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntityMob;
@@ -9,15 +8,13 @@ import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.componentAI.AITamable;
-import CoroUtil.componentAI.ICoroAI;
 
 public class DiplomacyHelper {
 
 	public String[] noAttackEnts;
 	public Class[] noAttackEntsCls;
 	
-	public static boolean shouldTargetEnt(ICoroAI source, Entity target) {
+	/*public static boolean shouldTargetEnt(ICoroAI source, Entity target) {
 		try {
 			if (target instanceof ICoroAI) {
 				//use team instance system
@@ -36,7 +33,7 @@ public class DiplomacyHelper {
 			//this will happen when ent death reference happens, cleanup, issue line was 'TeamInstance tiTarget = ((ICoroAI)target).getAIAgent().dipl_info;'
 		}
 		return false;
-	}
+	}*/
 	
 	public static boolean shouldTargetEnt(IBTAgent source, Entity target) {
 		TeamInstance tiSource = source.getAIBTAgent().dipl_info;
@@ -44,9 +41,9 @@ public class DiplomacyHelper {
 			
 			TeamInstance tiTarget = null;
 			
-			if (target instanceof ICoroAI) {
+			/*if (target instanceof ICoroAI) {
 				tiTarget = ((ICoroAI)target).getAIAgent().dipl_info;
-			} else if (target instanceof IBTAgent) {
+			} else */if (target instanceof IBTAgent) {
 				tiTarget = ((IBTAgent)target).getAIBTAgent().dipl_info;
 			} else if (target instanceof EntityPlayer) {
 				if (!((EntityPlayer)target).capabilities.isCreativeMode) {
@@ -81,7 +78,7 @@ public class DiplomacyHelper {
 		return false;
 	}
 	
-	public static boolean shouldTameTargetEnt(EntityLivingBase source, Entity target, AITamable tamable) {
+	/*public static boolean shouldTameTargetEnt(EntityLivingBase source, Entity target, AITamable tamable) {
 		//If new ai
 		try {
 			if (target instanceof ICoroAI) {
@@ -98,6 +95,6 @@ public class DiplomacyHelper {
 			//this will happen when ent death reference happens, cleanup, issue line was 'TeamInstance tiTarget = ((ICoroAI)target).getAIAgent().dipl_info;'
 		}
 		return false;
-	}
+	}*/
 	
 }

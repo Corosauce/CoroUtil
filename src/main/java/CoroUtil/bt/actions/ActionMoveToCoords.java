@@ -4,14 +4,14 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
+import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.leaf.LeafAction;
-import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.Vec3;
 
 public class ActionMoveToCoords extends LeafAction {
 
-	public ICoroAI ent;
+	public IBTAgent ent;
 	public BlockCoord[] coordsRef;
 	public int closeDist;
 	public boolean ignoreY = false;
@@ -23,7 +23,7 @@ public class ActionMoveToCoords extends LeafAction {
 	public double noMoveTicksThreshold = 0.1D;
 	public Vec3 noMoveTicksLastPos;
 	
-	public ActionMoveToCoords(Behavior parParent, ICoroAI parEnt, BlockCoord[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
+	public ActionMoveToCoords(Behavior parParent, IBTAgent parEnt, BlockCoord[] parCoordsRef, int parCloseDist, boolean parIgnoreY, boolean parHelpMonitor) {
 		super(parParent);
 		ent = parEnt;
 		coordsRef = parCoordsRef;
@@ -59,7 +59,8 @@ public class ActionMoveToCoords extends LeafAction {
 				if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).worldObj.getWorldTime() % 20 == 0) {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
-					ent.getAIAgent().moveTo(coordsRef[0]);
+					//TODO: 1.10 fix, used to use ICoroAI for some reason despite being a BT class
+					//ent.getAIBTAgent().moveTo(coordsRef[0]);
 					noMoveTicks = 0;
 				}
 				//timeout check go here maybe?

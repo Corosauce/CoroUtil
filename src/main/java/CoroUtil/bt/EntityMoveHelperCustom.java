@@ -82,10 +82,10 @@ public class EntityMoveHelperCustom
                 	extraSpeed = 4F;
                 }
                 
-                this.entity.setAIMoveSpeed((float)(extraSpeed * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue()));
+                this.entity.setAIMoveSpeed((float)(extraSpeed * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
                 
                 if (canFly || canSwimInWater) {
-                	this.entity.jumpMovementFactor = (float)(0.5F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
+                	this.entity.jumpMovementFactor = (float)(0.5F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
                 }
                 
                 /*if (d2 > 0.0D) {
@@ -106,7 +106,7 @@ public class EntityMoveHelperCustom
                 				extraY = 10F;
                 			}*/
                 			
-                			entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
+                			entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 		} else {
                 			((EntityLiving)this.entity).getJumpHelper().setJumping();
                 		}
@@ -124,7 +124,7 @@ public class EntityMoveHelperCustom
                 
                 if (d2 > 0.0D) {
                 	if (entity.isInWater() || entity.onGround) {
-                		entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue();
+                		entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 	}
                 }
             }
@@ -136,7 +136,7 @@ public class EntityMoveHelperCustom
      */
     private float limitAngle(float par1, float par2, float par3)
     {
-        float f3 = MathHelper.wrapAngleTo180_float(par2 - par1);
+        float f3 = MathHelper.wrapDegrees(par2 - par1);
 
         if (f3 > par3)
         {

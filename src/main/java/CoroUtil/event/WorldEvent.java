@@ -9,6 +9,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -188,7 +189,7 @@ public class WorldEvent {
     }*/
     
     public EntityPlayer tryGetCursedPlayer(String username) {
-    	EntityPlayer entP = FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(username);
+    	EntityPlayer entP = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
     	if (entP != null && entP.worldObj.provider.getDimension() == DimensionManager.getWorld(dimensionID).provider.getDimension()) {
@@ -265,7 +266,7 @@ public class WorldEvent {
 			if (entP != null) {
 				for (int armorIndex = 0; armorIndex < 4; armorIndex++) {
 					if (entP.inventory.armorInventory[armorIndex] != null && entP.inventory.armorInventory[armorIndex].getItem() instanceof ItemArmor) {
-						armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.inventory.armorInventory, DamageSource.generic);
+						armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.getArmorInventoryList(), DamageSource.generic);
 					}
 				}
 				
@@ -280,7 +281,7 @@ public class WorldEvent {
 				
 				//initial removal of current weap attrib
 				ItemStack itemstack = entP.inventory.getCurrentItem();
-				if (itemstack != null) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers());
+				if (itemstack != null) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 				
 				for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.length; slotIndex++) {
 					if (entP.inventory.mainInventory[slotIndex] != null) {
@@ -290,7 +291,7 @@ public class WorldEvent {
 	                    if (itemstack != null)
 	                    {
 	                    	//add attrib
-	                    	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers());
+	                    	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 	                    }
 	                    
 	                    //get val
@@ -310,7 +311,7 @@ public class WorldEvent {
 						if (itemstack != null)
 	                    {
 							//remove attrib
-							entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers());
+							entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 	                    }
 						
 	                    if (dmg > bestWeaponValue) {
@@ -321,7 +322,7 @@ public class WorldEvent {
 				
 				//readd of current weapon attrib
 				itemstack = entP.inventory.getCurrentItem();
-				if (itemstack != null) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers());
+				if (itemstack != null) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 				
 				//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);
 				/////////////////WorldDirector.getPlayerNBT(entP.username).setInteger("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));

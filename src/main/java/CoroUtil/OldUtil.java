@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FoodStats;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -425,7 +426,7 @@ public class OldUtil {
     //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
     public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
-    public static boolean chunkExists(World world, int x, int z) { return world.getChunkProvider().chunkExists(x, z); } //fixed for 1.5
+    public static boolean chunkExists(World world, int x, int z) { return world.isBlockLoaded(new BlockPos(x * 16, 128, z * 16)); } //fixed for 1.5
     
     public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor_double(ent.posX), MathHelper.floor_double(ent.posY), MathHelper.floor_double(ent.posZ)); }
     public static double getDistance(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }

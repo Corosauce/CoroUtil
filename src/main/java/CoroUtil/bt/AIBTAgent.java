@@ -115,11 +115,13 @@ public class AIBTAgent {
         //this.dataWatcher.addObject(20, Integer.valueOf(0)); //Move speed state
         //this.dataWatcher.addObject(21, Integer.valueOf(0)); //Swing arm state
 		
-        ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
+		//TODO: 1.10.x NEEDS MOVE TO NEW DATA SYSTEM
+		System.out.println("DATAWATCHER 1.10.x NEEDS MOVE TO NEW DATA SYSTEM");
+        /*ent.getDataWatcher().addObject(22, Integer.valueOf(0)); //onGround state for fall through floor fix
         //ent.getDataWatcher().addObject(23, new Integer(ent.getMaxHealth()));
         ent.getDataWatcher().addObject(24, Integer.valueOf(0)); //AI state, used for stuff like sitting animation, etc
         ent.getDataWatcher().addObject(25, Integer.valueOf(0)); //swing arm state
-        
+*/        
     }
 	
 	public void initBTTemplate() {
@@ -233,7 +235,7 @@ public class AIBTAgent {
 		//2: (prev operations) * (1F + modifier) (so a negative can multiply it down)
 		
 		//baseline movespeed
-		ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(moveSpeed);
+		ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(moveSpeed);
 	}
 	
 	public void tickAI() {

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.nbt.NBTTagCompound;
@@ -84,9 +85,10 @@ public class ChunkDataPoint
 		    			int heightVal = Math.max(0, chunk.getHeightValue(x, z)-1);
 		    			
 		    			if (heightVal >= 0) {
-			    			Block id = chunk.getBlock(x, heightVal, z);
+		    				IBlockState state = chunk.getBlockState(new BlockPos(x, heightVal, z));
+			    			Block id = state.getBlock();
 			    			
-			    			if (id.getMaterial().isLiquid()) {
+			    			if (id.getMaterial(state).isLiquid()) {
 		    					countWater++;
 		    				} else {
 		    					countLand++;

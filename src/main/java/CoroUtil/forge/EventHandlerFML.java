@@ -17,7 +17,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.formation.Manager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
@@ -26,7 +25,7 @@ import CoroUtil.world.player.DynamicDifficulty;
 public class EventHandlerFML {
 
 	public static World lastWorld = null;
-	public static Manager formationManager;
+	//public static Manager formationManager;
 	
 	@SideOnly(Side.CLIENT)
 	public static SoundTest soundTest;
@@ -45,7 +44,7 @@ public class EventHandlerFML {
 		
 		if (event.phase == Phase.START) {
 			//System.out.println("tick coroutil");
-			if (formationManager == null) formationManager = new Manager();
+			//if (formationManager == null) formationManager = new Manager();
 			
 			//might not account for dynamic dimension addition during runtime
 	    	if (lastWorld != DimensionManager.getWorld(0)) {
@@ -53,11 +52,11 @@ public class EventHandlerFML {
 	    		
 	    		World worlds[] = DimensionManager.getWorlds();
 	    		for (int i = 0; i < worlds.length; i++) {
-	    			worlds[i].addWorldAccess(new CoroAIWorldAccess());
+	    			worlds[i].addEventListener(new CoroAIWorldAccess());
 	    		}
 	    	}
 			
-			if (formationManager != null) formationManager.tickUpdate();
+			//if (formationManager != null) formationManager.tickUpdate();
 			
 			//Quest system
 	    	World worlds[] = DimensionManager.getWorlds();

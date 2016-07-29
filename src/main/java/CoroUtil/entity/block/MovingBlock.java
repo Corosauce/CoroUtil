@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -136,11 +137,12 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 
     @Override
     public void entityInit() {
-    	this.dataWatcher.addObject(2, Float.valueOf(rotationYawB));
+    	//TODO: 1.10 datawatcher to new system
+    	/*this.dataWatcher.addObject(2, Float.valueOf(rotationYawB));
     	this.dataWatcher.addObject(3, Float.valueOf(rotationPitchB));
     	this.dataWatcher.addObject(4, Float.valueOf(rotationRoll));
     	this.dataWatcher.addObject(5, Integer.valueOf(state));
-    	this.dataWatcher.addObject(6, Float.valueOf(scale));
+    	this.dataWatcher.addObject(6, Float.valueOf(scale));*/
     }
 
     @Override
@@ -175,7 +177,8 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	++this.age;
     	
     	//datawatchers
-    	if (worldObj.isRemote) {
+    	//TODO: 1.10 datawatcher to new system
+    	/*if (worldObj.isRemote) {
     		rotationYaw = rotationYawB = dataWatcher.getWatchableObjectFloat(2);
     		rotationPitch = rotationPitchB = dataWatcher.getWatchableObjectFloat(3);
     		rotationRoll = dataWatcher.getWatchableObjectFloat(4);
@@ -193,7 +196,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     			System.out.println("commenting out PacketDispatcher.sendPacketToAllInDimension call in MovingBlock");
     			//PacketDispatcher.sendPacketToAllInDimension(new Packet34EntityTeleport(getEntityId(), this.myEntitySize.multiplyBy32AndRound(posX), this.myEntitySize.multiplyBy32AndRound(posY), this.myEntitySize.multiplyBy32AndRound(posZ), (byte)0, (byte)0), worldObj.provider.dimensionId);
     		}
-    	}
+    	}*/
     	
     	//Main movement
         this.motionX *= (double)speedSlowing;
@@ -230,7 +233,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	int aheadEndY = MathHelper.floor_double(posY + (motionY));
 		    	int aheadEndZ = MathHelper.floor_double(posZ + (motionZ));
 		    	
-		    	Block id = worldObj.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ)).getBlock();
+		    	IBlockState id = worldObj.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ));
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
@@ -242,7 +245,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    		int aheadX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 				    	int aheadY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 				    	int aheadZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    	Block idCheck = worldObj.getBlockState(new BlockPos(aheadX, aheadY, aheadZ)).getBlock();
+				    	IBlockState idCheck = worldObj.getBlockState(new BlockPos(aheadX, aheadY, aheadZ));
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -258,7 +261,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			int tryX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
 					    	int tryY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
 					    	int tryZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    		Block idTry = worldObj.getBlockState(new BlockPos(tryX, tryY, tryZ)).getBlock();
+				    		IBlockState idTry = worldObj.getBlockState(new BlockPos(tryX, tryY, tryZ));
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);
@@ -346,8 +349,8 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         
     }
     
-    public boolean isSolid(Block id) {
-    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.circuits && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.plants && id.getMaterial().isSolid());
+    public boolean isSolid(IBlockState id) {
+    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.CIRCUITS && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.PLANTS && id.getMaterial().isSolid());
     }
     
     public void setPositionAndRotation(double par1, double par3, double par5, float par7, float par8, float parRoll)

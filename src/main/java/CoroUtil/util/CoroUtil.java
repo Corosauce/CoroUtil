@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
 
 public class CoroUtil {
 
@@ -32,7 +33,7 @@ public class CoroUtil {
 	
 	public static float updateRotation(float par1, float par2, float par3)
     {
-        float f3 = MathHelper.wrapAngleTo180_float(par2 - par1);
+        float f3 = MathHelper.wrapDegrees(par2 - par1);
 
         if (f3 > par3)
         {
@@ -79,7 +80,7 @@ public class CoroUtil {
 	}
 	
 	public static void sendPlayerMsg(EntityPlayerMP entP, String msg) {
-		entP.addChatMessage(new ChatComponentText(msg));
+		entP.addChatMessage(new TextComponentString(msg));
 	}
 	
 }

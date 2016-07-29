@@ -17,7 +17,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.entity.EntityTropicalFishHook;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilItem;
@@ -31,7 +30,7 @@ public class AIInventory {
 	
 	//custom fakePlayer for Comrade support
 	public GameProfile playerProfile = null;
-	public FakePlayer fakePlayer = null;
+	//public FakePlayer fakePlayer = null;
 	
 	public EntityLivingBase entOwner;
 	
@@ -57,22 +56,18 @@ public class AIInventory {
 	}
 	
 	public static AIInventory getInventory(EntityLivingBase parEntSource) {
-		if (parEntSource instanceof ICoroAI) {
-			return ((ICoroAI)parEntSource).getAIAgent().entInv;
-		} else if (parEntSource instanceof IBTAgent) {
+		if (parEntSource instanceof IBTAgent) {
 			return ((IBTAgent)parEntSource).getAIBTAgent().entInv;
 		}
 		return null;
 	}
 	
 	//server side only
-	public FakePlayer getFakePlayer(World parWorld) {
+	/*public FakePlayer getFakePlayer(World parWorld) {
 		if (fakePlayer == null) {
-			playerProfile = new GameProfile(UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C99CAE77"), "fakePlayer" + entOwner.getEntityId()/*"[Minecraft]"*/);
+			playerProfile = new GameProfile(UUID.fromString("41C82C87-7AfB-4024-BA57-13D2C99CAE77"), "fakePlayer" + entOwner.getEntityId()"[Minecraft]");
 			fakePlayer = FakePlayerFactory.get((WorldServer) parWorld, playerProfile);
-			if (entOwner instanceof ICoroAI) {
-				OldUtil.playerToCompAILookup.put(CoroUtilEntity.getName(fakePlayer), ((ICoroAI)entOwner).getAIAgent().entInt);
-			} else if (entOwner instanceof IBTAgent) {
+			if (entOwner instanceof IBTAgent) {
 				System.out.println("TODO: add lookup for fakeplayer to AIBTAgent");//((IBTAgent)entOwner).getAIBTAgent().entInv;
 			}
 			
@@ -86,7 +81,7 @@ public class AIInventory {
 		fakePlayer.rotationYawHead = entOwner.rotationYawHead;
 		
 		return fakePlayer;
-	}
+	}*/
 	
 	public void setSlotContents(int parSlot, ItemStack parStack) {
 		inventory.setInventorySlotContents(parSlot, parStack);
@@ -107,16 +102,16 @@ public class AIInventory {
 		return inventory.getStackInSlot(slot_Active);
 	}
 	
-	public void attackMelee(Entity ent, float dist) {
+	/*public void attackMelee(Entity ent, float dist) {
 		setSlotActive(slot_Melee);
 		performLeftClick(ent, dist);
 	}
 
 	public void attackRanged(Entity ent, float dist) {
 		setSlotActive(slot_Ranged);
-		/*CoroUtil.faceEntity(fakePlayer, ent, 180, 180);*/
+		//CoroUtil.faceEntity(fakePlayer, ent, 180, 180);
 		performRightClick();
-	}
+	}*/
 	
 	public NBTTagCompound nbtWrite() {
 		NBTTagCompound nbt = new NBTTagCompound();
@@ -154,7 +149,7 @@ public class AIInventory {
             	inventory.invList[i] = ItemStack.loadItemStackFromNBT(nbttaglist.getCompoundTagAt(i));
             }
         }
-	}
+	}/*
 	
 	public void performLeftClick(Entity ent, float dist) {
 		//System.out.println("CHECK: performLeftClick in AIInventory");
@@ -183,18 +178,19 @@ public class AIInventory {
 			Item item = is.getItem();
 			if (item != null) {
 				//special fishing exception
-				/*if (item instanceof ItemTropicalFishingRod) {
+				if (item instanceof ItemTropicalFishingRod) {
 					((ItemTropicalFishingRod)item).onItemRightClickSpecial(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj), entOwner);
-				} else {*/
+				} else {
 					item.onItemRightClick(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj));
 				//}
 			}
 		}
-	}
+	}*/
 	
 	public void syncToClient() {
 		//syncing might not actually be needed given we are setting from our inventory to vanilla EntityLivingBase inventory
-		entOwner.setCurrentItemOrArmor(0, inventory.getStackInSlot(getSlotActive()));
+		//TODO: 1.10 verify if needed
+		//entOwner.setCurrentItemOrArmor(0, inventory.getStackInSlot(getSlotActive()));
 	}
 	
 	public void tick() {
@@ -227,11 +223,11 @@ public class AIInventory {
 	}
 	
 	public void cleanup() {
-		if (fakePlayer != null) OldUtil.playerToCompAILookup.remove(CoroUtilEntity.getName(fakePlayer));
+		//if (fakePlayer != null) OldUtil.playerToCompAILookup.remove(CoroUtilEntity.getName(fakePlayer));
 		entOwner = null;
     	//inventory = null; //playerKillEvent needs this, race condition?
     	fishEntity = null;
     	playerProfile = null;
-    	fakePlayer = null;
+    	//fakePlayer = null;
     }
 }

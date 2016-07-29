@@ -5,6 +5,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
@@ -71,7 +72,8 @@ public class EventHandlerForge {
 			try {
 				
 				//an event is fired where its air and has no chunk X or Z, cancel this
-				if (event.action == Action.RIGHT_CLICK_AIR) return;
+				//if (event.action == Action.RIGHT_CLICK_AIR) return;
+				if (event instanceof RightClickEmpty) return;
 				
 				if (ConfigCoroAI.trackPlayerData) {
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.getWorld()).getChunkData(event.getPos().getX() / 16, event.getPos().getZ() / 16);

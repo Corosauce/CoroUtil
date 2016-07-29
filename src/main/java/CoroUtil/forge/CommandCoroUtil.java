@@ -20,7 +20,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
-import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
@@ -56,7 +55,7 @@ public class CommandCoroUtil extends CommandBase {
 						aq.initCreateObject(plQuests);
 						
 						aq.initFirstTime(player.worldObj.provider.getDimension());
-						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.diamond), 5, false);
+						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.DIAMOND), 5, false);
 						
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);
 						System.out.println("create success type: " + aq.questType);
@@ -220,13 +219,13 @@ public class CommandCoroUtil extends CommandBase {
 		player.worldObj.spawnEntityInWorld(ent);
 		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.worldObj.getDifficultyForLocation(new BlockPos(ent)), null);
-		if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
+		//if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {
 		List<String> entNames = new ArrayList<String>();
         
-		Iterator it = EntityList.stringToClassMapping.keySet().iterator();
+		Iterator it = EntityList.NAME_TO_CLASS.keySet().iterator();
 		
 		while (it.hasNext()) {
 			String entry = (String) it.next();
@@ -333,7 +332,7 @@ public class CommandCoroUtil extends CommandBase {
 	}
 	
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender)
+	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
     {
         return par1ICommandSender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
     }

@@ -1,29 +1,11 @@
 package CoroUtil.forge;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.componentAI.ICoroAI;
-import CoroUtil.entity.IEntityPacket;
 import CoroUtil.packet.INBTPacketHandler;
-import CoroUtil.packet.NBTDataManager;
-import CoroUtil.packet.PacketHelper;
-import CoroUtil.quest.PlayerQuestManager;
-import CoroUtil.quest.PlayerQuests;
-import CoroUtil.tile.ITilePacket;
-import CoroUtil.util.CoroUtilEntity;
 
 public class EventHandlerPacket {
 	
@@ -56,7 +38,7 @@ public class EventHandlerPacket {
 		return null;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
 		
@@ -93,15 +75,15 @@ public class EventHandlerPacket {
 				
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity instanceof IEntityPacket) {
-					((IEntityPacket) entity).handleNBTFromServer(nbt/*.getCompoundTag("abilities")*/);
+					((IEntityPacket) entity).handleNBTFromServer(nbt.getCompoundTag("abilities"));
 				}
 				
-				/*NBTTagCompound abilities = nbt.getCompoundTag("abilities");
+				NBTTagCompound abilities = nbt.getCompoundTag("abilities");
 				Iterator it = abilities.func_150296_c().iterator();
                 while (it.hasNext()) {
                 	String tagName = (String) it.next();
                 	NBTTagCompound entry = abilities.getCompoundTag(tagName);
-                }*/
+                }
 			} else if (command.equals("QuestData")) {
 				//receiving quest data for a specific player
 				NBTTagCompound data = nbt.getCompoundTag("data");
@@ -165,6 +147,6 @@ public class EventHandlerPacket {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-	}
+	}*/
 	
 }

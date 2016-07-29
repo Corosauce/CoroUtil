@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
@@ -83,7 +84,7 @@ public class AbilityAttackMelee extends Ability {
 			}
 			
 			if (curTickPerform == 1) {
-				this.owner.swingItem();
+				this.owner.swingArm(EnumHand.MAIN_HAND);
 			}
 			
 			if (target != null) {

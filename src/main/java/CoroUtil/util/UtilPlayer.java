@@ -36,7 +36,7 @@ public class UtilPlayer {
 		}
 		
 		//randomization appears to be in play for this
-		armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.inventory.armorInventory, DamageSource.generic);
+		armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.getArmorInventoryList(), DamageSource.generic);
 		
 		//new plan here for 1.6
 		//remove attrib from ent for current item

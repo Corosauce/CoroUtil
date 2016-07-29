@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class CommandCoroUtilClient extends CommandBase {
@@ -33,12 +34,12 @@ public class CommandCoroUtilClient extends CommandBase {
 	        		if (var2.length > 2) param = var2[2];
 	        		HashMap<String, Integer> entNames = listEntities(param, dim);
 	                
-	        		var1.addChatMessage(new ChatComponentText("List for dimension id: " + dim));
+	        		var1.addChatMessage(new TextComponentString("List for dimension id: " + dim));
 	        		
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    var1.addChatMessage(new ChatComponentText(pairs.getKey() + " = " + pairs.getValue()));
+	                    var1.addChatMessage(new TextComponentString(pairs.getKey() + " = " + pairs.getValue()));
 	                    //CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, pairs.getKey() + " = " + pairs.getValue());
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
@@ -84,7 +85,7 @@ public class CommandCoroUtilClient extends CommandBase {
 	}
 	
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender)
+	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
     {
         return true;
     }

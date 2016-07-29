@@ -65,7 +65,7 @@ public class TileHandler {
 	public void tickUpdate() {
 		if (tileDataWatcher.hasChanges()) {
 			//System.out.println("server side detects changes! packets go go go!");
-			FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().sendPacketToAllPlayersInDimension(PacketHelper.createPacketForTEntDWServer(tEnt), tEnt.getWorld().provider.getDimension());
+			FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().sendPacketToAllPlayersInDimension(PacketHelper.createPacketForTEntDWServer(tEnt), tEnt.getWorld().provider.getDimension());
 		}
 	}
 	

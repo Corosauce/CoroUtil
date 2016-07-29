@@ -58,7 +58,7 @@ public class ItemQuest extends ActiveQuest {
 	}
 	
 	public void pickupEvent(EntityItemPickupEvent event) {
-		if (event.getEntityPlayer().equals(playerQuests.getPlayer()) && CoroUtilItem.getNameByItem(event.item.getEntityItem().getItem()).equals(neededItemID)) {
+		if (event.getEntityPlayer().equals(playerQuests.getPlayer()) && CoroUtilItem.getNameByItem(event.getItem().getEntityItem().getItem()).equals(neededItemID)) {
 			curItemCount++;
 			saveAndSync();
 			System.out.println("quest item inc");

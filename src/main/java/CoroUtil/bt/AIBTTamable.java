@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import CoroUtil.OldUtil;
@@ -96,7 +97,7 @@ public class AIBTTamable {
 					}
 				}*/
 				
-				if (!agent.ent.isPotionActive(Potion.confusion.id)) agent.ent.addPotionEffect(new PotionEffect(Potion.confusion.id, 5, 0));
+				if (!agent.ent.isPotionActive(MobEffects.NAUSEA)) agent.ent.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 5, 0));
 			}
 		}
 	}

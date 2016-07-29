@@ -29,7 +29,7 @@ public class PacketHelper {
 
 	@SideOnly(Side.CLIENT)
 	public static void sendClientPacket(Packet packet) {
-		FMLClientHandler.instance().getClient().thePlayer.sendQueue.addToSendQueue(packet);
+		FMLClientHandler.instance().getClient().thePlayer.connection.sendPacket(packet);
 	}
 	
 	/*public static void writeNBTTagCompound(NBTTagCompound par0NBTTagCompound, DataOutputStream par1DataOutputStream) throws IOException

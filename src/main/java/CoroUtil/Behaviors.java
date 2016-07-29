@@ -8,6 +8,8 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.ai.EntityAIAttackMelee;
+import net.minecraft.entity.ai.EntityAIAttackRangedBow;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAITasks;
@@ -97,9 +99,9 @@ public class Behaviors {
 	
 	public static void checkOrFixTargetTasks(EntityCreature ent, Class targetClass) {
 		if (!aiEnhanced.containsKey(ent)) {
-			EntityAIBase newTask = new EntityAIAttackOnCollide(ent, targetClass, 0.23D/*entC.getAIMoveSpeed()*/, true);
+			EntityAIBase newTask = new EntityAIAttackMelee(ent, /*targetClass, */0.23D/*entC.getAIMoveSpeed()*/, true);
 			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, true);
-			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIArrowAttack((IRangedAttackMob)ent, 0.25F, 20, 60, 15.0F);
+			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIAttackRangedBow((EntitySkeleton)ent, 0.25F, /*20, */60, 15.0F);
 			
 			ent.tasks.addTask(3, newTask);
 			EntityAITasks targetTasks = (EntityAITasks)OldUtil.getPrivateValueSRGMCP(EntityLiving.class, ent, "field_70715_bh", "targetTasks");

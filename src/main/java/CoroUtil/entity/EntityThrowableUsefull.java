@@ -394,7 +394,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      */
     private float updateRotation(float p_70663_1_, float p_70663_2_, float p_70663_3_)
     {
-        float f3 = MathHelper.wrapAngleTo180_float(p_70663_2_ - p_70663_1_);
+        float f3 = MathHelper.wrapDegrees(p_70663_2_ - p_70663_1_);
 
         if (f3 > p_70663_3_)
         {

@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -69,7 +71,7 @@ public class PlayerQuests {
 	}
 	
 	public EntityPlayer getPlayer() {
-		return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerByUsername(playerName);
+		return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
 		//return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
 	}
 	
@@ -253,7 +255,7 @@ public class PlayerQuests {
 				qStr = "Type: " + activeQuests.get(i).questType;
 			}*/
 			
-			mc.fontRendererObj.drawStringWithShadow(EnumChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRendererObj.drawStringWithShadow(ChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
 			mc.fontRendererObj.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
 			mc.fontRendererObj.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
 		}

@@ -69,12 +69,12 @@ public class BreakBlockQuest extends ActiveQuest {
 			return;
 		}
 		if (getBlock() != null) {
-			if (getBlock() != event.state.getBlock()) {
+			if (getBlock() != event.getState().getBlock()) {
 				return;
 			}
 		}
 		if (blockCoords != null) {
-			if (blockCoords.posX != event.pos.getX() || blockCoords.posY != event.pos.getY() || blockCoords.posZ != event.pos.getZ()) {
+			if (blockCoords.posX != event.getPos().getX() || blockCoords.posY != event.getPos().getY() || blockCoords.posZ != event.getPos().getZ()) {
 				return;
 			}
 		}
