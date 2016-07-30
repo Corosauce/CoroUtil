@@ -101,7 +101,7 @@ public class DynamicDifficulty {
 			if (dbg) System.out.println("1");
     		if ((player.capabilities.isFlying || (!player.onGround && !player.isInWater() && !player.isInsideOfMaterial(Material.LAVA)))) {
     			if (dbg) System.out.println("2");
-    			if (player.ridingEntity == null) {
+    			if (player.getRidingEntity() == null) {
     				if (dbg) System.out.println("3");
     				Block block = null;
     				int pX = MathHelper.floor_double(player.posX);
@@ -115,7 +115,7 @@ public class DynamicDifficulty {
     							block = state.getBlock();
     							if (block != Blocks.AIR) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-    								block.addCollisionBoxesToList(world, new BlockPos(pX+x, pY+y, pZ+z), state, player.getEntityBoundingBox(), list, player);
+    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player);
     								if (list.size() > 0) {
     									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
         								foundWall = true;

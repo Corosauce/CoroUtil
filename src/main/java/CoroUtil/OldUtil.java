@@ -2,7 +2,6 @@ package CoroUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.HashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
@@ -22,7 +21,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import CoroUtil.componentAI.ICoroAI;
 import CoroUtil.pathfinding.PathEntityEx;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilBlock;
@@ -59,7 +57,7 @@ public class OldUtil {
 	//TODO: USE THIS INSTEAD NOW (for 1.8 only possibly) Launch.blackboard.get("fml.deobfuscatedEnvironment") , if it doesnt exist it means its running in production
 	
 	//public static HashMap<String, c_EntInterface> playerToAILookup = new HashMap();
-	public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();
+	//public static HashMap<String, ICoroAI> playerToCompAILookup = new HashMap();
 	
 	//Tropicraft reflection
 	public static boolean hasTropicraft = true; //try reflection once
@@ -403,7 +401,7 @@ public class OldUtil {
     	newPath = true;
     }
     
-    public static Entity getEntByPersistantID(World world, int id) {
+    /*public static Entity getEntByPersistantID(World world, int id) {
 		try {
 			for (int i = 0; i < world.loadedEntityList.size(); i++) {
 				Entity ent = (Entity)world.loadedEntityList.get(i);
@@ -417,7 +415,7 @@ public class OldUtil {
 			ex.printStackTrace();
 		}
 		return null;
-	}
+	}*/
     
     //public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
     //public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }

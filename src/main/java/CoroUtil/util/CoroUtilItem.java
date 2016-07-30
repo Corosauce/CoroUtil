@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
@@ -23,7 +24,7 @@ public class CoroUtilItem {
 	
 	public static Item getItemByName(String name) {
 		try {
-			Object obj = Item.itemRegistry.getObject(new ResourceLocation(name));
+			Object obj = Item.REGISTRY.getObject(new ResourceLocation(name));
 			if (obj != null) {
 				return (Item) obj;
 			} else {
@@ -36,12 +37,12 @@ public class CoroUtilItem {
 	}
 	
 	public static String getNameByItem(Item item) {
-		return Item.itemRegistry.getNameForObject(item).toString();
+		return Item.REGISTRY.getNameForObject(item).toString();
 	}
 	
 	public static float getLeftClickDamage(ItemStack is) {
 		if (is.getItem() == null) return 0;
-		ServersideAttributeMap attributes = new ServersideAttributeMap();
+		AttributeMap attributes = new AttributeMap();
 		attributes.registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
 		Multimap map = is.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, is);
 		attributes.applyAttributeModifiers(map);

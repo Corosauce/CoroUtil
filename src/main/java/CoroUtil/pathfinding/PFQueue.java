@@ -1515,7 +1515,7 @@ public class PFQueue implements Runnable {
                             	}
                             }
 
-                            if(var11 == Material.LAVA || var11 == Material.cactus) {
+                            if(var11 == Material.LAVA || var11 == Material.CACTUS) {
                                 return -2;
                             }
                             

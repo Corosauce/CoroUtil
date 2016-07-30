@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import CoroUtil.util.CoroUtil;
 
 public class CommandModConfig extends CommandBase {
@@ -26,7 +27,7 @@ public class CommandModConfig extends CommandBase {
 	}
 	
 	@Override
-	public List addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos)
+	public List getTabCompletionOptions(MinecraftServer server, ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos)
     {
 		List<String> list = new ArrayList<String>(ConfigMod.configLookup.get(getCommandName()).valsBoolean.keySet());
 		list.addAll(ConfigMod.configLookup.get(getCommandName()).valsInteger.keySet());
@@ -51,7 +52,7 @@ public class CommandModConfig extends CommandBase {
 						if (var2.length > 2) {
 							Object obj = ConfigMod.getField(var2[modid], var2[field]);
 							if (obj != null) {
-								var1.addChatMessage(new ChatComponentText(var2[field] + " = " + obj));
+								var1.addChatMessage(new TextComponentString(var2[field] + " = " + obj));
 							} else {
 								CoroUtil.sendPlayerMsg(playerMP, "failed to get " + var2[field]);
 							}
@@ -126,7 +127,7 @@ public class CommandModConfig extends CommandBase {
 	}
 	
 	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender par1ICommandSender)
+	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
     {
         return par1ICommandSender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
     }

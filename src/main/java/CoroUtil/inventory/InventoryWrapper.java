@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ReportedException;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 public class InventoryWrapper implements IInventory {
 
@@ -302,8 +304,8 @@ public class InventoryWrapper implements IInventory {
 	}
 
 	@Override
-	public IChatComponent getDisplayName() {
-		return new ChatComponentText("Inventory Wrapper");
+	public ITextComponent getDisplayName() {
+		return new TextComponentString("Inventory Wrapper");
 	}
 
 	@Override

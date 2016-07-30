@@ -45,7 +45,7 @@ public class ParticleBehaviorCharge extends ParticleBehaviors {
 		//for (int i = 0; i < particles.size(); i++) {
 			//EntityRotFX particle = particles.get(i);
 			
-			if (curTick == 0 || particle.isDead) {
+			if (curTick == 0 || !particle.isAlive()) {
 				particles.remove(particle);
 			} else {
 				double centerX = coordSource.xCoord + 0.0D;

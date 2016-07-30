@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -90,7 +92,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	    	int maxX = 0;
 	    	int maxZ = 0;
 	    	
-	    	List chunks = ((ChunkProviderServer)world.getChunkProvider()).func_152380_a();
+	    	List chunks = Lists.newArrayList(((ChunkProviderServer)world.getChunkProvider()).getLoadedChunks());
     		
 	    	if (chunks == null) {
 	    		try {
@@ -260,7 +262,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 
 	@Override
 	public boolean isAirBlock(BlockPos pos) {
-		return this.getBlockState(pos).getBlock().isAir(this, pos);
+		IBlockState state = getBlockState(pos);
+		return state.getBlock().isAir(state, this, pos);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -269,16 +272,16 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		return this.worldObj.getBiomeGenForCoords(pos);
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	@Override
 	public boolean extendedLevelsInChunkCache() {
 		return this.hasExtendedLevels;
-	}
+	}*/
 
 	@Override
 	public int getStrongPower(BlockPos pos, EnumFacing direction) {
 		IBlockState iblockstate = this.getBlockState(pos);
-        return iblockstate.getBlock().getStrongPower(this, pos, iblockstate, direction);
+        return iblockstate.getBlock().getStrongPower(iblockstate, this, pos, direction);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -294,7 +297,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
         if (pos.getY() >= 0 && pos.getY() < 256) return _default;
         if (x < 0 || x >= chunkArray.length || z < 0 || x >= chunkArray[x].length) return _default;
 
-        return getBlockState(pos).getBlock().isSideSolid(this, pos, side);
+        IBlockState state = getBlockState(pos);
+        return state.getBlock().isSideSolid(state, this, pos, side);
 	}
 
 }

@@ -4,11 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import CoroUtil.componentAI.ICoroAI;
 
 public class CoroUtilInventory {
 
@@ -64,7 +60,7 @@ public class CoroUtilInventory {
 		}*/
 	}
 	
-	public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
+	/*public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
     	
     	TileEntity tEnt = (TileEntityChest)world.getTileEntity(new BlockPos(x, y, z));
 		if (tEnt instanceof TileEntityChest) {
@@ -74,6 +70,6 @@ public class CoroUtilInventory {
 			return true;
 		}
 		return false;
-    }
+    }*/
 	
 }

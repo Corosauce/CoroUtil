@@ -262,4 +262,12 @@ public class EntityRotFX extends Particle
 	public World getWorld() {
 		return this.worldObj;
 	}
+	
+	public void setCanCollide(boolean val) {
+		this.field_190017_n = val;
+	}
+	
+	public boolean getCanCollide() {
+		return this.field_190017_n;
+	}
 }

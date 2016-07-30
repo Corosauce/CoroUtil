@@ -38,7 +38,7 @@ public class ParticleBehaviors {
 		for (int i = 0; i < particles.size(); i++) {
 			EntityRotFX particle = particles.get(i);
 			
-			if (particle.isDead) {
+			if (!particle.isAlive()) {
 				particles.remove(particle);
 			} else {
 				tickUpdate(particle);

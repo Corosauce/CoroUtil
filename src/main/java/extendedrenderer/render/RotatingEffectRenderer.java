@@ -97,7 +97,7 @@ public class RotatingEffectRenderer
                     //var3.setDead();
                 }
 
-                if (var3.isDead)
+                if (!var3.isAlive())
                 {
                     this.fxLayers[var1].remove(var2--);
                 }

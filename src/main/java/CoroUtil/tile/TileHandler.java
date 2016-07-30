@@ -10,6 +10,8 @@ import CoroUtil.packet.PacketHelper;
 
 public class TileHandler {
 
+	//recode if needed, since DataWatcher was phased out
+	
 	//handles watching the tile entity (server side only? nope!)
 	
 	//since tiles are getting datawatchers, and using ids for the variable tracked sucks, using helper methods or code changes do:
@@ -49,7 +51,7 @@ public class TileHandler {
 	 
 	 */
 
-	public TileEntity tEnt;
+	/*public TileEntity tEnt;
 	public TileDataWatcher tileDataWatcher;
 	
 	public HashMap<String, Integer> mapNameToID;
@@ -94,5 +96,5 @@ public class TileHandler {
 	public void handleServerSentDataWatcherList(List parList) {
 		//System.out.println(this + " client received DW data, updating");
 		tileDataWatcher.updateWatchedObjectsFromList(parList);
-	}
+	}*/
 }

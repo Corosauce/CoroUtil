@@ -42,7 +42,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 	@Override
 	public void tickUpdateAct(EntityRotFX particle) {
 		
-		if (particle.isDead) {
+		if (!particle.isAlive()) {
 			particles.remove(particle);
 		} else {
 			double centerX = coordSource.xCoord + 0.0D;
