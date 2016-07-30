@@ -1459,7 +1459,7 @@ public class PFQueue implements Runnable {
                                 System.out.println("ladder!");
                             }*/
                             
-                            Material var11 = var9.getMaterial();//Block.blocksList[var9].blockMaterial;
+                            Material var11 = var9.getMaterial(var9.getDefaultState());//Block.blocksList[var9].blockMaterial;
                             //Block block = Block.blocksList[var9];
                             int meta = getBlockMetadata(var2, var3, var4);
                             
@@ -1490,7 +1490,7 @@ public class PFQueue implements Runnable {
                             
                             //note...... an entity was unable to use stairs with tallgrass on it, even with this code here, wtf?
                             //adding isSideSolid checks to the partial pathing part possible fixed this, saw an entity path through 2 high tallgrass this time
-                            if (var11 == Material.circuits || var11 == Material.SNOW || var11 == Material.plants) {
+                            if (var11 == Material.CIRCUITS || var11 == Material.SNOW || var11 == Material.PLANTS) {
                             	return 1;
                             }
                             
@@ -1515,7 +1515,7 @@ public class PFQueue implements Runnable {
                             	}
                             }
 
-                            if(var11 == Material.lava || var11 == Material.cactus) {
+                            if(var11 == Material.LAVA || var11 == Material.cactus) {
                                 return -2;
                             }
                             

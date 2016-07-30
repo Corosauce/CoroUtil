@@ -99,7 +99,7 @@ public class DynamicDifficulty {
 		
 		if ((!player.capabilities.isCreativeMode || autoAttackTest)) {
 			if (dbg) System.out.println("1");
-    		if ((player.capabilities.isFlying || (!player.onGround && !player.isInWater() && !player.isInsideOfMaterial(Material.lava)))) {
+    		if ((player.capabilities.isFlying || (!player.onGround && !player.isInWater() && !player.isInsideOfMaterial(Material.LAVA)))) {
     			if (dbg) System.out.println("2");
     			if (player.ridingEntity == null) {
     				if (dbg) System.out.println("3");
@@ -379,16 +379,16 @@ public class DynamicDifficulty {
 	}
 	
 	public static void handleHarvest(HarvestDropsEvent event) {
-		if (event.harvester != null) {
-			if (event.world.playerEntities.contains(event.harvester)) {
+		if (event.getHarvester() != null) {
+			if (event.getWorld().playerEntities.contains(event.getHarvester())) {
 				
-				NBTTagCompound nbt = event.harvester.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(event.harvester));
-				if (event.state != null && event.state.getBlock() instanceof BlockOre) {
+				NBTTagCompound nbt = event.getHarvester().getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(event.harvester));
+				if (event.getState() != null && event.getState().getBlock() instanceof BlockOre) {
 					int curVal = nbt.getInteger(dataPlayerHarvestOre);
 					curVal++;
 					nbt.setInteger(dataPlayerHarvestOre, curVal);
 					//System.out.println("increment!");
-				} else if (event.state != null && event.state.getBlock() instanceof BlockLog) {
+				} else if (event.getState() != null && event.getState().getBlock() instanceof BlockLog) {
 					int curVal = nbt.getInteger(dataPlayerHarvestLog);
 					curVal++;
 					nbt.setInteger(dataPlayerHarvestLog, curVal);
@@ -397,7 +397,7 @@ public class DynamicDifficulty {
 				/*float curVal = nbt.getFloat(dataPlayerHarvestRating);
 				curVal += getBlockImportanceValue(event.block);
 				nbt.setFloat(dataPlayerHarvestRating, curVal);*/
-				increaseInvadeRating(event.harvester, getBlockImportanceValue(event.state.getBlock()));
+				increaseInvadeRating(event.getHarvester(), getBlockImportanceValue(event.getState().getBlock()));
 				
 				//System.out.println("harvested block for " + event.harvester.username + " - " + event.block);
 			}
@@ -470,7 +470,7 @@ public class DynamicDifficulty {
 	
 	public static EntityPlayer getBestPlayerForArea(World world, BlockCoord pos) {
 		
-		EntityPlayer player = world.getClosestPlayer(pos.posX, pos.posY, pos.posZ, -1);
+		EntityPlayer player = world.getClosestPlayer(pos.posX, pos.posY, pos.posZ, -1, false);
 		
 		return player;
 	}

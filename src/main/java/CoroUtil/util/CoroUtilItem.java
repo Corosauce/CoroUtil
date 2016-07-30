@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -42,7 +43,7 @@ public class CoroUtilItem {
 		if (is.getItem() == null) return 0;
 		ServersideAttributeMap attributes = new ServersideAttributeMap();
 		attributes.registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
-		Multimap map = is.getItem().getAttributeModifiers(is);
+		Multimap map = is.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, is);
 		attributes.applyAttributeModifiers(map);
 		try {
 			return (float)attributes.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();

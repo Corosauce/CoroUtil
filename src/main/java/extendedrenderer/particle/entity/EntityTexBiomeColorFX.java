@@ -58,7 +58,7 @@ public class EntityTexBiomeColorFX extends EntityTexFX
         
         //biome color override
         //int meta = this.worldObj.getBlockMetadata((x, y, z)
-        color = new Color(Blocks.leaves.colorMultiplier(worldObj, new BlockPos(x, y, z)));
+        color = new Color(Blocks.LEAVES.colorMultiplier(worldObj, new BlockPos(x, y, z)));
 
         //BRIGHTNESS OVERRIDE! for textures
         this.particleRed = this.particleGreen = this.particleBlue = 0.7F;

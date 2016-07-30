@@ -13,7 +13,7 @@ public class CoroUtilBlock {
     }*/
 	
 	public static boolean isAir(Block parBlock) {
-		Material mat = parBlock.getMaterial();
+		Material mat = parBlock.getDefaultState().getMaterial();
 		if (mat == Material.AIR) {
 			return true;
 		} else {
@@ -26,7 +26,7 @@ public class CoroUtilBlock {
 	}
 	
 	public static boolean isEqualMaterial(Block parBlock, Material parMaterial) {
-		return parBlock.getMaterial() == parMaterial;
+		return parBlock.getMaterial(parBlock.getDefaultState()) == parMaterial;
 	}
 	
 	public static Block getBlockByName(String name) {

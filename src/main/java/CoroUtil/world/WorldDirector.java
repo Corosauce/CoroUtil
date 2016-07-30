@@ -256,9 +256,9 @@ public class WorldDirector implements Runnable {
 	public boolean isLogOrLeafBlock(Block id) {
 		Block block = id;
 		if (block == null) return false;
-		if (block.getMaterial() == Material.LEAVES) return true;
-		if (block.getMaterial() == Material.PLANTS) return true;
-		if (block.getMaterial() == Material.WOOD) return true;
+		if (block.getMaterial(block.getDefaultState()) == Material.LEAVES) return true;
+		if (block.getMaterial(block.getDefaultState()) == Material.PLANTS) return true;
+		if (block.getMaterial(block.getDefaultState()) == Material.WOOD) return true;
 		return false;
 	}
 	

@@ -311,7 +311,7 @@ public class PathNavigateCustom
         	Block block = this.theEntity.worldObj.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
         	//System.out.println("block type for next node: " + block);
         	
-        	if (block.getMaterial() == Material.WATER || block.getMaterial() == Material.lava) {
+        	if (block.getMaterial(block.getDefaultState()) == Material.WATER || block.getMaterial(block.getDefaultState()) == Material.LAVA) {
         		//System.out.println("adjusting water based node pos");
         		adjY = 1;
         	}
@@ -577,7 +577,7 @@ public class PathNavigateCustom
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
                     	Block block = this.worldObj.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
-                        Material material = block.getMaterial();
+                        Material material = block.getMaterial(block.getDefaultState());
 
                         if (material == Material.AIR)
                         {
@@ -589,7 +589,7 @@ public class PathNavigateCustom
                             return false;
                         }
 
-                        if (material == Material.lava)
+                        if (material == Material.LAVA)
                         {
                             return false;
                         }
