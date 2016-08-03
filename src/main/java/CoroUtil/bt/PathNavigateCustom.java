@@ -18,6 +18,7 @@ import net.minecraft.world.ChunkCache;
 import net.minecraft.world.World;
 import CoroUtil.util.Vec3;
 
+//TODO: rebase off of newer mojang version when we actually make use of AIBTAgent again
 public class PathNavigateCustom
 {
     private EntityLivingBase theEntity;
@@ -44,7 +45,7 @@ public class PathNavigateCustom
     /**
      * Coordinates of the entity's position last time a check was done (part of monitoring getting 'stuck')
      */
-    private Vec3 lastPosCheck = new Vec3(0.0D, 0.0D, 0.0D);
+    private Vec3d lastPosCheck = new Vec3d(0.0D, 0.0D, 0.0D);
 
     /**
      * Specifically, if a wooden door block is even considered to be passable by the pathfinder
@@ -83,7 +84,7 @@ public class PathNavigateCustom
     protected PathFinder getPathFinder()
     {
         this.nodeProcessor = new WalkNodeProcessor();
-        this.nodeProcessor.setEnterDoors(true);
+        //this.nodeProcessor.setEnterDoors(true);
         return new PathFinder(this.nodeProcessor);
     }
 
@@ -172,7 +173,7 @@ public class PathNavigateCustom
             BlockPos blockpos = new BlockPos(this.theEntity);
             int i = (int)(f + 8.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
-            Path pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
+            Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
             this.worldObj.theProfiler.endSection();
             return pathentity;
         }
@@ -205,7 +206,7 @@ public class PathNavigateCustom
             BlockPos blockpos = (new BlockPos(this.theEntity)).up();
             int i = (int)(f + 16.0F);
             ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
-            Path pathentity = this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
+            Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
             this.worldObj.theProfiler.endSection();
             return pathentity;
         }
@@ -250,7 +251,7 @@ public class PathNavigateCustom
             else
             {
                 this.speed = par2;
-                Vec3 vec3 = this.getEntityPosition();
+                Vec3d vec3 = this.getEntityPosition();
                 this.ticksAtLastPos = this.totalTicks;
                 this.lastPosCheck = vec3;
                 return true;
@@ -293,7 +294,7 @@ public class PathNavigateCustom
 
     private void pathFollow()
     {
-        Vec3 vec3 = this.getEntityPosition();
+        Vec3d vec3 = this.getEntityPosition();
         int i = this.currentPath.getCurrentPathLength();
 
         double adjY = 0;
@@ -395,9 +396,9 @@ public class PathNavigateCustom
         this.currentPath = null;
     }
 
-    private Vec3 getEntityPosition()
+    private Vec3d getEntityPosition()
     {
-        return new Vec3(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
+        return new Vec3d(this.theEntity.posX, (double)this.getPathableYPos(), this.theEntity.posZ);
     }
 
     /**
@@ -473,7 +474,7 @@ public class PathNavigateCustom
      * Returns true when an entity of specified size could safely walk in a straight line between the two points. Args:
      * pos1, pos2, entityXSize, entityYSize, entityZSize
      */
-    private boolean isDirectPathBetweenPoints(Vec3 par1Vec3, Vec3 par2Vec3, int par3, int par4, int par5)
+    private boolean isDirectPathBetweenPoints(Vec3d par1Vec3, Vec3d par2Vec3, int par3, int par4, int par5)
     {
         int l = MathHelper.floor_double(par1Vec3.xCoord);
         int i1 = MathHelper.floor_double(par1Vec3.zCoord);
@@ -556,7 +557,7 @@ public class PathNavigateCustom
      * Returns true when an entity could stand at a position, including solid blocks under the entire entity. Args:
      * xOffset, yOffset, zOffset, entityXSize, entityYSize, entityZSize, originPosition, vecX, vecZ
      */
-    private boolean isSafeToStandAt(int par1, int par2, int par3, int par4, int par5, int par6, Vec3 par7Vec3, double par8, double par10)
+    private boolean isSafeToStandAt(int par1, int par2, int par3, int par4, int par5, int par6, Vec3d par7Vec3, double par8, double par10)
     {
         int k1 = par1 - par4 / 2;
         int l1 = par3 - par6 / 2;
@@ -604,7 +605,7 @@ public class PathNavigateCustom
     /**
      * Returns true if an entity does not collide with any solid blocks at the position.
      */
-    private boolean isPositionClear(int p_179692_1_, int p_179692_2_, int p_179692_3_, int p_179692_4_, int p_179692_5_, int p_179692_6_, Vec3 p_179692_7_, double p_179692_8_, double p_179692_10_)
+    private boolean isPositionClear(int p_179692_1_, int p_179692_2_, int p_179692_3_, int p_179692_4_, int p_179692_5_, int p_179692_6_, Vec3d p_179692_7_, double p_179692_8_, double p_179692_10_)
     {
         for (BlockPos blockpos : BlockPos.getAllInBox(new BlockPos(p_179692_1_, p_179692_2_, p_179692_3_), new BlockPos(p_179692_1_ + p_179692_4_ - 1, p_179692_2_ + p_179692_5_ - 1, p_179692_3_ + p_179692_6_ - 1)))
         {

@@ -17,7 +17,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.entity.EntityTropicalFishHook;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilItem;
 
@@ -45,7 +44,7 @@ public class AIInventory {
 	public static int slot_Tool = 2;
 	
 	//because cross compatibility
-	public EntityTropicalFishHook fishEntity;
+	//public EntityTropicalFishHook fishEntity;
 	
 	public boolean grabItems = false;
 	
@@ -226,7 +225,7 @@ public class AIInventory {
 		//if (fakePlayer != null) OldUtil.playerToCompAILookup.remove(CoroUtilEntity.getName(fakePlayer));
 		entOwner = null;
     	//inventory = null; //playerKillEvent needs this, race condition?
-    	fishEntity = null;
+    	//fishEntity = null;
     	playerProfile = null;
     	//fakePlayer = null;
     }

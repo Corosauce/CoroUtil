@@ -38,7 +38,7 @@ public class RotatingEffectRenderer
     
     public static final ResourceLocation particleTextures = new ResourceLocation("textures/particle/particles.png");
     public static final ResourceLocation resLayer4 = new ResourceLocation(ExtendedRenderer.modid + ":textures/particles/particles_64.png");
-    public static final ResourceLocation resLayer5 = new ResourceLocation(ExtendedRenderer.modid + ":textures/particles/particles_16.png");;
+    public static final ResourceLocation resLayer5 = new ResourceLocation(ExtendedRenderer.modid + ":textures/particles/particles_16.png");
 
     public RotatingEffectRenderer(World var1, TextureManager par2TextureManager)
     {

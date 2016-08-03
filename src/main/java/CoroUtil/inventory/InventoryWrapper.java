@@ -173,14 +173,14 @@ public class InventoryWrapper implements IInventory {
                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
                 crashreportcategory.addCrashSection("Item ID", Integer.valueOf(Item.getIdFromItem(p_70441_1_.getItem())));
                 crashreportcategory.addCrashSection("Item data", Integer.valueOf(p_70441_1_.getItemDamage()));
-                crashreportcategory.addCrashSectionCallable("Item name", new Callable()
+                /*crashreportcategory.addCrashSectionCallable("Item name", new Callable()
                 {
                     private static final String __OBFID = "CL_00001710";
                     public String call()
                     {
                         return p_70441_1_.getDisplayName();
                     }
-                });
+                });*/
                 throw new ReportedException(crashreport);
             }
         }

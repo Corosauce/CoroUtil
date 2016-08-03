@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.render.RotatingEffectRenderer;
+import extendedrenderer.render.RotatingParticleManager;
 
 @Mod(modid = "ExtendedRenderer", name="Extended Renderer", version="v1.0")
 public class ExtendedRenderer {
@@ -30,8 +31,11 @@ public class ExtendedRenderer {
     @SidedProxy(clientSide = "extendedrenderer.ClientProxy", serverSide = "extendedrenderer.CommonProxy")
     public static CommonProxy proxy;
 
+    /*@SideOnly(Side.CLIENT)
+    public static RotatingEffectRenderer rotEffRenderer;*/
+    
     @SideOnly(Side.CLIENT)
-    public static RotatingEffectRenderer rotEffRenderer;
+    public static RotatingParticleManager rotEffRenderer;
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
