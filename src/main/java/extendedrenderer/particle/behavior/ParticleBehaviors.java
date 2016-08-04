@@ -71,7 +71,8 @@ public class ParticleBehaviors {
 		
 		double vecX = centerX - particle.posX;
 		double vecZ = centerZ - particle.posZ;
-		double distToCenter = Math.sqrt(vecX * vecX + vecZ * vecZ);
+		double squaredDistToCenter = vecX * vecX + vecZ * vecZ;
+		double squaredDist = 0.05D * 0.05D;
 		double rotYaw = (float)(Math.atan2(vecZ, vecX) * 180.0D / Math.PI);
 		double adjYaw = Math.min(360, 45+particle.getAge());
 		
@@ -79,20 +80,22 @@ public class ParticleBehaviors {
 		//rotYaw -= 90D;
 		//rotYaw += 20D;
 		double speed = 0.1D;
-		if (particle.getAge() < 25 && distToCenter > 0.05D) {
+		if (particle.getAge() < 25 && squaredDistToCenter > squaredDist) {
 			particle.motionX = Math.cos(rotYaw * 0.017453D) * speed;
 			particle.motionZ = Math.sin(rotYaw * 0.017453D) * speed;
 		} else {
 			double speed2 = 0.008D;
 			
-			double pSpeed = Math.sqrt(particle.motionX * particle.motionX + particle.motionZ * particle.motionZ);
+			double squaredPspeed = particle.motionX * particle.motionX + particle.motionZ * particle.motionZ;
+			double squaredSpeed1 = 0.2 * 0.2;
+			double squaredSpeed2 = 0.002 * 0.002;
 			
 			//cheap air search code
-			if (pSpeed < 0.2 && particle.motionY < 0.01) {
+			if (squaredPspeed < squaredSpeed1 && particle.motionY < 0.01) {
 				speed2 = 0.08D;
 			}
 			
-			if (pSpeed < 0.002 && Math.abs(particle.motionY) < 0.02) {
+			if (squaredPspeed < squaredSpeed2 && Math.abs(particle.motionY) < 0.02) {
 				particle.motionY -= 0.15D;
 			}
 			
