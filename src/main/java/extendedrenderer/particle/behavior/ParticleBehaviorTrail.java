@@ -33,7 +33,8 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 		particle.brightness = 1F;
 		particle.setScale(0.1F + rand.nextFloat() * 0.9F);
 		particle.spawnY = (float) particle.getPosY();
-		particle.noClip = true;
+		//particle.noClip = true;
+		particle.setCanCollide(false);
 		//entityfx.spawnAsWeatherEffect();
 		
 		return particle;

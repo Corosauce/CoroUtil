@@ -78,17 +78,17 @@ public class EntityRotFX extends Particle
     }
     
     @Override
-    public void setDead() {
+    public void setExpired() {
     	if (pb != null) pb.particles.remove(this);
-    	super.setDead();
+    	super.setExpired();
     }
     
     @Override
     public void onUpdate() {
     	if (callUpdateSuper) super.onUpdate();
-    	this.lastTickPosX = this.getPosX();
-        this.lastTickPosY = this.getPosY();
-        this.lastTickPosZ = this.getPosZ();
+    	this.setPrevPosX(this.getPosX());
+    	this.setPrevPosZ(this.getPosY());
+    	this.setPrevPosY(this.getPosZ());
         
         if (callUpdatePB && pb != null) pb.tickUpdate(this);
         
@@ -100,7 +100,7 @@ public class EntityRotFX extends Particle
 
             if (this.particleAge++ >= this.particleMaxAge)
             {
-                this.setDead();
+                this.setExpired();
             }
             
             if (spawnY != -1) {
@@ -122,7 +122,7 @@ public class EntityRotFX extends Particle
         return 5;
     }
     
-    @Override
+    /*@Override
     public void setParticleIcon(TextureAtlasSprite p_110125_1_)
     {
         if (this.getFXLayer() == 1)
@@ -138,7 +138,7 @@ public class EntityRotFX extends Particle
 
             this.particleIcon = p_110125_1_;
         }
-    }
+    }*/
 
     public void spawnAsWeatherEffect()
     {
@@ -269,5 +269,9 @@ public class EntityRotFX extends Particle
 	
 	public boolean getCanCollide() {
 		return this.field_190017_n;
+	}
+	
+	public boolean isCollided() {
+		return this.isCollided;
 	}
 }

@@ -33,7 +33,8 @@ public class ParticleBehaviorCharge extends ParticleBehaviors {
 		particle.brightness = 1F;
 		particle.setScale(0.1F + rand.nextFloat() * 0.5F);
 		particle.spawnY = (float) particle.getPosY();
-		particle.noClip = true;
+		//particle.noClip = true;
+		particle.setCanCollide(false);
 		//entityfx.spawnAsWeatherEffect();
 		
 		return particle;

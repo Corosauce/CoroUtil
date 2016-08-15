@@ -125,7 +125,7 @@ public class ParticleBehaviors {
 			if (particle.getAlphaF() > 0) {
 				particle.setAlphaF(particle.getAlphaF() - rateAlpha);
 			} else {
-				particle.setDead();
+				particle.setExpired();
 			}
 		}
 		
@@ -152,7 +152,7 @@ public class ParticleBehaviors {
 			if (particle.getAlphaF() > 0) {
 				particle.setAlphaF(particle.getAlphaF() - rateAlpha*1.3F);
 			} else {
-				particle.setDead();
+				particle.setExpired();
 			}
 		}
 	}
@@ -179,9 +179,9 @@ public class ParticleBehaviors {
 		particle.setPrevPosX(particle.getPosX());
 		particle.setPrevPosY(particle.getPosY());
 		particle.setPrevPosZ(particle.getPosZ());
-		particle.lastTickPosX = particle.getPosX();
-		particle.lastTickPosY = particle.getPosY();
-		particle.lastTickPosZ = particle.getPosZ();
+		/*particle.prevPosX = particle.getPosX();
+		particle.prevPosY = particle.getPosY();
+		particle.prevPosZ = particle.getPosZ();*/
 		
 		//keep AABB small, very important to performance
 		particle.setSize(0.01F, 0.01F);
@@ -209,8 +209,10 @@ public class ParticleBehaviors {
 	public static EntityRotFX setParticleCloud(EntityRotFX particle, float freezeY) {
 		particle.spawnY = freezeY;
 		particle.rotationPitch = 90F;
-		particle.renderDistanceWeight = 999D;
-        particle.noClip = true;
+		//particle.renderDistanceWeight = 999D;
+		//1.10.2 no known replacement for above
+        //particle.noClip = true;
+		particle.setCanCollide(false);
         particle.setSize(0.25F, 0.25F);
         particle.setScale(500F);
         //particle.particleScale = 200F;

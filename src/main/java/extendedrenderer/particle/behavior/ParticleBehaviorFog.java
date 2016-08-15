@@ -53,7 +53,8 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		
 		particle.setScale(sizeBase);
 		//particle.spawnY = (float) particle.posY;
-		particle.noClip = false;
+		//particle.noClip = false;
+		particle.setCanCollide(true);
 		//entityfx.spawnAsWeatherEffect();
 		
 		particle.renderRange = 2048;
@@ -97,12 +98,14 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 					}*/
 				}
 				double moveSpeed = 0.001D;
-				if (particle.onGround) {
+				//1.10.2 no
+				/*if (particle.onGround) {
 					moveSpeed = 0.012D;
 					particle.setMotionY(particle.getMotionY() + 0.01D);
-				}
+				}*/
 				
-				if (particle.isCollidedHorizontally) {
+				//if (particle.isCollidedHorizontally) {
+				if (particle.isCollided()) {
 					particle.rotationYaw += 0.1;
 				}
 				
