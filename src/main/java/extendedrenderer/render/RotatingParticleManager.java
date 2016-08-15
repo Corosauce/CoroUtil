@@ -82,7 +82,7 @@ public class RotatingParticleManager
     private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
     /** Reference to the World object. */
     protected World worldObj;
-    private final ArrayDeque<Particle>[][] fxLayers = new ArrayDeque[4][];
+    public final ArrayDeque<Particle>[][] fxLayers = new ArrayDeque[4][];
     private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
     private final TextureManager renderer;
     /** RNG. */

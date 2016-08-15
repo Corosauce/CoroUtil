@@ -2,6 +2,7 @@ package extendedrenderer.particle.entity;
 
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -274,4 +275,12 @@ public class EntityRotFX extends Particle
 	public boolean isCollided() {
 		return this.isCollided;
 	}
+	
+	public double getDistance(double x, double y, double z)
+    {
+        double d0 = this.posX - x;
+        double d1 = this.posY - y;
+        double d2 = this.posZ - z;
+        return (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+    }
 }
