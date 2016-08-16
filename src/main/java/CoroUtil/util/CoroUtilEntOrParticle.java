@@ -69,6 +69,33 @@ public class CoroUtilEntOrParticle {
 		}
 	}
 	
+	public static void setMotionX(Object obj, double val) {
+		if (obj instanceof Particle) {
+			checkFields();
+			set(fieldMotionX, obj, val);
+		} else {
+			((Entity)obj).motionX = val;
+		}
+	}
+	
+	public static void setMotionY(Object obj, double val) {
+		if (obj instanceof Particle) {
+			checkFields();
+			set(fieldMotionY, obj, val);
+		} else {
+			((Entity)obj).motionY = val;
+		}
+	}
+	
+	public static void setMotionZ(Object obj, double val) {
+		if (obj instanceof Particle) {
+			checkFields();
+			set(fieldMotionZ, obj, val);
+		} else {
+			((Entity)obj).motionZ = val;
+		}
+	}
+	
 	public static void checkFields() {
 		if (fieldPosX == null) {
 			try {
@@ -107,6 +134,14 @@ public class CoroUtilEntOrParticle {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	private static void set(Field field, Object obj, double val) {
+		try {
+			field.setDouble(obj, val);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

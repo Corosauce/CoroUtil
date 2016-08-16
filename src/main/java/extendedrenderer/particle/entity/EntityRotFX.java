@@ -145,7 +145,8 @@ public class EntityRotFX extends Particle
     {
         weatherEffect = true;
         ExtendedRenderer.rotEffRenderer.addEffect(this);
-        this.worldObj.addWeatherEffect(this);
+        //RELOCATED TO CODE AFTER CALLING spawnAsWeatherEffect(), also uses list in WeatherManagerClient
+        //this.worldObj.addWeatherEffect(this);
     }
 
     public int getAge()
