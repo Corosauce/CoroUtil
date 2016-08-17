@@ -244,16 +244,16 @@ public class RotatingParticleManager
 
     private void updateEffectLayer(int layer)
     {
-        this.worldObj.theProfiler.startSection(layer + "");
+        //this.worldObj.theProfiler.startSection(layer + "");
 
         for (int i = 0; i < 2; ++i)
         {
-            this.worldObj.theProfiler.startSection(i + "");
+            //this.worldObj.theProfiler.startSection(i + "");
             this.tickParticleList(this.fxLayers[layer][i]);
-            this.worldObj.theProfiler.endSection();
+            //this.worldObj.theProfiler.endSection();
         }
 
-        this.worldObj.theProfiler.endSection();
+        //this.worldObj.theProfiler.endSection();
     }
 
     private void tickParticleList(Queue<Particle> p_187240_1_)

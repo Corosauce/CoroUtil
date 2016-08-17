@@ -1,6 +1,7 @@
 package CoroUtil.util;
 
 import net.minecraft.block.Block;
+import net.minecraft.util.math.BlockPos;
 
 public class ChunkCoordinatesBlock extends BlockCoord {
 
@@ -29,6 +30,10 @@ public class ChunkCoordinatesBlock extends BlockCoord {
         super(par1BlockCoord);
         block = parBlockID;
         meta = parMeta;
+    }
+    
+    public BlockPos toBlockPos() {
+    	return new BlockPos(this.posX, this.posY, this.posZ);
     }
 	
 }
