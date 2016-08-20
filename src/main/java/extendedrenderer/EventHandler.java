@@ -1,6 +1,8 @@
 package extendedrenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -30,8 +32,22 @@ public class EventHandler {
             }
         }
 
-        //Rotating particles hook
+        //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
+		EntityRenderer er = mc.entityRenderer;
+		er.enableLightmap();
+        mc.mcProfiler.endStartSection("litParticles");
+        //particlemanager.renderLitParticles(entity, partialTicks);
+        ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        RenderHelper.disableStandardItemLighting();
+        //private method, cant use.... for now
+        //er.setupFog(0, event.getPartialTicks());
+        mc.mcProfiler.endStartSection("particles");
+        //particlemanager.renderParticles(entity, partialTicks);
         ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        er.disableLightmap();
+        
+        //old code call
+        //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
     }
 	
 	@SideOnly(Side.CLIENT)

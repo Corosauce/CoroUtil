@@ -1,7 +1,9 @@
 package extendedrenderer.particle.entity;
 
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,6 +44,7 @@ public class EntityRotFX extends Particle
         super(par1World, par2, par4, par6, par8, par10, par12);
         setSize(0.3F, 0.3F);
         //this.isImmuneToFire = true;
+        //this.setMaxAge(100);
         
         this.entityID = par1World.rand.nextInt(100000);
     }/*
@@ -86,7 +89,8 @@ public class EntityRotFX extends Particle
     
     @Override
     public void onUpdate() {
-    	if (callUpdateSuper) super.onUpdate();
+    	super.onUpdate();
+    	/*if (callUpdateSuper) super.onUpdate();
     	this.setPrevPosX(this.getPosX());
     	this.setPrevPosZ(this.getPosY());
     	this.setPrevPosY(this.getPosZ());
@@ -109,7 +113,7 @@ public class EntityRotFX extends Particle
             }
             
             this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
-        }
+        }*/
     }
     
     public void setParticleTextureIndex(int par1)
@@ -284,4 +288,20 @@ public class EntityRotFX extends Particle
         double d2 = this.posZ - z;
         return (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
     }
+	
+	@Override
+	public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn,
+			float partialTicks, float rotationX, float rotationZ,
+			float rotationYZ, float rotationXY, float rotationXZ) {
+		
+		//override rotations
+		float var3 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
+        float var4 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
+        float var5 = -var4 * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
+        float var6 = var3 * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
+        float var7 = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
+		
+		super.renderParticle(worldRendererIn, entityIn, partialTicks, var3,
+				var7, var4, var5, var6);
+	}
 }

@@ -11,6 +11,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite smoke;
 	public static TextureAtlasSprite cloud;
 	public static TextureAtlasSprite cloud256;
+	public static TextureAtlasSprite leaf;
 	//public static TextureAtlasSprite test;
 	public static TextureAtlasSprite cloud256dark;
 	public static TextureAtlasSprite cloudDownfall;
@@ -22,25 +23,28 @@ public class ParticleRegistry {
 			ResourceLocation res;
 		
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/white");
-			event.getMap().setTextureEntry(res.toString(), squareGrey = new TextureAtlasSpriteImpl(res.toString()));
+			event.getMap().setTextureEntry(squareGrey = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00");
-			event.getMap().setTextureEntry(res.toString(), smoke = new TextureAtlasSpriteImpl(res.toString()));
+			event.getMap().setTextureEntry(smoke = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64");
-			event.getMap().setTextureEntry(res.toString(), cloud = new TextureAtlasSpriteImpl(res.toString()));
+			event.getMap().setTextureEntry(cloud = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256");
-			event.getMap().setTextureEntry(res.toString(), cloud256 = new TextureAtlasSpriteImpl(res.toString()));
+			event.getMap().setTextureEntry(cloud256 = new TextureAtlasSpriteImpl(res.toString()));
+			
+			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf");
+			event.getMap().setTextureEntry(leaf = new TextureAtlasSpriteImpl(res.toString()));
 			
 			/*res = new ResourceLocation(ExtendedRenderer.modid + ":particles/radarIconCyclone");
-			event.map.setTextureEntry(res.toString(), test = new TextureAtlasSpriteImpl(res.toString()));*/
+			event.map.setTextureEntry(test = new TextureAtlasSpriteImpl(res.toString()));*/
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256dark");
-			event.getMap().setTextureEntry(res.toString(), cloud256dark = new TextureAtlasSpriteImpl(res.toString()));
+			event.getMap().setTextureEntry(cloud256dark = new TextureAtlasSpriteImpl(res.toString()));
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall");
-			event.getMap().setTextureEntry(res.toString(), cloudDownfall = new TextureAtlasSpriteImpl(res.toString()));/*
+			event.getMap().setTextureEntry(cloudDownfall = new TextureAtlasSpriteImpl(res.toString()));/*
 			
 			ResourceLocation squareGrey2 = new ResourceLocation(ExtendedRenderer.modidCaps + ":particles/white");
 			event.map.setTextureEntry(squareGrey2.toString(), new TextureAtlasSpriteImpl(squareGrey2.toString()));
