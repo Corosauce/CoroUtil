@@ -25,9 +25,4 @@ public class ParticleTexFX extends EntityRotFX {
     {
         return 1;
     }
-    
-    @Override
-    public boolean isTransparent() {
-    	return true;
-    }
 }

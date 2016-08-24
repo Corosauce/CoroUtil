@@ -12,6 +12,8 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite cloud;
 	public static TextureAtlasSprite cloud256;
 	public static TextureAtlasSprite leaf;
+	public static TextureAtlasSprite rain;
+	public static TextureAtlasSprite snow;
 	//public static TextureAtlasSprite test;
 	public static TextureAtlasSprite cloud256dark;
 	public static TextureAtlasSprite cloudDownfall;
@@ -36,6 +38,12 @@ public class ParticleRegistry {
 			
 			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf");
 			event.getMap().setTextureEntry(leaf = new TextureAtlasSpriteImpl(res.toString()));
+			
+			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/rain");
+			event.getMap().setTextureEntry(rain = new TextureAtlasSpriteImpl(res.toString()));
+			
+			res = new ResourceLocation(ExtendedRenderer.modid + ":particles/snow");
+			event.getMap().setTextureEntry(snow = new TextureAtlasSpriteImpl(res.toString()));
 			
 			/*res = new ResourceLocation(ExtendedRenderer.modid + ":particles/radarIconCyclone");
 			event.map.setTextureEntry(test = new TextureAtlasSpriteImpl(res.toString()));*/

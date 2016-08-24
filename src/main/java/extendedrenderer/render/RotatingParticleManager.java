@@ -321,6 +321,8 @@ public class RotatingParticleManager
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
+        
+        GlStateManager.disableCull();
 
         for (int i_nf = 0; i_nf < 3; ++i_nf)
         {
@@ -386,6 +388,8 @@ public class RotatingParticleManager
                 }
             }
         }
+        
+        GlStateManager.enableCull();
 
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();

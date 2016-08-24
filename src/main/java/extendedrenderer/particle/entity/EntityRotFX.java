@@ -1,9 +1,14 @@
 package extendedrenderer.particle.entity;
 
+import java.util.List;
+
+import CoroUtil.api.weather.IWindHandler;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,7 +17,7 @@ import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 
 @SideOnly(Side.CLIENT)
-public class EntityRotFX extends Particle
+public class EntityRotFX extends Particle implements IWindHandler
 {
     public boolean weatherEffect = false;
 
@@ -38,6 +43,14 @@ public class EntityRotFX extends Particle
     
     public float rotationYaw;
     public float rotationPitch;
+    
+    public float windWeight = 0;
+    public int particleDecayExtra = 0;
+    public boolean isTransparent = true;
+    
+    public boolean killOnCollide = false;
+	
+	public boolean facePlayer = false;
     
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
@@ -114,6 +127,12 @@ public class EntityRotFX extends Particle
             
             this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
         }*/
+    	if (killOnCollide) {
+    		if (this.isCollided()) {
+    			this.setExpired();
+    		}
+    		
+    	}
     }
     
     public void setParticleTextureIndex(int par1)
@@ -295,13 +314,88 @@ public class EntityRotFX extends Particle
 			float rotationYZ, float rotationXY, float rotationXZ) {
 		
 		//override rotations
-		float var3 = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
-        float var4 = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
-        float var5 = -var4 * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
-        float var6 = var3 * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
-        float var7 = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
+		if (!facePlayer) {
+			rotationX = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
+			rotationYZ = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
+	        rotationXY = -rotationYZ * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
+	        rotationXZ = rotationX * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
+	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
+		}
 		
-		super.renderParticle(worldRendererIn, entityIn, partialTicks, var3,
-				var7, var4, var5, var6);
+		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
+				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
+
+	@Override
+	public float getWindWeight() {
+		return windWeight;
+	}
+
+	@Override
+	public int getParticleDecayExtra() {
+		return particleDecayExtra;
+	}
+    
+    @Override
+    public boolean isTransparent() {
+    	return isTransparent;
+    }
+    
+    public void setKillOnCollide(boolean val) {
+    	this.killOnCollide = val;
+    }
+    
+    //override to fix isCollided check
+    @Override
+    public void moveEntity(double x, double y, double z)
+    {
+        double d0 = y;
+
+        if (this.field_190017_n)
+        {
+            List<AxisAlignedBB> list = this.worldObj.getCollisionBoxes((Entity)null, this.getEntityBoundingBox().addCoord(x, y, z));
+
+            for (AxisAlignedBB axisalignedbb : list)
+            {
+                y = axisalignedbb.calculateYOffset(this.getEntityBoundingBox(), y);
+            }
+
+            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, y, 0.0D));
+
+            for (AxisAlignedBB axisalignedbb1 : list)
+            {
+                x = axisalignedbb1.calculateXOffset(this.getEntityBoundingBox(), x);
+            }
+
+            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, 0.0D, 0.0D));
+
+            for (AxisAlignedBB axisalignedbb2 : list)
+            {
+                z = axisalignedbb2.calculateZOffset(this.getEntityBoundingBox(), z);
+            }
+
+            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, 0.0D, z));
+        }
+        else
+        {
+            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
+        }
+
+        this.resetPositionToBB();
+        this.isCollided = d0 != y && d0 < 0.0D;
+
+        if (x != x)
+        {
+            this.motionX = 0.0D;
+        }
+
+        if (z != z)
+        {
+            this.motionZ = 0.0D;
+        }
+    }
+    
+    public void setFacePlayer(boolean val) {
+    	this.facePlayer = val;
+    }
 }
