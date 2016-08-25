@@ -44,7 +44,7 @@ public class EntityRotFX extends Particle implements IWindHandler
     public float rotationYaw;
     public float rotationPitch;
     
-    public float windWeight = 0;
+    public float windWeight = 5;
     public int particleDecayExtra = 0;
     public boolean isTransparent = true;
     

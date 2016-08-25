@@ -57,10 +57,10 @@ public class EventHandler {
         //er.setupFog(0, event.getPartialTicks());
         mc.mcProfiler.endStartSection("particles");
         //particlemanager.renderParticles(entity, partialTicks);
-        GlStateManager.matrixMode(5889);
-        GlStateManager.loadIdentity();
-        Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
-        GlStateManager.matrixMode(5888);
+        //GlStateManager.matrixMode(5889);
+        //GlStateManager.loadIdentity();
+        //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
+        //GlStateManager.matrixMode(5888);
         ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
         er.disableLightmap();
         
