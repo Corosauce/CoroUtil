@@ -1,15 +1,12 @@
 package extendedrenderer.particle.entity;
 
-import weather2.util.WeatherUtilParticle;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import CoroUtil.util.CoroUtilParticle;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 
@@ -53,15 +50,15 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		
 		int rainDrops = 5 + ((Math.max(0, severityOfRainRate-1)) * 5);
 		
-		for (int ii = 0; ii < Math.min(rainDrops, WeatherUtilParticle.maxRainDrops); ii++) {
+		for (int ii = 0; ii < Math.min(rainDrops, CoroUtilParticle.maxRainDrops); ii++) {
 			float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
 	        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
 	        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
 	        
 	        if (ii != 0) {
-	        	f5 += WeatherUtilParticle.rainPositions[ii].xCoord;
-	        	f6 += WeatherUtilParticle.rainPositions[ii].yCoord;
-	        	f7 += WeatherUtilParticle.rainPositions[ii].zCoord;
+	        	f5 += CoroUtilParticle.rainPositions[ii].xCoord;
+	        	f6 += CoroUtilParticle.rainPositions[ii].yCoord;
+	        	f7 += CoroUtilParticle.rainPositions[ii].zCoord;
 	        }
 	        
 	        int i = this.getBrightnessForRender(partialTicks);

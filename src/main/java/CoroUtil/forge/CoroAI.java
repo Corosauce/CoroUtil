@@ -32,7 +32,7 @@ import CoroUtil.world.WorldDirectorManager;
 
 import com.google.common.collect.BiMap;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.5", acceptableRemoteVersions="*")
+@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.6", acceptableRemoteVersions="*")
 public class CoroAI {
 	
 	@Mod.Instance( value = "CoroAI" )
