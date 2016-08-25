@@ -2,14 +2,8 @@ package extendedrenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import extendedrenderer.particle.entity.EntityRotFX;
-import extendedrenderer.particle.entity.EntityTexBiomeColorFX;
-import extendedrenderer.particle.entity.EntityTexFX;
-import extendedrenderer.render.RenderNull;
-import extendedrenderer.render.RotatingEffectRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 
 @SideOnly(Side.CLIENT)

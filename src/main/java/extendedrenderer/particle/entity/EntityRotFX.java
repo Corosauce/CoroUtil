@@ -398,4 +398,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     public void setFacePlayer(boolean val) {
     	this.facePlayer = val;
     }
+    
+    public TextureAtlasSprite getParticleTexture() {
+    	return this.particleTexture;
+    }
 }

@@ -2,7 +2,6 @@ package extendedrenderer;
 
 import java.io.File;
 
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -16,7 +15,6 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import extendedrenderer.render.RotatingEffectRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 
 @Mod(modid = "ExtendedRenderer", name="Extended Renderer", version="v1.0")

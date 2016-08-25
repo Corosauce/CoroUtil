@@ -10,7 +10,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.util.Vec3;
-import extendedrenderer.particle.entity.EntityIconWindFX;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.ParticleTexFX;
 
@@ -155,12 +154,6 @@ public class ParticleBehaviors {
 				particle.setExpired();
 			}
 		}
-	}
-	
-	public EntityRotFX spawnNewParticleWindFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
-		EntityRotFX entityfx = new EntityIconWindFX(world, x, y, z, vecX, vecY, vecZ, icon);
-		entityfx.pb = this;
-		return entityfx;
 	}
 	
 	public EntityRotFX spawnNewParticleIconFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
