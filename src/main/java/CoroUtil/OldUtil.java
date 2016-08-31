@@ -18,6 +18,7 @@ import net.minecraft.util.FoodStats;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -163,7 +164,8 @@ public class OldUtil {
 		checkforMCP = false;
 		try {
 			//runningMCP = getPrivateValue(MinecraftServer.class, MinecraftServer.getServer(), "tickables") != null;
-			runningMCP = getPrivateValue(MinecraftServer.class, FMLCommonHandler.instance().getMinecraftServerInstance(), "motd") != null;
+			//runningMCP = getPrivateValue(MinecraftServer.class, FMLCommonHandler.instance().getMinecraftServerInstance(), "motd") != null;
+			runningMCP = getPrivateValue(Vec3i.class, null, "NULL_VECTOR") != null;
 		} catch (Exception e) {
 			runningMCP = false;
 			System.out.println("CoroAI: 'tickables' field not found, mcp mode disabled");
