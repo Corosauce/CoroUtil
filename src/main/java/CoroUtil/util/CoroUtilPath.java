@@ -27,6 +27,16 @@ public class CoroUtilPath {
 		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
 	}
 	
+	/**
+	 * If close enough, paths to coords, if too far based on attribute, tries to find best spot towards target to pathfind to
+	 * 
+	 * @param ent
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param moveSpeedAmp
+	 * @return
+	 */
 	public static boolean tryMoveToXYZLongDist(EntityCreature ent, double x, double y, double z, double moveSpeedAmp) {
 		
 		World world = ent.worldObj;

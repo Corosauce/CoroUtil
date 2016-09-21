@@ -283,10 +283,10 @@ public class RotatingParticleManager
         }
         catch (Throwable throwable)
         {
-            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Particle");
+            CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Rotating Particle");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
             final int i = particle.getFXLayer();
-            crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>()
+            crashreportcategory.setDetail("Rotating Particle", new ICrashReportDetail<String>()
             {
                 public String call() throws Exception
                 {
