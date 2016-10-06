@@ -4,6 +4,8 @@ import java.util.Iterator;
 
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
+import modconfig.gui.GuiConfigEditor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,7 +35,7 @@ public class EventHandlerPacket {
 				int pos = 0;
 				ConfigMod.dbg("modconfig packet, size: " + "derp");
 				//TODO: readd GUI
-				if (/*!GuiConfigEditor.clientMode || */ConfigMod.configLookup.get(modID).configData.size() == 0) {
+				if (!GuiConfigEditor.clientMode || ConfigMod.configLookup.get(modID).configData.size() == 0) {
 	                ConfigMod.configLookup.get(modID).configData.clear();
 	                //Iterator it = nbtEntries.getTagList(p_150295_1_, p_150295_2_)
 	                Iterator it = nbtEntries.getKeySet().iterator();
@@ -48,7 +50,7 @@ public class EventHandlerPacket {
                 }
 			} else if (command.equals("openGUI")) {
 				//TODO: readd GUI
-				//Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
+				Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
 			}
 			
 		} catch (Exception ex) {
@@ -65,7 +67,7 @@ public class EventHandlerPacket {
 			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 			String command = nbt.getString("command");
 			
-			System.out.println("command: " + command);
+			//System.out.println("command: " + command);
 			
 			if (command.equals("setData")) {
 				String data = nbt.getString("data");

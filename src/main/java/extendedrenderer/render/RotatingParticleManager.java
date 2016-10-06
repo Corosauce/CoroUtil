@@ -9,6 +9,9 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GLUConstants;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.Barrier;
 import net.minecraft.client.particle.IParticleFactory;
