@@ -32,13 +32,13 @@ import CoroUtil.world.WorldDirectorManager;
 
 import com.google.common.collect.BiMap;
 
-@Mod(modid = "CoroAI", name="CoroAI", version="v1.1.8", acceptableRemoteVersions="*")
+@Mod(modid = "coroai", name="coroai", version="v1.1.9", acceptableRemoteVersions="*")
 public class CoroAI {
 	
-	@Mod.Instance( value = "CoroAI" )
+	@Mod.Instance( value = "coroai" )
 	public static CoroAI instance;
 	public static String modID = "coroutil";
-	public static String modIDForge = "CoroAI";
+	public static String modIDForge = "coroai";
     
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")

@@ -17,14 +17,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.render.RotatingParticleManager;
 
-@Mod(modid = "ExtendedRenderer", name="Extended Renderer", version="v1.0")
+@Mod(modid = "extendedrenderer", name="Extended Renderer", version="v1.0")
 public class ExtendedRenderer {
 	
-	@Mod.Instance( value = "ExtendedRenderer" )
+	@Mod.Instance( value = "extendedrenderer" )
 	public static ExtendedRenderer instance;
 	public static String modid = "extendedrenderer";
-	//because assets used it this way, remove later
-	public static String modidCaps = "ExtendedRenderer";
     
     @SidedProxy(clientSide = "extendedrenderer.ClientProxy", serverSide = "extendedrenderer.CommonProxy")
     public static CommonProxy proxy;

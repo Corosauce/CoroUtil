@@ -25,11 +25,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.OldUtil;
 
-//@NetworkMod(channels = { "ModConfig" }, clientSideRequired = true, serverSideRequired = true, packetHandler = MCPacketHandler.class)
-@Mod(modid = "ConfigMod", name="Extended Mod Config", version="v1.0", useMetadata=false)
+@Mod(modid = "configmod", name="Extended Mod Config", version="v1.0", useMetadata=false)
 public class ConfigMod {
 
-	@Mod.Instance( value = "ConfigMod" )
+	@Mod.Instance( value = "configmod" )
 	public static ConfigMod instance;
 	
 	//public static Class configFieldClass = ModConfigFields.class;
