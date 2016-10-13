@@ -27,6 +27,8 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static int cleanupStrayMobsTimeOfDay = 2000;
 	
+	public static boolean desirePathDerp = false;
+	
 	@Override	
 	public String getConfigFileName() {
 		return "CoroUtil";

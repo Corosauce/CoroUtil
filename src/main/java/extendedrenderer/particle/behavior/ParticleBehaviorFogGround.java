@@ -48,7 +48,7 @@ public class ParticleBehaviorFogGround extends ParticleBehaviors {
 		//particle.setRBGColorF((float) (0.4F + (Math.abs(particle.posX / 300D) * 0.6D)), 0.4F, (float) (0.4F + (Math.abs(particle.posZ / 300D) * 0.6D)));
 		//particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
-		particle.setAlphaF(0F);
+		particle.setAlphaF(1F);
 		
 		float sizeBase = (float) (30+(rand.nextDouble()*4));
 		

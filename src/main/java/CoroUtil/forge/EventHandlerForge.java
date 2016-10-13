@@ -1,7 +1,14 @@
 package CoroUtil.forge;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -17,6 +24,7 @@ import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 import CoroUtil.world.player.DynamicDifficulty;
 
@@ -96,5 +104,48 @@ public class EventHandlerForge {
 		DynamicDifficulty.logDeath(event);
 	}
 	
-	
+	@SubscribeEvent
+	public void entityTick(LivingUpdateEvent event) {
+		if (ConfigCoroAI.desirePathDerp) {
+			EntityLivingBase ent = event.getEntityLiving();
+			int walkOnRate = 5;
+			
+			if (!ent.worldObj.isRemote) {
+				if (ent.worldObj.getTotalWorldTime() % walkOnRate == 0) {
+					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
+					if (speed > 0.08) {
+						//System.out.println(entityId + " - speed: " + speed);
+						int newX = MathHelper.floor_double(ent.posX);
+						int newY = MathHelper.floor_double(ent.getEntityBoundingBox().minY - 1);
+						int newZ = MathHelper.floor_double(ent.posZ);
+						IBlockState state = ent.worldObj.getBlockState(new BlockPos(newX, newY, newZ));
+						Block id = state.getBlock();
+						
+						//check for block that can have beaten path data
+						
+						if (id == Blocks.GRASS) {
+							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
+							
+							//add depending on a weight?
+							bdp.walkedOnAmount += 0.25F;
+							
+							//System.out.println("inc walk amount: " + bdp.walkedOnAmount);
+							
+							if (bdp.walkedOnAmount > 5F) {
+								//System.out.println("dirt!!!");
+								if (ent.worldObj.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
+									ent.worldObj.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
+								}
+								
+								//BlockRegistry.dirtPath.blockID);
+								//cleanup for memory
+								WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).removeBlockData(newX, newY, newZ);
+								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

@@ -324,8 +324,15 @@ public class RotatingParticleManager
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
+        //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
         GlStateManager.disableCull();
+        
+        //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
+        int mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
+        int mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
+        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         for (int i_nf = 0; i_nf < 3; ++i_nf)
         {
@@ -391,6 +398,10 @@ public class RotatingParticleManager
                 }
             }
         }
+        
+        //restore original mipmap state
+        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
+        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
         
         GlStateManager.enableCull();
 

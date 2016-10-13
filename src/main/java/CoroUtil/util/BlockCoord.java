@@ -1,5 +1,7 @@
 package CoroUtil.util;
 
+import net.minecraft.util.math.BlockPos;
+
 public class BlockCoord {
 	
 	public int posX;
@@ -65,6 +67,10 @@ public class BlockCoord {
         double d1 = (double)this.getY() - toY;
         double d2 = (double)this.getZ() - toZ;
         return d0 * d0 + d1 * d1 + d2 * d2;
+    }
+    
+    public BlockPos toBlockPos() {
+    	return new BlockPos(posX, posY, posZ);
     }
 	
 }

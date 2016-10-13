@@ -9,8 +9,10 @@ public class ParticleRegistry {
 
 	public static TextureAtlasSprite squareGrey;
 	public static TextureAtlasSprite smoke;
+	public static TextureAtlasSprite smokeTest;
 	public static TextureAtlasSprite cloud;
 	public static TextureAtlasSprite cloud256;
+	public static TextureAtlasSprite cloud256_2;
 	public static TextureAtlasSprite leaf;
 	public static TextureAtlasSprite rain;
 	public static TextureAtlasSprite snow;
@@ -24,8 +26,10 @@ public class ParticleRegistry {
 		
 		squareGrey = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
 		smoke = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
+		smokeTest = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
 		cloud = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
 		cloud256 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256"));
+		cloud256_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_5"));
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
 		rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
 		snow = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/snow"));
