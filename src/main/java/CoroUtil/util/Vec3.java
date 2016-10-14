@@ -20,6 +20,10 @@ public class Vec3
     {
         return new Vec3(p_72443_0_, p_72443_2_, p_72443_4_);
     }*/
+    
+    public Vec3(Vec3 pos) {
+    	this(pos.xCoord, pos.yCoord, pos.zCoord);
+    }
 
     public Vec3(double p_i1108_1_, double p_i1108_3_, double p_i1108_5_)
     {

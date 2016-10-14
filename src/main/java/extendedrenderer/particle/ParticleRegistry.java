@@ -13,6 +13,8 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite cloud;
 	public static TextureAtlasSprite cloud256;
 	public static TextureAtlasSprite cloud256_2;
+	public static TextureAtlasSprite chicken;
+	public static TextureAtlasSprite potato;
 	public static TextureAtlasSprite leaf;
 	public static TextureAtlasSprite rain;
 	public static TextureAtlasSprite snow;
@@ -30,6 +32,8 @@ public class ParticleRegistry {
 		cloud = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
 		cloud256 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256"));
 		cloud256_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_5"));
+		chicken = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/chicken"));
+		potato = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/potato"));
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
 		rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
 		snow = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/snow"));
