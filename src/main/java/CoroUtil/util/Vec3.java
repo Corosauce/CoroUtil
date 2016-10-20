@@ -1,5 +1,6 @@
 package CoroUtil.util;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class Vec3
@@ -259,5 +260,9 @@ public class Vec3
     
     public net.minecraft.util.math.Vec3d toMCVec() {
     	return new net.minecraft.util.math.Vec3d(this.xCoord, this.yCoord, this.zCoord);
+    }
+    
+    public BlockPos toBlockPos() {
+    	return new BlockPos(this.xCoord, this.yCoord, this.zCoord);
     }
 }
