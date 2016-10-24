@@ -11,8 +11,10 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLUConstants;
+import org.lwjgl.util.glu.Project;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Barrier;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
@@ -51,7 +53,9 @@ import net.minecraft.client.particle.ParticleSuspendedTown;
 import net.minecraft.client.particle.ParticleSweepAttack;
 import net.minecraft.client.particle.ParticleWaterWake;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -333,6 +337,18 @@ public class RotatingParticleManager
         int mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityRenderer er = mc.entityRenderer;
+        
+        //TODO: requires AT for EntityRenderer
+        boolean testGLUOverride = false;
+        if (testGLUOverride) {
+	        /*GlStateManager.matrixMode(5889);
+	        GlStateManager.loadIdentity();
+	        Project.gluPerspective(er.getFOVModifier(partialTicks, true), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, er.farPlaneDistance * 4.0F);
+	        GlStateManager.matrixMode(5888);*/
+        }
 
         for (int i_nf = 0; i_nf < 3; ++i_nf)
         {
