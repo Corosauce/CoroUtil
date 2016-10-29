@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -22,6 +23,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.quest.PlayerQuestManager;
+import CoroUtil.util.CoroUtilPlayer;
+import CoroUtil.util.Vec3;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
@@ -106,13 +109,25 @@ public class EventHandlerForge {
 	
 	@SubscribeEvent
 	public void entityTick(LivingUpdateEvent event) {
+		
+		EntityLivingBase ent = event.getEntityLiving();
+		if (!ent.worldObj.isRemote) {
+			if (ent instanceof EntityPlayer) {
+				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
+			}
+		}
+		
 		if (ConfigCoroAI.desirePathDerp) {
-			EntityLivingBase ent = event.getEntityLiving();
+			
 			int walkOnRate = 5;
 			
 			if (!ent.worldObj.isRemote) {
 				if (ent.worldObj.getTotalWorldTime() % walkOnRate == 0) {
 					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
+					if (ent instanceof EntityPlayer) {
+						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((EntityPlayer) ent, 0.1F);
+						speed = Math.sqrt(vec.xCoord * vec.xCoord + vec.yCoord * vec.yCoord + vec.zCoord * vec.zCoord);
+					}
 					if (speed > 0.08) {
 						//System.out.println(entityId + " - speed: " + speed);
 						int newX = MathHelper.floor_double(ent.posX);
