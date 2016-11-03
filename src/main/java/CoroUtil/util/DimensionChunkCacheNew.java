@@ -232,7 +232,6 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	
 	@Override
 	public int getCombinedLight(BlockPos pos, int lightValue) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

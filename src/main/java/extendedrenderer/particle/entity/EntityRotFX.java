@@ -42,6 +42,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     //not a real entity ID now, just used for making rendering of entities slightly unique
     private int entityID = 0;
     
+    public int debugID = 0;
+    
     public float rotationYaw;
     public float rotationPitch;
     
@@ -52,8 +54,10 @@ public class EntityRotFX extends Particle implements IWindHandler
     public boolean killOnCollide = false;
 	
 	public boolean facePlayer = false;
-    
-    public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
+	
+	public boolean vanillaMotionDampen = true;
+
+	public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
         setSize(0.3F, 0.3F);
@@ -104,30 +108,15 @@ public class EntityRotFX extends Particle implements IWindHandler
     @Override
     public void onUpdate() {
     	super.onUpdate();
-    	/*if (callUpdateSuper) super.onUpdate();
-    	this.setPrevPosX(this.getPosX());
-    	this.setPrevPosZ(this.getPosY());
-    	this.setPrevPosY(this.getPosZ());
-        
-        if (callUpdatePB && pb != null) pb.tickUpdate(this);
-        
-        //calling required stuff the super did
-        if (!callUpdateSuper) {
-        	this.setPrevPosX(this.getPosX());
-            this.setPrevPosY(this.getPosY());
-            this.setPrevPosZ(this.getPosZ());
-
-            if (this.particleAge++ >= this.particleMaxAge)
-            {
-                this.setExpired();
-            }
-            
-            if (spawnY != -1) {
-            	setPosition(getPosX(), spawnY, getPosZ());
-            }
-            
-            this.moveEntity(this.getMotionX(), this.getMotionY(), this.getMotionZ());
-        }*/
+    	
+    	if (!isVanillaMotionDampen()) {
+    		//cancel motion dampening (which is basically air resistance)
+    		//keep this up to date with the inverse of whatever Particle.onUpdate uses
+        	this.motionX /= 0.9800000190734863D;
+            this.motionY /= 0.9800000190734863D;
+            this.motionZ /= 0.9800000190734863D;
+    	}
+    	
     	if (killOnCollide) {
     		if (this.isCollided()) {
     			this.setExpired();
@@ -146,24 +135,6 @@ public class EntityRotFX extends Particle implements IWindHandler
     {
         return 5;
     }
-    
-    /*@Override
-    public void setParticleIcon(TextureAtlasSprite p_110125_1_)
-    {
-        if (this.getFXLayer() == 1)
-        {
-            this.particleIcon = p_110125_1_;
-        }
-        else
-        {
-            if (this.getFXLayer() != 2)
-            {
-                throw new RuntimeException("Invalid call to Particle.setTex, use coordinate methods");
-            }
-
-            this.particleIcon = p_110125_1_;
-        }
-    }*/
 
     public void spawnAsWeatherEffect()
     {
@@ -403,4 +374,12 @@ public class EntityRotFX extends Particle implements IWindHandler
     public TextureAtlasSprite getParticleTexture() {
     	return this.particleTexture;
     }
+    
+    public boolean isVanillaMotionDampen() {
+		return vanillaMotionDampen;
+	}
+
+	public void setVanillaMotionDampen(boolean motionDampen) {
+		this.vanillaMotionDampen = motionDampen;
+	}
 }

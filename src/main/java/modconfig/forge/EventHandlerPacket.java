@@ -34,7 +34,6 @@ public class EventHandlerPacket {
 				//int entryCount = nbt.getInteger("entryCount");
 				int pos = 0;
 				ConfigMod.dbg("modconfig packet, size: " + "derp");
-				//TODO: readd GUI
 				if (!GuiConfigEditor.clientMode || ConfigMod.configLookup.get(modID).configData.size() == 0) {
 	                ConfigMod.configLookup.get(modID).configData.clear();
 	                //Iterator it = nbtEntries.getTagList(p_150295_1_, p_150295_2_)
@@ -49,7 +48,6 @@ public class EventHandlerPacket {
 	                }
                 }
 			} else if (command.equals("openGUI")) {
-				//TODO: readd GUI
 				Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
 			}
 			
