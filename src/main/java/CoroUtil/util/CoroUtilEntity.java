@@ -63,7 +63,7 @@ public class CoroUtilEntity {
 	}
 	
 	public static String getName(Entity ent) {
-		return ent.getName();
+		return ent != null ? ent.getName() : "nullObject";
 	}
 	
 	public static EntityPlayer getPlayerByUUID(UUID uuid) {

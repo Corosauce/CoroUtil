@@ -2,6 +2,7 @@ package CoroUtil.util;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 public class Vec3
 {
@@ -23,6 +24,10 @@ public class Vec3
     }*/
     
     public Vec3(Vec3 pos) {
+    	this(pos.xCoord, pos.yCoord, pos.zCoord);
+    }
+    
+    public Vec3(Vec3d pos) {
     	this(pos.xCoord, pos.yCoord, pos.zCoord);
     }
 

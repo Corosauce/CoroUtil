@@ -1,6 +1,7 @@
 package CoroUtil.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -83,6 +84,10 @@ public class CoroUtil {
 	}
 	
 	public static void sendPlayerMsg(EntityPlayerMP entP, String msg) {
+		sendCommandSenderMsg(entP, msg);
+	}
+	
+	public static void sendCommandSenderMsg(ICommandSender entP, String msg) {
 		entP.addChatMessage(new TextComponentString(msg));
 	}
 	

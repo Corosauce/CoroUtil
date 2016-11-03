@@ -8,6 +8,7 @@ import java.util.Map;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
@@ -17,6 +18,7 @@ import net.minecraft.init.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -39,12 +41,21 @@ public class CommandCoroUtil extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
+		EntityPlayer player = null;
+		if (var1 instanceof EntityPlayer) {
+			player = (EntityPlayer) var1;
+		}
+		World world = var1.getEntityWorld();
+		int dimension = world.provider.getDimension();
+		BlockPos posBlock = var1.getPosition();
+		Vec3d posVec = var1.getPositionVector();
+		
 		try {
-			if(var1 instanceof EntityPlayerMP)
-			{
-				EntityPlayer player = getCommandSenderAsPlayer(var1);
+			/*if(var1 instanceof EntityPlayerMP)
+			{*/
+				//EntityPlayer player = getCommandSenderAsPlayer(var1);
 				
-				if (var2[0].equals("testquest")) {
+				if (var2[0].equals("testquest") && player != null) {
 					String createQuestStr = "CoroUtil.quest.quests.ItemQuest";
 					PlayerQuests plQuests = PlayerQuestManager.i().getPlayerQuests(player);
 					ActiveQuest aq = PlayerQuests.createQuestFromString(createQuestStr);
@@ -54,7 +65,7 @@ public class CommandCoroUtil extends CommandBase {
 					if (aq != null) {
 						aq.initCreateObject(plQuests);
 						
-						aq.initFirstTime(player.worldObj.provider.getDimension());
+						aq.initFirstTime(dimension);
 						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.DIAMOND), 5, false);
 						
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);
@@ -66,13 +77,13 @@ public class CommandCoroUtil extends CommandBase {
 					plQuests.saveAndSyncPlayer();
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
-					BehaviorModifier.test(player.worldObj, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
+					BehaviorModifier.test(world, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
 					
 					/*TaskDigTowardsTarget task = new TaskDigTowardsTarget();
 					
 					System.out.println("ENHANCE!");
 					BehaviorModifier.enhanceZombiesToDig(DimensionManager.getWorld(0), new Vec3(player.posX, player.posY, player.posZ), new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class }, 5, 0.8F);*/
-				} else if (var2[0].equalsIgnoreCase("spawn")) {
+				} else if (var2[0].equalsIgnoreCase("spawn") && player != null) {
 					
 					String prefix = "";
 					String mobToSpawn = var2[1];
@@ -84,27 +95,27 @@ public class CommandCoroUtil extends CommandBase {
 					}
 
 					for (int i = 0; i < count; i++) {
-						Entity ent = EntityList.createEntityByName(prefix + mobToSpawn, player.worldObj);
+						Entity ent = EntityList.createEntityByName(prefix + mobToSpawn, world);
 						
-						if (ent == null) ent = EntityList.createEntityByName(mobToSpawn, player.worldObj);
+						if (ent == null) ent = EntityList.createEntityByName(mobToSpawn, world);
 						
 						if (ent == null) {
 							List<String> entsToSpawn = listEntitiesSpawnable(mobToSpawn);
 							if (entsToSpawn.size() > 0) {
 								for (int j = 0; j < entsToSpawn.size(); j++) {
-									Entity ent2 = EntityList.createEntityByName(entsToSpawn.get(j), player.worldObj);
+									Entity ent2 = EntityList.createEntityByName(entsToSpawn.get(j), world);
 									if (ent2 != null) {
-										CoroUtil.sendPlayerMsg((EntityPlayerMP) player, "spawned: " + CoroUtilEntity.getName(ent2));
+										CoroUtil.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
 										spawnEntity(player, ent2);
 									}
 								}
 							} else {
-								CoroUtil.sendPlayerMsg((EntityPlayerMP) player, "found nothing to spawn");
+								CoroUtil.sendCommandSenderMsg(player, "found nothing to spawn");
 							}
 						} else {
 							if (ent != null) {
 								
-								CoroUtil.sendPlayerMsg((EntityPlayerMP) player, "spawned: " + CoroUtilEntity.getName(ent));
+								CoroUtil.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
 								spawnEntity(player, ent);
 								
 							}
@@ -114,37 +125,37 @@ public class CommandCoroUtil extends CommandBase {
 	        		if (var2[1].equalsIgnoreCase("count")) {
 	        			boolean exact = false;
 	        			if (var2.length > 3) exact = var2[3].equals("exact");
-	        			CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, var2[2] + " count: " + getEntityCount(var2[2], false, exact, ((EntityPlayer)var1).dimension));
+	        			CoroUtil.sendCommandSenderMsg(var1, var2[2] + " count: " + getEntityCount(var2[2], false, exact, dimension));
 	        		} else if (var2[1].equalsIgnoreCase("PFQueue")) {
 	        			if (var2[2].equalsIgnoreCase("lastpf")) {
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "last PF Time: " + ((System.currentTimeMillis() - PFQueue.lastSuccessPFTime) / 1000F));
+	        				CoroUtil.sendCommandSenderMsg(var1, "last PF Time: " + ((System.currentTimeMillis() - PFQueue.lastSuccessPFTime) / 1000F));
 	        				//var1.sendChatToPlayer(var2[2] + " set to: " + c_CoroAIUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
 	        			} if (var2[2].equalsIgnoreCase("stats")) {
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "PFQueue Stats");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "-------------");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.lastQueueSize + " - " + "PF queue size");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.lastChunkCacheCount + " - " + "Cached chunks");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.statsPerSecondPath + " - " + "Pathfinds / 10 sec");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.statsPerSecondPathSkipped + " - " + "Old PF Skips / 10 sec");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.statsPerSecondNodeMaxIter + " - " + "Big PF Skips / 10 sec");
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, PFQueue.statsPerSecondNode + " - " + "Nodes ran / 10 sec");
+	        				CoroUtil.sendCommandSenderMsg(var1, "PFQueue Stats");
+	        				CoroUtil.sendCommandSenderMsg(var1, "-------------");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.lastQueueSize + " - " + "PF queue size");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.lastChunkCacheCount + " - " + "Cached chunks");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPath + " - " + "Pathfinds / 10 sec");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPathSkipped + " - " + "Old PF Skips / 10 sec");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNodeMaxIter + " - " + "Big PF Skips / 10 sec");
+	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNode + " - " + "Nodes ran / 10 sec");
 	        					        				
 	        				
 	        				
 	        			} else {
 	        				//var1.sendChatToPlayer("Last chunk cache count: " + PFQueue.lastChunkCacheCount);
-	        				CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, var2[2] + " set to: " + OldUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
+	        				CoroUtil.sendCommandSenderMsg(var1, var2[2] + " set to: " + OldUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
 	        			}
 	        		}
 	        	} else if (var2[0].equalsIgnoreCase("kill")) {
 	        		boolean exact = false;
-	        		int dim = ((EntityPlayer)var1).dimension;
+	        		//int dim = world.provider.getDimension();
         			//if (var2.length > 2) exact = var2[2].equals("exact");
-	        		if (var2.length > 2) dim = Integer.valueOf(var2[1]);
-	        		CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, var2[1] + " count killed: " + getEntityCount(var2[1], true, exact, dim));
+	        		if (var2.length > 2) dimension = Integer.valueOf(var2[1]);
+	        		CoroUtil.sendCommandSenderMsg(var1, var2[1] + " count killed: " + getEntityCount(var2[1], true, exact, dimension));
 	        	} else if (var2[0].equalsIgnoreCase("list")) {
 	        		String param = null;
-	        		int dim = ((EntityPlayer)var1).dimension;
+	        		//int dim = world.provider.getDimension();
 	        		
 	        		String fullCommand = "";
 	        		for (String entry : var2) {
@@ -154,23 +165,23 @@ public class CommandCoroUtil extends CommandBase {
 	        		if (fullCommand.contains(" simple")) {
 	        			simple = true;
 	        		} else {
-	        			if (var2.length > 1) dim = Integer.valueOf(var2[1]);
+	        			if (var2.length > 1) dimension = Integer.valueOf(var2[1]);
 		        		if (var2.length > 2) param = var2[2];
 	        		}
-	        		HashMap<String, Integer> entNames = listEntities(param, dim, simple);
+	        		HashMap<String, Integer> entNames = listEntities(param, dimension, simple);
 	                
-	        		CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "List for dimension id: " + dim);
+	        		CoroUtil.sendCommandSenderMsg(var1, "List for dimension id: " + dimension);
 	        		
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, pairs.getKey() + " = " + pairs.getValue());
+	                    CoroUtil.sendCommandSenderMsg(var1, pairs.getKey() + " = " + pairs.getValue());
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
 	                }
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
 	        		String param = null;
-	        		int dim = ((EntityPlayer)var1).dimension;
+	        		//int dim = world.provider.getDimension();
 	        		int indexStart = 0;
 	        		
 	        		String fullCommand = "";
@@ -185,14 +196,14 @@ public class CommandCoroUtil extends CommandBase {
 	        			if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
 		        		if (var2.length > 2) param = var2[2];
 	        		//}
-	        		List<String> data = listEntitiesLocations(param, dim, simple, indexStart);
+	        		List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
 	                
-	        		CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, "Location list for dimension id: " + dim);
+	        		CoroUtil.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
 	        		for (String entry : data) {
-	        			CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, entry);
+	        			CoroUtil.sendCommandSenderMsg(var1, entry);
 	        		}
 	        	}
-			}
+			/*}*/
 		} catch (Exception ex) {
 			System.out.println("Exception handling CoroUtil command");
 			ex.printStackTrace();
@@ -340,6 +351,11 @@ public class CommandCoroUtil extends CommandBase {
 	@Override
 	public String getCommandUsage(ICommandSender icommandsender) {
 		return "Magic dev method!";
+	}
+	
+	@Override
+	public int getRequiredPermissionLevel() {
+		return 2;
 	}
 
 }
