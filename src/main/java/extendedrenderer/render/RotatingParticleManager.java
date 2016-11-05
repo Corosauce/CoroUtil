@@ -305,7 +305,7 @@ public class RotatingParticleManager
 	        GlStateManager.matrixMode(5888);*/
         }
         
-        boolean fog = true;
+        boolean fog = false;
         if (fog) {
         	boolean ATmode = true;
         	if (ATmode) {
