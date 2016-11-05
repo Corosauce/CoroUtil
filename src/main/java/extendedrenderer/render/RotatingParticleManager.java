@@ -309,7 +309,8 @@ public class RotatingParticleManager
         if (fog) {
         	boolean ATmode = true;
         	if (ATmode) {
-        		er.setupFog(0, partialTicks);
+        		//TODO: add AT if this will be used
+        		//er.setupFog(0, partialTicks);
         	} else {
         		//incomplete copy
 	        	float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");

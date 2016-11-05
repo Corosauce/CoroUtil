@@ -399,24 +399,16 @@ public class GuiConfigEditor extends GuiScreen
         }
     }
     
-    public void drawTexturedModalRect(int par1, int par2, int par3, int par4, int par5, int par6)
+    public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height)
     {
         float f = 0.00390625F / 2F;
-        float f1 = 0.00390625F / 2F;
-    	Tessellator tessellator = Tessellator.getInstance();
+        Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer vertexbuffer = tessellator.getBuffer();
-        /*tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(par1 + 0), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + 0) * f), (double)((float)(par4 + par6) * f1));
-        tessellator.addVertexWithUV((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4 + par6) * f1));
-        tessellator.addVertexWithUV((double)(par1 + par5), (double)(par2 + 0), (double)this.zLevel, (double)((float)(par3 + par5) * f), (double)((float)(par4 + 0) * f1));
-        tessellator.addVertexWithUV((double)(par1 + 0), (double)(par2 + 0), (double)this.zLevel, (double)((float)(par3 + 0) * f), (double)((float)(par4 + 0) * f1));
-        tessellator.draw();*/
-        
-        vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        vertexbuffer.pos((double)(par1 + 0), (double)(par2 + par6), (double)this.zLevel).tex((double)((float)(par3 + 0) * f), (double)((float)(par4 + par6) * f1)).color(0, 0, 0, 255).endVertex();
-        vertexbuffer.pos((double)(par1 + par5), (double)(par2 + par6), (double)this.zLevel).tex((double)((float)(par3 + par5) * f), (double)((float)(par4 + par6) * f1)).color(0, 0, 0, 255).endVertex();
-        vertexbuffer.pos((double)(par1 + par5), (double)(par2 + 0), (double)this.zLevel).tex((double)((float)(par3 + par5) * f), (double)((float)(par4 + 0) * f1)).color(0, 0, 0, 0).endVertex();
-        vertexbuffer.pos((double)(par1 + 0), (double)(par2 + 0), (double)this.zLevel).tex((double)((float)(par3 + 0) * f), (double)((float)(par4 + 0) * f1)).color(0, 0, 0, 0).endVertex();
+        vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        vertexbuffer.pos((double)(x + 0), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + height) * f)).endVertex();
+        vertexbuffer.pos((double)(x + width), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + height) * f)).endVertex();
+        vertexbuffer.pos((double)(x + width), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + 0) * f)).endVertex();
+        vertexbuffer.pos((double)(x + 0), (double)(y + 0), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + 0) * f)).endVertex();
         tessellator.draw();
     }
 }
