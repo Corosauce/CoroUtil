@@ -50,7 +50,7 @@ public class EventHandlerForge {
 		//check server side because some mods invoke saving client side (bad standard)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
-				CoroAI.writeOutData(false);
+				CoroUtil.writeOutData(false);
 			}
 		}
 	}
@@ -59,8 +59,8 @@ public class EventHandlerForge {
 	public void worldLoad(Load event) {
 		if (!event.getWorld().isRemote) {
 			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
-				if (WorldDirectorManager.instance().getWorldDirector(CoroAI.modID, event.getWorld()) == null) {
-					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroAI.modID, event.getWorld());
+				if (WorldDirectorManager.instance().getWorldDirector(CoroUtil.modID, event.getWorld()) == null) {
+					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroUtil.modID, event.getWorld());
 				}
 			}
 		}

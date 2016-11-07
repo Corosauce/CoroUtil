@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.forge.CoroAI;
+import CoroUtil.forge.CoroUtil;
 
 public class PacketHelper {
 	
@@ -87,7 +87,7 @@ public class PacketHelper {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
 		
-		CoroAI.dbg("createPacketForTEntDWClient incomplete");
+		CoroUtil.dbg("createPacketForTEntDWClient incomplete");
 		ByteBuf byteBuf = Unpooled.buffer();
 		
 		/*TileHandler tileHandler = ((ITilePacket)tEnt).getTileHandler();
@@ -110,14 +110,14 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntDWServer(TileEntity tEnt) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
 		
-		CoroAI.dbg("createPacketForTEntDWServer incomplete");
+		CoroUtil.dbg("createPacketForTEntDWServer incomplete");
 		ByteBuf byteBuf = Unpooled.buffer();
 		
 		/*TileDataWatcher tileDataWatcher = ((ITilePacket)tEnt).getTileHandler().tileDataWatcher;
@@ -135,7 +135,7 @@ public class PacketHelper {
 		pkt.data = bos.toByteArray();
 		pkt.length = bos.size();
 		pkt.isChunkDataPacket = false;*/
-		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
+		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
 	
 	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, NBTTagCompound data) {
@@ -172,7 +172,7 @@ public class PacketHelper {
         pkt.data = bos.toByteArray();
         pkt.length = bos.size();*/
         
-        return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroAI.eventChannelName);
+        return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
 	
 	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
@@ -213,7 +213,7 @@ public class PacketHelper {
 		data.setDouble("motionX", motionX);
 		data.setDouble("motionY", motionY);
 		data.setDouble("motionZ", motionZ);
-		return getNBTPacket(data, CoroAI.eventChannelName);
+		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 	
 }

@@ -35,7 +35,7 @@ public class EventHandlerFML {
 	@SubscribeEvent
 	public void tickWorld(WorldTickEvent event) {
 		if (event.phase == Phase.START) {
-			CoroAI.initTry();
+			CoroUtil.initTry();
 		}
 	}
 	

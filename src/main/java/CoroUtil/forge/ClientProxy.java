@@ -13,7 +13,7 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void init(CoroAI pMod)
+    public void init(CoroUtil pMod)
     {
         super.init(pMod);
         

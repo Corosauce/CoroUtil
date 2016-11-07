@@ -9,13 +9,13 @@ public class CommonProxy implements IGuiHandler
     public World mainWorld;
     private int entityId = 0;
 
-    public CoroAI mod;
+    public CoroUtil mod;
 
     public CommonProxy()
     {
     }
 
-    public void init(CoroAI pMod)
+    public void init(CoroUtil pMod)
     {
         mod = pMod;
     }

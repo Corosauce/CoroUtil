@@ -33,10 +33,10 @@ import CoroUtil.world.WorldDirectorManager;
 import com.google.common.collect.BiMap;
 
 @Mod(modid = "coroutil", name="coroutil", version="v1.1.9", acceptableRemoteVersions="*")
-public class CoroAI {
+public class CoroUtil {
 	
 	@Mod.Instance( value = "coroutil" )
-	public static CoroAI instance;
+	public static CoroUtil instance;
 	public static String modID = "coroutil";
 	public static String modIDForge = "coroutil";
     
@@ -102,7 +102,7 @@ public class CoroAI {
     	}
 	}
     
-    public CoroAI() {
+    public CoroUtil() {
     	
     }
     

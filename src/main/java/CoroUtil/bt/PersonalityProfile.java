@@ -25,7 +25,7 @@ import CoroUtil.bt.nodes.TrackTarget;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.bt.selector.SelectorConcurrent;
 import CoroUtil.entity.render.AnimationStateObject;
-import CoroUtil.forge.CoroAI;
+import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilAbility;
 
@@ -304,12 +304,12 @@ public class PersonalityProfile {
 		nbt.setString("command", "CoroAI_Ent");
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
-		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
+		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		if (rangeOverride) {
-			CoroAI.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.getDimension());
+			CoroUtil.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.getDimension());
 			//PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.worldObj.provider.dimensionId);
 		} else {
-			CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+			CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
 			//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 		}
 	}
@@ -320,8 +320,8 @@ public class PersonalityProfile {
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
 		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
-		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);
-		CoroAI.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
+		CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
 		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
 	}
 	

@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.forge.CoroAI;
+import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.util.CoroUtilFile;
@@ -119,8 +119,8 @@ public class PlayerQuests {
             	nbt.setString("command", "QuestData");
             	nbt.setTag("data", data);
             	
-                FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroAI.eventChannelName);
-                CoroAI.eventChannel.sendTo(packet, (EntityPlayerMP)getPlayer());
+                FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
+                CoroUtil.eventChannel.sendTo(packet, (EntityPlayerMP)getPlayer());
                 //writeNBTTagCompound(nbt, dos, data);
                 
                 //dos.write(data);

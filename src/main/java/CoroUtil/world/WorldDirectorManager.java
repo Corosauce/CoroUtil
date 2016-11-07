@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import CoroUtil.forge.CoroAI;
+import CoroUtil.forge.CoroUtil;
 import CoroUtil.world.grid.block.BlockDataGrid;
 import CoroUtil.world.grid.chunk.ChunkDataGrid;
 
@@ -51,10 +51,10 @@ public class WorldDirectorManager {
 	}
 	
 	public WorldDirector getCoroUtilWorldDirector(World world) {
-		WorldDirector wd = getWorldDirector(CoroAI.modID, world);
+		WorldDirector wd = getWorldDirector(CoroUtil.modID, world);
 		if (wd == null) {
 			wd = new WorldDirector(true);
-			WorldDirectorManager.instance().registerWorldDirector(wd, CoroAI.modID, world);
+			WorldDirectorManager.instance().registerWorldDirector(wd, CoroUtil.modID, world);
 		}
 		return wd;
 	}
