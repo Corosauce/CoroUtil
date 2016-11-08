@@ -76,6 +76,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 			if (!particle.isAlive()) {
 				particles.remove(particle);
 			} else {
+				//random rotation yaw adjustment
 				if (particle.getEntityId() % 2 == 0) {
 					particle.rotationYaw -= 0.1;
 				} else {
@@ -85,6 +86,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				float ticksFadeInMax = 50;
 				float ticksFadeOutMax = 50;
 				
+				//fade in and fade out near age edges
 				if (particle.getAge() < ticksFadeInMax) {
 					//System.out.println("particle.getAge(): " + particle.getAge());
 					particle.setAlphaF(particle.getAge() / ticksFadeInMax);
@@ -114,8 +116,9 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				}*/
 				
 				//get pos a bit under particle
-				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 0.5D, particle.getPosZ());
+				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 2.5D, particle.getPosZ());
 				IBlockState state = particle.getWorld().getBlockState(pos);
+				//if particle is near ground, push it up to keep from landing
 				if (!state.getBlock().isAir(state, particle.worldObj, pos)) {
 					if (particle.motionY < 0.09D) {
 						particle.motionY += 0.02D;
@@ -123,19 +126,20 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				}
 				
 				//if (particle.isCollidedHorizontally) {
-				if (particle.isCollided()) {
+				/*if (particle.isCollided()) {
 					particle.rotationYaw += 0.1;
-				}
+				}*/
 				
-				particle.setMotionX(particle.getMotionX() - Math.sin(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);
-				particle.setMotionZ(particle.getMotionZ() + Math.cos(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);
+				
+				/*particle.setMotionX(particle.getMotionX() - Math.sin(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);
+				particle.setMotionZ(particle.getMotionZ() + Math.cos(Math.toRadians((particle.rotationYaw + particle.getEntityId()) % 360)) * moveSpeed);*/
 				
 				double moveSpeedRand = 0.005D;
 				
 				particle.setMotionX(particle.getMotionX() + (rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand));
 				particle.setMotionZ(particle.getMotionZ() + (rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand));
 				
-				//TEMPOFF
+				//TEMPOFF?
 				particle.setScale(particle.getScale() - 0.1F);
 				
 				if (particle.spawnY != -1) {
