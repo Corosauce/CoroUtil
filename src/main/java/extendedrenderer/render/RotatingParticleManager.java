@@ -305,9 +305,9 @@ public class RotatingParticleManager
 	        GlStateManager.matrixMode(5888);*/
         }
         
-        boolean fog = false;
+        boolean fog = true;
         if (fog) {
-        	boolean ATmode = true;
+        	boolean ATmode = false;
         	if (ATmode) {
         		//TODO: add AT if this will be used
         		//er.setupFog(0, partialTicks);

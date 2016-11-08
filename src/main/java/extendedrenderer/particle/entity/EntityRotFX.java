@@ -3,10 +3,12 @@ package extendedrenderer.particle.entity;
 import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -294,6 +296,11 @@ public class EntityRotFX extends Particle implements IWindHandler
 	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
 		}
 		
+		/*IBlockState state = this.getWorld().getBlockState(new BlockPos(posX, posY, posZ));
+		if (state.getBlock() != Blocks.AIR) {
+			System.out.println("particle in: " + state);
+		}*/
+		
 		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
 				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
@@ -321,7 +328,9 @@ public class EntityRotFX extends Particle implements IWindHandler
     @Override
     public void moveEntity(double x, double y, double z)
     {
-        double d0 = y;
+        double yy = y;
+        double xx = x;
+        double zz = z;
 
         if (this.field_190017_n)
         {
@@ -354,14 +363,16 @@ public class EntityRotFX extends Particle implements IWindHandler
         }
 
         this.resetPositionToBB();
-        this.isCollided = d0 != y && d0 < 0.0D;
+        //was y != y before
+        //this.isCollided = yy != y && yy < 0.0D;
+        this.isCollided = yy != y || xx != x || zz != z;
 
-        if (x != x)
+        if (xx != x)
         {
             this.motionX = 0.0D;
         }
 
-        if (z != z)
+        if (zz != z)
         {
             this.motionZ = 0.0D;
         }
