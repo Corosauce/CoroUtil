@@ -30,6 +30,10 @@ public class Vec3
     public Vec3(Vec3d pos) {
     	this(pos.xCoord, pos.yCoord, pos.zCoord);
     }
+    
+    public Vec3(BlockPos pos) {
+    	this(pos.getX(), pos.getY(), pos.getZ());
+    }
 
     public Vec3(double p_i1108_1_, double p_i1108_3_, double p_i1108_5_)
     {

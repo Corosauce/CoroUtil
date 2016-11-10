@@ -116,12 +116,12 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				}*/
 				
 				//get pos a bit under particle
-				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 2.5D, particle.getPosZ());
+				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 4.5D, particle.getPosZ());
 				IBlockState state = particle.getWorld().getBlockState(pos);
 				//if particle is near ground, push it up to keep from landing
 				if (!state.getBlock().isAir(state, particle.worldObj, pos)) {
-					if (particle.motionY < 0.09D) {
-						particle.motionY += 0.02D;
+					if (particle.motionY < 0.15D) {
+						particle.motionY += 0.05D;
 					}
 				}
 				
