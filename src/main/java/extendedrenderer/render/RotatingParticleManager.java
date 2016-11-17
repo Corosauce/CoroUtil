@@ -305,9 +305,12 @@ public class RotatingParticleManager
 	        GlStateManager.matrixMode(5888);*/
         }
         
-        boolean fog = true;
+        boolean fog = false;
         if (fog) {
         	boolean ATmode = false;
+        	
+        	//TODO: make match other fog states
+        	
         	if (ATmode) {
         		//TODO: add AT if this will be used
         		//er.setupFog(0, partialTicks);
@@ -325,7 +328,7 @@ public class RotatingParticleManager
 	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
 	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
 	            
-	            GlStateManager.setFogDensity(0F);
+	            GlStateManager.setFogDensity(1F);
 	            
 	            GlStateManager.enableColorMaterial();
 	            GlStateManager.enableFog();
@@ -333,7 +336,7 @@ public class RotatingParticleManager
         	}
             
             GlStateManager.setFogStart(0);
-            GlStateManager.setFogEnd(1000);
+            GlStateManager.setFogEnd(100);
         }
 
         for (int i_nf = 0; i_nf < 3; ++i_nf)

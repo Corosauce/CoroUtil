@@ -33,7 +33,7 @@ public class CoroUtilPhysics {
     }
     
     /**
-     * Gets minimum distance to shape
+     * Gets minimum distance to shape, 2D only, y not used
      * Doesnt check if you are inside shape, use isInConvexShape for that
      * 
      * @param point
@@ -47,16 +47,19 @@ public class CoroUtilPhysics {
     	Vec3 closestPoint1 = null;
     	Vec3 closestPoint2 = null;
     	
-    	for (Vec3 pointTest : points) {
-    		double dist = pointTest.distanceTo(point);
-    		
-    		if (dist < closestDist1) {
-    			closestDist1 = (float) dist;
-    			closestPoint1 = pointTest;
-    		} else if (dist < closestDist2) {
-    			closestDist2 = (float) dist;
-    			closestPoint2 = pointTest;
-    		}
+    	//loop twice to account for edge case where points are ordered in increasing order of closeness, causing second closest clause to never trigger
+    	for (int i = 0; i < 2; i++) {
+	    	for (Vec3 pointTest : points) {
+	    		double dist = pointTest.distanceTo(point);
+	    		
+	    		if (dist < closestDist1) {
+	    			closestDist1 = (float) dist;
+	    			closestPoint1 = pointTest;
+	    		} else if (dist < closestDist2 && pointTest != closestPoint1) {
+	    			closestDist2 = (float) dist;
+	    			closestPoint2 = pointTest;
+	    		}
+	    	}
     	}
     	
     	if (closestPoint1 == null || closestPoint2 == null) {
@@ -68,7 +71,7 @@ public class CoroUtilPhysics {
     }
     
     /**
-     * x and y are point, rest is line
+     * x and y are point, rest is line, 2D only
      * 
      * @param x
      * @param y
