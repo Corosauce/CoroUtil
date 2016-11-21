@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.quest.PlayerQuestManager;
+import CoroUtil.test.Headshots;
 import CoroUtil.util.CoroUtilPlayer;
 import CoroUtil.util.Vec3;
 import CoroUtil.world.WorldDirector;
@@ -99,6 +100,7 @@ public class EventHandlerForge {
 	
 	@SubscribeEvent
 	public void entityHurt(LivingHurtEvent event) {
+		Headshots.hookLivingHurt(event);
 		DynamicDifficulty.logDamage(event);
 	}
 	

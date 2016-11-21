@@ -29,6 +29,8 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean desirePathDerp = false;
 	
+	public static boolean headshots = false;
+	
 	@Override	
 	public String getConfigFileName() {
 		return "CoroUtil";

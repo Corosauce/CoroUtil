@@ -123,6 +123,16 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					if (particle.motionY < 0.15D) {
 						particle.motionY += 0.05D;
 					}
+				//check ahead for better flowing over large cliffs
+				} else {
+					double aheadMultiplier = 20D;
+					BlockPos posAhead = new BlockPos(particle.getPosX() + (particle.getMotionX() * aheadMultiplier), particle.getPosY() - 4.5D, particle.getPosZ() + (particle.getMotionZ() * aheadMultiplier));
+					IBlockState stateAhead = particle.getWorld().getBlockState(posAhead);
+					if (!stateAhead.getBlock().isAir(stateAhead, particle.worldObj, posAhead)) {
+						if (particle.motionY < 0.35D) {
+							particle.motionY += 0.25D;
+						}
+					}
 				}
 				
 				//if (particle.isCollidedHorizontally) {

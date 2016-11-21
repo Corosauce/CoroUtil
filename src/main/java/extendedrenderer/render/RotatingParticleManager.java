@@ -307,7 +307,7 @@ public class RotatingParticleManager
         
         boolean fog = false;
         if (fog) {
-        	boolean ATmode = false;
+        	boolean ATmode = true;
         	
         	//TODO: make match other fog states
         	
@@ -335,8 +335,8 @@ public class RotatingParticleManager
 	            GlStateManager.colorMaterial(1028, 4608);
         	}
             
-            GlStateManager.setFogStart(0);
-            GlStateManager.setFogEnd(100);
+            /*GlStateManager.setFogStart(0);
+            GlStateManager.setFogEnd(100);*/
         }
 
         for (int i_nf = 0; i_nf < 3; ++i_nf)
