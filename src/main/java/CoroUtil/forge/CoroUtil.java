@@ -64,7 +64,7 @@ public class CoroUtil {
     public void load(FMLInitializationEvent event)
     {
     	//TickRegistry.registerTickHandler(new ServerTickHandler(this), Side.SERVER);
-    	FMLCommonHandler.instance().bus().register(new EventHandlerFML());
+		MinecraftForge.EVENT_BUS.register(new EventHandlerFML());
     	MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
     	//MinecraftForge.EVENT_BUS.register(new EventHandler());
     	proxy.init(this);
