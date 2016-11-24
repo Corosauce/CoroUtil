@@ -39,7 +39,7 @@ public class EntityRotFX extends Particle implements IWindHandler
     public float renderRange = 128F;
     
     //used in RotatingEffectRenderer to assist in solving some transparency ordering issues, eg, tornado funnel before clouds
-    public int renderOrder = -1;
+    public int renderOrder = 0;
     
     //not a real entity ID now, just used for making rendering of entities slightly unique
     private int entityID = 0;
@@ -132,7 +132,8 @@ public class EntityRotFX extends Particle implements IWindHandler
         this.particleTextureIndexInt = par1;
         if (this.getFXLayer() == 0) super.setParticleTextureIndex(par1);
     }
-    
+
+    @Override
     public int getFXLayer()
     {
         return 5;

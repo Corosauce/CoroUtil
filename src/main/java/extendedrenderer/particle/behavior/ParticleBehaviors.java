@@ -157,7 +157,7 @@ public class ParticleBehaviors {
 	}
 	
 	public EntityRotFX spawnNewParticleIconFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ) {
-		return spawnNewParticleIconFX(world, icon, x, y, z, vecX, vecY, vecZ, -1);
+		return spawnNewParticleIconFX(world, icon, x, y, z, vecX, vecY, vecZ, 0);
 	}
 	
 	public EntityRotFX spawnNewParticleIconFX(World world, TextureAtlasSprite icon, double x, double y, double z, double vecX, double vecY, double vecZ, int renderOrder) {
