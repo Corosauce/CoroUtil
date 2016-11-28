@@ -10,7 +10,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
-public class CoroUtil {
+public class CoroUtilMisc {
 
 	public static void faceEntity(Entity entToRotate, Entity par1Entity, float par2, float par3)
     {
@@ -98,4 +98,21 @@ public class CoroUtil {
 	public static EntityPlayer getPlayerClient() {
 		return Minecraft.getMinecraft().thePlayer;
 	}
+
+    public static float adjVal(float source, float target, float adj) {
+        if (source < target) {
+            source += adj;
+            //fix over adjust
+            if (source > target) {
+                source = target;
+            }
+        } else if (source > target) {
+            source -= adj;
+            //fix over adjust
+            if (source < target) {
+                source = target;
+            }
+        }
+        return source;
+    }
 }

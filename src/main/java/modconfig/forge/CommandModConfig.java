@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import CoroUtil.util.CoroUtil;
+import CoroUtil.util.CoroUtilMisc;
 
 public class CommandModConfig extends CommandBase {
 
@@ -65,10 +65,10 @@ public class CommandModConfig extends CommandBase {
 							if (obj != null) {
 								var1.addChatMessage(new TextComponentString(var2[field] + " = " + obj));
 							} else {
-								CoroUtil.sendCommandSenderMsg(var1, "failed to get " + var2[field]);
+								CoroUtilMisc.sendCommandSenderMsg(var1, "failed to get " + var2[field]);
 							}
 						} else {
-							CoroUtil.sendCommandSenderMsg(var1, "get requires 3 parameters");
+							CoroUtilMisc.sendCommandSenderMsg(var1, "get requires 3 parameters");
 						}
 					} else if (var2[cmd].equalsIgnoreCase("set")) {
 						if (var2.length > 2) {
@@ -91,7 +91,7 @@ public class CommandModConfig extends CommandBase {
 								CoroUtil.sendPlayerMsg(playerMP, "failed to set " + var2[field]);
 							}*/
 						} else {
-							CoroUtil.sendCommandSenderMsg(var1, "set requires 3+ parameters");
+							CoroUtilMisc.sendCommandSenderMsg(var1, "set requires 3+ parameters");
 						}
 					} else if (var2[cmd].equalsIgnoreCase("update") && player != null) {
 						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), (EntityPlayerMP)player);
@@ -123,7 +123,7 @@ public class CommandModConfig extends CommandBase {
 		String val = "";
 		for (int i = vall; i < var2.length; i++) val += var2[i] + (i != var2.length-1 ? " " : "");
 		if (ConfigMod.updateField(var2[modid], var2[field], val)) {
-			CoroUtil.sendCommandSenderMsg(playerMP, "set " + var2[field] + " to " + val);
+			CoroUtilMisc.sendCommandSenderMsg(playerMP, "set " + var2[field] + " to " + val);
 			
 			List blah = new ArrayList();
 			
@@ -133,7 +133,7 @@ public class CommandModConfig extends CommandBase {
 			ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), playerMP);
 			//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
 		} else {
-			CoroUtil.sendCommandSenderMsg(playerMP, "failed to set " + var2[field]);
+			CoroUtilMisc.sendCommandSenderMsg(playerMP, "failed to set " + var2[field]);
 		}
 	}
 	

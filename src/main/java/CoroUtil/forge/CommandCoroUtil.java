@@ -27,7 +27,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.util.CoroUtil;
+import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilItem;
 
@@ -105,17 +105,17 @@ public class CommandCoroUtil extends CommandBase {
 								for (int j = 0; j < entsToSpawn.size(); j++) {
 									Entity ent2 = EntityList.createEntityByName(entsToSpawn.get(j), world);
 									if (ent2 != null) {
-										CoroUtil.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
+										CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
 										spawnEntity(player, ent2);
 									}
 								}
 							} else {
-								CoroUtil.sendCommandSenderMsg(player, "found nothing to spawn");
+								CoroUtilMisc.sendCommandSenderMsg(player, "found nothing to spawn");
 							}
 						} else {
 							if (ent != null) {
 								
-								CoroUtil.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+								CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
 								spawnEntity(player, ent);
 								
 							}
@@ -125,26 +125,26 @@ public class CommandCoroUtil extends CommandBase {
 	        		if (var2[1].equalsIgnoreCase("count")) {
 	        			boolean exact = false;
 	        			if (var2.length > 3) exact = var2[3].equals("exact");
-	        			CoroUtil.sendCommandSenderMsg(var1, var2[2] + " count: " + getEntityCount(var2[2], false, exact, dimension));
+	        			CoroUtilMisc.sendCommandSenderMsg(var1, var2[2] + " count: " + getEntityCount(var2[2], false, exact, dimension));
 	        		} else if (var2[1].equalsIgnoreCase("PFQueue")) {
 	        			if (var2[2].equalsIgnoreCase("lastpf")) {
-	        				CoroUtil.sendCommandSenderMsg(var1, "last PF Time: " + ((System.currentTimeMillis() - PFQueue.lastSuccessPFTime) / 1000F));
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, "last PF Time: " + ((System.currentTimeMillis() - PFQueue.lastSuccessPFTime) / 1000F));
 	        				//var1.sendChatToPlayer(var2[2] + " set to: " + c_CoroAIUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
 	        			} if (var2[2].equalsIgnoreCase("stats")) {
-	        				CoroUtil.sendCommandSenderMsg(var1, "PFQueue Stats");
-	        				CoroUtil.sendCommandSenderMsg(var1, "-------------");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.lastQueueSize + " - " + "PF queue size");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.lastChunkCacheCount + " - " + "Cached chunks");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPath + " - " + "Pathfinds / 10 sec");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPathSkipped + " - " + "Old PF Skips / 10 sec");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNodeMaxIter + " - " + "Big PF Skips / 10 sec");
-	        				CoroUtil.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNode + " - " + "Nodes ran / 10 sec");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, "PFQueue Stats");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, "-------------");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.lastQueueSize + " - " + "PF queue size");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.lastChunkCacheCount + " - " + "Cached chunks");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPath + " - " + "Pathfinds / 10 sec");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.statsPerSecondPathSkipped + " - " + "Old PF Skips / 10 sec");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNodeMaxIter + " - " + "Big PF Skips / 10 sec");
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, PFQueue.statsPerSecondNode + " - " + "Nodes ran / 10 sec");
 	        					        				
 	        				
 	        				
 	        			} else {
 	        				//var1.sendChatToPlayer("Last chunk cache count: " + PFQueue.lastChunkCacheCount);
-	        				CoroUtil.sendCommandSenderMsg(var1, var2[2] + " set to: " + OldUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
+	        				CoroUtilMisc.sendCommandSenderMsg(var1, var2[2] + " set to: " + OldUtil.getPrivateValueBoth(PFQueue.class, PFQueue.instance, var2[2], var2[2]));
 	        			}
 	        		}
 	        	} else if (var2[0].equalsIgnoreCase("kill")) {
@@ -152,7 +152,7 @@ public class CommandCoroUtil extends CommandBase {
 	        		//int dim = world.provider.getDimension();
         			//if (var2.length > 2) exact = var2[2].equals("exact");
 	        		if (var2.length > 2) dimension = Integer.valueOf(var2[1]);
-	        		CoroUtil.sendCommandSenderMsg(var1, var2[1] + " count killed: " + getEntityCount(var2[1], true, exact, dimension));
+	        		CoroUtilMisc.sendCommandSenderMsg(var1, var2[1] + " count killed: " + getEntityCount(var2[1], true, exact, dimension));
 	        	} else if (var2[0].equalsIgnoreCase("list")) {
 	        		String param = null;
 	        		//int dim = world.provider.getDimension();
@@ -170,12 +170,12 @@ public class CommandCoroUtil extends CommandBase {
 	        		}
 	        		HashMap<String, Integer> entNames = listEntities(param, dimension, simple);
 	                
-	        		CoroUtil.sendCommandSenderMsg(var1, "List for dimension id: " + dimension);
+	        		CoroUtilMisc.sendCommandSenderMsg(var1, "List for dimension id: " + dimension);
 	        		
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    CoroUtil.sendCommandSenderMsg(var1, pairs.getKey() + " = " + pairs.getValue());
+	                    CoroUtilMisc.sendCommandSenderMsg(var1, pairs.getKey() + " = " + pairs.getValue());
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
 	                }
@@ -198,9 +198,9 @@ public class CommandCoroUtil extends CommandBase {
 	        		//}
 	        		List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
 	                
-	        		CoroUtil.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
+	        		CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
 	        		for (String entry : data) {
-	        			CoroUtil.sendCommandSenderMsg(var1, entry);
+	        			CoroUtilMisc.sendCommandSenderMsg(var1, entry);
 	        		}
 	        	}
 			/*}*/
