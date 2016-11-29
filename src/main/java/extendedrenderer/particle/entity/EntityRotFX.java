@@ -394,4 +394,9 @@ public class EntityRotFX extends Particle implements IWindHandler
 	public void setVanillaMotionDampen(boolean motionDampen) {
 		this.vanillaMotionDampen = motionDampen;
 	}
+
+    @Override
+    public int getBrightnessForRender(float p_189214_1_) {
+        return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.worldObj.getSunBrightness(1F))*/;
+    }
 }

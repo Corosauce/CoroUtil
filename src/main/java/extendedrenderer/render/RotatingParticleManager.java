@@ -58,6 +58,9 @@ public class RotatingParticleManager
     
     private final FloatBuffer fogColorBuffer = GLAllocation.createDirectFloatBuffer(16);
 
+    //a hack to enable fog for particles when weather2 sandstorm is active
+    public static float sandstormFogAmount = 0F;
+
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
         this.worldObj = worldIn;
@@ -277,7 +280,7 @@ public class RotatingParticleManager
 	        GlStateManager.matrixMode(5888);*/
         }
         
-        boolean fog = false;
+        boolean fog = true;
         if (fog) {
         	boolean ATmode = true;
         	
@@ -285,7 +288,16 @@ public class RotatingParticleManager
         	
         	if (ATmode) {
         		//TODO: add AT if this will be used
-        		//er.setupFog(0, partialTicks);
+
+                er.setupFog(0, partialTicks);
+
+                float fogScaleInvert = 1F - sandstormFogAmount;
+
+                //customized
+                //GlStateManager.setFogDensity(0F);
+                GlStateManager.setFogStart(0);
+                GlStateManager.setFogEnd(1000F * fogScaleInvert);
+                /**/
         	} else {
         		//incomplete copy
 	        	float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
