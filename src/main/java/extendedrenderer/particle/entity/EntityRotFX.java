@@ -59,6 +59,16 @@ public class EntityRotFX extends Particle implements IWindHandler
 	
 	public boolean vanillaMotionDampen = true;
 
+    //for particle behaviors
+    public double aboveGroundHeight = 4.5D;
+    public boolean checkAheadToBounce = true;
+    public boolean collisionSpeedDampen = true;
+
+    public double bounceSpeed = 0.05D;
+    public double bounceSpeedMax = 0.15D;
+    public double bounceSpeedAhead = 0.35D;
+    public double bounceSpeedMaxAhead = 0.25D;
+
 	public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -125,6 +135,14 @@ public class EntityRotFX extends Particle implements IWindHandler
     		}
     		
     	}
+
+    	if (!collisionSpeedDampen) {
+            //if (this.isCollided()) {
+            if (this.isCollided) {
+                this.motionX /= 0.699999988079071D;
+                this.motionZ /= 0.699999988079071D;
+            }
+        }
     }
     
     public void setParticleTextureIndex(int par1)

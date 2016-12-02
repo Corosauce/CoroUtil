@@ -83,13 +83,14 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					particle.rotationYaw += 0.1;
 				}
 				
-				float ticksFadeInMax = 50;
-				float ticksFadeOutMax = 50;
+				float ticksFadeInMax = 10;
+				float ticksFadeOutMax = 10;
 				
 				//fade in and fade out near age edges
 				if (particle.getAge() < ticksFadeInMax) {
 					//System.out.println("particle.getAge(): " + particle.getAge());
-					particle.setAlphaF(particle.getAge() / ticksFadeInMax);
+					particle.setAlphaF(Math.min(1F, particle.getAge() / ticksFadeInMax));
+					//System.out.println(particle.getAge() / ticksFadeInMax);
 					//particle.setAlphaF(1);
 				} else if (particle.getAge() > particle.getMaxAge() - ticksFadeOutMax) {
 					float count = particle.getAge() - (particle.getMaxAge() - ticksFadeOutMax);
@@ -102,6 +103,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					} else {
 						particle.setDead();
 					}*/
+					//particle.setAlphaF(1F);
 				}
 				
 				//TEMP
@@ -116,21 +118,21 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				}*/
 				
 				//get pos a bit under particle
-				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 4.5D, particle.getPosZ());
+				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - particle.aboveGroundHeight, particle.getPosZ());
 				IBlockState state = particle.getWorld().getBlockState(pos);
 				//if particle is near ground, push it up to keep from landing
 				if (!state.getBlock().isAir(state, particle.worldObj, pos)) {
-					if (particle.motionY < 0.15D) {
-						particle.motionY += 0.05D;
+					if (particle.motionY < particle.bounceSpeedMax) {
+						particle.motionY += particle.bounceSpeed;
 					}
 				//check ahead for better flowing over large cliffs
 				} else {
 					double aheadMultiplier = 20D;
-					BlockPos posAhead = new BlockPos(particle.getPosX() + (particle.getMotionX() * aheadMultiplier), particle.getPosY() - 4.5D, particle.getPosZ() + (particle.getMotionZ() * aheadMultiplier));
+					BlockPos posAhead = new BlockPos(particle.getPosX() + (particle.getMotionX() * aheadMultiplier), particle.getPosY() - particle.aboveGroundHeight, particle.getPosZ() + (particle.getMotionZ() * aheadMultiplier));
 					IBlockState stateAhead = particle.getWorld().getBlockState(posAhead);
 					if (!stateAhead.getBlock().isAir(stateAhead, particle.worldObj, posAhead)) {
-						if (particle.motionY < 0.35D) {
-							particle.motionY += 0.25D;
+						if (particle.motionY < particle.bounceSpeedMaxAhead) {
+							particle.motionY += particle.bounceSpeedAhead;
 						}
 					}
 				}

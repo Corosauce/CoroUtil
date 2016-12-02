@@ -23,6 +23,10 @@ public class ParticleRegistry {
 	//public static TextureAtlasSprite test;
 	public static TextureAtlasSprite cloud256dark;
 	public static TextureAtlasSprite cloudDownfall;
+	public static TextureAtlasSprite tumbleweed;
+	public static TextureAtlasSprite debris_1;
+	public static TextureAtlasSprite debris_2;
+	public static TextureAtlasSprite debris_3;
 	
 	public static void init(TextureStitchEvent.Pre event) {
 		
@@ -43,6 +47,10 @@ public class ParticleRegistry {
 		snow = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/snow"));
 		cloud256dark = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256dark"));
 		cloudDownfall = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall"));
+		tumbleweed = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tumbleweed"));
+		debris_1 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_1"));
+		debris_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_2"));
+		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
 	}
 	
 	public static class TextureAtlasSpriteImpl extends TextureAtlasSprite {

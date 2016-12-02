@@ -295,8 +295,9 @@ public class RotatingParticleManager
 
                 //customized
                 //GlStateManager.setFogDensity(0F);
-                GlStateManager.setFogStart(0);
-                GlStateManager.setFogEnd(1000F * fogScaleInvert);
+                GlStateManager.setFogStart(0F);
+                GlStateManager.setFogEnd(Math.max(40F, 1000F * fogScaleInvert));
+                //GlStateManager.setFogEnd(30F);
                 /**/
         	} else {
         		//incomplete copy
