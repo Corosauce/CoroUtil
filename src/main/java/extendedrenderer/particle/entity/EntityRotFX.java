@@ -69,6 +69,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     public double bounceSpeedAhead = 0.35D;
     public double bounceSpeedMaxAhead = 0.25D;
 
+    public boolean spinFast = false;
+
 	public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -142,6 +144,11 @@ public class EntityRotFX extends Particle implements IWindHandler
                 this.motionX /= 0.699999988079071D;
                 this.motionZ /= 0.699999988079071D;
             }
+        }
+
+        if (spinFast) {
+            this.rotationPitch += this.entityID % 2 == 0 ? 10 : -10;
+            this.rotationYaw += this.entityID % 2 == 0 ? -10 : 10;
         }
     }
     
