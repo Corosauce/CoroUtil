@@ -170,8 +170,13 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         //config.drawTexturedModalRect(xPosition, yPosition, 0, 46 + k * 20, width / 2, height);
         //config.drawTexturedModalRect(xPosition + width / 2, yPosition, 200 - width / 2, 46 + k * 20, width / 2, height);
-        int stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(config.getData().configData.get(index).name);
-        config.drawString(mc.fontRendererObj, config.getData().configData.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
+
+        List<ConfigEntryInfo> data = config.getData().configData;
+
+        if (data.get(index) == null || data.get(index).editBox == null) return;
+
+        int stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(data.get(index).name);
+        config.drawString(mc.fontRendererObj, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
         /*for (int x = 0; x < options.keyBindings.length; x++)
@@ -183,7 +188,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             }
         }*/
         
-        String value = config.getData().configData.get(index).value.toString();
+        String value = data.get(index).value.toString();
         int maxWidth = (config.xSize / 2) - 45;
         //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
         
@@ -192,12 +197,12 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         String str = (conflict ? ChatFormatting.RED : "") + value;//options.getOptionDisplayString(index);
         str = (index == selected ? ChatFormatting.WHITE + "> " + ChatFormatting.YELLOW + "??? " + ChatFormatting.WHITE + "<" : str);
         //config.drawString(mc.fontRenderer, str, xPosition + 20/* + (width / 2)*/, yPosition + (height - 8) / 2, 0xFFFFFFFF);
-        List<ConfigEntryInfo> configDataTest = config.getData().configData;
-        if (config.getData().configData.get(index) == null) return;
-        config.getData().configData.get(index).editBox.xPos = xPosition + 20;
-        config.getData().configData.get(index).editBox.yPos = yPosition/* + (height - 8) / 2*/;
+        List<ConfigEntryInfo> configDataTest = data;
+
+        data.get(index).editBox.xPos = xPosition + 20;
+        data.get(index).editBox.yPos = yPosition/* + (height - 8) / 2*/;
         //config.configData.get(index).editBox.text = config.configData.get(index).value.toString();
-        config.getData().configData.get(index).editBox.drawTextBox();
+        data.get(index).editBox.drawTextBox();
         
         int hover_x_min = xPosition - stringWidth + 15;
         int hover_y_min = yPosition;
@@ -205,7 +210,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         int hover_y_max = yPosition + height;
 
         boolean hover_string = _mouseX >= hover_x_min && _mouseY >= hover_y_min && _mouseX < hover_x_max && _mouseY < hover_y_max;
-        String s = ConfigMod.getComment(config.getData().configID, config.getData().configData.get(index).name);
+        String s = ConfigMod.getComment(config.getData().configID, data.get(index).name);
 
         // Draw a tooltip with the description associated with the config value
         if (hover_string && s != null) {
