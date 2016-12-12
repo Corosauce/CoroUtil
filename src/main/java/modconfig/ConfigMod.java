@@ -130,8 +130,8 @@ public class ConfigMod {
     /* Main Usage Methods Start */
     
     /* Main Inits */
-    public static void addConfigFile(FMLPreInitializationEvent event, String modID, IConfigCategory configCat) {
-    	addConfigFile(event, modID, configCat, true);
+    public static void addConfigFile(FMLPreInitializationEvent event, /*String modID, */IConfigCategory configCat) {
+    	addConfigFile(event, configCat.getRegistryName(), configCat, true);
     }
     
     public static void addConfigFile(FMLPreInitializationEvent event, String modID, IConfigCategory configCat, boolean liveEdit) {

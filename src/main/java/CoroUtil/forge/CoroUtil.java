@@ -53,8 +53,8 @@ public class CoroUtil {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-    	ConfigMod.addConfigFile(event, "coroai", new ConfigCoroAI());
-    	ConfigMod.addConfigFile(event, "coroutildd", new ConfigDynamicDifficulty());
+    	ConfigMod.addConfigFile(event, new ConfigCoroAI());
+    	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
     	
     	eventChannel.register(new EventHandlerPacket());
     }

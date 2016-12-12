@@ -50,15 +50,25 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static double difficulty_Infernal_Elite_ScaleRate = 1F;
 	public static double difficulty_Infernal_Ultra_ScaleRate = 1F;
 	public static double difficulty_Infernal_Infernal_ScaleRate = 1F;
-	
+
 	@Override
-	public String getConfigFileName() {
+	public String getName() {
 		return "CoroUtil_DynamicDifficulty";
 	}
 
 	@Override
+	public String getRegistryName() {
+		return "coroutildd";
+	}
+
+	@Override
+	public String getConfigFileName() {
+		return getName();
+	}
+
+	@Override
 	public String getCategory() {
-		return "CoroUtil_DynamicDifficulty";
+		return getName();
 	}
 
 	@Override

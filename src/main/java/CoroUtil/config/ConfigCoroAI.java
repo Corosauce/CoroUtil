@@ -30,15 +30,25 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean desirePathDerp = false;
 	
 	public static boolean headshots = false;
-	
-	@Override	
-	public String getConfigFileName() {
+
+	@Override
+	public String getName() {
 		return "CoroUtil";
 	}
 
 	@Override
+	public String getRegistryName() {
+		return "coroai";
+	}
+
+	@Override
+	public String getConfigFileName() {
+		return getName();
+	}
+
+	@Override
 	public String getCategory() {
-		return "CoroUtil";
+		return getName();
 	}
 
 	@Override
