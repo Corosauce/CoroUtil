@@ -152,7 +152,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				particle.setMotionZ(particle.getMotionZ() + (rand.nextDouble() * moveSpeedRand - rand.nextDouble() * moveSpeedRand));
 				
 				//TEMPOFF?
-				particle.setScale(particle.getScale() - 0.1F);
+				//particle.setScale(particle.getScale() - 0.1F);
 				
 				if (particle.spawnY != -1) {
 					particle.setPosition(particle.getPosX(), particle.spawnY, particle.getPosZ());
