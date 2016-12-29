@@ -1,14 +1,11 @@
 package CoroUtil.util;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.World;
 
 public class CoroUtilMisc {
 
@@ -89,14 +86,6 @@ public class CoroUtilMisc {
 	
 	public static void sendCommandSenderMsg(ICommandSender entP, String msg) {
 		entP.addChatMessage(new TextComponentString(msg));
-	}
-	
-	public static World getWorldClient() {
-		return Minecraft.getMinecraft().theWorld;
-	}
-	
-	public static EntityPlayer getPlayerClient() {
-		return Minecraft.getMinecraft().thePlayer;
 	}
 
     public static float adjVal(float source, float target, float adj) {
