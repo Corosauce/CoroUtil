@@ -32,13 +32,14 @@ import CoroUtil.world.WorldDirectorManager;
 
 import com.google.common.collect.BiMap;
 
-@Mod(modid = "coroutil", name="coroutil", version="1.1.10", acceptableRemoteVersions="*")
+@Mod(modid = "coroutil", name="coroutil", version=CoroUtil.version, acceptableRemoteVersions="*")
 public class CoroUtil {
 	
 	@Mod.Instance( value = "coroutil" )
 	public static CoroUtil instance;
 	public static String modID = "coroutil";
-    
+
+	public static final String version = "${version}";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
