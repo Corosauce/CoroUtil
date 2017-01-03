@@ -136,12 +136,13 @@ public class PFQueue implements Runnable {
     
     public PFQueue(IBlockAccess var1, boolean singleton) {
     	if (instance == null && singleton) {
-    		System.out.println("Initializing PFQueue");
+
 	    	instance = this;
 	    	queue = new LinkedList();
 	    	pfDelays = new HashMap();
+			//System.out.println("Initializing PFQueue");
 	        //Start the endless loop!
-	        (new Thread(this, "Pathfinder Thread")).start();
+	        //(new Thread(this, "Pathfinder Thread")).start();
 	        
     	} else {
     		//not duplicate, just using different instance to prevent thread crashes on internal temp lists 
@@ -173,7 +174,9 @@ public class PFQueue implements Runnable {
     }
     
     public void manageQueue() {
-    	
+		try {
+			Thread.sleep(50);
+		} catch (Exception ex) {}
     }
     
     // MAIN INTERFACE FUNCTIONS START \\
