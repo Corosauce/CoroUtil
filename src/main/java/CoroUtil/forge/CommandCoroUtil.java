@@ -6,12 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import CoroUtil.util.CoroUtilCrossMod;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -231,6 +233,17 @@ public class CommandCoroUtil extends CommandBase {
 		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.worldObj.getDifficultyForLocation(new BlockPos(ent)), null);
 		//if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
+
+		//TEST
+		/*if (ent instanceof EntityLivingBase) {
+			String listMods = "";
+			for (String mod : CoroUtilCrossMod.listModifiers) {
+				listMods += mod + " ";
+			}
+			CoroUtilCrossMod.infernalMobs_AddModifiers((EntityLivingBase)ent, listMods);
+
+
+		}*/
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {
