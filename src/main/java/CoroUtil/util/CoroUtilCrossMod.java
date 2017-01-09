@@ -4,12 +4,17 @@ import net.minecraft.entity.EntityLivingBase;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by Corosus on 1/7/2017.
  */
 public class CoroUtilCrossMod {
+
+    private static boolean checkHasInfernalMobs = true;
+    private static boolean hasInfernalMobs = false;
 
     public static List<String> listModifiers = new ArrayList<>();
 
@@ -44,7 +49,49 @@ public class CoroUtilCrossMod {
 
     }
 
+    /**
+     * Check if infernal mobs mod is loaded, cache result
+     *
+     * @return
+     */
+    public static boolean hasInfernalMobs() {
+        if (!checkHasInfernalMobs) {
+            return hasInfernalMobs;
+        } else {
+            checkHasInfernalMobs = false;
+            try {
+                Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
+                if (clazz != null) {
+                    hasInfernalMobs = true;
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return hasInfernalMobs;
+        }
+    }
+
+    public static boolean infernalMobs_AddRandomModifiers(EntityLivingBase ent, int modifierCount) {
+        String listMods = "";
+
+        if (modifierCount >= listModifiers.size()) {
+            modifierCount = listModifiers.size() - 1;
+        }
+
+        List<Integer> listInts = new ArrayList<>();
+        for (int i = 0; i < listModifiers.size(); i++) { listInts.add(i); }
+        Collections.shuffle(listInts);
+
+        for (int i = 0; i < modifierCount; i++) {
+            listMods += listModifiers.get(listInts.get(i)) + " ";
+        }
+
+        return infernalMobs_AddModifiers(ent, listMods);
+    }
+
     public static boolean infernalMobs_AddModifiers(EntityLivingBase ent, String modifiers) {
+
+        if (!hasInfernalMobs()) return false;
 
         /**
          *
