@@ -1,4 +1,4 @@
-package CoroUtil.world.player;
+package CoroUtil.difficulty;
 
 import java.util.ArrayList;
 import java.util.HashMap;

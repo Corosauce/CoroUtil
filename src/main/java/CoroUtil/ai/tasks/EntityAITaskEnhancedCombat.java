@@ -21,7 +21,7 @@ import net.minecraft.world.World;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
-import CoroUtil.world.player.DynamicDifficulty;
+import CoroUtil.difficulty.DynamicDifficulty;
 
 import CoroUtil.config.ConfigHWMonsters;
 

@@ -3,7 +3,7 @@ package CoroUtil.api.dynamicdifficulty;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.Optional;
-import CoroUtil.world.player.DynamicDifficulty;
+import CoroUtil.difficulty.DynamicDifficulty;
 
 public class DynamicDifficultyUtil {
 

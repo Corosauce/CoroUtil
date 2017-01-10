@@ -49,7 +49,7 @@ public class BehaviorModifier {
         			
         			//if (parWorld.rand.nextFloat() < chanceToEnhance) {
         			
-	        			if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CoroAI)) {
+	        			if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap)) {
 	            			for (Class clazz : taskToInject) {
 	    		        		addTask(ent, clazz, priorityOfTask);
 	            			}
@@ -90,6 +90,26 @@ public class BehaviorModifier {
 		
 		return !foundTask;
 		
+	}
+
+	public static boolean replaceTaskIfMissing(EntityCreature ent, Class taskToReplace, Class tasksToReplaceWith, int priorityOfTask) {
+		EntityAITaskEntry foundTask = null;
+		for (Object entry2 : ent.tasks.taskEntries) {
+			EntityAITaskEntry entry = (EntityAITaskEntry) entry2;
+			if (taskToReplace.isAssignableFrom(entry.action.getClass())) {
+				foundTask = entry;
+				break;
+			}
+		}
+
+		if (foundTask != null) {
+			ent.tasks.taskEntries.remove(foundTask);
+
+			addTask(ent, tasksToReplaceWith, priorityOfTask);
+		}
+
+		return foundTask != null;
+
 	}
 	
 	public static boolean replaceTaskIfMissing(EntityCreature ent, Class taskToReplace, Class[] tasksToReplaceWith, int[] priorityOfTask) {

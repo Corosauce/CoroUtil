@@ -10,14 +10,12 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
-import net.minecraft.init.PotionTypes;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
-import CoroUtil.world.player.DynamicDifficulty;
+import CoroUtil.difficulty.DynamicDifficulty;
 
 public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitializer
 {

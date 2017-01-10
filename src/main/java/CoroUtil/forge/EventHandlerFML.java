@@ -21,7 +21,7 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
 import CoroUtil.world.WorldDirectorManager;
-import CoroUtil.world.player.DynamicDifficulty;
+import CoroUtil.difficulty.DynamicDifficulty;
 public class EventHandlerFML {
 
 	public static World lastWorld = null;

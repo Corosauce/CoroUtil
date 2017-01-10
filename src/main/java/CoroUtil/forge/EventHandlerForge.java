@@ -1,13 +1,17 @@
 package CoroUtil.forge;
 
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.buffs.BuffBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -30,7 +34,9 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import CoroUtil.world.player.DynamicDifficulty;
+import CoroUtil.difficulty.DynamicDifficulty;
+
+import java.util.List;
 
 public class EventHandlerForge {
 
@@ -159,6 +165,43 @@ public class EventHandlerForge {
 								WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).removeBlockData(newX, newY, newZ);
 								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
 							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Called on load from chunk, or spawnEntityInWorld, so do first time effects after spawning in and there will be no double buffs
+	 *
+	 * @param event
+	 */
+	@SubscribeEvent
+	public void entityCreated(EntityJoinWorldEvent event) {
+		if (event.getEntity().worldObj.isRemote) return;
+		if (event.getEntity() instanceof EntityCreature) {
+			EntityCreature ent = (EntityCreature) event.getEntity();
+
+			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+				float difficultySpawnedIn = 0;
+				if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
+					difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
+				} else {
+					//safely get difficulty for area
+					if (ent.worldObj.isBlockLoaded(ent.getPosition())) {
+						difficultySpawnedIn = DynamicDifficulty.getDifficultyAveragedForArea(ent);
+					}
+				}
+
+				List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+				for (String buff : buffs) {
+					if (ent.getEntityData().getBoolean(buff)) {
+						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
+						if (buffObj != null) {
+							buffObj.applyBuffFromReload(ent, difficultySpawnedIn);
+						} else {
+							CoroUtil.dbg("warning: unable to find buff by name of " + buff);
 						}
 					}
 				}

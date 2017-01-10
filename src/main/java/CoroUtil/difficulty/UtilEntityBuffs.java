@@ -1,64 +1,69 @@
 package CoroUtil.difficulty;
 
-import CoroUtil.ai.BehaviorModifier;
 import CoroUtil.ai.ITaskInitializer;
-import CoroUtil.ai.tasks.TaskCallForHelp;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.difficulty.buffs.*;
 import CoroUtil.util.BlockCoord;
-import CoroUtil.util.CoroUtilCrossMod;
-import CoroUtil.world.player.DynamicDifficulty;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.config.ConfigHWMonsters;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAIZombieAttack;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Corosus on 1/8/2017.
  */
 public class UtilEntityBuffs {
 
+    public static HashMap<String, BuffBase> lookupBuffs = new HashMap<>();
 
-
-    public static String dataEntityBuffed_AI_CoroAI = "CoroAI_HW_Buffed_AI_CoroAI";
-    public static String dataEntityBuffed_AI_Digging = "CoroAI_HW_Buffed_AI_Digging";
+    //used to flag if entity is buffed at all, helps with checking if difficulty was cached, and other efficiencies
+    public static String dataEntityBuffed = "CoroAI_HW_Buffed";
+    //used for flagging we tried to buff, doesnt mean hes actually buffed or not, just that we gave him a chance to be buffed
+    public static String dataEntityBuffDiceRolled = "CoroAI_HW_BuffDiceRolled";
+    //cached difficulty for when he was buffed, for reloading from disk
+    public static String dataEntityBuffed_Difficulty = "CoroAI_HW_Difficulty";
 
     //deprecating?
     public static String dataEntityBuffed_Tried = "CoroAI_HW_Buffed_AI_Tried";
 
-    public static String dataEntityBuffed_AI_Infernal = "CoroAI_HW_Buffed_AI_Infernal";
+    //consider moving these buff name fields to their own class for easy reference
 
+    public static String dataEntityBuffed_AI_LungeAndCounterLeap = "CoroAI_HW_Buffed_AI_LungeAndCounterLeap";
+    public static String dataEntityBuffed_AI_Digging = "CoroAI_HW_Buffed_AI_Digging";
+    public static String dataEntityBuffed_AI_AntiAir = "CoroAI_HW_Buffed_AI_AntiAir";
+    public static String dataEntityBuffed_AI_Infernal = "CoroAI_HW_Buffed_AI_Infernal";
     public static String dataEntityBuffed_Health = "CoroAI_HW_Buffed_Health";
     public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
     public static String dataEntityBuffed_Inventory = "CoroAI_HW_Buffed_Inventory";
     public static String dataEntityBuffed_Speed = "CoroAI_HW_Buffed_Speed";
     public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
 
-    public static Class[] tasksToInject = new Class[] { EntityAITaskEnhancedCombat.class, EntityAITaskAntiAir.class };
-    public static int[] taskPriorities = { 2, 3 };
+    //use for buffs that say they can apply but failed to apply
+    //do we need it?
+    public static String dataFlagFailed = "_Failed";
 
-    public static Class[] tasksToInjectInv = new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class };
-    public static int[] taskPrioritiesInv = {5, 5};
+    //public static String dataFlagApplied = "_Applied";
+
+    //public static Class[] tasksToInject = new Class[] { EntityAITaskEnhancedCombat.class, EntityAITaskAntiAir.class };
+    //public static int[] taskPriorities = { 2, 3 };
+
+    //public static Class[] tasksToInjectInv = new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class };
+    //public static int[] taskPrioritiesInv = {5, 5};
 
     public static double speedCap = 0.4D;
 
@@ -111,38 +116,81 @@ public class UtilEntityBuffs {
         obj.setListArmor(listItems);
         obj.setWeapon(new ItemStack(Items.DIAMOND_SWORD));
         lookupDifficultyToEquipment.put(4, obj);
+
+        addBuff(new BuffHealth());
+        addBuff(new BuffSpeed());
+        addBuff(new BuffXP());
+        addBuff(new BuffInventory());
+        addBuff(new BuffAI_Infernal());
+        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
+        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
+        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
+    }
+
+    public static void addBuff(BuffBase buff) {
+        lookupBuffs.put(buff.getTagName(), buff);
+    }
+
+    /**
+     * All non reloading methods must use this to make sure difficulty cache is set
+     *
+     * @param buffName
+     * @param ent
+     * @param difficulty
+     * @return
+     */
+    public static boolean applyBuff(String buffName, EntityCreature ent, float difficulty) {
+        if (lookupBuffs.containsKey(buffName)) {
+
+            //mark entity is buffed
+            ent.getEntityData().setBoolean(dataEntityBuffed, true);
+
+            //store difficulty for reloading buffs later
+            if (!ent.getEntityData().hasKey(dataEntityBuffed_Difficulty)) {
+                ent.getEntityData().setFloat(dataEntityBuffed_Difficulty, difficulty);
+            }
+
+            return lookupBuffs.get(buffName).applyBuff(ent, difficulty);
+        } else {
+            return false;
+        }
+    }
+
+    public static List<String> getAllBuffNames() {
+        return new ArrayList<>(lookupBuffs.keySet());
+    }
+
+    public static BuffBase getBuff(String buff) {
+        return lookupBuffs.get(buff);
     }
     
-    public static void buffGeneric(World world, EntityCreature ent, EntityPlayer playerClosest) {
+    /*public static void buffGeneric(World world, EntityCreature ent, EntityPlayer playerClosest) {
         if (ent instanceof EntityZombie) {
-						/*if (ConfigHWMonsters.antiAir) {
-							BehaviorModifier.addTaskIfMissing(ent, TaskAntiAir.class, tasksToInject, taskPriorities[0]);
-						}*/
 
             //note, there are 2 instances of attack on collide, we are targetting the first one that is for player
             //TODO: 1.10.2 verify going from EntityAIAttackOnCollide to EntityAIZombieAttack doesnt break things
             BehaviorModifier.replaceTaskIfMissing(ent, EntityAIZombieAttack.class, tasksToInject, taskPriorities);
         }
 
-        if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_CoroAI)) {
-            ent.getEntityData().setBoolean(dataEntityBuffed_AI_CoroAI, true);
+        if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap)) {
+            ent.getEntityData().setBoolean(dataEntityBuffed_AI_LungeAndCounterLeap, true);
             //BehaviorModifier.addTaskIfMissing(ent, TaskDigTowardsTarget.class, tasksToInject, taskPriorities[0]);
 
             float difficulty = DynamicDifficulty.getDifficultyScaleAverage(world, playerClosest, new BlockCoord(ent));
 
-            /**
+            *//**
              * The mathematical behavior is as follows:
              * Operation 0: Increment X by Amount,
              * Operation 1: Increment Y by X * Amount,
              * Operation 2: Y = Y * (1 + Amount) (equivalent to Increment Y by Y * Amount).
              * The game first sets X = Base, then executes all Operation 0 modifiers, then sets Y = X,
              * then executes all Operation 1 modifiers, and finally executes all Operation 2 modifiers.
-             */
+             *//*
 
             float maxHealthClean = Math.round(ent.getMaxHealth() * 1000F) / 1000F;
             //System.out.println("health max before: " + maxHealthClean);
 
-            double healthBoostMultiply = (double)(/*1F + */difficulty * ConfigHWMonsters.scaleHealth);
+            double healthBoostMultiply = (double)(*//*1F + *//*difficulty * ConfigHWMonsters.scaleHealth);
             ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, 2));
 
             //chance to ignore knockback based on difficulty
@@ -173,7 +221,7 @@ public class UtilEntityBuffs {
 
             //System.out.println(debug);
         }
-    }
+    }*/
 
     /**
      * Randomly decide how many aspects to buff, and by how much based on difficulty and config
@@ -183,6 +231,9 @@ public class UtilEntityBuffs {
      * @param playerClosest
      */
     public static void buff_RollDice(World world, EntityCreature ent, EntityPlayer playerClosest) {
+
+        //we already gave him a chance to get buffs, abort
+        if (ent.getEntityData().getBoolean(dataEntityBuffDiceRolled)) return;
 
         /**
          * number of buffs to add depends on difficulty
@@ -196,10 +247,34 @@ public class UtilEntityBuffs {
 
         float difficulty = DynamicDifficulty.getDifficultyScaleAverage(world, playerClosest, new BlockCoord(ent));
 
+        //NEW!
+
+        //TODO: filter buffs by minimum required difficulty level for better tiered progression
+        List<String> listBuffs = UtilEntityBuffs.getAllBuffNames();
+        Collections.shuffle(listBuffs);
+
+        ent.getEntityData().setBoolean(dataEntityBuffDiceRolled, true);
+
+        for (String buff : listBuffs) {
+            if (remainingBuffs > 0) {
+                if (getBuff(buff).canApplyBuff(ent, difficulty)) {
+                    //use main method that also marks entity buffed and caches difficulty
+                    if (applyBuff(buff, ent, difficulty)) {
+                        remainingBuffs--;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+
+        //OLD D:
+
         //until i go more object oriented, a buff can return false to say it didnt properly apply, and still set the tag to prevent retrying
         //- this is so it wont keep retrying that buff but wont decrement remainingBuffs
 
-        while (remainingBuffs > 0) {
+        /*while (remainingBuffs > 0) {
             int randVal = rand.nextInt(6);
             if (randVal == 0) {
                 if (!ent.getEntityData().getBoolean(dataEntityBuffed_Health)) {
@@ -226,7 +301,7 @@ public class UtilEntityBuffs {
                     }
                 }
             } else if (randVal == 4) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_CoroAI)) {
+                if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap)) {
                     if (buffAI_CoroAI_Combat(world, ent, playerClosest, difficulty)) {
                         remainingBuffs--;
                     }
@@ -245,11 +320,11 @@ public class UtilEntityBuffs {
                     ent.getEntityData().getBoolean(dataEntityBuffed_Damage) &&
                     ent.getEntityData().getBoolean(dataEntityBuffed_Inventory) &&
                     ent.getEntityData().getBoolean(dataEntityBuffed_Speed) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_AI_CoroAI) &&
+                    ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap) &&
                     ent.getEntityData().getBoolean(dataEntityBuffed_AI_Infernal)) {
                 break;
             }
-        }
+        }*/
 
 
     }
@@ -326,71 +401,6 @@ public class UtilEntityBuffs {
 
         ent.getEntityData().setBoolean(dataEntityBuffed_Speed, true);
         return true;
-    }
-
-    public static boolean buffXP(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_XP, true);
-
-        try {
-            int xp = ObfuscationReflectionHelper.getPrivateValue(EntityLiving.class, ent, "field_70728_aV", "experienceValue");
-            xp += difficulty * 10F;
-            ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, ent, xp, "field_70728_aV", "experienceValue");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    public static boolean buffAI_CoroAI_Digging(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_AI_Digging, true);
-
-
-        //do dig task only, not call for help, move that elsewhere, generic ai combat buff maybe
-        if (!hasTask(ent, tasksToInjectInv[0])) {
-            addTask(ent, tasksToInjectInv[0], taskPrioritiesInv[0]);
-        }
-
-        /*for (Class clazz : tasksToInjectInv) {
-            addTask(ent, clazz, taskPrioritiesInv[0]);
-        }*/
-
-        return true;
-    }
-
-    public static boolean buffAI_CoroAI_Combat(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        //TODO: make it so the tasks themselves dont have rand chance, have it be on if they are added so this method called means they 100% are either used or not used
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_AI_CoroAI, true);
-
-        if (ent instanceof EntityZombie) {
-						/*if (ConfigHWMonsters.antiAir) {
-							BehaviorModifier.addTaskIfMissing(ent, TaskAntiAir.class, tasksToInject, taskPriorities[0]);
-						}*/
-
-            //note, there are 2 instances of attack on collide, we are targetting the first one that is for player
-            //TODO: 1.10.2 verify going from EntityAIAttackOnCollide to EntityAIZombieAttack doesnt break things
-            BehaviorModifier.replaceTaskIfMissing(ent, EntityAIZombieAttack.class, tasksToInject, taskPriorities);
-        } else {
-            return false;
-        }
-
-
-        return true;
-    }
-
-    public static boolean buffAI_Infernal(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_AI_Infernal, true);
-
-        if (!CoroUtilCrossMod.hasInfernalMobs()) return false;
-
-        //how many modifiers do we add? based on difficulty i guess, x2!
-        return CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, (int)(difficulty * 2D));
     }
 
     /**
