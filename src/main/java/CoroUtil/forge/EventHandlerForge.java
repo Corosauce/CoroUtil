@@ -199,6 +199,7 @@ public class EventHandlerForge {
 					if (ent.getEntityData().getBoolean(buff)) {
 						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
 						if (buffObj != null) {
+							System.out.println("reloading buff: " + buff);
 							buffObj.applyBuffFromReload(ent, difficultySpawnedIn);
 						} else {
 							CoroUtil.dbg("warning: unable to find buff by name of " + buff);

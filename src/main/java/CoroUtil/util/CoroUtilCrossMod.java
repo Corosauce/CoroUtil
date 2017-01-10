@@ -86,7 +86,12 @@ public class CoroUtilCrossMod {
             listMods += listModifiers.get(listInts.get(i)) + " ";
         }
 
-        return infernalMobs_AddModifiers(ent, listMods);
+        if (!listMods.equals("")) {
+            return infernalMobs_AddModifiers(ent, listMods);
+        } else {
+            //didnt fail, just nothing to apply because difficulty too low
+            return true;
+        }
     }
 
     public static boolean infernalMobs_AddModifiers(EntityLivingBase ent, String modifiers) {

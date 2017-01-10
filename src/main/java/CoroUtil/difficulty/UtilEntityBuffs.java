@@ -118,7 +118,7 @@ public class UtilEntityBuffs {
         lookupDifficultyToEquipment.put(4, obj);
 
         addBuff(new BuffHealth());
-        addBuff(new BuffSpeed());
+        //addBuff(new BuffSpeed());
         addBuff(new BuffXP());
         addBuff(new BuffInventory());
         addBuff(new BuffAI_Infernal());
@@ -255,10 +255,14 @@ public class UtilEntityBuffs {
 
         ent.getEntityData().setBoolean(dataEntityBuffDiceRolled, true);
 
+        //TEMP
+        applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+
         for (String buff : listBuffs) {
             if (remainingBuffs > 0) {
                 if (getBuff(buff).canApplyBuff(ent, difficulty)) {
                     //use main method that also marks entity buffed and caches difficulty
+                    System.out.println("applying buff: " + buff);
                     if (applyBuff(buff, ent, difficulty)) {
                         remainingBuffs--;
                     }
