@@ -12,6 +12,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -146,6 +147,26 @@ public class DynamicDifficulty {
 		}
 		
 	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity) {
+		return getDifficultyAveragedForArea(spawnedEntity, spawnedEntity.getPosition());
+	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity, BlockPos pos) {
+		return getDifficultyAveragedForArea(spawnedEntity, pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity, int x, int y, int z) {
+
+		//TODO: cache so there is less player lookup thrashing for spawn candidate code
+		EntityPlayer player = spawnedEntity.worldObj.getClosestPlayerToEntity(spawnedEntity, -1);
+
+		if (player != null) {
+			return getDifficultyScaleAverage(player, x, y, z);
+		}
+
+		return 0;
+	}
 	
 	public static float getDifficultyScaleAverage(EntityPlayer player, int x, int y, int z) {
 		return getDifficultyScaleAverage(player, new BlockCoord(x, y, z));
@@ -274,12 +295,14 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
-				if (chunk != null && chunk.isLoaded()) {
-					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
-					
-					if (cdp.averageDPS > bestDPS) {
-						bestDPS = cdp.averageDPS;
+				if (world.isBlockLoaded(checkPos.toBlockPos())) {
+					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					if (chunk != null) {
+						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
+
+						if (cdp.averageDPS > bestDPS) {
+							bestDPS = cdp.averageDPS;
+						}
 					}
 				}
 			}
@@ -322,8 +345,8 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
-				if (chunk.isLoaded()) {
+				if (world.isBlockLoaded(checkPos.toBlockPos())) {
+					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						totalTime += chunk.getInhabitedTime();
 						count++;
