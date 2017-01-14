@@ -13,6 +13,7 @@ public interface ISimulationTickable {
 	public NBTTagCompound writeToNBT(NBTTagCompound parData);
 	public void cleanup();
 	public BlockCoord getOrigin();
+	public void setOrigin(BlockCoord coord);
 	public boolean isThreaded();
 	public String getSharedSimulationName();
 }

@@ -20,8 +20,7 @@ public class BuffAI_Infernal extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
 
-        //TODO: how many modifiers do we add? based on difficulty i guess, x2!
-        CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, (int)(difficulty * 2D));
+        CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, getBuffsForDifficulty(difficulty));
 
         return super.applyBuff(ent, difficulty);
     }
@@ -37,5 +36,15 @@ public class BuffAI_Infernal extends BuffBase {
         //TODO: see if we can just give infernal buffs the correct way so infernal mobs manages its own restoring of its modifiers
 
         super.applyBuffFromReload(ent, difficulty);
+    }
+
+    /**
+     * For every 0.1 of difficulty, add an infernal modifier
+     *
+     * @param difficulty
+     * @return
+     */
+    public int getBuffsForDifficulty(float difficulty) {
+        return (int)(difficulty * 10D);
     }
 }

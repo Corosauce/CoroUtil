@@ -11,7 +11,7 @@ public class ConfigHWMonsters implements IConfigCategory {
 	public static boolean antiAir = true;
 	
 	@ConfigComment("0 = leap and pull down, 1 = super evil effects and force pull down")
-	public static int antiAirType = 0;
+	public static int antiAirType = 1;
 	
 	public static double antiAirLeapSpeed = 0.15D;
 	

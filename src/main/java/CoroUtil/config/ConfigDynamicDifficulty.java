@@ -23,6 +23,10 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static int difficulty_BestDPSRadius = 4;
 	
 	public static int difficulty_BestVanillaDPS = 20;
+
+	public static int difficulty_BestVanillaHealth = 20;
+	public static int difficulty_BestVanillaArmor = 20;
+	public static int difficulty_BestVanillaArmorEnchant = 25;
 	
 	public static double difficulty_MaxDPSLoggable = 500;
 	
@@ -30,10 +34,11 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	
 	public static double weightPosOccupy = 1D;
 	public static double weightPlayerEquipment = 1.5D;
-	public static double weightPlayerServerTime = 1D;
+	public static double weightPlayerServerTime = 0D;
 	public static double weightDPS = 1.5D;
 	public static double weightHealth = 1D;
 	public static double weightDistFromSpawn = 1D;
+	public static double weightBuffedLocation = 2D;
 	
 	@ConfigComment("-1 = dont cap it")
 	public static double difficulty_Max = -1;

@@ -2,6 +2,8 @@ package CoroUtil.difficulty.buffs;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.util.CoroUtilAttributes;
+import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -32,7 +34,10 @@ public class BuffSpeed extends BuffBase {
         if (curSpeed < UtilEntityBuffs.speedCap) {
             double speedBoost = (Math.min(ConfigHWMonsters.scaleSpeedCap, difficulty * ConfigHWMonsters.scaleSpeed));
             //debug += "speed % " + speedBoost;
-            ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("speed multiplier boost", speedBoost, 2));
+            AttributeModifier speedBoostModifier = new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", speedBoost, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal());
+            if (!ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(speedBoostModifier)) {
+                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(speedBoostModifier);
+            }
         }
 
         return super.applyBuff(ent, difficulty);

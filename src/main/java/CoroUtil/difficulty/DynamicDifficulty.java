@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOre;
@@ -38,6 +40,23 @@ import CoroUtil.util.UtilPlayer;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 
+/**
+ * Design notes:
+ *
+ * - Difficulty for vanillaish ranges from 0 to 1
+ * - 0 = just starting
+ * - 1 = Typical endgame expected scenario, eg best equipment, 50 hours occupying base
+ *
+ * - It can go past 1 for vanilla though with:
+ * -- occupied chunk time
+ * -- server time (default off)
+ * -- dist from spawn
+ * -- dps if they somehow exceed what i consider best vanilla dps possible
+ *
+ * - mod focused buffs
+ * -- max health (tinkers buffs)
+ *
+ */
 public class DynamicDifficulty {
 	
 	public static String dataPlayerServerTicks = "HW_dataPlayerServerTicks";
@@ -193,8 +212,9 @@ public class DynamicDifficulty {
 		float weightDPS = (float) ConfigDynamicDifficulty.weightDPS;
 		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
 		float weightDistFromSpawn = (float) ConfigDynamicDifficulty.weightDistFromSpawn;
+		float weightBuffedLocation = (float) ConfigDynamicDifficulty.weightBuffedLocation;
 		
-		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn;
+		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn + weightBuffedLocation;
 		
 		float difficultyPosOccupy = getDifficultyScaleForPosOccupyTime(world, pos) * weightPosOccupy;
 		float difficultyPlayerEquipment = getDifficultyScaleForPlayerEquipment(player) * weightPlayerEquipment;
@@ -202,8 +222,9 @@ public class DynamicDifficulty {
 		float difficultyDPS = getDifficultyScaleForPosDPS(world, pos) * weightDPS;
 		float difficultyHealth = getDifficultyScaleForHealth(player) * weightHealth;
 		float difficultyDistFromSpawn = getDifficultyScaleForDistFromSpawn(player) * weightDistFromSpawn;
+		float difficultyBuffedLocation =  getDifficultyForBuffedLocation(world, pos) * weightBuffedLocation;
 		
-		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn;
+		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn + difficultyBuffedLocation;
 		
 		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
@@ -243,7 +264,7 @@ public class DynamicDifficulty {
 	}
 	
 	public static float getDifficultyScaleForHealth(EntityPlayer player) {
-		float baseMax = 20F;
+		float baseMax = ConfigDynamicDifficulty.difficulty_BestVanillaHealth;
 		float curMax = player.getMaxHealth();
 		float scale = curMax / baseMax;
 		return scale - 1F;
@@ -264,9 +285,9 @@ public class DynamicDifficulty {
 	
 	public static int getBestPlayerRatingPossibleVanilla(boolean calcWeapon) {
 		//diamond armor
-		int bestArmor = 20;
+		int bestArmor = ConfigDynamicDifficulty.difficulty_BestVanillaArmor;
 		//protection 5 on diamond armor (there is randomization)
-		int bestArmorEnchant = 25;
+		int bestArmorEnchant = ConfigDynamicDifficulty.difficulty_BestVanillaArmorEnchant;
 		int bestWeapon = 8;
 		//6.25 for sharpness 5
 		int bestWeaponEnchant = 6;
@@ -512,7 +533,8 @@ public class DynamicDifficulty {
 				if (event.getSource() == DamageSource.inWall || 
 						event.getSource() == DamageSource.inFire || 
 						event.getSource() == DamageSource.onFire || 
-						event.getSource() == DamageSource.drown/* || event.source == DamageSource.lava*/) {
+						event.getSource() == DamageSource.drown ||
+						event.getSource() == DamageSource.fall/* || event.source == DamageSource.lava*/) {
 					return;
 				}
 				
@@ -653,6 +675,35 @@ public class DynamicDifficulty {
 			
 			cdp.lastDPSRecalc = world.getTotalWorldTime();
 		}
+	}
+
+
+
+	public static void buffLocation(World world, BlockCoord coord, int distRadius, float difficulty) {
+		BuffedLocation zone = new BuffedLocation(distRadius, difficulty);
+		zone.setOrigin(coord);
+		WorldDirectorManager.instance().getCoroUtilWorldDirector(world).addTickingLocation(zone);
+	}
+
+	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord) {
+		//TODO: cache results to minimize lookup thrash
+		float bestDifficulty = 0;
+		//BuffedLocation bestBuff = null;
+		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(world);
+		for (ISimulationTickable loc : wd.listTickingLocations) {
+			if (loc instanceof BuffedLocation) {
+				BuffedLocation buff = (BuffedLocation)loc;
+				double dist = coord.getDistanceSquared(buff.getOrigin());
+				if (dist < buff.buffDistRadius * buff.buffDistRadius) {
+					if (buff.difficulty > bestDifficulty) {
+						//bestBuff = buff;
+						bestDifficulty = buff.difficulty;
+					}
+				}
+			}
+		}
+
+		return bestDifficulty;
 	}
 	
 	

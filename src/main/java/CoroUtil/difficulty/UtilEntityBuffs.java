@@ -7,6 +7,9 @@ import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -467,5 +470,4 @@ public class UtilEntityBuffs {
         }
         return false;
     }
-    
 }

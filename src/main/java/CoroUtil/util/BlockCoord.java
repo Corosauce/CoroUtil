@@ -29,6 +29,12 @@ public class BlockCoord {
     	this.posY = MathHelper.floor_double(ent.posY);
     	this.posZ = MathHelper.floor_double(ent.posZ);
     }
+
+    public BlockCoord(BlockPos pos) {
+        this.posX = pos.getX();
+        this.posY = pos.getY();
+        this.posZ = pos.getZ();
+    }
     
     public boolean equals(Object p_equals_1_)
     {
@@ -64,7 +70,11 @@ public class BlockCoord {
     public int getZ() {
     	return posZ;
     }
-    
+
+    public double getDistanceSquared(BlockCoord coord) {
+        return distanceSq(coord.getX(), coord.getY(), coord.getZ());
+    }
+
     public double getDistanceSquared(double toX, double toY, double toZ) {
     	return distanceSq(toX, toY, toZ);
     }

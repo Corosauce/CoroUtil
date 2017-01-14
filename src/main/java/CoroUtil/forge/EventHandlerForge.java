@@ -122,6 +122,13 @@ public class EventHandlerForge {
 		if (!ent.worldObj.isRemote) {
 			if (ent instanceof EntityPlayer) {
 				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
+
+				//attempt to disable flying if a tornado was just recently grabbing us but no longer is, and only do this for the first tick since it wasnt
+				long lastTimeFlying = ent.getEntityData().getLong("CoroUtil_LastTimeFlying");
+				if (lastTimeFlying + 50 < ((EntityPlayer) ent).worldObj.getTotalWorldTime() &&
+						lastTimeFlying + 51 > ((EntityPlayer) ent).worldObj.getTotalWorldTime()) {
+					((EntityPlayer) ent).capabilities.allowFlying = false;
+				}
 			}
 		}
 		

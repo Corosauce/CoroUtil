@@ -6,7 +6,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import CoroUtil.util.CoroUtilCrossMod;
+import CoroUtil.config.ConfigDynamicDifficulty;
+import CoroUtil.difficulty.BuffedLocation;
+import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.util.*;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
@@ -29,9 +36,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.util.CoroUtilMisc;
-import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilItem;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -61,22 +65,62 @@ public class CommandCoroUtil extends CommandBase {
 					String createQuestStr = "CoroUtil.quest.quests.ItemQuest";
 					PlayerQuests plQuests = PlayerQuestManager.i().getPlayerQuests(player);
 					ActiveQuest aq = PlayerQuests.createQuestFromString(createQuestStr);
-					
+
 					System.out.println("trying to create quest from str: " + createQuestStr);
-					
+
 					if (aq != null) {
 						aq.initCreateObject(plQuests);
-						
+
 						aq.initFirstTime(dimension);
-						((ItemQuest)aq).initCustomData(CoroUtilItem.getNameByItem(Items.DIAMOND), 5, false);
-						
+						((ItemQuest) aq).initCustomData(CoroUtilItem.getNameByItem(Items.DIAMOND), 5, false);
+
 						PlayerQuestManager.i().getPlayerQuests(CoroUtilEntity.getName(player)).questAdd(aq);
 						System.out.println("create success type: " + aq.questType);
 					} else {
 						System.out.println("failed to create quest " + createQuestStr);
 					}
-					
+
 					plQuests.saveAndSyncPlayer();
+				} else if (var2[0].equals("buffloc")) {
+					int distRadius = 32;
+					float difficulty = 2;
+					if (var2.length > 1) {
+						difficulty = Float.valueOf(var2[1]);
+					}
+					ISimulationTickable zone = WorldDirectorManager.instance().getCoroUtilWorldDirector(world).getTickingSimulationByLocation(new BlockCoord(posBlock));
+					if (zone == null) {
+						DynamicDifficulty.buffLocation(world, new BlockCoord(posBlock), distRadius, difficulty);
+						System.out.println("buffed zone at " + posBlock);
+					} else {
+						System.out.println("buffed zone already at " + posBlock);
+					}
+				} else if (var2[0].equals("buffremove")) {
+					boolean removeAll = false;
+					if (var2.length > 1) {
+						removeAll = var2[1].equalsIgnoreCase("all");
+					}
+					WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(world);
+					if (removeAll) {
+						Iterator<ISimulationTickable> it = wd.listTickingLocations.iterator();
+						while(it.hasNext()) {
+							ISimulationTickable loc = it.next();
+							if (loc instanceof BuffedLocation) {
+								wd.removeTickingLocation(loc, true);
+								it.remove();
+								System.out.println("removed buffed zone at " + loc.getOrigin());
+							}
+						}
+
+					} else {
+						ISimulationTickable zone = wd.getTickingSimulationByLocation(new BlockCoord(posBlock));
+						if (zone != null) {
+							wd.removeTickingLocation(zone);
+							System.out.println("removed buffed zone at " + posBlock);
+						} else {
+							System.out.println("cant find buffed zone at " + posBlock);
+						}
+					}
+
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(world, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
@@ -204,7 +248,25 @@ public class CommandCoroUtil extends CommandBase {
 	        		for (String entry : data) {
 	        			CoroUtilMisc.sendCommandSenderMsg(var1, entry);
 	        		}
-	        	}
+				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
+					if ((var1 instanceof EntityPlayerMP)) {
+						EntityPlayerMP ent = (EntityPlayerMP) var1;
+						//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
+						net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
+						BlockCoord pos = new BlockCoord(MathHelper.floor_double(posVec2.xCoord), MathHelper.floor_double(posVec2.yCoord), MathHelper.floor_double(posVec2.zCoord));
+						//long dayNumber = (ent.worldObj.getWorldTime() / 24000) + 1;
+						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player rating: " + DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerEquipment);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.worldObj, pos) + " weight: " + ConfigDynamicDifficulty.weightPosOccupy);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + DynamicDifficulty.getDifficultyScaleForPosDPS(ent.worldObj, pos) + " weight: " + ConfigDynamicDifficulty.weightDPS);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.worldObj, ent, pos));
+					}
+				}
 			/*}*/
 		} catch (Exception ex) {
 			System.out.println("Exception handling CoroUtil command");

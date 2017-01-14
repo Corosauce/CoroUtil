@@ -156,8 +156,12 @@ public class WorldDirector implements Runnable {
 		}
 		listTickingLocations.add(location);
 	}
-	
+
 	public void removeTickingLocation(ISimulationTickable location) {
+		removeTickingLocation(location, false);
+	}
+
+	public void removeTickingLocation(ISimulationTickable location, boolean iterateRemoveList) {
 		if (location.getOrigin() != null) {
 			Integer hash = PathPointEx.makeHash(location.getOrigin().posX, location.getOrigin().posY, location.getOrigin().posZ);
 			if (lookupTickingManagedLocations.containsKey(hash)) {
@@ -167,7 +171,7 @@ public class WorldDirector implements Runnable {
 				System.out.println("Error, couldnt find location for removal");
 			}
 		}
-		listTickingLocations.remove(location);
+		if (!iterateRemoveList) listTickingLocations.remove(location);
 	}
 	
 	public void setSharedSimulationUpdateRateLimit(String name, int limit) {
@@ -189,7 +193,7 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
-	public ISimulationTickable getTickingSimluationByLocation(BlockCoord parCoords) {
+	public ISimulationTickable getTickingSimulationByLocation(BlockCoord parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}
@@ -330,6 +334,24 @@ public class WorldDirector implements Runnable {
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+
+		if (unloadInstances) {
+
+			for (ISimulationTickable entry : listTickingLocations) {
+				entry.cleanup();
+			}
+
+			listTickingLocations.clear();
+			lookupTickingManagedLocations.clear();
+
+			//unused?
+			extraData = new NBTTagCompound();
+			worldEvents.clear();
+
+			//unused
+			lookupNameToUpdatesPerTickCur.clear();
+			lookupNameToUpdatesPerTickLimit.clear();
 		}
 	}
 	
