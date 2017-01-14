@@ -33,7 +33,7 @@ public class BuffAI_Infernal extends BuffBase {
     @Override
     public void applyBuffFromReload(EntityCreature ent, float difficulty) {
 
-        //TODO: see if we can just give infernal buffs the correct way so infernal mobs manages its own restoring of its modifiers
+        //infernal mobs own system should be restoring it correctly now
 
         super.applyBuffFromReload(ent, difficulty);
     }

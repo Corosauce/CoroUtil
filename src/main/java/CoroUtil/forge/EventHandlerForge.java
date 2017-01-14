@@ -2,6 +2,7 @@ package CoroUtil.forge;
 
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.BuffBase;
+import CoroUtil.util.CoroUtilCrossMod;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
@@ -23,6 +24,7 @@ import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.config.ConfigCoroAI;
@@ -184,9 +186,13 @@ public class EventHandlerForge {
 	 *
 	 * @param event
 	 */
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void entityCreated(EntityJoinWorldEvent event) {
 		if (event.getEntity().worldObj.isRemote) return;
+		//System.out.println("coroutil event EntityJoinWorldEvent for " + event.getEntity());
+
+		CoroUtilCrossMod.processSpawnOverride(event);
+
 		if (event.getEntity() instanceof EntityCreature) {
 			EntityCreature ent = (EntityCreature) event.getEntity();
 

@@ -1,7 +1,12 @@
 package CoroUtil.util;
 
+import CoroUtil.config.ConfigDynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +15,12 @@ import java.util.List;
 
 /**
  * TODO: respect infernal mobs config of specifically disabled modifiers, and maybe some other things?
+ * - see InfernalMobsCore.mobMods, contains list of allowed mods, does not contain config removed ones
+ *
+ * his settings:
+ * - elite: 2 + 3 rand
+ * - ultra: + 3 + 2 rand
+ * - infernal: + 3 + 2 rand
  *
  * Created by Corosus on 1/7/2017.
  */
@@ -125,4 +136,50 @@ public class CoroUtilCrossMod {
         return false;
     }
 
+    public static boolean infernalMobs_RemoveAllModifiers(EntityLivingBase ent) {
+        if (!hasInfernalMobs()) return false;
+
+        try {
+            Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
+            if (clazz != null) {
+
+                Method method = clazz.getDeclaredMethod("removeEntFromElites", EntityLivingBase.class);
+                method.invoke(null, ent);
+
+                return true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Called from lowest priority event so ours always runs after infernals, keeps track of what mod added the modifications and removes if it wasnt us
+     *
+     * @param event
+     */
+    public static void processSpawnOverride(EntityJoinWorldEvent event) {
+
+        if (!hasInfernalMobs()) return;
+
+        if (!ConfigDynamicDifficulty.difficulty_OverrideInfernalMobs) return;
+
+        //updated based off of InfernalMobsCore.getNBTTag();
+        String infernalNBTString = "InfernalMobsMod";
+
+        if (event.getEntity() instanceof EntityLivingBase) {
+            EntityLivingBase ent = (EntityLivingBase)event.getEntity();
+            /**
+             * Aggressively remove infernal modifiers and nbt data for it, unless we added them ourselves
+             */
+            if (ent.getEntityData().hasKey(infernalNBTString)) {
+                if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
+                    infernalMobs_RemoveAllModifiers(ent);
+                    ent.getEntityData().removeTag(infernalNBTString);
+                }
+            }
+        }
+    }
 }

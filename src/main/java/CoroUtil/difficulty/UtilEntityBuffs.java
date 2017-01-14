@@ -263,7 +263,10 @@ public class UtilEntityBuffs {
 
         //TEMP
         //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
-        applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
+        //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
+        applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
+
+        if (true) return;
 
         for (String buff : listBuffs) {
             if (remainingBuffs > 0) {
@@ -277,64 +280,6 @@ public class UtilEntityBuffs {
                 break;
             }
         }
-
-
-        //OLD D:
-
-        //until i go more object oriented, a buff can return false to say it didnt properly apply, and still set the tag to prevent retrying
-        //- this is so it wont keep retrying that buff but wont decrement remainingBuffs
-
-        /*while (remainingBuffs > 0) {
-            int randVal = rand.nextInt(6);
-            if (randVal == 0) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_Health)) {
-                    if (buffHealth(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            } else if (randVal == 1) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_Damage)) {
-                    if (buffDamage(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            } else if (randVal == 2) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_Inventory)) {
-                    if (buffInventory(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            } else if (randVal == 3) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_Speed)) {
-                    if (buffSpeed(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            } else if (randVal == 4) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap)) {
-                    if (buffAI_CoroAI_Combat(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            } else if (randVal == 5) {
-                if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_Infernal)) {
-                    if (buffAI_Infernal(world, ent, playerClosest, difficulty)) {
-                        remainingBuffs--;
-                    }
-                }
-            }
-
-            //endless loop protection - check if it has all buffs
-            //keep in mind AI buff can fail and use only the tried tag
-            if (ent.getEntityData().getBoolean(dataEntityBuffed_Health) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_Damage) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_Inventory) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_Speed) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap) &&
-                    ent.getEntityData().getBoolean(dataEntityBuffed_AI_Infernal)) {
-                break;
-            }
-        }*/
 
 
     }
