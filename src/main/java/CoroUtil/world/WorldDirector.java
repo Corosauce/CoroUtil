@@ -394,6 +394,7 @@ public class WorldDirector implements Runnable {
 				}
 		    }
 		    if (locationObj != null) {
+				locationObj.setWorld(this.getWorld());
 		    	locationObj.init();
 				locationObj.readFromNBT(nbt);
 				locationObj.initPost();

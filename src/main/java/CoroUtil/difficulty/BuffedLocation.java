@@ -37,8 +37,7 @@ public class BuffedLocation extends TickableLocationBase {
 
     @Override
     public void tickUpdate() {
-        //TODO: generic way to get world from object
-        World world = DimensionManager.getWorld(0);
+        World world = getWorld();
 
         if (world.getTotalWorldTime() % 40 == 0) {
             System.out.println("tick! " + origin);

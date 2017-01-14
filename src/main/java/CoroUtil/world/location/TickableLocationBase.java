@@ -2,6 +2,7 @@ package CoroUtil.world.location;
 
 import CoroUtil.util.BlockCoord;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 
 /**
  * Base class for ticking locations (threaded ticking optional)
@@ -11,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
  */
     public abstract class TickableLocationBase implements ISimulationTickable {
 
+    public World world;
     public BlockCoord origin;
     public String classname;
 
@@ -58,6 +60,16 @@ import net.minecraft.nbt.NBTTagCompound;
     @Override
     public void cleanup() {
 
+    }
+
+    @Override
+    public void setWorld(World world) {
+        this.world = world;
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 
     @Override

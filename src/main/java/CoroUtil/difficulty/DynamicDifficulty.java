@@ -679,10 +679,12 @@ public class DynamicDifficulty {
 
 
 
-	public static void buffLocation(World world, BlockCoord coord, int distRadius, float difficulty) {
+	public static BuffedLocation buffLocation(World world, BlockCoord coord, int distRadius, float difficulty) {
 		BuffedLocation zone = new BuffedLocation(distRadius, difficulty);
+		zone.setWorld(world);
 		zone.setOrigin(coord);
 		WorldDirectorManager.instance().getCoroUtilWorldDirector(world).addTickingLocation(zone);
+		return zone;
 	}
 
 	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord) {
