@@ -25,7 +25,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     private int leapDelayCur = 0;
     //private int leapDelayRate = 40;
     
-    private boolean autoAttackTest = false;
+    private boolean autoAttackTest = true;
     private boolean tryingToGrab = false;
     private boolean grabLock = false;
     

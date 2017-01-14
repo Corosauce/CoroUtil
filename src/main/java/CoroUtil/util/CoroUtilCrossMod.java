@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * TODO: respect infernal mobs config of specifically disabled modifiers, and maybe some other things?
+ *
  * Created by Corosus on 1/7/2017.
  */
 public class CoroUtilCrossMod {

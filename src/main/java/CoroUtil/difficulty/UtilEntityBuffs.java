@@ -153,6 +153,9 @@ public class UtilEntityBuffs {
                 ent.getEntityData().setFloat(dataEntityBuffed_Difficulty, difficulty);
             }
 
+
+            System.out.println("applying buff: " + buffName);
+
             return lookupBuffs.get(buffName).applyBuff(ent, difficulty);
         } else {
             return false;
@@ -259,13 +262,13 @@ public class UtilEntityBuffs {
         ent.getEntityData().setBoolean(dataEntityBuffDiceRolled, true);
 
         //TEMP
-        applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+        //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+        applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
 
         for (String buff : listBuffs) {
             if (remainingBuffs > 0) {
                 if (getBuff(buff).canApplyBuff(ent, difficulty)) {
                     //use main method that also marks entity buffed and caches difficulty
-                    System.out.println("applying buff: " + buff);
                     if (applyBuff(buff, ent, difficulty)) {
                         remainingBuffs--;
                     }

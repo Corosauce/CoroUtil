@@ -1,8 +1,13 @@
 package CoroUtil.forge;
 
+import CoroUtil.packet.PacketHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.packet.INBTPacketHandler;
@@ -36,6 +41,35 @@ public class EventHandlerPacket {
 			return (INBTPacketHandler)Minecraft.getMinecraft().currentScreen;
 		}
 		return null;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
+		try {
+			final NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
+
+			String command = nbt.getString("command");
+
+			if (command.equals("Ent_Motion")) {
+
+				final int entID = nbt.getInteger("entityID");
+
+				Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+					@Override
+					public void run() {
+						Entity entity = getClientWorld().getEntityByID(entID);
+						if (entity != null) {
+							entity.motionX += nbt.getDouble("motionX");
+							entity.motionY += nbt.getDouble("motionY");
+							entity.motionZ += nbt.getDouble("motionZ");
+						}
+					}
+				});
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 	
 	/*@SideOnly(Side.CLIENT)
