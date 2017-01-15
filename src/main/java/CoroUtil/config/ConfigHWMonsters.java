@@ -54,7 +54,7 @@ public class ConfigHWMonsters implements IConfigCategory {
 	public static String blackListPlayers = "";
 	public static boolean useBlacklistAsWhitelist = false;
 
-
+	public static boolean genTotems = true;
 
 
 	@Override

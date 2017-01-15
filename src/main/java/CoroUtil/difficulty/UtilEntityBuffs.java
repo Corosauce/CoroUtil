@@ -154,7 +154,7 @@ public class UtilEntityBuffs {
             }
 
 
-            System.out.println("applying buff: " + buffName);
+            //System.out.println("applying buff: " + buffName);
 
             return lookupBuffs.get(buffName).applyBuff(ent, difficulty);
         } else {
