@@ -264,7 +264,7 @@ public class UtilEntityBuffs {
         //TEMP
         //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
         //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
-        applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
+        //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
 
         if (true) return;
 
