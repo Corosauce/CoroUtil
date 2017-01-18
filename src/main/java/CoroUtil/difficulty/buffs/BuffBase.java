@@ -25,6 +25,24 @@ public abstract class BuffBase {
         return true;
     }
 
+    /**
+     * Run after all buffs processed, to apply stuff that might need to happen after other buffs do their initial work
+     * Mainly used for when buffs are batch applied like on dice roll or deserialization
+     *
+     * @param ent
+     * @param difficulty
+     */
+    public void applyBuffPost(EntityCreature ent, float difficulty) {
+        return;
+    }
+
+    /**
+     * Checks to see if theres some random reason why buff cannot be applied, does not factor in if buff was already applied
+     *
+     * @param ent
+     * @param difficulty
+     * @return
+     */
     public boolean canApplyBuff(EntityCreature ent, float difficulty) {
         return true;
     }

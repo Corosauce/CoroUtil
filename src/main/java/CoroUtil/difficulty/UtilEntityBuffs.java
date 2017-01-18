@@ -3,6 +3,7 @@ package CoroUtil.difficulty;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
+import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
@@ -55,6 +56,14 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_Inventory = "CoroAI_HW_Buffed_Inventory";
     public static String dataEntityBuffed_Speed = "CoroAI_HW_Buffed_Speed";
     public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
+
+    /**
+     * Flags from invasion mod for its own dice rolling
+     */
+
+    public static String dataEntityEnhanced = "CoroAI_HW_Inv_Enhanced";
+    public static String dataEntityEnhanceTried = "CoroAI_HW_Inv_EnhanceTried";
+    public static String dataEntityWaveSpawned = "CoroAI_HW_Inv_WaveSpawned";
 
     //use for buffs that say they can apply but failed to apply
     //do we need it?
@@ -125,13 +134,46 @@ public class UtilEntityBuffs {
         addBuff(new BuffXP());
         addBuff(new BuffInventory());
         addBuff(new BuffAI_Infernal());
-        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
+        addBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
         addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
         addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
     }
 
     public static void addBuff(BuffBase buff) {
         lookupBuffs.put(buff.getTagName(), buff);
+    }
+
+    public static boolean hasBuff(EntityCreature ent, BuffBase buff) {
+        return hasBuff(ent, buff.getTagName());
+    }
+
+    public static boolean hasBuff(EntityCreature ent, String buff) {
+        return ent.getEntityData().getBoolean(buff);
+    }
+
+    /**
+     * Non batch based buff applying, checks if buff was not already applied, then calls applyBuff and applyBuffPost
+     *
+     * @param buffName
+     * @param ent
+     * @param difficulty
+     * @return
+     */
+    public static boolean applyBuffSingularTry(String buffName, EntityCreature ent, float difficulty) {
+        if (!hasBuff(ent, buffName)) {
+            BuffBase buff = getBuff(buffName);
+            if (buff != null) {
+                if (buff.canApplyBuff(ent, difficulty)) {
+                    if (!applyBuff(buffName, ent, difficulty)) {
+                        return false;
+                    } else {
+                        applyBuffPost(buffName, ent, difficulty);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -159,6 +201,37 @@ public class UtilEntityBuffs {
             return lookupBuffs.get(buffName).applyBuff(ent, difficulty);
         } else {
             return false;
+        }
+    }
+
+    /**
+     *
+     * @param buffName
+     * @param ent
+     * @param difficulty
+     * @return
+     */
+    public static void applyBuffPost(String buffName, EntityCreature ent, float difficulty) {
+        if (lookupBuffs.containsKey(buffName)) {
+
+            //System.out.println("applying buff: " + buffName);
+
+            lookupBuffs.get(buffName).applyBuffPost(ent, difficulty);
+        }
+    }
+
+    public static void applyBuffPostAll(EntityCreature ent, float difficulty) {
+        List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+        for (String buff : buffs) {
+            if (ent.getEntityData().getBoolean(buff)) {
+                BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
+                if (buffObj != null) {
+                    //System.out.println("applyBuffPostAll buff: " + buff);
+                    buffObj.applyBuffPost(ent, difficulty);
+                } else {
+                    CoroUtil.dbg("warning: unable to find buff by name of " + buff);
+                }
+            }
         }
     }
 
@@ -261,27 +334,32 @@ public class UtilEntityBuffs {
 
         ent.getEntityData().setBoolean(dataEntityBuffDiceRolled, true);
 
+        boolean testSpecific = true;
+
         //TEMP
-        //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
-        //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
-        //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
-
-        if (true) return;
-
-        for (String buff : listBuffs) {
-            if (remainingBuffs > 0) {
-                if (getBuff(buff).canApplyBuff(ent, difficulty)) {
-                    //use main method that also marks entity buffed and caches difficulty
-                    if (applyBuff(buff, ent, difficulty)) {
-                        remainingBuffs--;
+        if (testSpecific) {
+            //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+            //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
+            //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
+        } else {
+            for (String buff : listBuffs) {
+                if (remainingBuffs > 0) {
+                    if (!hasBuff(ent, buff)) {
+                        if (getBuff(buff).canApplyBuff(ent, difficulty)) {
+                            //use main method that also marks entity buffed and caches difficulty
+                            if (applyBuff(buff, ent, difficulty)) {
+                                remainingBuffs--;
+                            }
+                        }
                     }
+                } else {
+                    break;
                 }
-            } else {
-                break;
             }
         }
 
-
+        //TODO: if there was a buff before this method body, this might be calling the post call redundantly
+        UtilEntityBuffs.applyBuffPostAll(ent, difficulty);
     }
 
     public static boolean buffHealth(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
