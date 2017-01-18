@@ -2,6 +2,8 @@ package CoroUtil.ai.tasks;
 
 import java.util.Random;
 
+import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.forge.CommonProxy;
 import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -9,6 +11,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +22,7 @@ import CoroUtil.util.BlockCoord;
 public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer
 {
     private EntityCreature entity = null;
+	private IBlockState stateCurMining = null;
     private BlockCoord posCurMining = null;
     private EntityLivingBase targetLastTracked = null;
     private int digTimeCur = 0;
@@ -103,10 +107,12 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     {
     	//System.out.println("continue!");
     	if (posCurMining == null) return false;
-    	if (entity.worldObj.getBlockState(new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ)).getBlock() != Blocks.AIR) {
+        BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
+        IBlockState state = entity.worldObj.getBlockState(pos);
+    	if (!entity.worldObj.isAirBlock(pos)) {
     		return true;
     	} else {
-    		posCurMining = null;
+			setMiningBlock(null, null);
     		//System.out.println("ending execute");
     		return false;
     	}
@@ -128,7 +134,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	//System.out.println("reset!");
     	digTimeCur = 0;
     	curBlockDamage = 0;
-    	posCurMining = null;
+		setMiningBlock(null, null);
     }
 
     /**
@@ -156,8 +162,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		if (entity.getAttackTarget() == null) {
 			return false;
 		}
-    	
-    	posCurMining = null;
+
+		setMiningBlock(null, null);
     	
     	double vecX = entity.getAttackTarget().posX - entity.posX;
     	//feet
@@ -188,7 +194,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	//System.out.println("ahead to target: " + block);
     	
     	if (UtilMining.canMineBlock(entity.worldObj, coords, block)) {
-    		posCurMining = coords;
+			setMiningBlock(state, coords);
     		//entity.worldObj.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air);
     		return true;
     	} else {
@@ -198,7 +204,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     			state = entity.worldObj.getBlockState(coords.toBlockPos());
     	    	//block = entity.worldObj.getBlock(coords.posX, coords.posY, coords.posZ);
         		if (UtilMining.canMineBlock(entity.worldObj, coords, block)) {
-            		posCurMining = coords;
+					setMiningBlock(state, coords);
             		return true;
         		}
     		}
@@ -210,7 +216,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		state = entity.worldObj.getBlockState(coords.toBlockPos());
 	    	block = state.getBlock();
     		if (UtilMining.canMineBlock(entity.worldObj, coords, block)) {
-        		posCurMining = coords;
+				setMiningBlock(state, coords);
         		return true;
     		} else {
     			//try to dig down if all else failed and target is below
@@ -222,7 +228,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	    		//block = entity.worldObj.getBlock(coords.posX, coords.posY, coords.posZ);
     		    	
     	    		if (UtilMining.canMineBlock(entity.worldObj, coords, block)) {
-    	        		posCurMining = coords;
+						setMiningBlock(state, coords);
     	        		return true;
     	    		}
     			}
@@ -231,15 +237,23 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		return false;
     	}
     }
+
+    public void setMiningBlock(IBlockState state, BlockCoord pos) {
+		this.posCurMining = pos;
+		this.stateCurMining = state;
+	}
     
     public void tickMineBlock() {
     	if (posCurMining == null) return;
+
+		IBlockState state = entity.worldObj.getBlockState(posCurMining.toBlockPos());
+		Block block = state.getBlock();
     	
-    	//force stop mining if pushed away
-    	if (entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 3) {
+    	//force stop mining if pushed away, or if block changed
+    	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 3) {
     		//entity.worldObj.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
     		entity.worldObj.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
-    		posCurMining = null;
+			setMiningBlock(null, null);
     		return;
     	}
     	
@@ -247,16 +261,25 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	
     	//Block block = entity.worldObj.getBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
     	//double blockStrength = block.getBlockHardness(entity.worldObj, posCurMining.posX, posCurMining.posY, posCurMining.posZ);
-    	IBlockState state = entity.worldObj.getBlockState(posCurMining.toBlockPos());
-    	Block block = state.getBlock();
     	//Block block = state.getBlock();
+
     	
     	double blockStrength = state.getBlockHardness(entity.worldObj, posCurMining.toBlockPos());
     	
     	if (blockStrength == -1) {
-    		posCurMining = null;
+			setMiningBlock(null, null);
     		return;
     	}
+
+
+		if (entity.worldObj.getTotalWorldTime() % 10 == 0) {
+			//entity.swingItem();
+			entity.swingArm(EnumHand.MAIN_HAND);
+			//System.out.println("swing!");
+
+			entity.worldObj.playSound(null, new BlockPos(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ()), block.getSoundType(state, entity.worldObj, posCurMining.toBlockPos(), entity).getBreakSound(), SoundCategory.HOSTILE, 0.5F, 1F);
+			//entity.worldObj.playSoundEffect(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ(), block.stepSound.getBreakSound(), 0.5F, 1F);
+		}
     	
     	curBlockDamage += 0.01D / blockStrength;
     	
@@ -264,20 +287,17 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		//entity.worldObj.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
     		entity.worldObj.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
     		//entity.worldObj.setBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ, Blocks.AIR);
-    		entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
-    		
+    		//entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
+            entity.worldObj.setBlockState(posCurMining.toBlockPos(), CommonProxy.blockRepairingBlock.getDefaultState());
+            TileEntity tEnt = entity.worldObj.getTileEntity(posCurMining.toBlockPos());
+            if (tEnt instanceof TileEntityRepairingBlock) {
+                ((TileEntityRepairingBlock) tEnt).setBlockData(state);
+            }
+			setMiningBlock(null, null);
     		
     	} else {
     		//entity.worldObj.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, (int)(curBlockDamage * 10D));
     		entity.worldObj.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), (int)(curBlockDamage * 10D));
-    	}
-    	if (entity.worldObj.getTotalWorldTime() % 10 == 0) {
-    		//entity.swingItem();
-    		entity.swingArm(EnumHand.MAIN_HAND);
-    		//System.out.println("swing!");
-    		
-    		entity.worldObj.playSound(null, new BlockPos(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ()), block.getSoundType(state, entity.worldObj, posCurMining.toBlockPos(), entity).getBreakSound(), SoundCategory.HOSTILE, 0.5F, 1F);
-    		//entity.worldObj.playSoundEffect(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ(), block.stepSound.getBreakSound(), 0.5F, 1F);
     	}
     }
 }

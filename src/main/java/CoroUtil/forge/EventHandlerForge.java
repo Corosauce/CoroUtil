@@ -166,7 +166,7 @@ public class EventHandlerForge {
 							
 							if (bdp.walkedOnAmount > 5F) {
 								//System.out.println("dirt!!!");
-								if (ent.worldObj.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
+								if (ent.worldObj.isAirBlock(new BlockPos(newX, newY+1, newZ))) {
 									ent.worldObj.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
 								}
 								

@@ -131,9 +131,10 @@ public class DynamicDifficulty {
     				for (int x = -1; !foundWall && x <= 1; x++) {
     					for (int z = -1; !foundWall && z <= 1; z++) {
     						for (int y = -1; !foundWall && y <= 1; y++) {
-    							IBlockState state = world.getBlockState(new BlockPos(pX+x, pY+y, pZ+z));
+								BlockPos pos = new BlockPos(pX+x, pY+y, pZ+z);
+    							IBlockState state = world.getBlockState(pos);
     							block = state.getBlock();
-    							if (block != Blocks.AIR) {
+    							if (!block.isAir(state, world, pos)) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
     								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player);
     								if (list.size() > 0) {

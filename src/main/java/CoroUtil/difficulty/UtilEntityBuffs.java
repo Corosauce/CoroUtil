@@ -338,7 +338,7 @@ public class UtilEntityBuffs {
 
         //TEMP
         if (testSpecific) {
-            //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+            applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
             //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
             //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
         } else {

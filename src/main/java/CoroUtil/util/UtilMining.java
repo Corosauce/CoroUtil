@@ -1,5 +1,6 @@
 package CoroUtil.util;
 
+import CoroUtil.forge.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -18,7 +19,7 @@ public class UtilMining {
     	if (world.getTileEntity(pos.toBlockPos()) != null) {
     		return false;
     	}
-    	if (block == Blocks.AIR) {
+    	if (block.isAir(state, world, pos.toBlockPos()) || block == CommonProxy.blockRepairingBlock) {
     		return false;
     	}
     	/*if (block == Blocks.obsidian) {

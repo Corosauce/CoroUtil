@@ -40,7 +40,7 @@ public class BuffedLocation extends TickableLocationBase {
         World world = getWorld();
 
         if (world.getTotalWorldTime() % 40 == 0) {
-            System.out.println("tick! " + origin);
+            //System.out.println("tick! " + origin);
         }
     }
 
