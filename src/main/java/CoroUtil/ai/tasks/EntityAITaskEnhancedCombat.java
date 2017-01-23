@@ -13,6 +13,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -24,6 +25,7 @@ import CoroUtil.util.BlockCoord;
 import CoroUtil.difficulty.DynamicDifficulty;
 
 import CoroUtil.config.ConfigHWMonsters;
+import net.minecraftforge.common.config.Config;
 
 public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskInitializer
 {
@@ -283,30 +285,37 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
 
             if (this.entity.getHeldItemMainhand() != null)
             {
-                this.entity.swingArm(EnumHand.MAIN_HAND);;
+                this.entity.swingArm(EnumHand.MAIN_HAND);
             }
             
             this.entity.attackEntityAsMob(entitylivingbase);
-            
-            if (leapAttacking && ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier > 0) {
-            	double extraArmorPiercingDamage = this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
-                extraArmorPiercingDamage *= ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier;
-                if (this.worldObj.getDifficulty() == EnumDifficulty.EASY)
-                {
-                	extraArmorPiercingDamage = extraArmorPiercingDamage / 2.0F + 1.0F;
-                } else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD)
-                {
-                	extraArmorPiercingDamage = extraArmorPiercingDamage * 3.0F / 2.0F;
+
+            int lowestHealthAllowed = 2;
+
+            //make sure theyre actually still alive, and can lose more health
+            if (entitylivingbase.getHealth() > lowestHealthAllowed) {
+                if (leapAttacking && ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier > 0) {
+                    double extraDamage = this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+                    extraDamage *= ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier;
+                    if (this.worldObj.getDifficulty() == EnumDifficulty.EASY) {
+                        extraDamage = extraDamage / 2.0F + 1.0F;
+                    } else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD) {
+                        extraDamage = extraDamage * 3.0F / 2.0F;
+                    }
+                    //entitylivingbase.attackEntityFrom();
+                    //entitylivingbase.damageEntity(DamageSource.magic, (float) extraArmorPiercingDamage);
+                    if (ConfigHWMonsters.counterAttackLeapArmorPiercing) {
+                        float newHealth = entitylivingbase.getHealth() - (float) extraDamage;
+                        if (newHealth < lowestHealthAllowed) {
+                            newHealth = lowestHealthAllowed;
+                        }
+                        entitylivingbase.setHealth(newHealth);
+                    } else {
+                        entitylivingbase.attackEntityFrom(DamageSource.causeMobDamage(entity), (float) extraDamage);
+                    }
+                    //System.out.println("hit!: " + extraArmorPiercingDamage);
+
                 }
-            	//entitylivingbase.attackEntityFrom();
-                //entitylivingbase.damageEntity(DamageSource.magic, (float) extraArmorPiercingDamage);
-                float newHealth = entitylivingbase.getHealth() - (float) extraArmorPiercingDamage;
-                if (newHealth < 2) {
-                	newHealth = 2;
-                }
-                entitylivingbase.setHealth(newHealth);
-                //System.out.println("hit!: " + extraArmorPiercingDamage);
-                
             }
             
         }

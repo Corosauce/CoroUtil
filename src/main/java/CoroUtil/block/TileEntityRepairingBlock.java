@@ -7,12 +7,16 @@ import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 public class TileEntityRepairingBlock extends TileEntity implements ITickable
 {
@@ -27,19 +31,32 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     {
     	if (!worldObj.isRemote) {
 
+            //if for some reason data is invalid, remove block
             if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
                 getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
+
+                //temp
+                //setBlockData(Blocks.STONE.getDefaultState());
             } else {
 
-                ticksRepairCount++;
+
                 //System.out.println("ticksRepairCount = " + ticksRepairCount);
 
+                //AxisAlignedBB aabb = new AxisAlignedBB(this.getPos().getX(), this.getPos().getY(), this.getPos().getZ(), this.getPos().getX(), this.getPos().getY(), this.getPos().getZ());
+
+                //System.out.println(listTest.size());
+
                 if (ticksRepairCount >= ticksRepairMax) {
-                    //if (this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, orig_blockState.getBoundingBox(this.getWorld(), this.getPos())) == null)
-                    //{
+                    AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
+                    aabb = aabb.offset(this.getPos());
+                    List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
+                    if (listTest.size() == 0)
+                    {
                         System.out.println("restoring: " + orig_blockState);
                         getWorld().setBlockState(this.getPos(), orig_blockState);
-                    //}
+                    }
+                } else {
+                    ticksRepairCount++;
                 }
             }
     	}
