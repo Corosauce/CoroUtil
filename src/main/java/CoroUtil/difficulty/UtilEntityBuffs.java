@@ -242,65 +242,6 @@ public class UtilEntityBuffs {
     public static BuffBase getBuff(String buff) {
         return lookupBuffs.get(buff);
     }
-    
-    /*public static void buffGeneric(World world, EntityCreature ent, EntityPlayer playerClosest) {
-        if (ent instanceof EntityZombie) {
-
-            //note, there are 2 instances of attack on collide, we are targetting the first one that is for player
-            //TODO: 1.10.2 verify going from EntityAIAttackOnCollide to EntityAIZombieAttack doesnt break things
-            BehaviorModifier.replaceTaskIfMissing(ent, EntityAIZombieAttack.class, tasksToInject, taskPriorities);
-        }
-
-        if (!ent.getEntityData().getBoolean(dataEntityBuffed_AI_LungeAndCounterLeap)) {
-            ent.getEntityData().setBoolean(dataEntityBuffed_AI_LungeAndCounterLeap, true);
-            //BehaviorModifier.addTaskIfMissing(ent, TaskDigTowardsTarget.class, tasksToInject, taskPriorities[0]);
-
-            float difficulty = DynamicDifficulty.getDifficultyScaleAverage(world, playerClosest, new BlockCoord(ent));
-
-            *//**
-             * The mathematical behavior is as follows:
-             * Operation 0: Increment X by Amount,
-             * Operation 1: Increment Y by X * Amount,
-             * Operation 2: Y = Y * (1 + Amount) (equivalent to Increment Y by Y * Amount).
-             * The game first sets X = Base, then executes all Operation 0 modifiers, then sets Y = X,
-             * then executes all Operation 1 modifiers, and finally executes all Operation 2 modifiers.
-             *//*
-
-            float maxHealthClean = Math.round(ent.getMaxHealth() * 1000F) / 1000F;
-            //System.out.println("health max before: " + maxHealthClean);
-
-            double healthBoostMultiply = (double)(*//*1F + *//*difficulty * ConfigHWMonsters.scaleHealth);
-            ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, 2));
-
-            //chance to ignore knockback based on difficulty
-            ent.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(difficulty * ConfigHWMonsters.scaleKnockbackResistance);
-
-            String debug = "";
-
-            double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
-            //avoid retardedly fast speeds
-            if (curSpeed < speedCap) {
-                double speedBoost = (Math.min(ConfigHWMonsters.scaleSpeedCap, difficulty * ConfigHWMonsters.scaleSpeed));
-                debug += "speed % " + speedBoost;
-                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("speed multiplier boost", speedBoost, 2));
-            }
-
-            debug += ", new speed: " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
-            //System.out.println("mobs final speed: " + ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
-            //System.out.println("difficulty: " + difficulty);
-            //System.out.println("hb %: " + healthBoostMultiply);
-            maxHealthClean = Math.round(ent.getMaxHealth() * 1000F) / 1000F;
-            //System.out.println("health max: " + maxHealthClean);
-
-            debug += ", health boost: " + healthBoostMultiply;
-
-            ent.setHealth(ent.getMaxHealth());
-
-            debug += ", new health: " + maxHealthClean;
-
-            //System.out.println(debug);
-        }
-    }*/
 
     /**
      * Randomly decide how many aspects to buff, and by how much based on difficulty and config

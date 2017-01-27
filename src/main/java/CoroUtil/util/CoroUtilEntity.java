@@ -133,4 +133,17 @@ public class CoroUtilEntity {
 
         return entityplayer;
     }
+
+    public static boolean canProcessForList(String playerName, String list, boolean whitelistMode) {
+        if (whitelistMode) {
+            if (!list.contains(playerName)) {
+                return false;
+            }
+        } else {
+            if (list.contains(playerName)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -39,6 +39,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static double weightHealth = 1D;
 	public static double weightDistFromSpawn = 1D;
 	public static double weightBuffedLocation = 2D;
+	public static double weightDebuffedLocation = 1D;
 	
 	@ConfigComment("-1 = dont cap it")
 	public static double difficulty_Max = -1;

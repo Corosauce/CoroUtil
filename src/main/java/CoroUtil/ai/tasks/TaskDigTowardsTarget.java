@@ -3,7 +3,10 @@ package CoroUtil.ai.tasks;
 import java.util.Random;
 
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.forge.CommonProxy;
+import CoroUtil.util.CoroUtilEntity;
+import CoroUtil.util.CoroUtilPlayer;
 import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -31,6 +34,14 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     //doesnt factor in ai tick delay of % 3
     private int noMoveTicks = 0;
 
+	/**
+	 * Fields used when task is added via invasions, but not via hwmonsters, or do we want that too?
+	 */
+	public static String dataUseInvasionRules = "HW_Inv_UseInvasionRules";
+	public static String dataUsePlayerList = "HW_Inv_UsePlayerList";
+	public static String dataWhitelistMode = "HW_Inv_WhitelistMode";
+	public static String dataListPlayers = "HW_Inv_ListPlayers";
+
     public TaskDigTowardsTarget()
     {
         //this.setMutexBits(3);
@@ -47,9 +58,12 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     public boolean shouldExecute()
     {
     	//this method ticks every 3 ticks in best conditions
+		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
     	
     	//prevent day digging, easy way to prevent digging once invasion ends
-    	if (entity.worldObj.isDaytime()) return false;
+		if (forInvasion) {
+			if (entity.worldObj.isDaytime()) return false;
+		}
     	
     	//System.out.println("should?");
     	/**
@@ -84,6 +98,24 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		} else {
     			targetLastTracked = entity.getAttackTarget();
     		}
+
+    		//prevent invasion spawned diggers to not dig for players with invasions off
+			if (entity.getEntityData().getBoolean(dataUsePlayerList)) {
+				String playerName = CoroUtilEntity.getName(entity.getAttackTarget());
+				boolean whitelistMode = entity.getEntityData().getBoolean(dataWhitelistMode);
+				String listPlayers = entity.getEntityData().getString(dataListPlayers);
+
+				if (whitelistMode) {
+					if (!listPlayers.contains(playerName)) {
+						return false;
+					}
+				} else {
+					if (listPlayers.contains(playerName)) {
+						return false;
+					}
+				}
+			}
+
     		//if (!entity.getNavigator().noPath()) System.out.println("path size: " + entity.getNavigator().getPath().getCurrentPathLength());
     		if (entity.getNavigator().noPath() || entity.getNavigator().getPath().getCurrentPathLength() == 1 || noMoveTicks > noMoveThreshold) {
     		//if (entity.motionX < 0.1D && entity.motionZ < 0.1D) {

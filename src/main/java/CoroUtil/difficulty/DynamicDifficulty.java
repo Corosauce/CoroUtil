@@ -109,7 +109,9 @@ public class DynamicDifficulty {
 			player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
 			
 		}
-		
+
+		int wallScanRange = 3;
+
 		boolean autoAttackTest = true;
 		boolean isInAir = false;
 		
@@ -128,9 +130,9 @@ public class DynamicDifficulty {
     				int pY = MathHelper.floor_double(player.getEntityBoundingBox().minY);
     				int pZ = MathHelper.floor_double(player.posZ);
     				boolean foundWall = false;
-    				for (int x = -1; !foundWall && x <= 1; x++) {
-    					for (int z = -1; !foundWall && z <= 1; z++) {
-    						for (int y = -1; !foundWall && y <= 1; y++) {
+    				for (int x = -wallScanRange; !foundWall && x <= wallScanRange; x++) {
+    					for (int z = -wallScanRange; !foundWall && z <= wallScanRange; z++) {
+    						for (int y = -wallScanRange; !foundWall && y <= wallScanRange; y++) {
 								BlockPos pos = new BlockPos(pX+x, pY+y, pZ+z);
     							IBlockState state = world.getBlockState(pos);
     							block = state.getBlock();
@@ -166,6 +168,18 @@ public class DynamicDifficulty {
 			player.getEntityData().setLong(dataPlayerDetectInAirTime, 0);
 		}
 		
+	}
+
+	public static void deathPlayer(EntityPlayer player) {
+		//TODO: find existing ones and reset their timer? what about it not buffing the exact new spot
+
+		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(player.worldObj);
+
+		if (wd != null) {
+			BuffedLocation debuff = new BuffedLocation(32, -2);
+			debuff.setDecays(true);
+			wd.addTickingLocation(debuff);
+		}
 	}
 
 	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity) {
@@ -206,16 +220,29 @@ public class DynamicDifficulty {
 		//difficulties designed for stuff only mods are capable of should be a flat out plus to the rating such as:
 		//- max health
 		//- ???
+
+
+
+
+		//TODO: DEBUFF!
+		//consider having no weight for it, or only using it when its != 0
+
+
+
+
 		
 		float weightPosOccupy = (float) ConfigDynamicDifficulty.weightPosOccupy;
 		float weightPlayerEquipment = (float) ConfigDynamicDifficulty.weightPlayerEquipment;
 		float weightPlayerServerTime = (float) ConfigDynamicDifficulty.weightPlayerServerTime;
 		float weightDPS = (float) ConfigDynamicDifficulty.weightDPS;
-		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
 		float weightDistFromSpawn = (float) ConfigDynamicDifficulty.weightDistFromSpawn;
+
+		//buffs that arent added into the total weight
+		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
 		float weightBuffedLocation = (float) ConfigDynamicDifficulty.weightBuffedLocation;
+		float weightDebuffedLocation = (float) ConfigDynamicDifficulty.weightDebuffedLocation;
 		
-		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn + weightBuffedLocation;
+		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn/* + weightBuffedLocation*/;
 		
 		float difficultyPosOccupy = getDifficultyScaleForPosOccupyTime(world, pos) * weightPosOccupy;
 		float difficultyPlayerEquipment = getDifficultyScaleForPlayerEquipment(player) * weightPlayerEquipment;
@@ -224,9 +251,13 @@ public class DynamicDifficulty {
 		float difficultyHealth = getDifficultyScaleForHealth(player) * weightHealth;
 		float difficultyDistFromSpawn = getDifficultyScaleForDistFromSpawn(player) * weightDistFromSpawn;
 		float difficultyBuffedLocation =  getDifficultyForBuffedLocation(world, pos) * weightBuffedLocation;
+		float difficultyDebuffedLocation =  getDifficultyForDebuffedLocation(world, pos) * weightDebuffedLocation;
 		
 		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn + difficultyBuffedLocation;
-		
+
+		//debuff
+		difficultyTotal += difficultyDebuffedLocation;
+
 		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
 		if (ConfigDynamicDifficulty.difficulty_Max != -1) {
@@ -234,6 +265,12 @@ public class DynamicDifficulty {
 				val = (float) ConfigDynamicDifficulty.difficulty_Max;
 			}
 		}
+
+		//account for debuffs potentially causing less than zero value
+		if (val < 0) {
+			val = 0;
+		}
+
 		return val;
 	}
 	
@@ -688,7 +725,15 @@ public class DynamicDifficulty {
 		return zone;
 	}
 
+	public static float getDifficultyForDebuffedLocation(World world, BlockCoord coord) {
+		return getDifficultyForBuffedLocation(world, coord, true);
+	}
+
 	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord) {
+		return getDifficultyForBuffedLocation(world, coord, false);
+	}
+
+	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord, boolean findDebuffInstead) {
 		//TODO: cache results to minimize lookup thrash
 		float bestDifficulty = 0;
 		//BuffedLocation bestBuff = null;
@@ -696,11 +741,18 @@ public class DynamicDifficulty {
 		for (ISimulationTickable loc : wd.listTickingLocations) {
 			if (loc instanceof BuffedLocation) {
 				BuffedLocation buff = (BuffedLocation)loc;
-				double dist = coord.getDistanceSquared(buff.getOrigin());
-				if (dist < buff.buffDistRadius * buff.buffDistRadius) {
-					if (buff.difficulty > bestDifficulty) {
-						//bestBuff = buff;
-						bestDifficulty = buff.difficulty;
+				if (buff.isDebuff() == findDebuffInstead) {
+					double dist = coord.getDistanceSquared(buff.getOrigin());
+					if (dist < buff.buffDistRadius * buff.buffDistRadius) {
+						if (findDebuffInstead) {
+							if (buff.difficulty < bestDifficulty) {
+								bestDifficulty = buff.difficulty;
+							}
+						} else {
+							if (buff.difficulty > bestDifficulty) {
+								bestDifficulty = buff.difficulty;
+							}
+						}
 					}
 				}
 			}

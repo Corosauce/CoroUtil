@@ -263,6 +263,7 @@ public class CommandCoroUtil extends CommandBase {
 						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
 						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.worldObj, ent, pos));
 					}

@@ -43,9 +43,15 @@ import java.util.List;
 
 public class EventHandlerForge {
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void deathEvent(LivingDeathEvent event) {
 		PlayerQuestManager.i().onEvent(event);
+
+		if (!event.getEntity().worldObj.isRemote && !event.isCanceled()) {
+			if (event.getEntity() instanceof EntityPlayer) {
+				DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
+			}
+		}
 	}
 	
 	@SubscribeEvent
