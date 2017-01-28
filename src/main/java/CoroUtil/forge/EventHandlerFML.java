@@ -2,10 +2,14 @@ package CoroUtil.forge;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.forge.EventHandlerForge.ChunkDataEntry;
 import CoroUtil.formation.Manager;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
@@ -17,6 +21,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -117,6 +122,23 @@ public class EventHandlerFML {
 						soundTest.tick();
 					}
 				}
+			}
+		}
+	}
+	
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void tickClient(ClientTickEvent event) {
+		if (ConfigCoroAI.debugChunkRenderUpdatesPoll) {
+			if (Minecraft.getMinecraft().theWorld == null || event.phase == Phase.START) return;
+			long time = Minecraft.getMinecraft().theWorld.getTotalWorldTime();
+			if (time % ConfigCoroAI.debugChunkRenderPollRate == 0) {
+				System.out.println("poll results: ");
+				for (Map.Entry<Integer, ChunkDataEntry> entrySet : EventHandlerForge.lookupChunkUpdateCount.entrySet()) {
+					System.out.println(time + " - render data chunkpos: " + entrySet.getValue().x + ", " + entrySet.getValue().z + " - pos: " + (entrySet.getValue().x * 16 + 8) + ", " + (entrySet.getValue().z * 16 + 8) + " = " + entrySet.getValue().count);
+				}
+				EventHandlerForge.lookupChunkUpdateCount.clear();
 			}
 		}
 	}

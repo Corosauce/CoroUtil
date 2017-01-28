@@ -27,6 +27,10 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static int cleanupStrayMobsTimeOfDay = 2000;
 	
+	public static boolean debugChunkRenderUpdates = false;
+	public static boolean debugChunkRenderUpdatesPoll = false;
+	public static int debugChunkRenderPollRate = 100;
+	
 	@Override	
 	public String getConfigFileName() {
 		return "CoroUtil";
