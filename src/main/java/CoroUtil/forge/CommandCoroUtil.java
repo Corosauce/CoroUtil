@@ -24,6 +24,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -264,8 +266,21 @@ public class CommandCoroUtil extends CommandBase {
 						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
 						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
 						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.worldObj, ent, pos));
+					}
+				} else if (var2[0].equalsIgnoreCase("testitem")) {
+					/**
+					 * ResourceLocation resourcelocation = new ResourceLocation(id);
+					 Item item = (Item)Item.REGISTRY.getObject(resourcelocation);
+					 */
+					Item item = Item.getByNameOrId("particleman:particleglove");
+					if (item != null) {
+						System.out.println("! " + item.getRegistryName().toString());
+					}
+					if (player != null) {
+						player.inventory.addItemStackToInventory(new ItemStack(item, 1));
 					}
 				}
 			/*}*/

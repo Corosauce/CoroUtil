@@ -20,6 +20,9 @@ public class BuffHealth extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
         double healthBoostMultiply = (/*1F + */difficulty * ConfigHWMonsters.scaleHealth);
+        if (healthBoostMultiply > ConfigHWMonsters.scaleHealthMax) {
+            healthBoostMultiply = ConfigHWMonsters.scaleHealthMax;
+        }
         ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.MULTIPLY_ALL.ordinal()));
 
         //group with health buff for now...

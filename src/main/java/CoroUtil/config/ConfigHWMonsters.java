@@ -26,6 +26,8 @@ public class ConfigHWMonsters implements IConfigCategory {
 	
 	@ConfigComment("Additional scaling for dynamic difficulty based health boost")
 	public static double scaleHealth = 1D;
+
+	public static double scaleHealthMax = 0.5D;
 	
 	//public static double scaleSpeed = 1D;
 

@@ -65,6 +65,11 @@ public class DynamicDifficulty {
 	public static String dataPlayerHarvestLog = "HW_dataPlayerHarvestLog";
 	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
 	public static String dataPlayerDetectInAirTime = "HW_dataPlayerDetectInAirTime";
+
+	public static String dataPlayerInvasionSkipping = "HW_dataPlayerInvasionSkipping";
+	public static String dataPlayerInvasionSkipCount = "HW_dataPlayerInvasionSkipCount";
+
+	public static String dataPlayerInvasionSkipBuff = "HW_dataPlayerInvasionSkipBuff";
 	
 	private static int tickRate = 20;
 	
@@ -250,13 +255,17 @@ public class DynamicDifficulty {
 		float difficultyDPS = getDifficultyScaleForPosDPS(world, pos) * weightDPS;
 		float difficultyHealth = getDifficultyScaleForHealth(player) * weightHealth;
 		float difficultyDistFromSpawn = getDifficultyScaleForDistFromSpawn(player) * weightDistFromSpawn;
-		float difficultyBuffedLocation =  getDifficultyForBuffedLocation(world, pos) * weightBuffedLocation;
-		float difficultyDebuffedLocation =  getDifficultyForDebuffedLocation(world, pos) * weightDebuffedLocation;
+		float difficultyBuffedLocation = getDifficultyForBuffedLocation(world, pos) * weightBuffedLocation;
+		float difficultyDebuffedLocation = getDifficultyForDebuffedLocation(world, pos) * weightDebuffedLocation;
+
+		float difficultyBuffInvasionSkip = getInvasionSkipBuff(player);
 		
 		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn + difficultyBuffedLocation;
 
 		//debuff
 		difficultyTotal += difficultyDebuffedLocation;
+
+		difficultyTotal += difficultyBuffInvasionSkip;
 
 		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
@@ -446,6 +455,18 @@ public class DynamicDifficulty {
 		
 		float scale = convertInhabTimeToDifficultyScale(bestTime);
 		return scale;*/
+	}
+
+	public static float getInvasionSkipBuff(EntityPlayer player) {
+		return player.getEntityData().getFloat(dataPlayerInvasionSkipBuff);
+		/*float buffBase = 0.5F;
+		float skipCount = player.getEntityData().getInteger(dataPlayerInvasionSkipCount);
+		float val = buffBase * skipCount;
+		return val;*/
+	}
+
+	public static void setInvasionSkipBuff(EntityPlayer player, float buff) {
+		player.getEntityData().setFloat(dataPlayerInvasionSkipBuff, buff);
 	}
 	
 	/**

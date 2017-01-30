@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
@@ -320,11 +321,17 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		entity.worldObj.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
     		//entity.worldObj.setBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ, Blocks.AIR);
     		//entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
-            entity.worldObj.setBlockState(posCurMining.toBlockPos(), CommonProxy.blockRepairingBlock.getDefaultState());
-            TileEntity tEnt = entity.worldObj.getTileEntity(posCurMining.toBlockPos());
-            if (tEnt instanceof TileEntityRepairingBlock) {
-                ((TileEntityRepairingBlock) tEnt).setBlockData(state);
+            if (UtilMining.canConvertToRepairingBlock(entity.worldObj, state)) {
+                entity.worldObj.setBlockState(posCurMining.toBlockPos(), CommonProxy.blockRepairingBlock.getDefaultState());
+                TileEntity tEnt = entity.worldObj.getTileEntity(posCurMining.toBlockPos());
+                if (tEnt instanceof TileEntityRepairingBlock) {
+                    ((TileEntityRepairingBlock) tEnt).setBlockData(state);
+                }
+            } else {
+                Block.spawnAsEntity(entity.worldObj, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1));
+                entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
             }
+
 			setMiningBlock(null, null);
     		
     	} else {

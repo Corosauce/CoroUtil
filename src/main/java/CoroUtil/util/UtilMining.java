@@ -2,6 +2,7 @@ package CoroUtil.util;
 
 import CoroUtil.forge.CommonProxy;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
@@ -31,5 +32,13 @@ public class UtilMining {
     	
     	return true;
     }
+
+    public static boolean canConvertToRepairingBlock(World world, IBlockState state) {
+		//should cover most all types we dont want to put into repairing state
+		if (!state.isFullCube()) {
+			return false;
+		}
+		return true;
+	}
 	
 }

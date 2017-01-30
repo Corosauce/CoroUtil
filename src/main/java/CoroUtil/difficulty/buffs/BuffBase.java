@@ -56,4 +56,8 @@ public abstract class BuffBase {
      */
     public void applyBuffFromReload(EntityCreature ent, float difficulty) {};
 
+    public float getMinRequiredDifficulty() {
+        return 0;
+    }
+
 }

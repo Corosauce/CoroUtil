@@ -17,6 +17,7 @@ public class BuffAI_TaskBase extends BuffBase {
     private Class task;
     private Class taskToReplace;
     private int taskPriority;
+    private float minRequiredDifficulty = 0;
 
     public BuffAI_TaskBase(String buffName, Class task, int taskPriority, Class taskToReplace) {
         this(buffName, task, taskPriority);
@@ -32,6 +33,15 @@ public class BuffAI_TaskBase extends BuffBase {
     @Override
     public String getTagName() {
         return buffName;
+    }
+
+    @Override
+    public float getMinRequiredDifficulty() {
+        return minRequiredDifficulty;
+    }
+
+    public void setMinRequiredDifficulty(float minRequiredDifficulty) {
+        this.minRequiredDifficulty = minRequiredDifficulty;
     }
 
     @Override
