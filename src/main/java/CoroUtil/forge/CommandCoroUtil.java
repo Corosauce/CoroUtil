@@ -259,14 +259,14 @@ public class CommandCoroUtil extends CommandBase {
 						//long dayNumber = (ent.worldObj.getWorldTime() / 24000) + 1;
 						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
 						CoroUtilMisc.sendCommandSenderMsg(ent, "player rating: " + DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerEquipment);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.worldObj, pos) + " weight: " + ConfigDynamicDifficulty.weightPosOccupy);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + DynamicDifficulty.getDifficultyScaleForPosDPS(ent.worldObj, pos) + " weight: " + ConfigDynamicDifficulty.weightDPS);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
 						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
+						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
 						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
 						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.worldObj, ent, pos));
 					}
