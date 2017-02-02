@@ -3,6 +3,8 @@ package CoroUtil.difficulty;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
+import CoroUtil.difficulty.data.DataEntryBuffInventory;
+import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
@@ -21,6 +23,7 @@ import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -279,9 +282,10 @@ public class UtilEntityBuffs {
 
         //TEMP
         if (testSpecific) {
-            applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
+            //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_Digging, ent, difficulty);
             //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
             //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
+            applyBuff(dataEntityBuffed_Inventory, ent, difficulty);
         } else {
             for (String buff : listBuffs) {
                 if (remainingBuffs > 0) {
@@ -436,5 +440,101 @@ public class UtilEntityBuffs {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static EquipmentForDifficulty getRandomEquipmentForDifficulty(float difficulty) {
+
+        /**
+         * TODO: a command to validate/test the json files that all the items exist
+         * - though consider scnenario where they have a bunch of json files for mods that might not be installed
+         * - i might want to ship mod with lots of json files with mods that they might install
+         * - how to handle? maybe report if a range of difficulty lacks items?
+         */
+
+
+
+
+        //TODO: consider replacing EquipmentForDifficulty with DataEntryBuffInventory
+
+        List<DataEntryBuffInventory> listEquipmentForDifficulty = new ArrayList<>();
+
+        for (DataEntryBuffInventory entry : DifficultyDataReader.listTemplatesInventory) {
+            if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
+                listEquipmentForDifficulty.add(entry);
+            }
+        }
+
+        //TODO: do weighted random stuff here, for now just choose one at pure random
+        if (listEquipmentForDifficulty.size() > 0) {
+            Random rand = new Random();
+            int choice = rand.nextInt(listEquipmentForDifficulty.size());
+
+            DataEntryBuffInventory entry = listEquipmentForDifficulty.get(choice);
+
+            EquipmentForDifficulty equipment = new EquipmentForDifficulty();
+            //TODO: handle this better?
+            try {
+                Item item = Item.getByNameOrId(entry.inv_hand_main);
+                if (item != null) {
+                    equipment.setWeapon(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+                Item item = Item.getByNameOrId(entry.inv_hand_off);
+                if (item != null) {
+                    equipment.setWeaponOffhand(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            List<ItemStack> listArmor = new ArrayList<>();
+
+            try {
+                Item item = Item.getByNameOrId(entry.inv_head);
+                if (item != null) {
+                    listArmor.add(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+                Item item = Item.getByNameOrId(entry.inv_chest);
+                if (item != null) {
+                    listArmor.add(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+                Item item = Item.getByNameOrId(entry.inv_legs);
+                if (item != null) {
+                    listArmor.add(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+                Item item = Item.getByNameOrId(entry.inv_feet);
+                if (item != null) {
+                    listArmor.add(new ItemStack(item));
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+            equipment.setListArmor(listArmor);
+
+            return equipment;
+        } else {
+            return null;
+        }
+
     }
 }

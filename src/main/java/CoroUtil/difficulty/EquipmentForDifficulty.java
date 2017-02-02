@@ -14,6 +14,7 @@ public class EquipmentForDifficulty {
     //ordered head to toe
     private List<ItemStack> listArmor;
     private ItemStack weapon;
+    private ItemStack weaponOffhand;
     //unused for now, worth considering in future
     private List<Potion> listPotions;
 
@@ -35,6 +36,14 @@ public class EquipmentForDifficulty {
 
     public void setWeapon(ItemStack weapon) {
         this.weapon = weapon;
+    }
+
+    public ItemStack getWeaponOffhand() {
+        return weaponOffhand;
+    }
+
+    public void setWeaponOffhand(ItemStack weaponOffhand) {
+        this.weaponOffhand = weaponOffhand;
     }
 
     public List<Potion> getListPotions() {
