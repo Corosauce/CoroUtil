@@ -2,6 +2,7 @@ package extendedrenderer;
 
 import java.nio.FloatBuffer;
 
+import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
@@ -24,25 +25,35 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
+import CoroUtil.forge.CoroUtil;
 
 public class EventHandler {
 
 	
 	public long lastWorldTime;
+    public World lastWorld;
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
 		Minecraft mc = Minecraft.getMinecraft();
-		
-		if (mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
-        {
-            lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
 
-            if (!isPaused())
-            {
-                ExtendedRenderer.rotEffRenderer.updateEffects();
+        //update world reference and clear old effects on world change or on no world
+        if (lastWorld != mc.theWorld) {
+            CoroUtil.dbg("CoroUtil: resetting rotating particle renderer");
+            ExtendedRenderer.rotEffRenderer.clearEffects(mc.theWorld);
+            lastWorld = mc.theWorld;
+        }
+
+		if (mc.theWorld != null) {
+
+            if (mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime) {
+                lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
+
+                if (!isPaused()) {
+                    ExtendedRenderer.rotEffRenderer.updateEffects();
+                }
             }
         }
 
