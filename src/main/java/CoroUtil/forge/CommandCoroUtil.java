@@ -30,6 +30,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -123,6 +124,10 @@ public class CommandCoroUtil extends CommandBase {
 						}
 					}
 
+				} else if (var2[0].equals("height")) {
+					var1.addChatMessage(new TextComponentString("height: " + world.getHeight(posBlock)));
+				} else if (var2[0].equals("heightprecip")) {
+					var1.addChatMessage(new TextComponentString("heightprecip: " + world.getPrecipitationHeight(posBlock)));
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(world, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
