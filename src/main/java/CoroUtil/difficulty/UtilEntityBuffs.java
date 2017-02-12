@@ -3,16 +3,13 @@ package CoroUtil.difficulty;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
-import CoroUtil.difficulty.data.DataEntryBuffInventory;
+import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.config.ConfigHWMonsters;
-import CoroUtil.world.WorldDirector;
-import CoroUtil.world.WorldDirectorManager;
-import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -454,11 +451,11 @@ public class UtilEntityBuffs {
 
 
 
-        //TODO: consider replacing EquipmentForDifficulty with DataEntryBuffInventory
+        //TODO: consider replacing EquipmentForDifficulty with DataEntryInventoryTemplate
 
-        List<DataEntryBuffInventory> listEquipmentForDifficulty = new ArrayList<>();
+        List<DataEntryInventoryTemplate> listEquipmentForDifficulty = new ArrayList<>();
 
-        for (DataEntryBuffInventory entry : DifficultyDataReader.listTemplatesInventory) {
+        for (DataEntryInventoryTemplate entry : DifficultyDataReader.listTemplatesInventory) {
             if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
                 listEquipmentForDifficulty.add(entry);
             }
@@ -469,7 +466,7 @@ public class UtilEntityBuffs {
             Random rand = new Random();
             int choice = rand.nextInt(listEquipmentForDifficulty.size());
 
-            DataEntryBuffInventory entry = listEquipmentForDifficulty.get(choice);
+            DataEntryInventoryTemplate entry = listEquipmentForDifficulty.get(choice);
 
             EquipmentForDifficulty equipment = new EquipmentForDifficulty();
             //TODO: handle this better?
