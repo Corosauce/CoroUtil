@@ -5,12 +5,15 @@ import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.config.ConfigHWMonsters;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks;
@@ -22,8 +25,13 @@ import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootTable;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -56,6 +64,7 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_Inventory = "CoroAI_HW_Buffed_Inventory";
     public static String dataEntityBuffed_Speed = "CoroAI_HW_Buffed_Speed";
     public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
+    public static String dataEntityBuffed_MobDrops = "CoroAI_HW_Buffed_MobDrops";
 
     /**
      * Flags from invasion mod for its own dice rolling
@@ -132,6 +141,7 @@ public class UtilEntityBuffs {
         addBuff(new BuffHealth());
         //addBuff(new BuffSpeed());
         addBuff(new BuffXP());
+        addBuff(new BuffMobDrops());
         addBuff(new BuffInventory());
         addBuff(new BuffAI_Infernal());
         addBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
@@ -283,6 +293,7 @@ public class UtilEntityBuffs {
             //applyBuff(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, ent, difficulty);
             //applyBuff(dataEntityBuffed_AI_Infernal, ent, difficulty);
             applyBuff(dataEntityBuffed_Inventory, ent, difficulty);
+            applyBuff(dataEntityBuffed_MobDrops, ent, difficulty);
         } else {
             for (String buff : listBuffs) {
                 if (remainingBuffs > 0) {
@@ -439,6 +450,57 @@ public class UtilEntityBuffs {
         return false;
     }
 
+    public static LootTable getRandomLootForDifficulty(EntityCreature ent, float difficulty) {
+        List<DataEntryMobDropsTemplate> listForDifficulty = new ArrayList<>();
+
+        for (DataEntryMobDropsTemplate entry : DifficultyDataReader.getData().listTemplatesMobDrops) {
+            if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
+                listForDifficulty.add(entry);
+            }
+        }
+
+        //TODO: do weighted random stuff here, for now just choose one at pure random
+        if (listForDifficulty.size() > 0) {
+            Random rand = new Random();
+            int choice = rand.nextInt(listForDifficulty.size());
+
+            DataEntryMobDropsTemplate entry = listForDifficulty.get(choice);
+
+            LootTable loot = DifficultyDataReader.getData().lookupLootTables.get(entry.loot_table);
+
+            if (loot != null) {
+                return loot;
+            } else {
+                loot = ent.worldObj.getLootTableManager().getLootTableFromLocation(new ResourceLocation(entry.loot_table));
+                if (loot != null) {
+                    return loot;
+                } else {
+                    CoroUtil.dbg("couldnt find loot table: " + entry.loot_table);
+                }
+
+            }
+
+        } else {
+            CoroUtil.dbg("couldnt find loot to drop within difficulty range");
+        }
+
+        return null;
+    }
+
+    public static void processLootTableOnEntity(EntityCreature ent, LootTable loottable, LivingDeathEvent event) {
+        LootContext.Builder lootcontext$builder = (new LootContext.Builder((WorldServer)ent.worldObj)).withLootedEntity(ent).withDamageSource(event.getSource());
+
+        if (ent.recentlyHit > 0 && ent.attackingPlayer != null)
+        {
+            lootcontext$builder = lootcontext$builder.withPlayer(ent.attackingPlayer).withLuck(ent.attackingPlayer.getLuck());
+        }
+
+        for (ItemStack itemstack : loottable.generateLootForPools(ent.worldObj.rand, lootcontext$builder.build()))
+        {
+            ent.entityDropItem(itemstack, 0.0F);
+        }
+    }
+
     public static EquipmentForDifficulty getRandomEquipmentForDifficulty(float difficulty) {
 
         /**
@@ -455,7 +517,7 @@ public class UtilEntityBuffs {
 
         List<DataEntryInventoryTemplate> listEquipmentForDifficulty = new ArrayList<>();
 
-        for (DataEntryInventoryTemplate entry : DifficultyDataReader.data.listTemplatesInventory) {
+        for (DataEntryInventoryTemplate entry : DifficultyDataReader.getData().listTemplatesInventory) {
             if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
                 listEquipmentForDifficulty.add(entry);
             }
@@ -531,6 +593,41 @@ public class UtilEntityBuffs {
             return equipment;
         } else {
             return null;
+        }
+
+    }
+
+    public static void onDeath(LivingDeathEvent event) {
+
+        if (event.getEntityLiving() instanceof EntityCreature) {
+            EntityCreature ent = (EntityCreature)event.getEntityLiving();
+            if (/*ent.canDropLoot() && */ent.worldObj.getGameRules().getBoolean("doMobLoot")) {
+
+                if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+                    float difficultySpawnedIn = 0;
+                    if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
+                        difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
+                    } else {
+                        //safely get difficulty for area
+                        if (ent.worldObj.isBlockLoaded(ent.getPosition())) {
+                            difficultySpawnedIn = DynamicDifficulty.getDifficultyAveragedForArea(ent);
+                        }
+                    }
+
+                    List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+                    for (String buff : buffs) {
+                        if (ent.getEntityData().getBoolean(buff)) {
+                            BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
+                            if (buffObj != null) {
+                                //System.out.println("reloading buff: " + buff);
+                                buffObj.applyBuffOnDeath(ent, difficultySpawnedIn, event);
+                            } else {
+                                CoroUtil.dbg("warning: unable to find buff by name of " + buff);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
     }

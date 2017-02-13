@@ -30,12 +30,16 @@ public class DifficultyDataReader {
     private static final Gson GSONBuffInventory = (new GsonBuilder()).registerTypeAdapter(DifficultyData.class, new DeserializerCModJson()).create();
     //private static final Gson GSON_INSTANCE = (new GsonBuilder()).registerTypeAdapter(RandomValueRange.class, new RandomValueRange.Serializer()).registerTypeAdapter(LootPool.class, new LootPool.Serializer()).registerTypeAdapter(LootTable.class, new LootTable.Serializer()).registerTypeHierarchyAdapter(LootEntry.class, new LootEntry.Serializer()).registerTypeHierarchyAdapter(LootFunction.class, new LootFunctionManager.Serializer()).registerTypeHierarchyAdapter(LootCondition.class, new LootConditionManager.Serializer()).registerTypeHierarchyAdapter(LootContext.EntityTarget.class, new LootContext.EntityTarget.Serializer()).create();
 
-    public static DifficultyData data;
+    private static DifficultyData data;
 
     public static String lootTablesFolder = "loot_tables";
 
     public DifficultyDataReader() {
         data = new DifficultyData();
+    }
+
+    public static DifficultyData getData() {
+        return data;
     }
 
     public void loadFiles() {

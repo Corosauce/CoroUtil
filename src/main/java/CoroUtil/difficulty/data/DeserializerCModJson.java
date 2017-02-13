@@ -2,6 +2,7 @@ package CoroUtil.difficulty.data;
 
 import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
+import CoroUtil.difficulty.data.cmodmobdropsold.DataEntryMobDropsTemplateOld;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -21,7 +22,7 @@ public class DeserializerCModJson implements JsonDeserializer<DifficultyData> {
         String format = eleFormat.getAsString();
 
         //since this class is run on multiple files, we cant just make a new instance each time, consider a refactor? loot tables arent handled in this class either
-        DifficultyData data = DifficultyDataReader.data;//new DifficultyData();
+        DifficultyData data = DifficultyDataReader.getData();//new DifficultyData();
 
         if (format.toLowerCase().equals("inventory")) {
             JsonElement eleTemplates = obj.get("templates");
@@ -43,6 +44,16 @@ public class DeserializerCModJson implements JsonDeserializer<DifficultyData> {
                 JsonElement eleInv = it.next();
                 DataEntryMobDropsTemplate entry = context.deserialize(eleInv, DataEntryMobDropsTemplate.class);
                 data.listTemplatesMobDrops.add(entry);
+            }
+        } else if (format.toLowerCase().equals("mob_drops_old")) {
+            JsonElement eleTemplates = obj.get("templates");
+
+            JsonArray arrTemplates = eleTemplates.getAsJsonArray();
+            Iterator<JsonElement> it = arrTemplates.iterator();
+            while (it.hasNext()) {
+                JsonElement eleInv = it.next();
+                DataEntryMobDropsTemplateOld entry = context.deserialize(eleInv, DataEntryMobDropsTemplateOld.class);
+                //data.listTemplatesMobDrops.add(entry);
             }
         }
 

@@ -1,0 +1,24 @@
+{
+  "format": "mob_drops_old",
+  "templates": [
+    {
+      "name": "basic",
+      "type": "all",
+      "rand_weight": 100,
+      "level_min": 0,
+      "level_max": 0.5,
+      "drops": [
+		{
+			"item": "minecraft:diamond"
+		},
+		{
+			"item": "minecraft:emerald",
+			"count": 2,
+			"metadata": 0,
+			"nbt": ""
+		}
+		
+	  ]
+    }
+  ]
+}

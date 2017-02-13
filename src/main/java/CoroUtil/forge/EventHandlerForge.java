@@ -45,9 +45,12 @@ public class EventHandlerForge {
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void deathEvent(LivingDeathEvent event) {
+
+		if (event.isCanceled()) return;
+
 		PlayerQuestManager.i().onEvent(event);
 
-		if (!event.getEntity().worldObj.isRemote && !event.isCanceled()) {
+		if (!event.getEntity().worldObj.isRemote) {
 			if (event.getEntity() instanceof EntityPlayer) {
 				DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
 
@@ -55,6 +58,8 @@ public class EventHandlerForge {
 				DynamicDifficulty.setInvasionSkipBuff((EntityPlayer) event.getEntity(), 0);
 				//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
 			}
+
+			UtilEntityBuffs.onDeath(event);
 		}
 	}
 	

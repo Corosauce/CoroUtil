@@ -1,6 +1,7 @@
 package CoroUtil.difficulty.buffs;
 
 import net.minecraft.entity.EntityCreature;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 /**
  * Created by Corosus on 1/9/2017.
@@ -55,6 +56,8 @@ public abstract class BuffBase {
      * @param difficulty
      */
     public void applyBuffFromReload(EntityCreature ent, float difficulty) {};
+
+    public void applyBuffOnDeath(EntityCreature ent, float difficulty, LivingDeathEvent event) {};
 
     public float getMinRequiredDifficulty() {
         return 0;
