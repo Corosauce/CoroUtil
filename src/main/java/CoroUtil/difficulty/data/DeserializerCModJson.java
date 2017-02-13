@@ -12,13 +12,16 @@ import java.util.List;
 /**
  * Created by Corosus on 2/1/2017.
  */
-public class DeserializerCModJson implements JsonDeserializer<Class> {
+public class DeserializerCModJson implements JsonDeserializer<DifficultyData> {
 
     @Override
-    public Class deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public DifficultyData deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject obj = json.getAsJsonObject();
         JsonElement eleFormat = obj.get("format");
         String format = eleFormat.getAsString();
+
+        //since this class is run on multiple files, we cant just make a new instance each time, consider a refactor? loot tables arent handled in this class either
+        DifficultyData data = DifficultyDataReader.data;//new DifficultyData();
 
         if (format.toLowerCase().equals("inventory")) {
             JsonElement eleTemplates = obj.get("templates");
@@ -28,7 +31,7 @@ public class DeserializerCModJson implements JsonDeserializer<Class> {
             while (it.hasNext()) {
                 JsonElement eleInv = it.next();
                 DataEntryInventoryTemplate entry = context.deserialize(eleInv, DataEntryInventoryTemplate.class);
-                DifficultyDataReader.listTemplatesInventory.add(entry);
+                data.listTemplatesInventory.add(entry);
             }
 
         } else if (format.toLowerCase().equals("mob_drops")) {
@@ -39,10 +42,10 @@ public class DeserializerCModJson implements JsonDeserializer<Class> {
             while (it.hasNext()) {
                 JsonElement eleInv = it.next();
                 DataEntryMobDropsTemplate entry = context.deserialize(eleInv, DataEntryMobDropsTemplate.class);
-                DifficultyDataReader.listTemplatesMobDrops.add(entry);
+                data.listTemplatesMobDrops.add(entry);
             }
         }
 
-        return null;
+        return data;
     }
 }

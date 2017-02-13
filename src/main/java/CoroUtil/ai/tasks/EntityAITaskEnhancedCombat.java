@@ -25,7 +25,6 @@ import CoroUtil.util.BlockCoord;
 import CoroUtil.difficulty.DynamicDifficulty;
 
 import CoroUtil.config.ConfigHWMonsters;
-import net.minecraftforge.common.config.Config;
 
 public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskInitializer
 {

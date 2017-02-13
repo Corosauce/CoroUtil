@@ -455,7 +455,7 @@ public class UtilEntityBuffs {
 
         List<DataEntryInventoryTemplate> listEquipmentForDifficulty = new ArrayList<>();
 
-        for (DataEntryInventoryTemplate entry : DifficultyDataReader.listTemplatesInventory) {
+        for (DataEntryInventoryTemplate entry : DifficultyDataReader.data.listTemplatesInventory) {
             if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
                 listEquipmentForDifficulty.add(entry);
             }

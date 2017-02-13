@@ -1,26 +1,26 @@
 package CoroUtil.forge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import CoroUtil.OldUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
-import CoroUtil.difficulty.UtilEntityBuffs;
-import CoroUtil.util.*;
+import CoroUtil.pathfinding.PFQueue;
+import CoroUtil.quest.PlayerQuestManager;
+import CoroUtil.quest.PlayerQuests;
+import CoroUtil.quest.quests.ActiveQuest;
+import CoroUtil.quest.quests.ItemQuest;
+import CoroUtil.util.BlockCoord;
+import CoroUtil.util.CoroUtilEntity;
+import CoroUtil.util.CoroUtilItem;
+import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -33,12 +33,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import CoroUtil.OldUtil;
-import CoroUtil.pathfinding.PFQueue;
-import CoroUtil.quest.PlayerQuestManager;
-import CoroUtil.quest.PlayerQuests;
-import CoroUtil.quest.quests.ActiveQuest;
-import CoroUtil.quest.quests.ItemQuest;
+
+import java.util.*;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -287,6 +283,8 @@ public class CommandCoroUtil extends CommandBase {
 					if (player != null) {
 						player.inventory.addItemStackToInventory(new ItemStack(item, 1));
 					}
+				} else if (var2[0].equalsIgnoreCase("testloot")) {
+
 				}
 			/*}*/
 		} catch (Exception ex) {
