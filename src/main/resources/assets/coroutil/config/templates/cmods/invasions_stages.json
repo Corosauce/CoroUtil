@@ -1,0 +1,47 @@
+{
+  "format": "cmods",
+  "templates": [
+    {
+      "name": "invasion_stage_1",
+      "cmods": [
+        {
+          "cmod": "template",
+          "format": "inventory",
+          "template": "boringvanilla"
+        },
+        {
+          "cmod": "template",
+          "format": "mob_drops",
+          "template": "testloot"
+        },
+        {
+          "cmod": "health",
+          "amplifier": 1
+        },
+        {
+          "cmod": "ai_mining"
+        },
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Cloaking", "Storm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0.1,
+          "max": 0.2
+        }
+      ]
+    }
+  ]
+}

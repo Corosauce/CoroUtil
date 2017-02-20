@@ -1,0 +1,44 @@
+{
+  "format": "mob_spawns",
+  "entries": [
+    {
+      "name": "invasion_stage_1",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0,
+          "max": 0.1
+        }
+      ],
+      "cmods": [
+        {
+          "cmod": "mob_spawns",
+          "count": 5,
+          "entities": [
+            "minecraft:zombie",
+            "docrobb:fishingzombie"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        }
+      ],
+      "actions": [
+        {
+          "action": "template",
+          "template": "invasion_stage_2"
+        }
+      ]
+    }
+  ]
+}

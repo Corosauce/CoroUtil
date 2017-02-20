@@ -1,0 +1,73 @@
+{
+  "format": "mob_spawns",
+  "templates": [
+    {
+      "name": "invasion_stage_1",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_1"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "specialmobs:ninjaskeleton"
+          ],
+          "count": 30
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:skeleton"
+          ],
+          "count": 10,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+
+}
