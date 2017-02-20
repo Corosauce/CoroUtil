@@ -91,7 +91,7 @@ public class DifficultyDataReader {
             if (lastPath.endsWith(lootTablesFolder)) {
                 String fileContents = Files.toString(file, Charsets.UTF_8);
                 String fileName = file.getName().replace(".json", "");
-                ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables" + fileName);
+                ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
                 LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true);
                 data.lookupLootTables.put(fileName, lootTable);
             } else {

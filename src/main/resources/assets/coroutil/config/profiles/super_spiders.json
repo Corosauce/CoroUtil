@@ -1,0 +1,80 @@
+{
+  "format": "profile",
+  "entries": [
+    {
+      "name": "super_spiders",
+      "conditions": [
+        {
+          "condition": "difficulty",
+          "min": 0.5,
+          "max": 1
+        },
+        {
+          "condition": "invasion_number",
+          "min": 0,
+          "max": 5
+        },
+        {
+          "condition": "context",
+          "type": "invasion"
+        },
+        {
+          "condition": "random",
+          "weight": 5
+        },
+        {
+          "condition": "template",
+          "template": "condition_set_1"
+        }
+      ],
+      "cmods": [
+        {
+          "cmod": "template",
+          "format": "inventory",
+          "template": "boringvanilla"
+        },
+        {
+          "cmod": "template",
+          "format": "mob_drops",
+          "template": "testloot"
+        },
+        {
+          "cmod": "health",
+          "amplifier": 1
+        },
+        {
+          "cmod": "ai_mining"
+        },
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Cloaking", "Storm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "less_super_spiders",
+      "conditions": [
+        {
+          "condition": "difficulty",
+          "min": 0.5,
+          "max": 1
+        }
+      ],
+      "cmods": [
+        {
+          "cmod": "template",
+          "format": "inventory",
+          "template": "boringvanilla"
+        },
+        {
+          "cmod": "template",
+          "format": "mob_drops",
+          "template": "testloot"
+        }
+      ]
+    }
+  ]
+
+}
