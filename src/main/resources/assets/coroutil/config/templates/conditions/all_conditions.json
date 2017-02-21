@@ -1,0 +1,45 @@
+{
+  "format": "conditions",
+  "templates": [
+    {
+      "name": "all_conditions",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion/regular/all",
+
+          "comment": "is 'all' even needed? its the same as not using this condition, maybe if recursive templates were a thing, top level one could override lower one"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0,
+          "max": 0.1
+        },
+        {
+          "condition": "invasion_number",
+          "min": 0,
+          "max": 5
+        },
+        {
+          "condition": "random",
+          "weight": 5,
+
+          "comment": "//weighed against what? what weight is 'dont do anything' ?"
+        },
+        {
+          "condition": "filter_mobs",
+          "mode": "whitelist/blacklist or allow/deny?",
+          "entities": [
+            "minecraft:zombie"
+          ]
+        },
+        {
+          "condition": "template",
+          "template": "condition_set_1",
+
+          "comment": "//since this is a template within a template, maybe dont allow it for now"
+        }
+      ]
+    }
+  ]
+}

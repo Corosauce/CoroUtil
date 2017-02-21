@@ -1,0 +1,81 @@
+{
+  "format": "cmods",
+  "templates": [
+    {
+      "name": "all_cmods",
+      "cmods": [
+        {
+          "cmod": "template",
+
+          "template": "boringvanilla",
+
+          "comment": "//since this is a template within a template, maybe dont allow it for now"
+        },
+        {
+          "cmod": "inventory",
+          "name": "boringvanilla",
+
+          "inv_hand_main": "minecraft:diamond_sword",
+          "inv_hand_off": "minecraft:shield",
+          "inv_head": "minecraft:diamond_helmet",
+          "inv_chest": "minecraft:diamond_chestplate",
+          "inv_legs": "minecraft:diamond_leggings",
+          "inv_feet": "minecraft:diamond_boots"
+        },
+        {
+          "cmod": "mob_drops",
+          "loot_table": "testloot"
+        },
+        {
+          "cmod": "attribute_health",
+          "operator": 0,
+          "value": 1.5,
+
+          "comment": "//need some way to multiply from difficulty, same for speed, xp, also a cap!"
+        },
+        {
+          "cmod": "attribute_speed",
+          "operator": 0,
+          "value": 1.1
+        },
+        {
+          "cmod": "xp",
+          "amplifier": 2
+        },
+        {
+          "cmod": "ai_antiair"
+        },
+        {
+          "cmod": "ai_mining"
+        },
+        {
+          "cmod": "ai_counterattack"
+        },
+        {
+          "cmod": "ai_lunge",
+          "comment": "currently exists only within ai_counterattack"
+        },
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Cloaking", "Storm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0.1,
+          "max": 0.2
+        }
+      ]
+    }
+  ]
+}
