@@ -8,10 +8,10 @@ import CoroUtil.difficulty.data.DataEntryBase;
 public class DataEntryInventoryTemplate extends DataEntryBase {
 
     public String name;
-    public String type;
-    public int rand_weight;
-    public float level_min;
-    public float level_max;
+    //public String type;
+    //public int rand_weight;
+    //public float level_min;
+    //public float level_max;
 
     public String inv_hand_main;
     public String inv_hand_off;

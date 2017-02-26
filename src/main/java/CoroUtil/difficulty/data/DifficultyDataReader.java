@@ -1,7 +1,7 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
-import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
+import CoroUtil.difficulty.data.cmods.*;
+import CoroUtil.difficulty.data.conditions.*;
 import CoroUtil.forge.CoroUtil;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -9,16 +9,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.conditions.LootConditionManager;
-import net.minecraft.world.storage.loot.functions.LootFunction;
-import net.minecraft.world.storage.loot.functions.LootFunctionManager;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Created by Corosus on 2/1/2017.
@@ -27,15 +22,37 @@ import java.util.List;
 public class DifficultyDataReader {
 
     //using Class.class because we dont need a return type
-    private static final Gson GSONBuffInventory = (new GsonBuilder()).registerTypeAdapter(DifficultyData.class, new DeserializerCModJson()).create();
+    private static final Gson GSONBuffInventory = (new GsonBuilder()).registerTypeAdapter(DifficultyData.class, new DeserializerAllJson()).create();
     //private static final Gson GSON_INSTANCE = (new GsonBuilder()).registerTypeAdapter(RandomValueRange.class, new RandomValueRange.Serializer()).registerTypeAdapter(LootPool.class, new LootPool.Serializer()).registerTypeAdapter(LootTable.class, new LootTable.Serializer()).registerTypeHierarchyAdapter(LootEntry.class, new LootEntry.Serializer()).registerTypeHierarchyAdapter(LootFunction.class, new LootFunctionManager.Serializer()).registerTypeHierarchyAdapter(LootCondition.class, new LootConditionManager.Serializer()).registerTypeHierarchyAdapter(LootContext.EntityTarget.class, new LootContext.EntityTarget.Serializer()).create();
 
     private static DifficultyData data;
 
     public static String lootTablesFolder = "loot_tables";
 
+    public static HashMap<String, Class> lookupJsonNameToCmodDeserializer = new HashMap<>();
+    public static HashMap<String, Class> lookupJsonNameToConditionDeserializer = new HashMap<>();
+
     public DifficultyDataReader() {
         data = new DifficultyData();
+
+        lookupJsonNameToCmodDeserializer.clear();
+        lookupJsonNameToCmodDeserializer.put("inventory", CmodInventory.class);
+        lookupJsonNameToCmodDeserializer.put("mob_drops", CmodMobDrops.class);
+        lookupJsonNameToCmodDeserializer.put("attribute_health", CmodAttributeHealth.class);
+        lookupJsonNameToCmodDeserializer.put("attribute_speed", CmodAttributeSpeed.class);
+        lookupJsonNameToCmodDeserializer.put("xp", CmodXP.class);
+        lookupJsonNameToCmodDeserializer.put("ai_antiair", CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put("ai_mining", CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put("ai_counterattack", CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put("ai_lunge", CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put("ai_infernal", CmodAIInfernal.class);
+
+        lookupJsonNameToConditionDeserializer.clear();
+        lookupJsonNameToConditionDeserializer.put("context", ConditionContext.class);
+        lookupJsonNameToConditionDeserializer.put("difficulty", ConditionDifficulty.class);
+        lookupJsonNameToConditionDeserializer.put("invasion_number", ConditionInvasionNumber.class);
+        lookupJsonNameToConditionDeserializer.put("random", ConditionRandom.class);
+        lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
     }
 
     public static DifficultyData getData() {
@@ -44,8 +61,7 @@ public class DifficultyDataReader {
 
     public void loadFiles() {
 
-        data.listTemplatesInventory.clear();
-        data.listTemplatesMobDrops.clear();
+        data.reset();
 
         CoroUtil.dbg("start reading difficulty files");
 

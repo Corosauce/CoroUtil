@@ -13,7 +13,6 @@
         },
         {
           "cmod": "inventory",
-          "name": "boringvanilla",
 
           "inv_hand_main": "minecraft:diamond_sword",
           "inv_hand_off": "minecraft:shield",

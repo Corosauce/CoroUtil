@@ -453,11 +453,11 @@ public class UtilEntityBuffs {
     public static LootTable getRandomLootForDifficulty(EntityCreature ent, float difficulty) {
         List<DataEntryMobDropsTemplate> listForDifficulty = new ArrayList<>();
 
-        for (DataEntryMobDropsTemplate entry : DifficultyDataReader.getData().listTemplatesMobDrops) {
+        /*for (DataEntryMobDropsTemplate entry : DifficultyDataReader.getData().listTemplatesMobDrops) {
             if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
                 listForDifficulty.add(entry);
             }
-        }
+        }*/
 
         //TODO: do weighted random stuff here, for now just choose one at pure random
         if (listForDifficulty.size() > 0) {
@@ -517,11 +517,12 @@ public class UtilEntityBuffs {
 
         List<DataEntryInventoryTemplate> listEquipmentForDifficulty = new ArrayList<>();
 
-        for (DataEntryInventoryTemplate entry : DifficultyDataReader.getData().listTemplatesInventory) {
+
+        /*for (DataEntryInventoryTemplate entry : DifficultyDataReader.getData().listTemplatesInventory) {
             if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
                 listEquipmentForDifficulty.add(entry);
             }
-        }
+        }*/
 
         //TODO: do weighted random stuff here, for now just choose one at pure random
         if (listEquipmentForDifficulty.size() > 0) {
