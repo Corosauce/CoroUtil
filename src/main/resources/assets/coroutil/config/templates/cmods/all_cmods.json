@@ -62,20 +62,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "invasion_stage_2",
-      "conditions": [
-        {
-          "condition": "context",
-          "type": "invasion"
-        },
-        {
-          "condition": "difficulty",
-          "min": 0.1,
-          "max": 0.2
-        }
-      ]
     }
   ]
 }
