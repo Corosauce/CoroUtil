@@ -2,13 +2,17 @@ package CoroUtil.difficulty.data;
 
 import net.minecraft.world.storage.loot.LootTable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Corosus on 2/1/2017.
  *
  */
 public class DifficultyData {
+
+    public List<DataMobSpawnsTemplate> listMobSpawnTemplates = new ArrayList<>();
 
     public HashMap<String, DataCmodTemplate> lookupCmodTemplates = new HashMap<>();
     public HashMap<String, DataConditionTemplate> lookupConditionTemplates = new HashMap<>();
@@ -20,6 +24,7 @@ public class DifficultyData {
     }
 
     public void reset() {
+        listMobSpawnTemplates.clear();
         lookupLootTables.clear();
         lookupCmodTemplates.clear();
         lookupConditionTemplates.clear();
@@ -35,5 +40,9 @@ public class DifficultyData {
 
     public void addLootTable(String name, LootTable template) {
         lookupLootTables.put(name, template);
+    }
+
+    public void addMobSpawnTemplate(DataMobSpawnsTemplate profile) {
+        listMobSpawnTemplates.add(profile);
     }
 }

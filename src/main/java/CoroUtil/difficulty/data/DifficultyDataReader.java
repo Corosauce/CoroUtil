@@ -46,6 +46,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put("ai_counterattack", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_lunge", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_infernal", CmodAIInfernal.class);
+        lookupJsonNameToCmodDeserializer.put("template", CmodTemplate.class);
 
         lookupJsonNameToConditionDeserializer.clear();
         lookupJsonNameToConditionDeserializer.put("context", ConditionContext.class);
@@ -53,6 +54,7 @@ public class DifficultyDataReader {
         lookupJsonNameToConditionDeserializer.put("invasion_number", ConditionInvasionNumber.class);
         lookupJsonNameToConditionDeserializer.put("random", ConditionRandom.class);
         lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
+        lookupJsonNameToConditionDeserializer.put("template", ConditionTemplate.class);
     }
 
     public static DifficultyData getData() {
