@@ -20,9 +20,9 @@ public class EventHandler {
     {
 		Minecraft mc = Minecraft.getMinecraft();
 		
-		if (mc.theWorld != null && mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime)
+		if (mc.theWorld != null && mc.theWorld.getTotalWorldTime() != lastWorldTime)
         {
-            lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
+            lastWorldTime = mc.theWorld.getTotalWorldTime();
 
             if (!isPaused())
             {
