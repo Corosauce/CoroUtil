@@ -36,7 +36,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 //currently mob spawn template names arent referenced for anything, so no need to index by them or check for duplicate names
                 JsonArray arr = objTemplate.get("conditions").getAsJsonArray();
 
-                template.conditions.addAll(getArray(arr, context, DataCondition.class));
+                template.conditions.addAll(getArray(arr, DataCondition.class));
 
                 arr = objTemplate.get("spawns").getAsJsonArray();
                 Iterator<JsonElement> it = arr.iterator();
@@ -44,28 +44,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                     JsonElement ele = it.next();
                     JsonObject obj2 = ele.getAsJsonObject();
 
-                    DataActionMobSpawns spawnTemplate = new DataActionMobSpawns();
-
-                    spawnTemplate.count = obj2.get("count").getAsInt();
-
-                    JsonArray arr2 = obj2.get("entities").getAsJsonArray();
-                    Iterator<JsonElement> it2 = arr2.iterator();
-                    while (it2.hasNext()) {
-                        spawnTemplate.entities.add(it2.next().getAsString());
-                    }
-
-                    if (obj2.has("cmods")) {
-                        JsonArray arr3 = obj2.get("cmods").getAsJsonArray();
-                        spawnTemplate.cmods.addAll(getArray(arr3, context, DataCmod.class));
-                    }
-
-                    /*String name = obj2.get("condition").getAsString();
-
-                    if (DifficultyDataReader.lookupJsonNameToConditionDeserializer.containsKey(name)) {
-                        DataCondition cmod = context.deserialize(obj2, DifficultyDataReader.lookupJsonNameToConditionDeserializer.get(name));
-
-                        template.conditions.add(cmod);
-                    }*/
+                    DataActionMobSpawns spawnTemplate = deserializeSpawns(obj2);
 
                     template.spawns.add(spawnTemplate);
                 }
@@ -88,7 +67,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 if (!data.lookupCmodTemplates.containsKey(template.name)) {
                     JsonArray arrCmods = objTemplate.get("cmods").getAsJsonArray();
 
-                    template.cmods.addAll(getArray(arrCmods, context, DataCmod.class));
+                    template.cmods.addAll(getArray(arrCmods, DataCmod.class));
 
                     data.addCmodTemplate(template.name, template);
                 } else {
@@ -110,7 +89,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 if (!data.lookupConditionTemplates.containsKey(template.name)) {
                     JsonArray arrCmods = objTemplate.get("conditions").getAsJsonArray();
 
-                    template.conditions.addAll(getArray(arrCmods, context, DataCondition.class));
+                    template.conditions.addAll(getArray(arrCmods, DataCondition.class));
 
                     data.addConditionTemplate(template.name, template);
                 } else {
@@ -124,7 +103,44 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         return data;
     }
 
-    public <T> List<T> getArray(JsonArray arr, JsonDeserializationContext context, Class<T> clazz) {
+    public static DataActionMobSpawns deserializeSpawns(JsonObject json) {
+        DataActionMobSpawns spawnTemplate = new DataActionMobSpawns();
+
+        spawnTemplate.count = json.get("count").getAsInt();
+
+        JsonArray arr2 = json.get("entities").getAsJsonArray();
+        Iterator<JsonElement> it2 = arr2.iterator();
+        while (it2.hasNext()) {
+            spawnTemplate.entities.add(it2.next().getAsString());
+        }
+
+        if (json.has("cmods")) {
+            JsonArray arr3 = json.get("cmods").getAsJsonArray();
+            spawnTemplate.cmods.addAll(getArray(arr3, DataCmod.class));
+        }
+        return spawnTemplate;
+    }
+
+    public static JsonObject serializeSpawns(DataActionMobSpawns spawns) {
+        JsonObject obj = new JsonObject();
+        obj.addProperty("count", spawns.count);
+        JsonArray arr1 = new JsonArray();
+        for (String str : spawns.entities) {
+            arr1.add(new JsonPrimitive(str));
+        }
+        obj.add("entities", arr1);
+        JsonArray arr2 = new JsonArray();
+        for (DataCmod cmod : spawns.cmods) {
+            arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
+            //arr2.add(new JsonPrimitive(((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod)))));
+        }
+        obj.add("cmods", arr2);
+        return obj;
+        //arr1.add();
+        //obj.add("entities");
+    }
+
+    public static <T> List<T> getArray(JsonArray arr, /*JsonDeserializationContext context, */Class<T> clazz) {
         List<T> list = new ArrayList<>();
         Iterator<JsonElement> it = arr.iterator();
         while (it.hasNext()) {
@@ -135,7 +151,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 String name = obj.get("condition").getAsString();
 
                 if (DifficultyDataReader.lookupJsonNameToConditionDeserializer.containsKey(name)) {
-                    DataCondition cmod = context.deserialize(obj, DifficultyDataReader.lookupJsonNameToConditionDeserializer.get(name));
+                    //DataCondition cmod = context.deserialize(obj, DifficultyDataReader.lookupJsonNameToConditionDeserializer.get(name));
+                    DataCondition cmod = (DataCondition)(new Gson()).fromJson(obj, DifficultyDataReader.lookupJsonNameToConditionDeserializer.get(name));
 
                     list.add(clazz.cast(cmod));
                 }
@@ -143,7 +160,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 String name = obj.get("cmod").getAsString();
 
                 if (DifficultyDataReader.lookupJsonNameToCmodDeserializer.containsKey(name)) {
-                    DataCmod cmod = context.deserialize(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
+                    //DataCmod cmod = context.deserialize(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
+                    DataCmod cmod = (DataCmod)(new Gson()).fromJson(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
 
                     list.add(clazz.cast(cmod));
                 }
