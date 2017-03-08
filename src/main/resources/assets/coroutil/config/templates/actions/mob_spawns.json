@@ -19,11 +19,36 @@
       ]
     },
     {
-      "name": "invasion_stage_2",
+      "name": "invasion_stage_2_option_1",
       "conditions": [
         {
           "condition": "template",
           "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 5
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "specialmobs:ninjaskeleton"
+          ],
+          "count": 30
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2_option_2",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
         }
       ],
       "spawns": [
