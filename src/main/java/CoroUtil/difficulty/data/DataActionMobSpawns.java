@@ -1,5 +1,6 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.util.CoroUtilEntity;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import java.util.ArrayList;
@@ -18,7 +19,9 @@ public class DataActionMobSpawns {
     public String toString() {
         String str = ChatFormatting.GOLD + "Entities: " + ChatFormatting.RESET;
         for (String entity : entities) {
-            str += entity + ", ";
+            String code = ChatFormatting.GREEN.toString();
+            if (CoroUtilEntity.getClassFromRegisty(entity) == null) code = ChatFormatting.RED.toString() + "MISSING! ";
+            str += code + entity + ", ";
         }
         str += " | " + ChatFormatting.GOLD + "With cmods: " + ChatFormatting.RESET;
         for (DataCmod cmod : cmods) {

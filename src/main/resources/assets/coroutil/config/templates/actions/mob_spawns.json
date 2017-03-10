@@ -54,7 +54,7 @@
       "spawns": [
         {
           "entities": [
-            "minecraft:zombie"
+            "Zombie", "Creeper"
           ],
           "count": 5,
           "cmods": [
@@ -69,7 +69,7 @@
         },
         {
           "entities": [
-            "minecraft:zombie"
+            "ZombTYPOie", "Skeleton"
           ],
           "count": 5,
           "cmods": [
@@ -81,7 +81,7 @@
         },
         {
           "entities": [
-            "minecraft:skeleton"
+            "Skeleton", "pretties.skyLantern"
           ],
           "count": 10,
           "cmods": [

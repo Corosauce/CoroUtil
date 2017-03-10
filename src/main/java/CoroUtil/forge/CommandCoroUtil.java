@@ -4,6 +4,7 @@ import CoroUtil.OldUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
@@ -285,6 +286,14 @@ public class CommandCoroUtil extends CommandBase {
 					}
 				} else if (var2[0].equalsIgnoreCase("testloot")) {
 
+				} else if (var2[0].equalsIgnoreCase("reloadData")) {
+					DifficultyDataReader.loadFiles();
+					var1.addChatMessage(new TextComponentString("Difficulty data reloaded"));
+				} else if (var2[0].equalsIgnoreCase("registry")) {
+					for (Map.Entry<String, Class <? extends Entity >> entry : EntityList.NAME_TO_CLASS.entrySet()) {
+						var1.addChatMessage(new TextComponentString(entry.getKey()));
+						System.out.println(entry.getKey());
+					}
 				}
 			/*}*/
 		} catch (Exception ex) {

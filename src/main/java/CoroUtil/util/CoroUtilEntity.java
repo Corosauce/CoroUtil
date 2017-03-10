@@ -149,6 +149,10 @@ public class CoroUtilEntity {
     }
 
     public static Class getClassFromRegisty(String name) {
-        return EntityList.NAME_TO_CLASS.get(name);
+        Class clazz = EntityList.NAME_TO_CLASS.get(name);
+        if (clazz == null) {
+            clazz = EntityList.NAME_TO_CLASS.get(name.replace("minecraft:", "").replace("minecraft.", ""));
+        }
+        return clazz;
     }
 }

@@ -10,6 +10,6 @@ public class CmodTemplate extends DataCmod {
 
     @Override
     public String toString() {
-        return super.toString() + ": " + template;
+        return super.toString() + " { " + template + " }";
     }
 }

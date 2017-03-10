@@ -60,8 +60,10 @@ public class CoroUtil {
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
 		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
 
-		DifficultyDataReader reader = new DifficultyDataReader();
-		reader.loadFiles();
+		/*DifficultyDataReader reader = new DifficultyDataReader();
+		reader.loadFiles();*/
+		DifficultyDataReader.init();
+		DifficultyDataReader.loadFiles();
     	
     	eventChannel.register(new EventHandlerPacket());
     }

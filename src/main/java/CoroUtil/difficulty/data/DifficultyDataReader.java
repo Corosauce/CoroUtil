@@ -32,7 +32,7 @@ public class DifficultyDataReader {
     public static HashMap<String, Class> lookupJsonNameToCmodDeserializer = new HashMap<>();
     public static HashMap<String, Class> lookupJsonNameToConditionDeserializer = new HashMap<>();
 
-    public DifficultyDataReader() {
+    public static void init() {
         data = new DifficultyData();
 
         lookupJsonNameToCmodDeserializer.clear();
@@ -61,13 +61,10 @@ public class DifficultyDataReader {
         return data;
     }
 
-    public void loadFiles() {
-
+    public static void loadFiles() {
         data.reset();
 
         CoroUtil.dbg("start reading difficulty files");
-
-
 
         /*File folderLoot = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\" + lootTablesFolder + "\\");
 
