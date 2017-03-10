@@ -9,4 +9,9 @@ import java.util.List;
  */
 public class CmodAIInfernal extends DataCmod {
     public List<String> modifiers;
+
+    @Override
+    public String toString() {
+        return super.toString() + ", mods: " + modifiers.spliterator();
+    }
 }

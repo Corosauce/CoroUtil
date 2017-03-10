@@ -7,4 +7,9 @@ import CoroUtil.difficulty.data.DataCmod;
  */
 public class CmodTemplate extends DataCmod {
     public String template;
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + template;
+    }
 }

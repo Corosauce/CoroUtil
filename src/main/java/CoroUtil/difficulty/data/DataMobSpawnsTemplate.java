@@ -1,6 +1,7 @@
 package CoroUtil.difficulty.data;
 
 import CoroUtil.difficulty.data.conditions.ConditionTemplate;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,5 +67,14 @@ public class DataMobSpawnsTemplate {
         List<DataCondition> list = new ArrayList<>();
         list.addAll(lookup.values());
         return list;
+    }
+
+    @Override
+    public String toString() {
+        String str = ChatFormatting.AQUA + "Profile: " + ChatFormatting.RESET + name + " | ";
+        for (DataActionMobSpawns spawn : spawns) {
+            str += spawn.toString() + " | ";
+        }
+        return str;
     }
 }

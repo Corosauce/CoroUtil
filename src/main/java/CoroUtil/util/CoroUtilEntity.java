@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -145,5 +146,9 @@ public class CoroUtilEntity {
             }
         }
         return true;
+    }
+
+    public static Class getClassFromRegisty(String name) {
+        return EntityList.NAME_TO_CLASS.get(name);
     }
 }

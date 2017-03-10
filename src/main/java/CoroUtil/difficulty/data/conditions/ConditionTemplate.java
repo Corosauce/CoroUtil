@@ -7,4 +7,9 @@ import CoroUtil.difficulty.data.DataCondition;
  */
 public class ConditionTemplate extends DataCondition {
     public String template;
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + template;
+    }
 }
