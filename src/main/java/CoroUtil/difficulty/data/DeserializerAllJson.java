@@ -1,9 +1,12 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.difficulty.data.cmods.CmodTemplate;
+import CoroUtil.difficulty.data.conditions.ConditionTemplate;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -129,15 +132,28 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
             arr1.add(new JsonPrimitive(str));
         }
         obj.add("entities", arr1);
-        JsonArray arr2 = new JsonArray();
+        /*JsonArray arr2 = new JsonArray();
         for (DataCmod cmod : spawns.cmods) {
             arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
             //arr2.add(new JsonPrimitive(((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod)))));
-        }
-        obj.add("cmods", arr2);
+        }*/
+        obj.add("cmods", serializeCmods(spawns.cmods));
         return obj;
         //arr1.add();
         //obj.add("entities");
+    }
+
+    public static JsonArray serializeCmods(List<DataCmod> cmods) {
+        JsonArray arr2 = new JsonArray();
+        for (DataCmod cmod : cmods) {
+            arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
+        }
+        return arr2;
+    }
+
+    public static List<DataCmod> deserializeCmods(String json) {
+        JsonArray array = (new JsonParser()).parse(json).getAsJsonArray();
+        return getArray(array, DataCmod.class);
     }
 
     public static <T> List<T> getArray(JsonArray arr, /*JsonDeserializationContext context, */Class<T> clazz) {
@@ -168,6 +184,96 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
             }
         }
 
+        return list;
+    }
+
+    /**
+     * Get conditions including ones nested in templates
+     * - aiming to use overridable conditions
+     * - top level condition overrides one in a template if are of the same type
+     * - there may be scenarios where i want to layer and use both conditions?
+     * - what about 2 templates referenced, each with a random?
+     * @return
+     */
+    public static List<DataCondition> getConditionsFlattened(List<DataCondition> conditions) {
+        //List<DataCondition> listTop = new ArrayList<>();
+        HashMap<String, DataCondition> lookup = new HashMap<>();
+        //conditions.contains()
+
+        for (DataCondition condition : conditions) {
+            if (condition instanceof ConditionTemplate) {
+
+            } else {
+                if (!lookup.containsKey(condition.condition)) {
+                    lookup.put(condition.condition, condition);
+                } else {
+                    CoroUtil.forge.CoroUtil.dbg("duplicate key for condition at top level " + condition.condition);
+                }
+            }
+
+        }
+
+        for (DataCondition condition : conditions) {
+            if (condition instanceof ConditionTemplate) {
+                DataConditionTemplate template = DifficultyDataReader.getData().lookupConditionTemplates.get(((ConditionTemplate) condition).template);
+                if (template != null) {
+                    for (DataCondition condition2 : template.conditions) {
+                        //prevent nested templating for now
+                        if (!(condition2 instanceof ConditionTemplate)) {
+                            if (!lookup.containsKey(condition2.condition)) {
+                                lookup.put(condition2.condition, condition2);
+                            } else {
+                                CoroUtil.forge.CoroUtil.dbg("duplicate key for condition from template " + condition2.condition);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        List<DataCondition> list = new ArrayList<>();
+        list.addAll(lookup.values());
+        return list;
+    }
+
+    public static List<DataCmod> getCmodsFlattened(List<DataCmod> cmods) {
+        //List<DataCondition> listTop = new ArrayList<>();
+        HashMap<String, DataCmod> lookup = new HashMap<>();
+        //conditions.contains()
+
+        for (DataCmod cmod : cmods) {
+            if (cmod instanceof CmodTemplate) {
+
+            } else {
+                if (!lookup.containsKey(cmod.cmod)) {
+                    lookup.put(cmod.cmod, cmod);
+                } else {
+                    CoroUtil.forge.CoroUtil.dbg("duplicate key for cmod at top level " + cmod.cmod);
+                }
+            }
+
+        }
+
+        for (DataCmod cmod : cmods) {
+            if (cmod instanceof CmodTemplate) {
+                DataCmodTemplate template = DifficultyDataReader.getData().lookupCmodTemplates.get(((CmodTemplate) cmod).template);
+                if (template != null) {
+                    for (DataCmod cmod2 : template.cmods) {
+                        //prevent nested templating for now
+                        if (!(cmod2 instanceof CmodTemplate)) {
+                            if (!lookup.containsKey(cmod2.cmod)) {
+                                lookup.put(cmod2.cmod, cmod2);
+                            } else {
+                                CoroUtil.forge.CoroUtil.dbg("duplicate key for cmod from template " + cmod2.cmod);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        List<DataCmod> list = new ArrayList<>();
+        list.addAll(lookup.values());
         return list;
     }
 }

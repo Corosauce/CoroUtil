@@ -92,6 +92,40 @@
           ]
         }
       ]
+    },
+    {
+      "name": "testSpawn",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "Zombie", "Skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        }
+      ]
     }
   ]
 

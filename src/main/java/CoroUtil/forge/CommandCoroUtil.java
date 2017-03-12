@@ -4,6 +4,9 @@ import CoroUtil.OldUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.DataActionMobSpawns;
+import CoroUtil.difficulty.data.DataMobSpawnsTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.quest.PlayerQuestManager;
@@ -17,9 +20,11 @@ import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -293,6 +298,50 @@ public class CommandCoroUtil extends CommandBase {
 					for (Map.Entry<String, Class <? extends Entity >> entry : EntityList.NAME_TO_CLASS.entrySet()) {
 						var1.addChatMessage(new TextComponentString(entry.getKey()));
 						System.out.println(entry.getKey());
+					}
+				} else if (var2[0].equalsIgnoreCase("ts") || var2[0].equalsIgnoreCase("testSpawn")) {
+					if (player != null) {
+						String profileName = var2[1];
+						DataMobSpawnsTemplate profileFound = null;
+						for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+							if (profile.name.equals(profileName)) {
+								profileFound = profile;
+								break;
+							}
+						}
+
+						if (profileFound != null) {
+
+							Random rand = new Random();
+							DataActionMobSpawns spawns = profileFound.spawns.get(rand.nextInt(profileFound.spawns.size()));
+							String spawn = spawns.entities.get(rand.nextInt(spawns.entities.size()));
+
+							Entity entL = EntityList.createEntityByName(spawn, world);
+							if (entL != null && entL instanceof EntityCreature) {
+
+								EntityCreature ent = (EntityCreature)entL;
+
+								BlockCoord pos = new BlockCoord(MathHelper.floor_double(posVec.xCoord), MathHelper.floor_double(posVec.yCoord), MathHelper.floor_double(posVec.zCoord));
+								float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+
+								ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
+								UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
+
+								spawnEntity(player, ent);
+
+								CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+							}
+
+							/*var1.addChatMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+							String data = profileFound.toString();
+							String[] list = data.split(" \\| ");
+							for (String entry : list) {
+								var1.addChatMessage(new TextComponentString(entry));
+							}*/
+						} else {
+							var1.addChatMessage(new TextComponentString("Could not find profile by name " + profileName));
+						}
+
 					}
 				}
 			/*}*/

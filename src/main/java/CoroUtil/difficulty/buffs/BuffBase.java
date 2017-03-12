@@ -1,6 +1,8 @@
 package CoroUtil.difficulty.buffs;
 
+import CoroUtil.difficulty.UtilEntityBuffs;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 /**
@@ -22,7 +24,9 @@ public abstract class BuffBase {
      * @param difficulty
      */
     public boolean applyBuff(EntityCreature ent, float difficulty) {
-        ent.getEntityData().setBoolean(getTagName(), true);
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+        data.setBoolean(getTagName(), true);
+        ent.getEntityData().setTag(UtilEntityBuffs.dataEntityBuffed_Data, data);
         return true;
     }
 

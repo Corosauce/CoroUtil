@@ -2,6 +2,7 @@ package CoroUtil.difficulty.buffs;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.cmods.CmodAIInfernal;
 import CoroUtil.util.CoroUtilCrossMod;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -20,7 +21,16 @@ public class BuffAI_Infernal extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
 
-        CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, getBuffsForDifficulty(difficulty));
+        CmodAIInfernal cmod = (CmodAIInfernal)UtilEntityBuffs.getCmodData(ent, getTagName());
+
+
+
+        String infernalmods = "";
+        for (String mod : cmod.modifiers) {
+            infernalmods += mod + " ";
+        }
+        CoroUtilCrossMod.infernalMobs_AddModifiers(ent, infernalmods);
+        //CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, getBuffsForDifficulty(difficulty));
 
         return super.applyBuff(ent, difficulty);
     }

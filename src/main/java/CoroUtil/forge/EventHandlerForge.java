@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -224,8 +225,9 @@ public class EventHandlerForge {
 				}
 
 				List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 				for (String buff : buffs) {
-					if (ent.getEntityData().getBoolean(buff)) {
+					if (data.getBoolean(buff)) {
 						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
 						if (buffObj != null) {
 							//System.out.println("reloading buff: " + buff);

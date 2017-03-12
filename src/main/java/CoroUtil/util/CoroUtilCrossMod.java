@@ -175,7 +175,7 @@ public class CoroUtilCrossMod {
              * Aggressively remove infernal modifiers and nbt data for it, unless we added them ourselves
              */
             if (ent.getEntityData().hasKey(infernalNBTString)) {
-                if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
+                if (!ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
                     infernalMobs_RemoveAllModifiers(ent);
                     ent.getEntityData().removeTag(infernalNBTString);
                 }

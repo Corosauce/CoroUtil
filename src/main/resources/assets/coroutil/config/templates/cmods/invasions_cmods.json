@@ -1,0 +1,16 @@
+{
+  "format": "cmods",
+  "templates": [
+    {
+      "name": "infernal_skeleton_1",
+      "cmods": [
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Cloaking", "Storm"
+          ]
+        }
+      ]
+    }
+  ]
+}

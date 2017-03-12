@@ -3,6 +3,8 @@ package CoroUtil.difficulty;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
+import CoroUtil.difficulty.data.DataCmod;
+import CoroUtil.difficulty.data.DeserializerAllJson;
 import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
@@ -10,23 +12,19 @@ import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
-import CoroUtil.config.ConfigHWMonsters;
+import com.google.gson.JsonArray;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAIZombieAttack;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
@@ -55,7 +53,7 @@ public class UtilEntityBuffs {
 
     //consider moving these buff name fields to their own class for easy reference
 
-    public static String dataEntityBuffed_AI_LungeAndCounterLeap = "CoroAI_HW_Buffed_AI_LungeAndCounterLeap";
+    /*public static String dataEntityBuffed_AI_LungeAndCounterLeap = "CoroAI_HW_Buffed_AI_LungeAndCounterLeap";
     public static String dataEntityBuffed_AI_Digging = "CoroAI_HW_Buffed_AI_Digging";
     public static String dataEntityBuffed_AI_AntiAir = "CoroAI_HW_Buffed_AI_AntiAir";
     public static String dataEntityBuffed_AI_Infernal = "CoroAI_HW_Buffed_AI_Infernal";
@@ -64,7 +62,21 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_Inventory = "CoroAI_HW_Buffed_Inventory";
     public static String dataEntityBuffed_Speed = "CoroAI_HW_Buffed_Speed";
     public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
-    public static String dataEntityBuffed_MobDrops = "CoroAI_HW_Buffed_MobDrops";
+    public static String dataEntityBuffed_MobDrops = "CoroAI_HW_Buffed_MobDrops";*/
+
+    public static String dataEntityBuffed_AI_LungeAndCounterLeap = "ai_counterattack";
+    public static String dataEntityBuffed_AI_Digging = "ai_mining";
+    public static String dataEntityBuffed_AI_AntiAir = "ai_antiair";
+    public static String dataEntityBuffed_AI_Infernal = "ai_infernal";
+    public static String dataEntityBuffed_Health = "attribute_health";
+    //public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
+    public static String dataEntityBuffed_Inventory = "inventory";
+    public static String dataEntityBuffed_Speed = "attribute_speed";
+    public static String dataEntityBuffed_XP = "xp";
+    public static String dataEntityBuffed_MobDrops = "mob_drops";
+
+    public static String dataEntityBuffed_Data = "CoroAI_HW_Buffed_Data";
+    public static String dataEntityCmodJson = "cmodjson";
 
     /**
      * Flags from invasion mod for its own dice rolling
@@ -138,18 +150,68 @@ public class UtilEntityBuffs {
         obj.setWeapon(new ItemStack(Items.DIAMOND_SWORD));
         lookupDifficultyToEquipment.put(4, obj);
 
-        addBuff(new BuffHealth());
-        //addBuff(new BuffSpeed());
-        addBuff(new BuffXP());
-        addBuff(new BuffMobDrops());
-        addBuff(new BuffInventory());
-        addBuff(new BuffAI_Infernal());
-        addBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
-        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
-        addBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
+        registerBuff(new BuffHealth());
+        //registerBuff(new BuffSpeed());
+        registerBuff(new BuffXP());
+        registerBuff(new BuffMobDrops());
+        registerBuff(new BuffInventory());
+        registerBuff(new BuffAI_Infernal());
+        registerBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
+        registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
+        registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
     }
 
-    public static void addBuff(BuffBase buff) {
+    /**
+     * Currently overrides any pre-existing cmod data present
+     *
+     * @param ent
+     * @param cmods
+     * @param difficulty
+     */
+    public static void registerAndApplyCmods(EntityCreature ent, List<DataCmod> cmods, float difficulty) {
+
+        List<DataCmod> cmodsFlat = DeserializerAllJson.getCmodsFlattened(cmods);
+
+        if (!ent.getEntityData().hasKey(dataEntityBuffed_Data)) {
+            ent.getEntityData().setTag(dataEntityBuffed_Data, new NBTTagCompound());
+        }
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+
+        //add the json that holds config data for cmods
+        JsonArray array = DeserializerAllJson.serializeCmods(cmodsFlat);
+        data.setString(dataEntityCmodJson, array.toString());
+
+        //apply the cmods via actual appliers, which also marks entity with easy to check cmod names
+        for (DataCmod cmod : cmodsFlat) {
+            applyBuff(cmod.cmod, ent, difficulty);
+        }
+
+        for (DataCmod cmod : cmodsFlat) {
+            applyBuffPost(cmod.cmod, ent, difficulty);
+        }
+
+        //ent.getEntityData().setTag(dataEntityBuffed_Data, data);
+    }
+
+    public static List<DataCmod> getAllCmodData(EntityCreature ent) {
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        String json = data.getString(dataEntityCmodJson);
+        return DeserializerAllJson.deserializeCmods(json);
+    }
+
+    public static DataCmod getCmodData(EntityCreature ent, String cmodName) {
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        String json = data.getString(dataEntityCmodJson);
+        List<DataCmod> cmods = DeserializerAllJson.deserializeCmods(json);
+        for (DataCmod cmod : cmods) {
+            if (cmod.cmod.equals(cmodName)) {
+                return cmod;
+            }
+        }
+        return null;
+    }
+
+    public static void registerBuff(BuffBase buff) {
         lookupBuffs.put(buff.getTagName(), buff);
     }
 
@@ -158,7 +220,8 @@ public class UtilEntityBuffs {
     }
 
     public static boolean hasBuff(EntityCreature ent, String buff) {
-        return ent.getEntityData().getBoolean(buff);
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        return data.getBoolean(buff);
     }
 
     /**
@@ -232,8 +295,9 @@ public class UtilEntityBuffs {
 
     public static void applyBuffPostAll(EntityCreature ent, float difficulty) {
         List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+        NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
         for (String buff : buffs) {
-            if (ent.getEntityData().getBoolean(buff)) {
+            if (data.getBoolean(buff)) {
                 BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
                 if (buffObj != null) {
                     //System.out.println("applyBuffPostAll buff: " + buff);
@@ -261,6 +325,8 @@ public class UtilEntityBuffs {
      * @param playerClosest
      */
     public static void buff_RollDice(World world, EntityCreature ent, EntityPlayer playerClosest) {
+
+        if (true) return;
 
         //we already gave him a chance to get buffs, abort
         if (ent.getEntityData().getBoolean(dataEntityBuffDiceRolled)) return;
@@ -313,98 +379,6 @@ public class UtilEntityBuffs {
 
         //TODO: if there was a buff before this method body, this might be calling the post call redundantly
         UtilEntityBuffs.applyBuffPostAll(ent, difficulty);
-    }
-
-    public static boolean buffHealth(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        double healthBoostMultiply = (/*1F + */difficulty * ConfigHWMonsters.scaleHealth);
-        ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, 2));
-
-        //group with health buff for now...
-        ent.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(difficulty * ConfigHWMonsters.scaleKnockbackResistance);
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_Health, true);
-
-        return true;
-    }
-
-    public static boolean buffDamage(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_Damage, true);
-
-        //TODO: decide if we will use this
-
-        return false;
-    }
-
-    /**
-     * Inventory using bipeds only!
-     *
-     * @param world
-     * @param ent
-     * @param playerClosest
-     */
-    public static boolean buffInventory(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_Inventory, true);
-
-        int inventoryStage = getInventoryStageBuff(difficulty);
-
-        EquipmentForDifficulty equipment = lookupDifficultyToEquipment.get(inventoryStage);
-        if (equipment != null) {
-            //allow for original weapon to remain if there was one and we are trying to remove it
-            if (equipment.getWeapon() != null) setEquipment(ent, EntityEquipmentSlot.MAINHAND, equipment.getWeapon());
-            //ent.setCurrentItemOrArmor(0, equipment.getWeapon());
-            for (int i = 0; i < 4; i++) {
-                //TODO: verify 1.10.2 update didnt mess with this, maybe rewrite a bit for new sane slot based system
-                if (equipment.getListArmor().size() >= i+1) {
-                    setEquipment(ent, equipment.getSlotForSlotID(i)/*i+1*/, equipment.getListArmor().get(i));
-                    //ent.setCurrentItemOrArmor(i+1, equipment.getListArmor().get(i));
-                } else {
-                    setEquipment(ent, equipment.getSlotForSlotID(i)/*i+1*/, null);
-                    //ent.setCurrentItemOrArmor(i+1, null);
-
-                }
-            }
-
-        } else {
-            System.out.println("error, couldnt find equipment for difficulty value: " + inventoryStage);
-        }
-
-        return true;
-    }
-
-    public static boolean buffSpeed(World world, EntityCreature ent, EntityPlayer playerClosest, float difficulty) {
-
-        double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
-        //avoid retardedly fast speeds
-        if (curSpeed < speedCap) {
-            double speedBoost = (Math.min(ConfigHWMonsters.scaleSpeedCap, difficulty * ConfigHWMonsters.scaleSpeed));
-            //debug += "speed % " + speedBoost;
-            ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("speed multiplier boost", speedBoost, 2));
-        }
-
-        ent.getEntityData().setBoolean(dataEntityBuffed_Speed, true);
-        return true;
-    }
-
-    /**
-     * Migrated methods from invasion mod
-     */
-
-    public static int getInventoryStageBuff(float difficultyScale) {
-        //clamp difficulty between 0 and 1 until we expand on this equipment more
-        float scaleCap = MathHelper.clamp_float(difficultyScale, 0F, 1F);
-        float scaleDivide = 1F / inventoryStages;
-        int inventoryStage = 0;
-        for (int i = 0; i < inventoryStages; i++) {
-            if (scaleCap <= scaleDivide * (i+1)) {
-                inventoryStage = i;
-                break;
-            }
-        }
-        return inventoryStage;
     }
 
     public static void setEquipment(EntityCreature ent, EntityEquipmentSlot slot/*int slot*/, ItemStack stack) {
@@ -616,8 +590,9 @@ public class UtilEntityBuffs {
                     }
 
                     List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+                    NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
                     for (String buff : buffs) {
-                        if (ent.getEntityData().getBoolean(buff)) {
+                        if (data.getBoolean(buff)) {
                             BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
                             if (buffObj != null) {
                                 //System.out.println("reloading buff: " + buff);
