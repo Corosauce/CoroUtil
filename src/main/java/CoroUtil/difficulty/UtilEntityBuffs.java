@@ -8,6 +8,7 @@ import CoroUtil.difficulty.data.DeserializerAllJson;
 import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
+import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
@@ -475,100 +476,76 @@ public class UtilEntityBuffs {
         }
     }
 
-    public static EquipmentForDifficulty getRandomEquipmentForDifficulty(float difficulty) {
+    public static EquipmentForDifficulty getEquipmentItemsFromData(CmodInventory data) {
 
         /**
          * TODO: a command to validate/test the json files that all the items exist
-         * - though consider scnenario where they have a bunch of json files for mods that might not be installed
+         * - though consider scenario where they have a bunch of json files for mods that might not be installed
          * - i might want to ship mod with lots of json files with mods that they might install
          * - how to handle? maybe report if a range of difficulty lacks items?
          */
 
-
-
-
-        //TODO: consider replacing EquipmentForDifficulty with DataEntryInventoryTemplate
-
-        List<DataEntryInventoryTemplate> listEquipmentForDifficulty = new ArrayList<>();
-
-
-        /*for (DataEntryInventoryTemplate entry : DifficultyDataReader.getData().listTemplatesInventory) {
-            if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
-                listEquipmentForDifficulty.add(entry);
+        EquipmentForDifficulty equipment = new EquipmentForDifficulty();
+        //TODO: handle this better?
+        try {
+            Item item = Item.getByNameOrId(data.inv_hand_main);
+            if (item != null) {
+                equipment.setWeapon(new ItemStack(item));
             }
-        }*/
-
-        //TODO: do weighted random stuff here, for now just choose one at pure random
-        if (listEquipmentForDifficulty.size() > 0) {
-            Random rand = new Random();
-            int choice = rand.nextInt(listEquipmentForDifficulty.size());
-
-            DataEntryInventoryTemplate entry = listEquipmentForDifficulty.get(choice);
-
-            EquipmentForDifficulty equipment = new EquipmentForDifficulty();
-            //TODO: handle this better?
-            try {
-                Item item = Item.getByNameOrId(entry.inv_hand_main);
-                if (item != null) {
-                    equipment.setWeapon(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                Item item = Item.getByNameOrId(entry.inv_hand_off);
-                if (item != null) {
-                    equipment.setWeaponOffhand(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            List<ItemStack> listArmor = new ArrayList<>();
-
-            try {
-                Item item = Item.getByNameOrId(entry.inv_head);
-                if (item != null) {
-                    listArmor.add(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                Item item = Item.getByNameOrId(entry.inv_chest);
-                if (item != null) {
-                    listArmor.add(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                Item item = Item.getByNameOrId(entry.inv_legs);
-                if (item != null) {
-                    listArmor.add(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            try {
-                Item item = Item.getByNameOrId(entry.inv_feet);
-                if (item != null) {
-                    listArmor.add(new ItemStack(item));
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            equipment.setListArmor(listArmor);
-
-            return equipment;
-        } else {
-            return null;
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+
+        try {
+            Item item = Item.getByNameOrId(data.inv_hand_off);
+            if (item != null) {
+                equipment.setWeaponOffhand(new ItemStack(item));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        List<ItemStack> listArmor = new ArrayList<>();
+
+        try {
+            Item item = Item.getByNameOrId(data.inv_head);
+            if (item != null) {
+                listArmor.add(new ItemStack(item));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            Item item = Item.getByNameOrId(data.inv_chest);
+            if (item != null) {
+                listArmor.add(new ItemStack(item));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            Item item = Item.getByNameOrId(data.inv_legs);
+            if (item != null) {
+                listArmor.add(new ItemStack(item));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            Item item = Item.getByNameOrId(data.inv_feet);
+            if (item != null) {
+                listArmor.add(new ItemStack(item));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        equipment.setListArmor(listArmor);
+
+        return equipment;
 
     }
 

@@ -227,6 +227,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                             }
                         }
                     }
+                } else {
+                    CoroUtil.forge.CoroUtil.dbg("warning, could not find condition template named " + ((ConditionTemplate) condition).template);
                 }
             }
         }
@@ -268,6 +270,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                             }
                         }
                     }
+                } else {
+                    CoroUtil.forge.CoroUtil.dbg("warning, could not find cmod template named " + ((CmodTemplate) cmod).template);
                 }
             }
         }

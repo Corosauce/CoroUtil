@@ -5,6 +5,7 @@ import CoroUtil.difficulty.data.DataEntryBase;
 /**
  * Created by Corosus on 2/1/2017.
  */
+@Deprecated
 public class DataEntryMobDropsDropOld extends DataEntryBase {
 
     public String item;

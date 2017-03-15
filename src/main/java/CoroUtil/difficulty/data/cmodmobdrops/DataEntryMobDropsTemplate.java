@@ -7,6 +7,7 @@ import java.util.List;
 /**
  * Created by Corosus on 2/1/2017.
  */
+@Deprecated
 public class DataEntryMobDropsTemplate extends DataEntryBase {
 
     public String name;

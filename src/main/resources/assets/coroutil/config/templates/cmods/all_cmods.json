@@ -29,6 +29,8 @@
           "cmod": "attribute_health",
           "operator": 0,
           "value": 1.5,
+          "basevalue?": 0,
+          "use_difficulty": false,
 
           "comment": "//need some way to multiply from difficulty, same for speed, xp, also a cap!"
         },
