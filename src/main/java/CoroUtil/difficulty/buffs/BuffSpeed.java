@@ -2,6 +2,8 @@ package CoroUtil.difficulty.buffs;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
+import CoroUtil.difficulty.data.cmods.CmodAttributeSpeed;
 import CoroUtil.util.CoroUtilAttributes;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
@@ -28,8 +30,31 @@ public class BuffSpeed extends BuffBase {
          * - monsters
          */
 
+        CmodAttributeSpeed cmod = (CmodAttributeSpeed)UtilEntityBuffs.getCmodData(ent, getTagName());
 
-        double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+        if (cmod != null) {
+            /**
+             * Lets start by keeping it simple
+             * - allow setting base health
+             * - allow setting extra health ontop of base health using difficulty * a basic multiplier
+             *
+             * health = base + (base * difficulty * multiplier)
+             *
+             * lets follow minecraft attrib rules:
+             * - set base health as our base here
+             * - apply a multiplier that does exactly above, doable by operation 1 aka INCREMENT_MULTIPLY_BASE
+             */
+
+            //set base value if we need to
+            if (cmod.base_value != -1) {
+                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
+            }
+
+            double extraMultiplier = (difficulty * cmod.difficulty_multiplier);
+            ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+        }
+
+        /*double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
         //avoid retardedly fast speeds
         if (curSpeed < UtilEntityBuffs.speedCap) {
             double speedBoost = (Math.min(ConfigHWMonsters.scaleSpeedCap, difficulty * ConfigHWMonsters.scaleSpeed));
@@ -38,7 +63,7 @@ public class BuffSpeed extends BuffBase {
             if (!ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(speedBoostModifier)) {
                 ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(speedBoostModifier);
             }
-        }
+        }*/
 
         return super.applyBuff(ent, difficulty);
     }

@@ -2,6 +2,9 @@ package CoroUtil.difficulty.buffs;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
+import CoroUtil.difficulty.data.cmods.CmodXP;
+import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -21,14 +24,18 @@ public class BuffXP extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
 
-        try {
-            int xp = ObfuscationReflectionHelper.getPrivateValue(EntityLiving.class, ent, "field_70728_aV", "experienceValue");
-            xp += difficulty * 10F;
-            ObfuscationReflectionHelper.setPrivateValue(EntityLiving.class, ent, xp, "field_70728_aV", "experienceValue");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        CmodXP cmod = (CmodXP)UtilEntityBuffs.getCmodData(ent, getTagName());
+
+        if (cmod != null) {
+            //set base value if we need to
+            if (cmod.base_value != -1) {
+                ent.experienceValue = (int)cmod.base_value;
+            }
+            double extraMultiplier = (/*1F + */difficulty * cmod.difficulty_multiplier);
+            ent.experienceValue += (int)((double)ent.experienceValue * extraMultiplier);
         }
+
+
 
         return super.applyBuff(ent, difficulty);
     }

@@ -5,6 +5,6 @@ import CoroUtil.difficulty.data.DataCmod;
 /**
  * Created by Corosus on 2/26/2017.
  */
-public class CmodXP extends DataCmod {
-    public double amplifier;
+public class CmodXP extends CmodAttributeBaseSimple {
+
 }

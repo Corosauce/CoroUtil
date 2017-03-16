@@ -209,6 +209,7 @@ public class UtilEntityBuffs {
                 return cmod;
             }
         }
+        CoroUtil.dbg("warning, could not find cmod data for nane " + cmodName);
         return null;
     }
 

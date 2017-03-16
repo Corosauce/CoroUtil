@@ -27,21 +27,17 @@
         },
         {
           "cmod": "attribute_health",
-          "operator": 0,
-          "value": 1.5,
-          "basevalue?": 0,
-          "use_difficulty": false,
-
-          "comment": "//need some way to multiply from difficulty, same for speed, xp, also a cap!"
+          "base_value": 40,
+          "difficulty_multiplier": 1.5
         },
         {
           "cmod": "attribute_speed",
-          "operator": 0,
-          "value": 1.1
+          "difficulty_multiplier": 1.1
         },
         {
           "cmod": "xp",
-          "amplifier": 2
+          "base_value": 0,
+          "difficulty_multiplier": 1.5
         },
         {
           "cmod": "ai_antiair"
