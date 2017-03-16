@@ -5,8 +5,8 @@ import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
-import CoroUtil.difficulty.data.DataActionMobSpawns;
-import CoroUtil.difficulty.data.DataMobSpawnsTemplate;
+import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
+import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.pathfinding.PFQueue;
 import CoroUtil.quest.PlayerQuestManager;
@@ -349,24 +349,41 @@ public class CommandCoroUtil extends CommandBase {
 				//TODO: VALIDATE ITEMS!!!
 				} else if (var2[0].equalsIgnoreCase("tp") || var2[0].equalsIgnoreCase("testProfile")) {
 					if (player != null) {
-						String profileName = var2[1];
-						DataMobSpawnsTemplate profileFound = null;
-						for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
-							if (profile.name.equals(profileName)) {
-								profileFound = profile;
-								break;
-							}
-						}
+						try {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(true);
 
-						if (profileFound != null) {
-							var1.addChatMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
-							String data = profileFound.toString();
-							String[] list = data.split(" \\| ");
-							for (String entry : list) {
-								var1.addChatMessage(new TextComponentString(entry));
+							String profileName = var2[1];
+							DataMobSpawnsTemplate profileFound = null;
+							for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+								if (profile.name.equals(profileName)) {
+									profileFound = profile;
+									break;
+								}
 							}
-						} else {
-							var1.addChatMessage(new TextComponentString("Could not find profile by name " + profileName));
+
+							if (profileFound != null) {
+								var1.addChatMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+								String data = profileFound.toString();
+								String[] list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.addChatMessage(new TextComponentString(entry));
+								}
+
+								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
+
+								var1.addChatMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test with templates flattened"));
+								data = profileFound.toString();
+								list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.addChatMessage(new TextComponentString(entry));
+								}
+							} else {
+								var1.addChatMessage(new TextComponentString("Could not find profile by name " + profileName));
+							}
+						} finally {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(false);
 						}
 
 					}

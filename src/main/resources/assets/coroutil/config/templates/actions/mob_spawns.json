@@ -126,6 +126,44 @@
           ]
         }
       ]
+    },
+    {
+      "name": "testSpawnBad",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_what_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "Zombie", "Skelleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_wuhhhhh"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail_bad"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1_bad"
+            }
+          ]
+        }
+      ]
     }
   ]
 

@@ -32,6 +32,26 @@ public class DifficultyDataReader {
     public static HashMap<String, Class> lookupJsonNameToCmodDeserializer = new HashMap<>();
     public static HashMap<String, Class> lookupJsonNameToConditionDeserializer = new HashMap<>();
 
+    //modes used for validating
+    private static boolean debugValidate = false;
+    private static boolean debugFlattenCmodsAndConditions = false;
+
+    public static boolean debugValidate() {
+        return debugValidate;
+    }
+
+    public static void setDebugValidate(boolean debugValidate) {
+        DifficultyDataReader.debugValidate = debugValidate;
+    }
+
+    public static boolean debugFlattenCmodsAndConditions() {
+        return debugFlattenCmodsAndConditions;
+    }
+
+    public static void setDebugFlattenCmodsAndConditions(boolean debugFlattenCmodsAndConditions) {
+        DifficultyDataReader.debugFlattenCmodsAndConditions = debugFlattenCmodsAndConditions;
+    }
+
     public static void init() {
         data = new DifficultyData();
 
@@ -46,7 +66,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put("ai_counterattack", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_lunge", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_infernal", CmodAIInfernal.class);
-        lookupJsonNameToCmodDeserializer.put("template", CmodTemplate.class);
+        lookupJsonNameToCmodDeserializer.put("template", CmodTemplateReference.class);
 
         lookupJsonNameToConditionDeserializer.clear();
         lookupJsonNameToConditionDeserializer.put("context", ConditionContext.class);
@@ -54,7 +74,7 @@ public class DifficultyDataReader {
         lookupJsonNameToConditionDeserializer.put("invasion_number", ConditionInvasionNumber.class);
         lookupJsonNameToConditionDeserializer.put("random", ConditionRandom.class);
         lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
-        lookupJsonNameToConditionDeserializer.put("template", ConditionTemplate.class);
+        lookupJsonNameToConditionDeserializer.put("template", ConditionTemplateReference.class);
     }
 
     public static DifficultyData getData() {

@@ -1,10 +1,10 @@
-package CoroUtil.difficulty.data;
+package CoroUtil.difficulty.data.spawns;
 
-import CoroUtil.difficulty.data.conditions.ConditionTemplate;
+import CoroUtil.difficulty.data.DataCondition;
+import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
 import com.mojang.realmsclient.gui.ChatFormatting;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**

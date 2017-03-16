@@ -1,7 +1,9 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.difficulty.data.cmods.CmodTemplate;
-import CoroUtil.difficulty.data.conditions.ConditionTemplate;
+import CoroUtil.difficulty.data.cmods.CmodTemplateReference;
+import CoroUtil.difficulty.data.conditions.ConditionTemplateReference;
+import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
+import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -201,7 +203,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         //conditions.contains()
 
         for (DataCondition condition : conditions) {
-            if (condition instanceof ConditionTemplate) {
+            if (condition instanceof ConditionTemplateReference) {
 
             } else {
                 if (!lookup.containsKey(condition.condition)) {
@@ -214,12 +216,12 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         }
 
         for (DataCondition condition : conditions) {
-            if (condition instanceof ConditionTemplate) {
-                DataConditionTemplate template = DifficultyDataReader.getData().lookupConditionTemplates.get(((ConditionTemplate) condition).template);
+            if (condition instanceof ConditionTemplateReference) {
+                DataConditionTemplate template = DifficultyDataReader.getData().lookupConditionTemplates.get(((ConditionTemplateReference) condition).template);
                 if (template != null) {
                     for (DataCondition condition2 : template.conditions) {
                         //prevent nested templating for now
-                        if (!(condition2 instanceof ConditionTemplate)) {
+                        if (!(condition2 instanceof ConditionTemplateReference)) {
                             if (!lookup.containsKey(condition2.condition)) {
                                 lookup.put(condition2.condition, condition2);
                             } else {
@@ -228,7 +230,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                         }
                     }
                 } else {
-                    CoroUtil.forge.CoroUtil.dbg("warning, could not find condition template named " + ((ConditionTemplate) condition).template);
+                    CoroUtil.forge.CoroUtil.dbg("warning, could not find condition template named " + ((ConditionTemplateReference) condition).template);
                 }
             }
         }
@@ -244,7 +246,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         //conditions.contains()
 
         for (DataCmod cmod : cmods) {
-            if (cmod instanceof CmodTemplate) {
+            if (cmod instanceof CmodTemplateReference) {
 
             } else {
                 if (!lookup.containsKey(cmod.cmod)) {
@@ -257,12 +259,12 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         }
 
         for (DataCmod cmod : cmods) {
-            if (cmod instanceof CmodTemplate) {
-                DataCmodTemplate template = DifficultyDataReader.getData().lookupCmodTemplates.get(((CmodTemplate) cmod).template);
+            if (cmod instanceof CmodTemplateReference) {
+                DataCmodTemplate template = DifficultyDataReader.getData().lookupCmodTemplates.get(((CmodTemplateReference) cmod).template);
                 if (template != null) {
                     for (DataCmod cmod2 : template.cmods) {
                         //prevent nested templating for now
-                        if (!(cmod2 instanceof CmodTemplate)) {
+                        if (!(cmod2 instanceof CmodTemplateReference)) {
                             if (!lookup.containsKey(cmod2.cmod)) {
                                 lookup.put(cmod2.cmod, cmod2);
                             } else {
@@ -271,7 +273,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                         }
                     }
                 } else {
-                    CoroUtil.forge.CoroUtil.dbg("warning, could not find cmod template named " + ((CmodTemplate) cmod).template);
+                    CoroUtil.forge.CoroUtil.dbg("warning, could not find cmod template named " + ((CmodTemplateReference) cmod).template);
                 }
             }
         }

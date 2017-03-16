@@ -1,5 +1,6 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import net.minecraft.world.storage.loot.LootTable;
 
 import java.util.ArrayList;
