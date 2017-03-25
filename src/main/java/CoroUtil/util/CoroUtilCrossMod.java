@@ -73,12 +73,13 @@ public class CoroUtilCrossMod {
         } else {
             checkHasInfernalMobs = false;
             try {
+                //this throws exception when its not installed
                 Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
                 if (clazz != null) {
                     hasInfernalMobs = true;
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                //ex.printStackTrace();
             }
             return hasInfernalMobs;
         }
