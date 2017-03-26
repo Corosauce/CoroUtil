@@ -2,6 +2,7 @@ package extendedrenderer;
 
 import java.nio.FloatBuffer;
 
+import CoroUtil.config.ConfigCoroAI;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
@@ -56,6 +57,8 @@ public class EventHandler {
                 }
             }
         }
+
+        if (ConfigCoroAI.disableParticleRenderer) return;
 
         //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
 		EntityRenderer er = mc.entityRenderer;
