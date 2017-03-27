@@ -93,18 +93,22 @@ public class GuiConfigEditor extends GuiScreen
     public void drawScreen(int var1, int var2, float var3)
     {
         //this.drawDefaultBackground();
-    	
-    	int startX = (this.width - this.xSize) / 2;
-        int startY = (this.height - this.ySize) / 2;
-    	
-    	drawGuiContainerBackgroundLayer(0,0,0);
-    	    	
-    	scrollPane.drawScreen(var1, var2, var3);
-    	
-    	drawGuiContainerClippingScrollLayer(0, 0, 0);
-    	
-    	this.drawString(this.fontRendererObj, "Config for: " + getCategory(), startX + 10, startY + 10, 16777215);
-    	this.drawString(this.fontRendererObj, (curIndex+1) + "/" + ConfigMod.liveEditConfigs.size(), startX + xSize - 60, startY + 10, 16777215);
+
+        try {
+            int startX = (this.width - this.xSize) / 2;
+            int startY = (this.height - this.ySize) / 2;
+
+            drawGuiContainerBackgroundLayer(0, 0, 0);
+
+            scrollPane.drawScreen(var1, var2, var3);
+
+            drawGuiContainerClippingScrollLayer(0, 0, 0);
+
+            this.drawString(this.fontRendererObj, "Config for: " + getCategory(), startX + 10, startY + 10, 16777215);
+            this.drawString(this.fontRendererObj, (curIndex + 1) + "/" + ConfigMod.liveEditConfigs.size(), startX + xSize - 60, startY + 10, 16777215);
+        } catch (Exception ex) {
+            //ignore
+        }
     	
     	//this.textboxWorldName.drawTextBox();
         super.drawScreen(var1, var2, var3);
