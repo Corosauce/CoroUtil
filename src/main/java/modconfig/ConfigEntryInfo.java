@@ -25,7 +25,7 @@ public class ConfigEntryInfo {
 		value = parVal;
 		comment = parComment;
 		
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) initButton();
+        if (getEffectiveSide() == Side.CLIENT) initButton();
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -34,5 +34,15 @@ public class ConfigEntryInfo {
         int buttonHeight = 16;
 		editBox = new GuiBetterTextField(Minecraft.getMinecraft().fontRendererObj, 0, 0, buttonWidth, buttonHeight);
 		editBox.setText(value.toString());
+	}
+
+	//fix for missing side check, forge fixed for 1.11.2 but not for 1.10.2, this lets me avoid reworking 5 methods to pass the world object for a more proper check
+	public static Side getEffectiveSide() {
+		Thread thr = Thread.currentThread();
+		if (thr.getName().contains("Netty Epoll Server IO")) {
+			return Side.SERVER;
+		} else {
+			return FMLCommonHandler.instance().getEffectiveSide();
+		}
 	}
 }
