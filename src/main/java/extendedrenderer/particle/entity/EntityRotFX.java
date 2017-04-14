@@ -71,6 +71,9 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     public boolean spinFast = false;
 
+    private float ticksFadeInMax = 0;
+    private float ticksFadeOutMax = 0;
+
 	public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -79,25 +82,23 @@ public class EntityRotFX extends Particle implements IWindHandler
         //this.setMaxAge(100);
         
         this.entityID = par1World.rand.nextInt(100000);
-    }/*
-
-    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int colorIndex)
-    {
-        super(var1, var2, var4, var6, var8, var10, var12);
-        setSize(0.3F, 0.3F);
-        this.isImmuneToFire = true;
     }
 
-    public EntityRotFX(World var1, double var2, double var4, double var6, double var8, double var10, double var12, double var14, int texIDs[])
-    {
-        super(var1, var2, var4, var6, var8, var10, var12);
-        setSize(0.3F, 0.3F);
-        this.isImmuneToFire = true;
+    public float getTicksFadeInMax() {
+        return ticksFadeInMax;
     }
-    
-    public EntityRotFX(World worldIn, double posXIn, double posYIn, double posZIn) {
-    	super(worldIn, posXIn, posYIn, posZIn);
-	}*/
+
+    public void setTicksFadeInMax(float ticksFadeInMax) {
+        this.ticksFadeInMax = ticksFadeInMax;
+    }
+
+    public float getTicksFadeOutMax() {
+        return ticksFadeOutMax;
+    }
+
+    public void setTicksFadeOutMax(float ticksFadeOutMax) {
+        this.ticksFadeOutMax = ticksFadeOutMax;
+    }
     
     public int getParticleTextureIndex()
     {
@@ -149,6 +150,17 @@ public class EntityRotFX extends Particle implements IWindHandler
         if (spinFast) {
             this.rotationPitch += this.entityID % 2 == 0 ? 10 : -10;
             this.rotationYaw += this.entityID % 2 == 0 ? -10 : 10;
+        }
+
+        if (ticksFadeInMax > 0 && this.getAge() < ticksFadeInMax) {
+            //System.out.println("particle.getAge(): " + particle.getAge());
+            this.setAlphaF(this.getAge() / ticksFadeInMax);
+            //particle.setAlphaF(1);
+        } else if (ticksFadeOutMax > 0 && this.getAge() > this.getMaxAge() - ticksFadeOutMax) {
+            float count = this.getAge() - (this.getMaxAge() - ticksFadeOutMax);
+            float val = (ticksFadeOutMax - (count)) / ticksFadeOutMax;
+            //System.out.println(val);
+            this.setAlphaF(val);
         }
     }
     

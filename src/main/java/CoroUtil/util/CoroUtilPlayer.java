@@ -39,5 +39,5 @@ public class CoroUtilPlayer {
 			return new Vec3(0, 0, 0);
 		}
 	}
-	
+
 }

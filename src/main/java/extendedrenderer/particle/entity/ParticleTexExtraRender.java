@@ -19,7 +19,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		
 		
 	}
-	
+
 	@Override
 	public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn,
 			float partialTicks, float rotationX, float rotationZ,

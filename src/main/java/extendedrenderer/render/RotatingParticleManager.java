@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.annotation.Nullable;
 
+import CoroUtil.config.ConfigCoroAI;
 import extendedrenderer.particle.entity.EntityRotFX;
 import org.lwjgl.opengl.GL11;
 
@@ -261,12 +262,17 @@ public class RotatingParticleManager
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
         GlStateManager.disableCull();
-        
+
+        int mip_min = 0;
+        int mip_mag = 0;
+
         //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
-        int mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
-        int mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
-        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        if (!ConfigCoroAI.disableMipmapFix) {
+            mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
+            mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        }
         
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
@@ -385,8 +391,10 @@ public class RotatingParticleManager
         }
         
         //restore original mipmap state
-        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
-        GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
+        if (!ConfigCoroAI.disableMipmapFix) {
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
+        }
         
         GlStateManager.enableCull();
 
