@@ -49,8 +49,8 @@ public class EventHandler {
 
 		if (mc.theWorld != null) {
 
-            if (mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime) {
-                lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
+            if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
+                lastWorldTime = mc.theWorld.getTotalWorldTime();
 
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
