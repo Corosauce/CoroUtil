@@ -74,7 +74,15 @@ public class EntityRotFX extends Particle implements IWindHandler
     private float ticksFadeInMax = 0;
     private float ticksFadeOutMax = 0;
 
-	public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
+    private boolean dontRenderUnderTopmostBlock = false;
+
+    private boolean killWhenUnderTopmostBlock = false;
+
+    private float ticksFadeOutMaxOnDeath = -1;
+    private float ticksFadeOutCurOnDeath = 0;
+    protected boolean fadingOut = false;
+
+    public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
         setSize(0.3F, 0.3F);
@@ -82,6 +90,30 @@ public class EntityRotFX extends Particle implements IWindHandler
         //this.setMaxAge(100);
         
         this.entityID = par1World.rand.nextInt(100000);
+    }
+
+    public float getTicksFadeOutMaxOnDeath() {
+        return ticksFadeOutMaxOnDeath;
+    }
+
+    public void setTicksFadeOutMaxOnDeath(float ticksFadeOutMaxOnDeath) {
+        this.ticksFadeOutMaxOnDeath = ticksFadeOutMaxOnDeath;
+    }
+
+    public boolean isKillWhenUnderTopmostBlock() {
+        return killWhenUnderTopmostBlock;
+    }
+
+    public void setKillWhenUnderTopmostBlock(boolean killWhenUnderTopmostBlock) {
+        this.killWhenUnderTopmostBlock = killWhenUnderTopmostBlock;
+    }
+
+    public boolean isDontRenderUnderTopmostBlock() {
+        return dontRenderUnderTopmostBlock;
+    }
+
+    public void setDontRenderUnderTopmostBlock(boolean dontRenderUnderTopmostBlock) {
+        this.dontRenderUnderTopmostBlock = dontRenderUnderTopmostBlock;
     }
 
     public float getTicksFadeInMax() {
@@ -131,13 +163,22 @@ public class EntityRotFX extends Particle implements IWindHandler
             this.motionY /= 0.9800000190734863D;
             this.motionZ /= 0.9800000190734863D;
     	}
-    	
-    	if (killOnCollide) {
-    		if (this.isCollided()) {
-    			this.setExpired();
-    		}
-    		
-    	}
+
+    	if (!this.isExpired && !fadingOut) {
+            if (killOnCollide) {
+                if (this.isCollided()) {
+                    startDeath();
+                }
+
+            }
+
+            if (killWhenUnderTopmostBlock) {
+                int height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+                if (this.posY <= height) {
+                    startDeath();
+                }
+            }
+        }
 
     	if (!collisionSpeedDampen) {
             //if (this.isCollided()) {
@@ -152,15 +193,40 @@ public class EntityRotFX extends Particle implements IWindHandler
             this.rotationYaw += this.entityID % 2 == 0 ? -10 : 10;
         }
 
-        if (ticksFadeInMax > 0 && this.getAge() < ticksFadeInMax) {
-            //System.out.println("particle.getAge(): " + particle.getAge());
-            this.setAlphaF(this.getAge() / ticksFadeInMax);
-            //particle.setAlphaF(1);
-        } else if (ticksFadeOutMax > 0 && this.getAge() > this.getMaxAge() - ticksFadeOutMax) {
-            float count = this.getAge() - (this.getMaxAge() - ticksFadeOutMax);
-            float val = (ticksFadeOutMax - (count)) / ticksFadeOutMax;
+        if (!fadingOut) {
+            if (ticksFadeInMax > 0 && this.getAge() < ticksFadeInMax) {
+                //System.out.println("particle.getAge(): " + particle.getAge());
+                this.setAlphaF(this.getAge() / ticksFadeInMax);
+                //particle.setAlphaF(1);
+            } else if (ticksFadeOutMax > 0 && this.getAge() > this.getMaxAge() - ticksFadeOutMax) {
+                float count = this.getAge() - (this.getMaxAge() - ticksFadeOutMax);
+                float val = (ticksFadeOutMax - (count)) / ticksFadeOutMax;
+                //System.out.println(val);
+                this.setAlphaF(val);
+                //make sure fully visible otherwise
+            } else if (ticksFadeInMax > 0 || ticksFadeOutMax > 0) {
+                this.setAlphaF(1F);
+            }
+        } else {
+    	    if (ticksFadeOutCurOnDeath < ticksFadeOutMaxOnDeath) {
+                ticksFadeOutCurOnDeath++;
+            } else {
+    	        this.setExpired();
+            }
+            float val = 1F - (ticksFadeOutCurOnDeath / ticksFadeOutMaxOnDeath);
             //System.out.println(val);
             this.setAlphaF(val);
+        }
+
+
+    }
+
+    public void startDeath() {
+        if (ticksFadeOutMaxOnDeath > 0) {
+            ticksFadeOutCurOnDeath = 0;//ticksFadeOutMaxOnDeath;
+            fadingOut = true;
+        } else {
+            this.setExpired();
         }
     }
     

@@ -361,9 +361,9 @@ public class RotatingParticleManager
                         vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
                         for (final Particle particle : entry[i][j]) {
-                            try {
+                            //try {
                                 particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
-                            } catch (Throwable throwable) {
+                            /*} catch (Throwable throwable) {
                                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
                                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
                                 crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
@@ -377,7 +377,7 @@ public class RotatingParticleManager
                                     }
                                 });
                                 throw new ReportedException(crashreport);
-                            }
+                            }*/
                         }
 
                         tessellator.draw();
