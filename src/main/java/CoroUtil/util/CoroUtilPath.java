@@ -23,7 +23,7 @@ public class CoroUtilPath {
 		return pe;
 	}
 	
-	public static boolean tryMoveToEntityLivingLongDist(EntityCreature entSource, Entity entityTo, double moveSpeedAmp) {
+	public static boolean tryMoveToEntityLivingLongDist(EntityLiving entSource, Entity entityTo, double moveSpeedAmp) {
 		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
 	}
 	
@@ -37,7 +37,7 @@ public class CoroUtilPath {
 	 * @param moveSpeedAmp
 	 * @return
 	 */
-	public static boolean tryMoveToXYZLongDist(EntityCreature ent, double x, double y, double z, double moveSpeedAmp) {
+	public static boolean tryMoveToXYZLongDist(EntityLiving ent, double x, double y, double z, double moveSpeedAmp) {
 		
 		World world = ent.worldObj;
 		
