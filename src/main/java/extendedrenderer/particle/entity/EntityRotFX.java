@@ -3,6 +3,7 @@ package extendedrenderer.particle.entity;
 import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
+import CoroUtil.util.Vec3;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -81,6 +82,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     private float ticksFadeOutMaxOnDeath = -1;
     private float ticksFadeOutCurOnDeath = 0;
     protected boolean fadingOut = false;
+
+    public float avoidTerrainAngle = 0;
 
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
@@ -284,6 +287,10 @@ public class EntityRotFX extends Particle implements IWindHandler
     
     public float getScale() {
     	return particleScale;
+    }
+
+    public Vec3 getPos() {
+        return new Vec3(posX, posY, posZ);
     }
 
 	public double getPosX() {
