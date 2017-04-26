@@ -15,6 +15,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	private int severityOfRainRate = 2;
 
 	private int extraParticlesBaseAmount = 5;
+
+	public boolean noExtraParticles = false;
 	
 	public ParticleTexExtraRender(World worldIn, double posXIn, double posYIn,
 			double posZIn, double mX, double mY, double mZ,
@@ -101,7 +103,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 		//catch code hotload crash, doesnt help much anyways
 		try {
-			for (int ii = 0; ii < Math.min(rainDrops, CoroUtilParticle.maxRainDrops); ii++) {
+			for (int ii = 0; ii < (noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops)); ii++) {
 				float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
 				float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
 				float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
