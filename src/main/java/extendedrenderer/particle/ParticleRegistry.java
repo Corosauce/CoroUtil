@@ -19,6 +19,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite potato;
 	public static TextureAtlasSprite leaf;
 	public static TextureAtlasSprite rain;
+	public static TextureAtlasSprite rain_white;
 	//public static TextureAtlasSprite rain_10;
 	//public static TextureAtlasSprite rain_vanilla;
 	//public static TextureAtlasSprite snow_vanilla;
@@ -47,6 +48,7 @@ public class ParticleRegistry {
 		potato = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/potato"));
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
 		rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
+		rain_white = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white"));
 		//rain_10 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_10"));
 		//rain_vanilla = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/vanilla/rain"));
 		//snow_vanilla = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/vanilla/snow"));

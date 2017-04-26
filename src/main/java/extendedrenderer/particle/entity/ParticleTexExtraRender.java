@@ -64,10 +64,13 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	        rotationXZ = rotationX * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
 	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
 		} else {
-			rotationXZ = (float)-this.motionZ;
-			rotationXY = (float)-this.motionX;
+			if (this.isSlantParticleToWind()) {
+				rotationXZ = (float) -this.motionZ;
+				rotationXY = (float) -this.motionX;
+			}
 			//rotationXZ = 6.28F;
 			//rotationXY = 1;
+			//rotationZ -= 1;
 		}
 
 		
@@ -76,6 +79,12 @@ public class ParticleTexExtraRender extends ParticleTexFX {
         float f2 = (float)this.particleTextureIndexY / 16.0F;
         float f3 = f2 + 0.0624375F;
         float f4 = 0.1F * this.particleScale;
+		float scaleY = 0.4F * this.particleScale;
+
+		float scale1 = 0.1F * this.particleScale;
+		float scale2 = 0.1F * this.particleScale;
+		float scale3 = 0.1F * this.particleScale;
+		float scale4 = 0.1F * this.particleScale;
 
         if (this.particleTexture != null)
         {
@@ -124,7 +133,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				int i = 15728640;//this.getBrightnessForRender(partialTicks);
 				int j = i >> 16 & 65535;
 				int k = i & 65535;
-				Vec3d[] avec3d = new Vec3d[] {new Vec3d((double)(-rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(-rotationYZ * f4 - rotationXZ * f4)), new Vec3d((double)(-rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(-rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(rotationYZ * f4 - rotationXZ * f4))};
+				Vec3d[] avec3d = new Vec3d[] {
+						new Vec3d((double)(-rotationX * scale1 - rotationXY * scale1), (double)(-rotationZ * scale1), (double)(-rotationYZ * scale1 - rotationXZ * scale1)),
+						new Vec3d((double)(-rotationX * scale2 + rotationXY * scale2), (double)(rotationZ * scale2), (double)(-rotationYZ * scale2 + rotationXZ * scale2)),
+						new Vec3d((double)(rotationX * scale3 + rotationXY * scale3), (double)(rotationZ * scale3), (double)(rotationYZ * scale3 + rotationXZ * scale3)),
+						new Vec3d((double)(rotationX * scale4 - rotationXY * scale4), (double)(-rotationZ * scale4), (double)(rotationYZ * scale4 - rotationXZ * scale4))};
 
 				/*if (this.field_190014_F != 0.0F)
 				{
