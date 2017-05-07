@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 
 import CoroUtil.config.ConfigCoroAI;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
 import CoroUtil.forge.CoroUtil;
+import extendedrenderer.shadertest.Renderer;
 
 public class EventHandler {
 
@@ -34,10 +36,31 @@ public class EventHandler {
 	public long lastWorldTime;
     public World lastWorld;
 
+    public static Renderer shaderTest;
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void tickRenderScreen(TickEvent.RenderTickEvent event) {
+        /*if (event.phase == TickEvent.Phase.END) {
+            if (shaderTest == null) {
+                shaderTest = new Renderer();
+                try {
+                    shaderTest.init();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            shaderTest.render(null);
+        }*/
+    }
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
+
+
+
 		Minecraft mc = Minecraft.getMinecraft();
 
         //update world reference and clear old effects on world change or on no world

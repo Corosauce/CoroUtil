@@ -6,7 +6,9 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import CoroUtil.config.ConfigCoroAI;
+import extendedrenderer.EventHandler;
 import extendedrenderer.particle.entity.EntityRotFX;
+import extendedrenderer.shadertest.Renderer;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
@@ -86,6 +88,13 @@ public class RotatingParticleManager
                 }
             }
         }
+
+        /*shaderTest = new Renderer();
+        try {
+            shaderTest.init();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }*/
 
 
         //this.registerVanillaParticles();
@@ -249,6 +258,17 @@ public class RotatingParticleManager
      */
     public void renderParticles(Entity entityIn, float partialTicks)
     {
+
+        if (EventHandler.shaderTest == null) {
+            EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+            try {
+                EventHandler.shaderTest.init();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        EventHandler.shaderTest.render(null);
+
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();
         float f2 = ActiveRenderInfo.getRotationYZ();
@@ -391,7 +411,7 @@ public class RotatingParticleManager
             }
         }
 
-        System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
+        //System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
         
         if (fog) {
         	GlStateManager.disableFog();
