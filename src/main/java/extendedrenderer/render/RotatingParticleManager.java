@@ -62,6 +62,8 @@ public class RotatingParticleManager
     //a hack to enable fog for particles when weather2 sandstorm is active
     public static float sandstormFogAmount = 0F;
 
+    public static int debugParticleRenderCount;
+
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
         this.worldObj = worldIn;
@@ -332,6 +334,8 @@ public class RotatingParticleManager
 
         //ArrayDeque<Particle>[][] entry = fxLayers.get(1);
 
+        debugParticleRenderCount = 0;
+
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
             for (int i_nf = 0; i_nf < 3; ++i_nf) {
                 final int i = i_nf;
@@ -363,6 +367,7 @@ public class RotatingParticleManager
                         for (final Particle particle : entry[i][j]) {
                             //try {
                                 particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
+                                debugParticleRenderCount++;
                             /*} catch (Throwable throwable) {
                                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
                                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
@@ -385,6 +390,8 @@ public class RotatingParticleManager
                 }
             }
         }
+
+        System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
         
         if (fog) {
         	GlStateManager.disableFog();

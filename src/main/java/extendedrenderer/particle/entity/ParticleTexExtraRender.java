@@ -1,5 +1,6 @@
 package extendedrenderer.particle.entity;
 
+import extendedrenderer.render.RotatingParticleManager;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -88,12 +89,42 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		float scale3 = 0.1F * this.particleScale;
 		float scale4 = 0.1F * this.particleScale;
 
+		float fixY = 0;
+
         if (this.particleTexture != null)
         {
             f = this.particleTexture.getMinU();
             f1 = this.particleTexture.getMaxU();
             f2 = this.particleTexture.getMinV();
             f3 = this.particleTexture.getMaxV();
+
+			/*f = this.particleTexture.getInterpolatedU((double)(this.particleTextureJitterX / 4.0F * 16.0F));
+			f1 = this.particleTexture.getInterpolatedU((double)((this.particleTextureJitterX + 1.0F) / 4.0F * 16.0F));
+			f2 = this.particleTexture.getInterpolatedV((double)(this.particleTextureJitterY / 4.0F * 16.0F));
+			f3 = this.particleTexture.getInterpolatedV((double)((this.particleTextureJitterY + 1.0F) / 4.0F * 16.0F));*/
+
+			float part = 16F / 3F;
+			float offset = 0;
+			float posBottom = (float)(this.posY - 10D);
+
+			float height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+
+			if (posBottom < height) {
+				float diff = height - posBottom;
+				offset = diff;
+				fixY = 0;//diff * 1.0F;
+				if (offset > part) offset = part;
+			}
+
+			/*f = this.particleTexture.getInterpolatedU(part);
+			f1 = this.particleTexture.getInterpolatedU(part*2F);
+			f2 = this.particleTexture.getInterpolatedV((part*2F) + offset);
+			f3 = this.particleTexture.getInterpolatedV(part + offset);*/
+
+			/*f = this.particleTexture.getInterpolatedU(4);
+			f1 = this.particleTexture.getInterpolatedU(12);
+			f2 = this.particleTexture.getInterpolatedV(16);
+			f3 = this.particleTexture.getInterpolatedV(8);*/
         }
 
 		int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
@@ -105,7 +136,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		try {
 			for (int ii = 0; ii < (noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops)); ii++) {
 				float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
-				float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+				float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY) + fixY;
 				float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
 
 				double xx = 0;
@@ -127,7 +158,9 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 					if (this.posY + yy <= height) continue;
 				}
 
-
+				if (ii != 0) {
+					RotatingParticleManager.debugParticleRenderCount++;
+				}
 
 				/*int height = entityIn.worldObj.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/

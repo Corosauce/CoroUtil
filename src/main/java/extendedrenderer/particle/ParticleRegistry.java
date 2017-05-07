@@ -16,6 +16,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite cloud256_6;
 	public static TextureAtlasSprite downfall2;
 	public static TextureAtlasSprite downfall3;
+	public static TextureAtlasSprite downfall4;
 	public static TextureAtlasSprite cloud256_7;
 	public static TextureAtlasSprite chicken;
 	public static TextureAtlasSprite potato;
@@ -33,6 +34,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite debris_1;
 	public static TextureAtlasSprite debris_2;
 	public static TextureAtlasSprite debris_3;
+	public static TextureAtlasSprite test_texture;
 	
 	public static void init(TextureStitchEvent.Pre event) {
 		
@@ -48,10 +50,12 @@ public class ParticleRegistry {
 		cloud256_7 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_7"));
 		downfall2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall2"));
 		downfall3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall3"));
+		downfall4 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall4"));
 		chicken = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/chicken"));
 		potato = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/potato"));
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
 		rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
+		test_texture = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/test_texture"));
 		rain_white = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white"));
 		//rain_10 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_10"));
 		//rain_vanilla = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/vanilla/rain"));
