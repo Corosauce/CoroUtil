@@ -9,6 +9,7 @@ import CoroUtil.config.ConfigCoroAI;
 import extendedrenderer.EventHandler;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.shadertest.Renderer;
+import extendedrenderer.shadertest.gametest.Main;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
@@ -259,15 +260,19 @@ public class RotatingParticleManager
     public void renderParticles(Entity entityIn, float partialTicks)
     {
 
-        if (EventHandler.shaderTest == null) {
-            EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+        if (Main.gameEngine == null) {
+            Main.initUnthreaded();
+            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
             try {
-                EventHandler.shaderTest.init();
+                //EventHandler.shaderTest.init();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-        EventHandler.shaderTest.render(null);
+
+        Main.gameLogic.renderer.render(null, Main.gameLogic.getMesh());
+
+
 
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();

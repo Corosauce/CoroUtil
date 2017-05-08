@@ -8,8 +8,18 @@ public class DummyGame implements IGameLogic {
 
     private float color = 0.0f;
 
-    private final Renderer renderer;
-    
+    public final Renderer renderer;
+
+    private Mesh mesh;
+
+    public Mesh getMesh() {
+        return mesh;
+    }
+
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+    }
+
     public DummyGame() {
         renderer = new Renderer();
     }
@@ -17,6 +27,17 @@ public class DummyGame implements IGameLogic {
     @Override
     public void init() throws Exception {
         renderer.init();
+
+        float[] vertices = new float[]{
+                -0.5f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f,
+        };
+
+        mesh = new Mesh(vertices);
     }
 
     @Override
@@ -42,8 +63,8 @@ public class DummyGame implements IGameLogic {
 
     @Override
     public void render(Window window) {
-        window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window);
+        if (window != null) window.setClearColor(color, color, color, 0.0f);
+        renderer.render(window, mesh);
     }
 
     @Override

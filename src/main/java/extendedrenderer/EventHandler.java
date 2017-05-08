@@ -36,7 +36,7 @@ public class EventHandler {
 	public long lastWorldTime;
     public World lastWorld;
 
-    public static Renderer shaderTest;
+    //public static Renderer shaderTest;
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
