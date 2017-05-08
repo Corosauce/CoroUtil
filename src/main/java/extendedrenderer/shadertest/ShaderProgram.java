@@ -10,6 +10,9 @@ public class ShaderProgram {
 
     private int fragmentShaderId;
 
+    private int vertexShaderAttributeIndexPosition = 0;
+    private int vertexShaderAttributeIndexColour = 1;
+
     public ShaderProgram() throws Exception {
         programId = glCreateProgram();
         if (programId == 0) {
@@ -40,8 +43,10 @@ public class ShaderProgram {
 
         glAttachShader(programId, shaderId);
 
+        //replaces use of "layout (location =0) " type indexing in shader, since that isnt supported for GLSL 120
         if (shaderType == GL_VERTEX_SHADER) {
-            glBindAttribLocation(programId, 0, "position");
+            glBindAttribLocation(programId, vertexShaderAttributeIndexPosition, "position");
+            glBindAttribLocation(programId, vertexShaderAttributeIndexColour, "inColour");
         }
 
         return shaderId;
