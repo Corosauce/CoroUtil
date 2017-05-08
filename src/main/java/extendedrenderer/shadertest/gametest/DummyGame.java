@@ -31,13 +31,15 @@ public class DummyGame implements IGameLogic {
         float[] vertices = new float[]{
                 -0.5f,  0.5f, 0.0f,
                 -0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
                 0.5f, -0.5f, 0.0f,
+                0.5f,  0.5f, 0.0f
         };
 
-        mesh = new Mesh(vertices);
+        int[] indices = new int[] {
+                0, 1, 3, 3, 1, 2
+        };
+
+        mesh = new Mesh(vertices, indices);
     }
 
     @Override

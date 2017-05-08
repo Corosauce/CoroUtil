@@ -3,6 +3,7 @@ package extendedrenderer;
 import java.nio.FloatBuffer;
 
 import CoroUtil.config.ConfigCoroAI;
+import extendedrenderer.shadertest.gametest.Main;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
@@ -41,17 +42,23 @@ public class EventHandler {
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void tickRenderScreen(TickEvent.RenderTickEvent event) {
-        /*if (event.phase == TickEvent.Phase.END) {
-            if (shaderTest == null) {
-                shaderTest = new Renderer();
-                try {
-                    shaderTest.init();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+        if (event.phase == TickEvent.Phase.END) {
+            tickShaderTest();
+        }
+    }
+
+    public static void tickShaderTest() {
+        if (Main.gameEngine == null) {
+            Main.initUnthreaded();
+            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+            try {
+                //EventHandler.shaderTest.init();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-            shaderTest.render(null);
-        }*/
+        }
+
+        Main.gameLogic.renderer.render(null, Main.gameLogic.getMesh());
     }
 
 	@SubscribeEvent

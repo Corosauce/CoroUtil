@@ -64,7 +64,8 @@ public class Renderer {
         glEnableVertexAttribArray(0);
 
         // Draw the vertices
-        glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+        //glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
+        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
 
         // Restore state
         glDisableVertexAttribArray(0);

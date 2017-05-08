@@ -260,17 +260,7 @@ public class RotatingParticleManager
     public void renderParticles(Entity entityIn, float partialTicks)
     {
 
-        if (Main.gameEngine == null) {
-            Main.initUnthreaded();
-            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
-            try {
-                //EventHandler.shaderTest.init();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
 
-        Main.gameLogic.renderer.render(null, Main.gameLogic.getMesh());
 
 
 
