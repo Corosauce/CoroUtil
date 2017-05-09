@@ -92,6 +92,34 @@ public class Renderer {
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+
+            /*Vector3f itemPos = gameItem.getPosition();
+            float posx = itemPos.x + displxInc * 0.01f;
+            float posy = itemPos.y + displyInc * 0.01f;
+            float posz = itemPos.z + displzInc * 0.01f;
+            gameItem.setPosition(posx, posy, posz);
+
+            // Update scale
+            float scale = gameItem.getScale();
+            scale += scaleInc * 0.05f;
+            if ( scale < 0 ) {
+                scale = 0;
+            }
+            gameItem.setScale(scale);*/
+
+            float zz = (float)Math.sin(Math.toRadians((mc.theWorld.getTotalWorldTime() * 5) % 360));
+
+            gameItem.setPosition(0, 0, (zz * 25) - 50);
+
+            gameItem.setScale(10F);
+
+            // Update rotation angle
+            float rotation = gameItem.getRotation().z + 1.5f;
+            if ( rotation > 360 ) {
+                rotation = 0;
+            }
+            gameItem.setRotation(0, 0, rotation);
+
             // Set world matrix for this item
             Matrix4fe worldMatrix = transformation.getWorldMatrix(
                     gameItem.getPosition(),
