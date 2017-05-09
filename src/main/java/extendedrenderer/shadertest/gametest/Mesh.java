@@ -5,7 +5,7 @@ import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
@@ -92,6 +92,22 @@ public class Mesh {
                 //MemoryUtil.memFree(verticesBuffer);
             }
         }
+    }
+
+    public void render() {
+        //System.out.println("render start");
+        // Draw the mesh
+        glBindVertexArray(getVaoId());
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+
+        glDrawElements(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0);
+
+        // Restore state
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glBindVertexArray(0);
+        //System.out.println("render end");
     }
 
     public int getColourVboId() {

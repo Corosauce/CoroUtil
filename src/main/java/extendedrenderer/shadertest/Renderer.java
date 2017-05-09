@@ -3,10 +3,12 @@ package extendedrenderer.shadertest;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-import extendedrenderer.shadertest.gametest.Mesh;
-import extendedrenderer.shadertest.gametest.Window;
+import extendedrenderer.shadertest.gametest.*;
+import net.minecraft.client.Minecraft;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL20;
 
+import javax.vecmath.Matrix4f;
 import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
@@ -18,9 +20,18 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Renderer {
 
+    private static final float FOV = (float) Math.toRadians(60.0f);
+
+    private static final float Z_NEAR = 0.01f;
+
+    private static final float Z_FAR = 1000.f;
+
     private ShaderProgram shaderProgram;
 
+    private Transformation transformation;
+
     public Renderer() {
+        transformation = new Transformation();
     }
 
     public void init() throws Exception {
@@ -51,15 +62,18 @@ public class Renderer {
         shaderProgram.createFragmentShader(fragment);
         shaderProgram.link();
 
-
+        shaderProgram.createUniform("projectionMatrix");
+        shaderProgram.createUniform("worldMatrix");
     }
 
     public void clear() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Mesh mesh) {
+    public void render(Window window, GameItem[] gameItems) {
         //clear();
+
+        //if (true) return;
 
         if (window != null && window.isResized()) {
             glViewport(0, 0, window.getWidth(), window.getHeight());
@@ -68,19 +82,25 @@ public class Renderer {
 
         shaderProgram.bind();
 
-        // Bind to the VAO
-        glBindVertexArray(mesh.getVaoId());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
+        Minecraft mc = Minecraft.getMinecraft();
 
-        // Draw the vertices
-        //glDrawArrays(GL_TRIANGLES, 0, mesh.getVertexCount());
-        glDrawElements(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0);
+        float aspectRatio = (float)mc.displayWidth / (float)mc.displayHeight;//(float) window.getWidth() / window.getHeight();
+        Matrix4fe projectionMatrix = transformation.getProjectionMatrix(FOV, aspectRatio, Z_NEAR, Z_FAR);
+        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
-        // Restore state
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
+        //testCode();
+
+        // Render each gameItem
+        for(GameItem gameItem : gameItems) {
+            // Set world matrix for this item
+            Matrix4fe worldMatrix = transformation.getWorldMatrix(
+                    gameItem.getPosition(),
+                    gameItem.getRotation(),
+                    gameItem.getScale());
+            shaderProgram.setUniform("worldMatrix", worldMatrix);
+            // Render the mes for this game item
+            gameItem.getMesh().render();
+        }
 
         shaderProgram.unbind();
     }
@@ -91,5 +111,27 @@ public class Renderer {
         }
 
 
+    }
+
+    public static void testCode() {
+        //1
+        float FOV = (float)Math.toRadians(60F);
+        float z_near = 0.01F;
+        float z_far = 1000F;
+        float aspectRatio = 600F / 480F;//(float) window.getWidth() / window.getHeight();
+        Matrix4fe mat = new Matrix4fe().setPerspective(FOV, aspectRatio, z_near, z_far);
+
+        //2
+        /*Matrix4fe mat2 = new Matrix4fe();
+        FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+        mat2.get(fb);
+        GL20.glUniformMatrix4(uniforms.get(uniformName), false, fb);*/
+
+        /*try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Dump the matrix into a float buffer
+            FloatBuffer fb = stack.mallocFloat(16);
+            value.get(fb);
+            GL20.glUniformMatrix4(uniforms.get(uniformName), false, fb);
+        }*/
     }
 }

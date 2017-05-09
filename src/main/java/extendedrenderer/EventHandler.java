@@ -48,6 +48,14 @@ public class EventHandler {
     }
 
     public static void tickShaderTest() {
+
+    }
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+    public void worldRender(RenderWorldLastEvent event)
+    {
+
         if (Main.gameEngine == null) {
             Main.initUnthreaded();
             //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
@@ -58,15 +66,7 @@ public class EventHandler {
             }
         }
 
-        Main.gameLogic.renderer.render(null, Main.gameLogic.getMesh());
-    }
-
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-    public void worldRender(RenderWorldLastEvent event)
-    {
-
-
+        Main.gameLogic.renderer.render(null, Main.gameLogic.gameItems);
 
 		Minecraft mc = Minecraft.getMinecraft();
 

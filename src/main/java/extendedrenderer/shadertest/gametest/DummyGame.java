@@ -10,15 +10,7 @@ public class DummyGame implements IGameLogic {
 
     public final Renderer renderer;
 
-    private Mesh mesh;
-
-    public Mesh getMesh() {
-        return mesh;
-    }
-
-    public void setMesh(Mesh mesh) {
-        this.mesh = mesh;
-    }
+    public GameItem[] gameItems;
 
     public DummyGame() {
         renderer = new Renderer();
@@ -28,25 +20,28 @@ public class DummyGame implements IGameLogic {
     public void init() throws Exception {
         renderer.init();
 
-        float[] vertices = new float[]{
-                -0.5f,  0.5f, 0.0f,
-                -0.5f, -0.5f, 0.0f,
-                0.5f, -0.5f, 0.0f,
-                0.5f,  0.5f, 0.0f
+        float[] positions = new float[]{
+                -0.5f,  0.5f,  0.5f,
+                -0.5f, -0.5f,  0.5f,
+                0.5f, -0.5f,  0.5f,
+                0.5f,  0.5f,  0.5f
         };
 
         float[] colours = new float[]{
                 0.5f, 0.0f, 0.0f,
                 0.0f, 0.5f, 0.0f,
                 0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
+                0.0f, 0.5f, 0.5f
         };
 
         int[] indices = new int[] {
                 0, 1, 3, 3, 1, 2
         };
 
-        mesh = new Mesh(vertices, colours, indices);
+        Mesh mesh = new Mesh(positions, colours, indices);
+        GameItem gameItem = new GameItem(mesh);
+        gameItem.setPosition(0, 0, -2);
+        gameItems = new GameItem[] { gameItem };
     }
 
     @Override
@@ -73,7 +68,7 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         if (window != null) window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window, mesh);
+        renderer.render(window, gameItems);
     }
 
     @Override
