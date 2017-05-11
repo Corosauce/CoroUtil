@@ -19,7 +19,7 @@ public class ShaderProgram {
     private int fragmentShaderId;
 
     private int vertexShaderAttributeIndexPosition = 0;
-    private int vertexShaderAttributeIndexColour = 1;
+    private int vertexShaderAttributeTexCoord = 1;
 
     private Map<String, Integer> uniforms;
 
@@ -51,6 +51,10 @@ public class ShaderProgram {
         GL20.glUniformMatrix4(uniforms.get(uniformName), false, fb);
     }
 
+    public void setUniform(String uniformName, int value) {
+        GL20.glUniform1i(uniforms.get(uniformName), value);
+    }
+
     public void createVertexShader(String shaderCode) throws Exception {
         vertexShaderId = createShader(shaderCode, GL_VERTEX_SHADER);
     }
@@ -77,7 +81,7 @@ public class ShaderProgram {
         //replaces use of "layout (location =0) " type indexing in shader, since that isnt supported for GLSL 120
         if (shaderType == GL_VERTEX_SHADER) {
             glBindAttribLocation(programId, vertexShaderAttributeIndexPosition, "position");
-            glBindAttribLocation(programId, vertexShaderAttributeIndexColour, "inColour");
+            glBindAttribLocation(programId, vertexShaderAttributeTexCoord, "texCoord");
         }
 
         return shaderId;

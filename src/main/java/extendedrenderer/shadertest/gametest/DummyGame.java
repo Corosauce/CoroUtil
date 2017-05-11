@@ -1,6 +1,8 @@
 package extendedrenderer.shadertest.gametest;
 
+import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.shadertest.Renderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class DummyGame implements IGameLogic {
 
@@ -27,18 +29,28 @@ public class DummyGame implements IGameLogic {
                 0.5f,  0.5f,  0.5f
         };
 
-        float[] colours = new float[]{
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f
+        /*float[] texCoords = new float[]{
+                0.0f, 0.0f,
+                0.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 0.0f
+        };*/
+
+        TextureAtlasSprite ta = ParticleRegistry.rain_white;
+
+        float[] texCoords = new float[]{
+                ta.getMinU(), ta.getMinV(),
+                ta.getMinU(), ta.getMaxV(),
+                ta.getMaxU(), ta.getMaxV(),
+                ta.getMaxU(), ta.getMinV()
         };
+
 
         int[] indices = new int[] {
                 0, 1, 3, 3, 1, 2
         };
 
-        Mesh mesh = new Mesh(positions, colours, indices);
+        Mesh mesh = new Mesh(positions, texCoords, indices);
         GameItem gameItem = new GameItem(mesh);
         gameItem.setPosition(0, 0, -2);
         gameItems = new GameItem[] { gameItem };

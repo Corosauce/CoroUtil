@@ -64,6 +64,7 @@ public class Renderer {
 
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("worldMatrix");
+        shaderProgram.createUniform("texture_sampler");
     }
 
     public void clear() {
@@ -87,6 +88,8 @@ public class Renderer {
         float aspectRatio = (float)mc.displayWidth / (float)mc.displayHeight;//(float) window.getWidth() / window.getHeight();
         Matrix4fe projectionMatrix = transformation.getProjectionMatrix(FOV, aspectRatio, Z_NEAR, Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+        shaderProgram.setUniform("texture_sampler", 0);
 
         //testCode();
 

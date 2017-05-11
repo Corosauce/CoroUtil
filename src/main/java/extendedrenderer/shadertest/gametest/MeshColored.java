@@ -4,43 +4,34 @@ import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.*;
 
 /**
  * Created by corosus on 08/05/17.
  */
-public class Mesh {
+public class MeshColored {
 
     private int vaoId;
 
-    //private int posVboId;
+    private int posVboId;
 
-    //private int colourVboId;
+    private int colourVboId;
 
-    //private int idxVboId;
-
-    private List<Integer> vboIdList = new ArrayList<>();
+    private int idxVboId;
 
     private int vertexCount;
 
-    public Mesh(float[] positions, float[] textCoords, int[] indices) {
+    public MeshColored(float[] positions, float[] colours, int[] indices) {
 
         vertexCount = indices.length;
 
         FloatBuffer verticesBuffer = null;
         IntBuffer indicesBuffer = null;
-        FloatBuffer textCoordsBuffer = null;
+        FloatBuffer colourBuffer = null;
         try {
 
             verticesBuffer = BufferUtils.createFloatBuffer(positions.length);//MemoryUtil.memAllocFloat(vertices.length);
@@ -54,8 +45,7 @@ public class Mesh {
 
 
             // Create the VBO and bint to it
-            int posVboId = glGenBuffers();
-            vboIdList.add(posVboId);
+            posVboId = glGenBuffers();
             glBindBuffer(GL_ARRAY_BUFFER, posVboId);
             glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
             // Define structure of the data
@@ -63,21 +53,19 @@ public class Mesh {
             //might not be needed, but added when downgrading to GLSL 120
             glEnableVertexAttribArray(0);
 
-            //tex vbo
-            int texVboId = glGenBuffers();
-            vboIdList.add(texVboId);
-            textCoordsBuffer = BufferUtils.createFloatBuffer(textCoords.length);
-            textCoordsBuffer.put(textCoords).flip();
-            glBindBuffer(GL_ARRAY_BUFFER, texVboId);
-            glBufferData(GL_ARRAY_BUFFER, textCoordsBuffer, GL_STATIC_DRAW);
-            glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+            //color vbo
+            colourVboId = glGenBuffers();
+            colourBuffer = BufferUtils.createFloatBuffer(colours.length);
+            colourBuffer.put(colours).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, colourVboId);
+            glBufferData(GL_ARRAY_BUFFER, colourBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
 
             //????
             //glEnableVertexAttribArray(1);
 
             //index vbo
-            int idxVboId = glGenBuffers();
-            vboIdList.add(idxVboId);
+            idxVboId = glGenBuffers();
             indicesBuffer = BufferUtils.createIntBuffer(indices.length);
             indicesBuffer.put(indices).flip();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxVboId);
@@ -117,12 +105,36 @@ public class Mesh {
         //System.out.println("render end");
     }
 
+    public int getColourVboId() {
+        return colourVboId;
+    }
+
+    public void setColourVboId(int colourVboId) {
+        this.colourVboId = colourVboId;
+    }
+
+    public int getIdxVboId() {
+        return idxVboId;
+    }
+
+    public void setIdxVboId(int idxVboId) {
+        this.idxVboId = idxVboId;
+    }
+
     public int getVaoId() {
         return vaoId;
     }
 
     public void setVaoId(int vaoId) {
         this.vaoId = vaoId;
+    }
+
+    public int getPosVboId() {
+        return posVboId;
+    }
+
+    public void setPosVboId(int posVboId) {
+        this.posVboId = posVboId;
     }
 
     public int getVertexCount() {
@@ -138,9 +150,9 @@ public class Mesh {
 
         // Delete the VBO
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        for (int vboId : vboIdList) {
-            glDeleteBuffers(vboId);
-        }
+        glDeleteBuffers(posVboId);
+        glDeleteBuffers(colourVboId);
+        glDeleteBuffers(idxVboId);
 
         // Delete the VAO
         glBindVertexArray(0);
