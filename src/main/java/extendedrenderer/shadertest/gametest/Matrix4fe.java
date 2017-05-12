@@ -18,10 +18,103 @@ public class Matrix4fe extends Matrix4f {
         this.m33 = 1.0F;
     }
 
+    public Matrix4fe(Matrix4fe mat) {
+        this.setMatrix4f(mat);
+
+        this.properties = mat.properties();
+    }
+
+    private void setMatrix4f(Matrix4fe mat) {
+        this._m00(mat.m00());
+        this._m01(mat.m01());
+        this._m02(mat.m02());
+        this._m03(mat.m03());
+        this._m10(mat.m10());
+        this._m11(mat.m11());
+        this._m12(mat.m12());
+        this._m13(mat.m13());
+        this._m20(mat.m20());
+        this._m21(mat.m21());
+        this._m22(mat.m22());
+        this._m23(mat.m23());
+        this._m30(mat.m30());
+        this._m31(mat.m31());
+        this._m32(mat.m32());
+        this._m33(mat.m33());
+    }
+
     void _properties(int properties) {
         //this.properties = (byte)properties;
         //force all the caches off
         this.properties = 0;
+    }
+
+    public byte properties() {
+        return this.properties;
+    }
+
+    public float m00() {
+        return this.m00;
+    }
+
+    public float m01() {
+        return this.m01;
+    }
+
+    public float m02() {
+        return this.m02;
+    }
+
+    public float m03() {
+        return this.m03;
+    }
+
+    public float m10() {
+        return this.m10;
+    }
+
+    public float m11() {
+        return this.m11;
+    }
+
+    public float m12() {
+        return this.m12;
+    }
+
+    public float m13() {
+        return this.m13;
+    }
+
+    public float m20() {
+        return this.m20;
+    }
+
+    public float m21() {
+        return this.m21;
+    }
+
+    public float m22() {
+        return this.m22;
+    }
+
+    public float m23() {
+        return this.m23;
+    }
+
+    public float m30() {
+        return this.m30;
+    }
+
+    public float m31() {
+        return this.m31;
+    }
+
+    public float m32() {
+        return this.m32;
+    }
+
+    public float m33() {
+        return this.m33;
     }
 
     void _m00(float m00) {
@@ -116,6 +209,182 @@ public class Matrix4fe extends Matrix4f {
         this._m23(-1.0F);
         //this._properties(1);
         return this;
+    }
+
+    public Matrix4fe rotate(float ang, float x, float y, float z, Matrix4fe dest) {
+        return (this.properties & 4) != 0?dest.rotation(ang, x, y, z):
+                ((this.properties & 8) != 0?this.rotateTranslation(ang, x, y, z, dest):
+                        ((this.properties & 2) != 0?this.rotateAffine(ang, x, y, z, dest):
+                                this.rotateGeneric(ang, x, y, z, dest)));
+    }
+
+    public Matrix4fe rotate(float angle, Vector3f axis) {
+        return this.rotate(angle, axis.x, axis.y, axis.z);
+    }
+
+    private Matrix4fe rotateGeneric(float ang, float x, float y, float z, Matrix4fe dest) {
+        float s = (float)Math.sin((double)ang);
+        float c = (float)cosFromSin((double)s, (double)ang);
+        float C = 1.0F - c;
+        float xx = x * x;
+        float xy = x * y;
+        float xz = x * z;
+        float yy = y * y;
+        float yz = y * z;
+        float zz = z * z;
+        float rm00 = xx * C + c;
+        float rm01 = xy * C + z * s;
+        float rm02 = xz * C - y * s;
+        float rm10 = xy * C - z * s;
+        float rm11 = yy * C + c;
+        float rm12 = yz * C + x * s;
+        float rm20 = xz * C + y * s;
+        float rm21 = yz * C - x * s;
+        float rm22 = zz * C + c;
+        float nm00 = this.m00 * rm00 + this.m10 * rm01 + this.m20 * rm02;
+        float nm01 = this.m01 * rm00 + this.m11 * rm01 + this.m21 * rm02;
+        float nm02 = this.m02 * rm00 + this.m12 * rm01 + this.m22 * rm02;
+        float nm03 = this.m03 * rm00 + this.m13 * rm01 + this.m23 * rm02;
+        float nm10 = this.m00 * rm10 + this.m10 * rm11 + this.m20 * rm12;
+        float nm11 = this.m01 * rm10 + this.m11 * rm11 + this.m21 * rm12;
+        float nm12 = this.m02 * rm10 + this.m12 * rm11 + this.m22 * rm12;
+        float nm13 = this.m03 * rm10 + this.m13 * rm11 + this.m23 * rm12;
+        dest._m20(this.m00 * rm20 + this.m10 * rm21 + this.m20 * rm22);
+        dest._m21(this.m01 * rm20 + this.m11 * rm21 + this.m21 * rm22);
+        dest._m22(this.m02 * rm20 + this.m12 * rm21 + this.m22 * rm22);
+        dest._m23(this.m03 * rm20 + this.m13 * rm21 + this.m23 * rm22);
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m03(nm03);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m13(nm13);
+        dest._m30(this.m30);
+        dest._m31(this.m31);
+        dest._m32(this.m32);
+        dest._m33(this.m33);
+        dest._properties((byte)(this.properties & -14));
+        return dest;
+    }
+
+    public Matrix4fe rotate(float ang, float x, float y, float z) {
+        return this.rotate(ang, x, y, z, this);
+    }
+
+    public Matrix4fe rotation(float angle, float x, float y, float z) {
+        float sin = (float)Math.sin((double)angle);
+        float cos = (float)cosFromSin((double)sin, (double)angle);
+        float C = 1.0F - cos;
+        float xy = x * y;
+        float xz = x * z;
+        float yz = y * z;
+        this._m00(cos + x * x * C);
+        this._m10(xy * C - z * sin);
+        this._m20(xz * C + y * sin);
+        this._m30(0.0F);
+        this._m01(xy * C + z * sin);
+        this._m11(cos + y * y * C);
+        this._m21(yz * C - x * sin);
+        this._m31(0.0F);
+        this._m02(xz * C - y * sin);
+        this._m12(yz * C + x * sin);
+        this._m22(cos + z * z * C);
+        this._m32(0.0F);
+        this._m03(0.0F);
+        this._m13(0.0F);
+        this._m23(0.0F);
+        this._m33(1.0F);
+        this._properties(2);
+        return this;
+    }
+
+    public Matrix4fe rotateTranslation(float ang, float x, float y, float z, Matrix4fe dest) {
+        float s = (float)Math.sin((double)ang);
+        float c = (float)cosFromSin((double)s, (double)ang);
+        float C = 1.0F - c;
+        float xx = x * x;
+        float xy = x * y;
+        float xz = x * z;
+        float yy = y * y;
+        float yz = y * z;
+        float zz = z * z;
+        float rm00 = xx * C + c;
+        float rm01 = xy * C + z * s;
+        float rm02 = xz * C - y * s;
+        float rm10 = xy * C - z * s;
+        float rm11 = yy * C + c;
+        float rm12 = yz * C + x * s;
+        float rm20 = xz * C + y * s;
+        float rm21 = yz * C - x * s;
+        float rm22 = zz * C + c;
+        dest._m20(rm20);
+        dest._m21(rm21);
+        dest._m22(rm22);
+        dest._m00(rm00);
+        dest._m01(rm01);
+        dest._m02(rm02);
+        dest._m03(0.0F);
+        dest._m10(rm10);
+        dest._m11(rm11);
+        dest._m12(rm12);
+        dest._m13(0.0F);
+        dest._m30(this.m30);
+        dest._m31(this.m31);
+        dest._m32(this.m32);
+        dest._m33(this.m33);
+        dest._properties((byte)(this.properties & -14));
+        return dest;
+    }
+
+    public Matrix4fe rotateAffine(float ang, float x, float y, float z, Matrix4fe dest) {
+        float s = (float)Math.sin((double)ang);
+        float c = (float)cosFromSin((double)s, (double)ang);
+        float C = 1.0F - c;
+        float xx = x * x;
+        float xy = x * y;
+        float xz = x * z;
+        float yy = y * y;
+        float yz = y * z;
+        float zz = z * z;
+        float rm00 = xx * C + c;
+        float rm01 = xy * C + z * s;
+        float rm02 = xz * C - y * s;
+        float rm10 = xy * C - z * s;
+        float rm11 = yy * C + c;
+        float rm12 = yz * C + x * s;
+        float rm20 = xz * C + y * s;
+        float rm21 = yz * C - x * s;
+        float rm22 = zz * C + c;
+        float nm00 = this.m00 * rm00 + this.m10 * rm01 + this.m20 * rm02;
+        float nm01 = this.m01 * rm00 + this.m11 * rm01 + this.m21 * rm02;
+        float nm02 = this.m02 * rm00 + this.m12 * rm01 + this.m22 * rm02;
+        float nm10 = this.m00 * rm10 + this.m10 * rm11 + this.m20 * rm12;
+        float nm11 = this.m01 * rm10 + this.m11 * rm11 + this.m21 * rm12;
+        float nm12 = this.m02 * rm10 + this.m12 * rm11 + this.m22 * rm12;
+        dest._m20(this.m00 * rm20 + this.m10 * rm21 + this.m20 * rm22);
+        dest._m21(this.m01 * rm20 + this.m11 * rm21 + this.m21 * rm22);
+        dest._m22(this.m02 * rm20 + this.m12 * rm21 + this.m22 * rm22);
+        dest._m23(0.0F);
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m03(0.0F);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m13(0.0F);
+        dest._m30(this.m30);
+        dest._m31(this.m31);
+        dest._m32(this.m32);
+        dest._m33(this.m33);
+        dest._properties((byte)(this.properties & -14));
+        return dest;
+    }
+
+    public Matrix4f rotateAffine(float ang, float x, float y, float z) {
+        return this.rotateAffine(ang, x, y, z, this);
     }
 
     public Matrix4fe rotateX(float ang, Matrix4fe dest) {
@@ -280,6 +549,11 @@ public class Matrix4fe extends Matrix4f {
         return dest;
     }
 
+    public final Matrix4fe identity() {
+        identity(this);
+        return this;
+    }
+
     public final Matrix4fe identity(Matrix4fe dest) {
         dest.m00 = 1.0F;
         dest.m01 = 0.0F;
@@ -373,5 +647,46 @@ public class Matrix4fe extends Matrix4f {
         this._m32(z);
         this._properties(10);
         return this;
+    }
+
+    public Matrix4fe mul(Matrix4fe right) {
+        return this.mulGeneric(right, this);
+    }
+
+    private Matrix4fe mulGeneric(Matrix4fe right, Matrix4fe dest) {
+        float nm00 = this.m00 * right.m00() + this.m10 * right.m01() + this.m20 * right.m02() + this.m30 * right.m03();
+        float nm01 = this.m01 * right.m00() + this.m11 * right.m01() + this.m21 * right.m02() + this.m31 * right.m03();
+        float nm02 = this.m02 * right.m00() + this.m12 * right.m01() + this.m22 * right.m02() + this.m32 * right.m03();
+        float nm03 = this.m03 * right.m00() + this.m13 * right.m01() + this.m23 * right.m02() + this.m33 * right.m03();
+        float nm10 = this.m00 * right.m10() + this.m10 * right.m11() + this.m20 * right.m12() + this.m30 * right.m13();
+        float nm11 = this.m01 * right.m10() + this.m11 * right.m11() + this.m21 * right.m12() + this.m31 * right.m13();
+        float nm12 = this.m02 * right.m10() + this.m12 * right.m11() + this.m22 * right.m12() + this.m32 * right.m13();
+        float nm13 = this.m03 * right.m10() + this.m13 * right.m11() + this.m23 * right.m12() + this.m33 * right.m13();
+        float nm20 = this.m00 * right.m20() + this.m10 * right.m21() + this.m20 * right.m22() + this.m30 * right.m23();
+        float nm21 = this.m01 * right.m20() + this.m11 * right.m21() + this.m21 * right.m22() + this.m31 * right.m23();
+        float nm22 = this.m02 * right.m20() + this.m12 * right.m21() + this.m22 * right.m22() + this.m32 * right.m23();
+        float nm23 = this.m03 * right.m20() + this.m13 * right.m21() + this.m23 * right.m22() + this.m33 * right.m23();
+        float nm30 = this.m00 * right.m30() + this.m10 * right.m31() + this.m20 * right.m32() + this.m30 * right.m33();
+        float nm31 = this.m01 * right.m30() + this.m11 * right.m31() + this.m21 * right.m32() + this.m31 * right.m33();
+        float nm32 = this.m02 * right.m30() + this.m12 * right.m31() + this.m22 * right.m32() + this.m32 * right.m33();
+        float nm33 = this.m03 * right.m30() + this.m13 * right.m31() + this.m23 * right.m32() + this.m33 * right.m33();
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m03(nm03);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m13(nm13);
+        dest._m20(nm20);
+        dest._m21(nm21);
+        dest._m22(nm22);
+        dest._m23(nm23);
+        dest._m30(nm30);
+        dest._m31(nm31);
+        dest._m32(nm32);
+        dest._m33(nm33);
+        dest._properties(0);
+        return dest;
     }
 }

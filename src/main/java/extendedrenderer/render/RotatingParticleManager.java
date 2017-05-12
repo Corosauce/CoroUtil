@@ -278,7 +278,7 @@ public class RotatingParticleManager
         GlStateManager.alphaFunc(516, 0.003921569F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
-        GlStateManager.disableCull();
+
 
         int mip_min = 0;
         int mip_mag = 0;

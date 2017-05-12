@@ -12,10 +12,13 @@ public class DummyGame implements IGameLogic {
 
     public final Renderer renderer;
 
+    public final Camera camera;
+
     public GameItem[] gameItems;
 
     public DummyGame() {
         renderer = new Renderer();
+        camera = new Camera();
     }
     
     @Override
@@ -80,7 +83,7 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         if (window != null) window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window, gameItems);
+        renderer.render(window, camera, gameItems);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class Renderer {
         shaderProgram.link();
 
         shaderProgram.createUniform("projectionMatrix");
-        shaderProgram.createUniform("worldMatrix");
+        shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
     }
 
@@ -71,7 +71,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, GameItem[] gameItems) {
+    public void render(Window window, Camera camera, GameItem[] gameItems) {
         //clear();
 
         //if (true) return;
@@ -85,9 +85,13 @@ public class Renderer {
 
         Minecraft mc = Minecraft.getMinecraft();
 
+        if (mc.theWorld == null || mc.thePlayer == null) return;
+
         float aspectRatio = (float)mc.displayWidth / (float)mc.displayHeight;//(float) window.getWidth() / window.getHeight();
         Matrix4fe projectionMatrix = transformation.getProjectionMatrix(FOV, aspectRatio, Z_NEAR, Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+        Matrix4fe viewMatrix = transformation.getViewMatrix(camera);
 
         shaderProgram.setUniform("texture_sampler", 0);
 
@@ -112,23 +116,31 @@ public class Renderer {
 
             float zz = (float)Math.sin(Math.toRadians((mc.theWorld.getTotalWorldTime() * 5) % 360));
 
-            gameItem.setPosition(0, 0, (zz * 25) - 50);
+            //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
+
+            gameItem.setPosition(291F, 78F, 4930F + (zz * 25) - 50);
 
             gameItem.setScale(10F);
+
+            if (mc.getRenderViewEntity() != null) {
+                camera.setPosition((float) mc.getRenderViewEntity().posX, (float) mc.getRenderViewEntity().posY, (float) mc.getRenderViewEntity().posZ);
+
+                float pitch = mc.getRenderViewEntity().rotationPitch;
+                float yaw = mc.getRenderViewEntity().rotationYaw;
+                camera.setRotation(-pitch, -yaw, 0);
+            }
+
+
 
             // Update rotation angle
             float rotation = gameItem.getRotation().z + 1.5f;
             if ( rotation > 360 ) {
                 rotation = 0;
             }
-            gameItem.setRotation(0, 0, rotation);
+            gameItem.setRotation(rotation, rotation, rotation);
 
-            // Set world matrix for this item
-            Matrix4fe worldMatrix = transformation.getWorldMatrix(
-                    gameItem.getPosition(),
-                    gameItem.getRotation(),
-                    gameItem.getScale());
-            shaderProgram.setUniform("worldMatrix", worldMatrix);
+            Matrix4fe modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
+            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mes for this game item
             gameItem.getMesh().render();
         }

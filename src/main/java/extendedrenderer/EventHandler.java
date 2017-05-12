@@ -66,7 +66,7 @@ public class EventHandler {
             }
         }
 
-        Main.gameLogic.renderer.render(null, Main.gameLogic.gameItems);
+        Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
 		Minecraft mc = Minecraft.getMinecraft();
 
