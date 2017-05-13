@@ -5,8 +5,12 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.glu.Project;
 
 import javax.vecmath.Matrix4f;
 import java.io.File;
@@ -87,8 +91,17 @@ public class Renderer {
 
         if (mc.theWorld == null || mc.thePlayer == null) return;
 
+        //FOV = 90F;
+
+        float fovwat = 99.000015F;
+        float fov = 89.2F;
+        fov = 90F;
+        fov = mc.entityRenderer.getFOVModifier(mc.getRenderPartialTicks(), true);
+
+        //mc.entityRenderer.debugView = false;
+
         float aspectRatio = (float)mc.displayWidth / (float)mc.displayHeight;//(float) window.getWidth() / window.getHeight();
-        Matrix4fe projectionMatrix = transformation.getProjectionMatrix(FOV, aspectRatio, Z_NEAR, Z_FAR);
+        Matrix4fe projectionMatrix = transformation.getProjectionMatrix(fov, aspectRatio, Z_NEAR, Z_FAR * 1F);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
 
         Matrix4fe viewMatrix = transformation.getViewMatrix(camera);
@@ -96,6 +109,37 @@ public class Renderer {
         shaderProgram.setUniform("texture_sampler", 0);
 
         //testCode();
+
+        float rotation = camera.getRotation().y + 1.5f;
+        if ( rotation > 360 ) {
+            rotation = 0;
+        }
+
+        if (mc.getRenderViewEntity() != null) {
+
+            float posScale = 1.0F;
+
+            camera.setPosition((float) -mc.getRenderViewEntity().posX * posScale,
+                    (float) mc.getRenderViewEntity().posY/* * posScale*/,
+                    (float) mc.getRenderViewEntity().posZ * posScale);
+
+            //always 0 apparently, maybe for spectator mode
+            float pitch = (float)mc.entityRenderer.cameraPitch;
+            float yaw = (float)mc.entityRenderer.cameraYaw;
+
+            pitch = -mc.getRenderViewEntity().rotationPitch;
+            yaw = -mc.getRenderViewEntity().rotationYaw;
+
+            camera.setRotation(pitch, yaw, 0);
+
+            //camera.setRotation(0, 0, 0);
+
+            //temp
+            /*GlStateManager.matrixMode(5889);
+            GlStateManager.loadIdentity();
+            Project.gluPerspective(fov, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, mc.entityRenderer.farPlaneDistance * MathHelper.SQRT_2);
+            GlStateManager.matrixMode(5888);*/
+        }
 
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
@@ -118,30 +162,33 @@ public class Renderer {
 
             //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
 
-            gameItem.setPosition(291F, 78F, 4930F + (zz * 25) - 50);
+            float wat = 1F;
 
-            gameItem.setScale(10F);
+            gameItem.setPosition(291F * wat, 78F, (4930F * wat)/* + (zz * 25) - 50*/);
 
-            if (mc.getRenderViewEntity() != null) {
-                camera.setPosition((float) mc.getRenderViewEntity().posX, (float) mc.getRenderViewEntity().posY, (float) mc.getRenderViewEntity().posZ);
+            gameItem.setPosition(-0F * wat, -100F, (0F * wat)/* + (zz * 25) - 50*/);
 
-                float pitch = mc.getRenderViewEntity().rotationPitch;
-                float yaw = mc.getRenderViewEntity().rotationYaw;
-                camera.setRotation(-pitch, -yaw, 0);
-            }
+            gameItem.setScale(1F);
 
 
 
             // Update rotation angle
-            float rotation = gameItem.getRotation().z + 1.5f;
+            /*float rotation = gameItem.getRotation().z + 1.5f;
             if ( rotation > 360 ) {
                 rotation = 0;
             }
-            gameItem.setRotation(rotation, rotation, rotation);
+            gameItem.setRotation(rotation, rotation, rotation);*/
+
+            gameItem.getRotation().y+=10;
+
+            //gameItem.setRotation(0, 0, 0);
 
             Matrix4fe modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mes for this game item
+
+            //GL11.glCullFace(1);
+
             gameItem.getMesh().render();
         }
 

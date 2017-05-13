@@ -26,10 +26,10 @@ public class DummyGame implements IGameLogic {
         renderer.init();
 
         float[] positions = new float[]{
-                -0.5f,  0.5f,  0.5f,
-                -0.5f, -0.5f,  0.5f,
-                0.5f, -0.5f,  0.5f,
-                0.5f,  0.5f,  0.5f
+                -0.5f,  0.5f,  0.0f,
+                -0.5f, -0.5f,  0.0f,
+                0.5f, -0.5f,  0.0f,
+                0.5f,  0.5f,  0.0f
         };
 
         /*float[] texCoords = new float[]{
