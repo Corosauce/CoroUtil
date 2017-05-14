@@ -100,9 +100,17 @@ public class Renderer {
 
         //mc.entityRenderer.debugView = false;
 
+        Matrix4fe mat = new Matrix4fe();
+
         float aspectRatio = (float)mc.displayWidth / (float)mc.displayHeight;//(float) window.getWidth() / window.getHeight();
-        Matrix4fe projectionMatrix = transformation.getProjectionMatrix(fov, aspectRatio, Z_NEAR, Z_FAR * 1F);
-        shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+        //mat = transformation.getProjectionMatrix(fov, aspectRatio, Z_NEAR, Z_FAR * 1F);
+
+        //get existing modelview matrix and set it in shader
+        FloatBuffer buf = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+        buf.rewind();
+        Matrix4fe.get(mat, 0, buf);
+        shaderProgram.setUniform("projectionMatrix", mat);
 
         Matrix4fe viewMatrix = transformation.getViewMatrix(camera);
 
@@ -119,16 +127,16 @@ public class Renderer {
 
             float posScale = 1.0F;
 
-            camera.setPosition((float) -mc.getRenderViewEntity().posX * posScale,
-                    (float) mc.getRenderViewEntity().posY/* * posScale*/,
+            camera.setPosition((float) mc.getRenderViewEntity().posX * posScale,
+                    (float) -mc.getRenderViewEntity().posY/* * posScale*/,
                     (float) mc.getRenderViewEntity().posZ * posScale);
 
             //always 0 apparently, maybe for spectator mode
             float pitch = (float)mc.entityRenderer.cameraPitch;
             float yaw = (float)mc.entityRenderer.cameraYaw;
 
-            pitch = -mc.getRenderViewEntity().rotationPitch;
-            yaw = -mc.getRenderViewEntity().rotationYaw;
+            pitch = mc.getRenderViewEntity().rotationPitch;
+            yaw = mc.getRenderViewEntity().rotationYaw;
 
             camera.setRotation(pitch, yaw, 0);
 
@@ -168,7 +176,17 @@ public class Renderer {
 
             gameItem.setPosition(-0F * wat, -100F, (0F * wat)/* + (zz * 25) - 50*/);
 
-            gameItem.setScale(1F);
+            float x = (float)(10D - mc.getRenderManager().renderPosX);
+            float y = (float)(100D - mc.getRenderManager().renderPosY);
+            float z = (float)(10D - mc.getRenderManager().renderPosZ);
+
+            gameItem.setPosition(x, y, z);
+
+            gameItem.setPosition(-0, 0, 3);
+
+            gameItem.setPosition(10, 109, 10);
+
+            gameItem.setScale(20F);
 
 
 
@@ -183,6 +201,7 @@ public class Renderer {
 
             //gameItem.setRotation(0, 0, 0);
 
+            //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixMC(gameItem);
             Matrix4fe modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mes for this game item

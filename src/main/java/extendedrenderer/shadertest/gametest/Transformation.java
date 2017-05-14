@@ -52,6 +52,17 @@ public class Transformation {
         Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
         return viewCurr.mul(modelViewMatrix);
     }
+
+    public Matrix4fe getModelViewMatrixMC(GameItem gameItem) {
+        Vector3f rotation = gameItem.getRotation();
+        modelViewMatrix.identity().translate(gameItem.getPosition()).
+                rotateX((float)Math.toRadians(-rotation.x)).
+                rotateY((float)Math.toRadians(-rotation.y)).
+                rotateZ((float)Math.toRadians(-rotation.z)).
+                scale(gameItem.getScale());
+        //Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
+        return modelViewMatrix;//viewCurr.mul(modelViewMatrix);
+    }
     
     public Matrix4fe getWorldMatrix(Vector3f offset, Vector3f rotation, float scale) {
         modelViewMatrix.identity(modelViewMatrix)

@@ -24,6 +24,25 @@ public class Matrix4fe extends Matrix4f {
         this.properties = mat.properties();
     }
 
+    public static void get(Matrix4f m, int offset, FloatBuffer src) {
+        m.m00 = src.get(offset);
+        m.m01 = src.get(offset + 1);
+        m.m02 = src.get(offset + 2);
+        m.m03 = src.get(offset + 3);
+        m.m10 = src.get(offset + 4);
+        m.m11 = src.get(offset + 5);
+        m.m12 = src.get(offset + 6);
+        m.m13 = src.get(offset + 7);
+        m.m20 = src.get(offset + 8);
+        m.m21 = src.get(offset + 9);
+        m.m22 = src.get(offset + 10);
+        m.m23 = src.get(offset + 11);
+        m.m30 = src.get(offset + 12);
+        m.m31 = src.get(offset + 13);
+        m.m32 = src.get(offset + 14);
+        m.m33 = src.get(offset + 15);
+    }
+
     private void setMatrix4f(Matrix4fe mat) {
         this._m00(mat.m00());
         this._m01(mat.m01());
