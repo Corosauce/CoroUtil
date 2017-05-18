@@ -20,6 +20,7 @@ public class ShaderProgram {
 
     private int vertexShaderAttributeIndexPosition = 0;
     private int vertexShaderAttributeTexCoord = 1;
+    private int vertexShaderAttributeModelViewMatrix = 5;
 
     private Map<String, Integer> uniforms;
 
@@ -82,6 +83,7 @@ public class ShaderProgram {
         if (shaderType == GL_VERTEX_SHADER) {
             glBindAttribLocation(programId, vertexShaderAttributeIndexPosition, "position");
             glBindAttribLocation(programId, vertexShaderAttributeTexCoord, "texCoord");
+            glBindAttribLocation(programId, vertexShaderAttributeModelViewMatrix, "modelViewMatrix");
         }
 
         return shaderId;

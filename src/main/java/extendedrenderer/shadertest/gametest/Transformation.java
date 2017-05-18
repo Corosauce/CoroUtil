@@ -1,6 +1,8 @@
 package extendedrenderer.shadertest.gametest;
 
 
+import org.lwjgl.util.vector.Quaternion;
+
 import javax.vecmath.Vector3f;
 
 public class Transformation {
@@ -10,11 +12,14 @@ public class Transformation {
     private Matrix4fe modelViewMatrix;
 
     private Matrix4fe viewMatrix;
+
+    private Matrix4fe modelMatrix;
     
     public Transformation() {
         modelViewMatrix = new Matrix4fe();
         projectionMatrix = new Matrix4fe();
         viewMatrix = new Matrix4fe();
+        modelMatrix = new Matrix4fe();
     }
 
     public final Matrix4fe getProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar) {
@@ -53,6 +58,23 @@ public class Transformation {
         return viewCurr.mul(modelViewMatrix);
     }
 
+    public Matrix4fe buildModelViewMatrix(Matrix4fe modelMatrix, Matrix4fe viewMatrix) {
+        Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
+        return viewCurr.mul(modelMatrix);
+    }
+
+    public Matrix4fe getModelViewMatrixOffset(GameItem gameItem, Matrix4fe viewMatrix, Matrix4fe offsetMatrix) {
+        Vector3f rotation = gameItem.getRotation();
+        modelViewMatrix.identity().translate(gameItem.getPosition()).
+                rotateX((float)Math.toRadians(-rotation.x)).
+                rotateY((float)Math.toRadians(-rotation.y)).
+                rotateZ((float)Math.toRadians(-rotation.z)).
+                scale(gameItem.getScale());
+        Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
+        Matrix4fe mat2 = new Matrix4fe(offsetMatrix);
+        return viewCurr.mul(mat2).mul(modelViewMatrix);
+    }
+
     public Matrix4fe getModelViewMatrixMC(GameItem gameItem) {
         Vector3f rotation = gameItem.getRotation();
         modelViewMatrix.identity().translate(gameItem.getPosition()).
@@ -72,5 +94,14 @@ public class Transformation {
                 rotateZ((float)Math.toRadians(rotation.z)).
                 scale(scale);
         return modelViewMatrix;
+    }
+
+    public Matrix4fe buildModelMatrix(GameItem gameItem) {
+        Vector3f rotation = gameItem.getRotation();
+        return modelMatrix.identity().translate(gameItem.getPosition()).
+                rotateX((float)Math.toRadians(-rotation.x)).
+                rotateY((float)Math.toRadians(-rotation.y)).
+                rotateZ((float)Math.toRadians(-rotation.z)).
+                scale(gameItem.getScale());
     }
 }

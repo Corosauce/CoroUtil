@@ -708,4 +708,41 @@ public class Matrix4fe extends Matrix4f {
         dest._properties(0);
         return dest;
     }
+
+    public Matrix4f mulAffine(Matrix4fe right, Matrix4fe dest) {
+        float nm00 = this.m00 * right.m00() + this.m10 * right.m01() + this.m20 * right.m02();
+        float nm01 = this.m01 * right.m00() + this.m11 * right.m01() + this.m21 * right.m02();
+        float nm02 = this.m02 * right.m00() + this.m12 * right.m01() + this.m22 * right.m02();
+        float nm03 = this.m03;
+        float nm10 = this.m00 * right.m10() + this.m10 * right.m11() + this.m20 * right.m12();
+        float nm11 = this.m01 * right.m10() + this.m11 * right.m11() + this.m21 * right.m12();
+        float nm12 = this.m02 * right.m10() + this.m12 * right.m11() + this.m22 * right.m12();
+        float nm13 = this.m13;
+        float nm20 = this.m00 * right.m20() + this.m10 * right.m21() + this.m20 * right.m22();
+        float nm21 = this.m01 * right.m20() + this.m11 * right.m21() + this.m21 * right.m22();
+        float nm22 = this.m02 * right.m20() + this.m12 * right.m21() + this.m22 * right.m22();
+        float nm23 = this.m23;
+        float nm30 = this.m00 * right.m30() + this.m10 * right.m31() + this.m20 * right.m32() + this.m30;
+        float nm31 = this.m01 * right.m30() + this.m11 * right.m31() + this.m21 * right.m32() + this.m31;
+        float nm32 = this.m02 * right.m30() + this.m12 * right.m31() + this.m22 * right.m32() + this.m32;
+        float nm33 = this.m33;
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m03(nm03);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m13(nm13);
+        dest._m20(nm20);
+        dest._m21(nm21);
+        dest._m22(nm22);
+        dest._m23(nm23);
+        dest._m30(nm30);
+        dest._m31(nm31);
+        dest._m32(nm32);
+        dest._m33(nm33);
+        dest._properties(2);
+        return dest;
+    }
 }

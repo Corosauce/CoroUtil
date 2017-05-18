@@ -4,6 +4,9 @@ import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.shadertest.Renderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DummyGame implements IGameLogic {
 
     private int direction = 0;
@@ -14,11 +17,12 @@ public class DummyGame implements IGameLogic {
 
     public final Camera camera;
 
-    public GameItem[] gameItems;
+    public List<GameItem> gameItems;
 
     public DummyGame() {
         renderer = new Renderer();
         camera = new Camera();
+        gameItems = new ArrayList<>();
     }
     
     @Override
@@ -53,10 +57,13 @@ public class DummyGame implements IGameLogic {
                 0, 1, 3, 3, 1, 2
         };
 
-        Mesh mesh = new Mesh(positions, texCoords, indices);
-        GameItem gameItem = new GameItem(mesh);
-        gameItem.setPosition(0, 0, -2);
-        gameItems = new GameItem[] { gameItem };
+        Mesh mesh = new InstancedMesh(positions, texCoords, indices, 2);
+        for (int i = 0; i < 10000; i++) {
+            GameItem gameItem = new GameItem(mesh);
+            gameItem.setPosition(0, 0, -2);
+            gameItems.add(gameItem);
+        }
+
     }
 
     @Override

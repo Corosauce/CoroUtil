@@ -16,6 +16,7 @@ import javax.vecmath.Matrix4f;
 import java.io.File;
 import java.nio.FloatBuffer;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
@@ -67,7 +68,7 @@ public class Renderer {
         shaderProgram.link();
 
         shaderProgram.createUniform("projectionMatrix");
-        shaderProgram.createUniform("modelViewMatrix");
+        //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
     }
 
@@ -75,7 +76,7 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems) {
+    public void render(Window window, Camera camera, List<GameItem> gameItems) {
         //clear();
 
         //if (true) return;
@@ -149,8 +150,15 @@ public class Renderer {
             GlStateManager.matrixMode(5888);*/
         }
 
+        //temp hack to test until redesign
+        InstancedMesh mesh = null;
+
+        int i = 0;
+
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+
+            mesh = (InstancedMesh)gameItem.getMesh();
 
             /*Vector3f itemPos = gameItem.getPosition();
             float posx = itemPos.x + displxInc * 0.01f;
@@ -184,9 +192,12 @@ public class Renderer {
 
             gameItem.setPosition(-0, 0, 3);
 
-            gameItem.setPosition(10, 109, 10);
+            float xxx = (float)Math.sin(Math.PI * ((float)i*0.005F)) * ((float)i*0.005F);
+            float zzz = (float)Math.cos(Math.PI * ((float)i*0.005F)) * ((float)i*0.005F);
 
-            gameItem.setScale(20F);
+            gameItem.setPosition(10 + xxx, 109, 0 + zzz);
+
+            gameItem.setScale(2F);
 
 
 
@@ -201,15 +212,23 @@ public class Renderer {
 
             //gameItem.setRotation(0, 0, 0);
 
+            Matrix4fe matOffset = new Matrix4fe();
+            matOffset.identity();
+            matOffset.translate(0, 0, 0);
+
             //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixMC(gameItem);
-            Matrix4fe modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
-            shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+            //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixOffset(gameItem, viewMatrix, matOffset);
+            //shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
             // Render the mes for this game item
 
             //GL11.glCullFace(1);
 
-            gameItem.getMesh().render();
+            //gameItem.getMesh().render();
+
+            i++;
         }
+
+        mesh.renderListInstanced(gameItems, transformation, viewMatrix);
 
         shaderProgram.unbind();
     }
