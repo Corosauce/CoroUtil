@@ -115,6 +115,8 @@ public class InstancedMesh extends Mesh {
             renderChunkInstanced(subList, transformation, viewMatrix);
         }
 
+        //renderChunkInstanced(gameItems, transformation, viewMatrix);
+
         endRender();
     }
 

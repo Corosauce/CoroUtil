@@ -197,6 +197,8 @@ public class Renderer {
 
             gameItem.setPosition(10 + xxx, 109, 0 + zzz);
 
+            gameItem.setPosition(10, 109, 0 + ((float)i*5));
+
             gameItem.setScale(2F);
 
 

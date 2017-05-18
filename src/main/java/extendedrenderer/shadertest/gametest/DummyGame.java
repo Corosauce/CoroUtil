@@ -57,8 +57,11 @@ public class DummyGame implements IGameLogic {
                 0, 1, 3, 3, 1, 2
         };
 
-        Mesh mesh = new InstancedMesh(positions, texCoords, indices, 2);
-        for (int i = 0; i < 10000; i++) {
+        int instances = 4;
+        int instancesRender = 4;
+
+        Mesh mesh = new InstancedMesh(positions, texCoords, indices, instancesRender);
+        for (int i = 0; i < instances; i++) {
             GameItem gameItem = new GameItem(mesh);
             gameItem.setPosition(0, 0, -2);
             gameItems.add(gameItem);
