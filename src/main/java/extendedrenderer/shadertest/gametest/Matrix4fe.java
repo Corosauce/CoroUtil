@@ -745,4 +745,27 @@ public class Matrix4fe extends Matrix4f {
         dest._properties(2);
         return dest;
     }
+
+    public Matrix4f transpose3x3(Matrix4fe dest) {
+        float nm00 = this.m00;
+        float nm01 = this.m10;
+        float nm02 = this.m20;
+        float nm10 = this.m01;
+        float nm11 = this.m11;
+        float nm12 = this.m21;
+        float nm20 = this.m02;
+        float nm21 = this.m12;
+        float nm22 = this.m22;
+        dest._m00(nm00);
+        dest._m01(nm01);
+        dest._m02(nm02);
+        dest._m10(nm10);
+        dest._m11(nm11);
+        dest._m12(nm12);
+        dest._m20(nm20);
+        dest._m21(nm21);
+        dest._m22(nm22);
+        dest._properties(0);
+        return dest;
+    }
 }

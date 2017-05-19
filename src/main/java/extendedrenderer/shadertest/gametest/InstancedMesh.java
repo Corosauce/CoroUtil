@@ -125,13 +125,16 @@ public class InstancedMesh extends Mesh {
 
         int i = 0;
 
+        //temp
+        boolean billBoard = true;
+
         //Texture text = getMaterial().getTexture();
         for (GameItem gameItem : gameItems) {
             Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem);
             if (viewMatrix != null) {
-                /*if (billBoard) {
+                if (billBoard) {
                     viewMatrix.transpose3x3(modelMatrix);
-                }*/
+                }
                 Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
                 modelViewMatrix.get(INSTANCE_SIZE_FLOATS * i, instanceDataBuffer);
                 i++;
