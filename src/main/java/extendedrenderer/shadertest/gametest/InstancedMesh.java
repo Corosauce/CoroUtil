@@ -5,6 +5,7 @@ import org.lwjgl.BufferUtils;
 import java.nio.FloatBuffer;
 import java.util.List;
 
+import static org.lwjgl.opengl.ARBDrawInstanced.glDrawElementsInstancedARB;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -124,20 +125,27 @@ public class InstancedMesh extends Mesh {
         this.instanceDataBuffer.clear();
 
         int i = 0;
+        int index = 0;
 
         //temp
         boolean billBoard = true;
 
         //Texture text = getMaterial().getTexture();
-        for (GameItem gameItem : gameItems) {
+        for (int ii = 0; i < gameItems.size(); ii++) {
+        //for (GameItem gameItem : gameItems) {
+            GameItem gameItem = gameItems.get(i);
+
             Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem);
             if (viewMatrix != null) {
-                if (billBoard) {
+                /*if (billBoard) {
                     viewMatrix.transpose3x3(modelMatrix);
-                }
-                Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
-                modelViewMatrix.get(INSTANCE_SIZE_FLOATS * i, instanceDataBuffer);
-                i++;
+                }*/
+
+                //if (index != 0) {
+                    Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+                    modelViewMatrix.get(INSTANCE_SIZE_FLOATS * i, instanceDataBuffer);
+                //}
+
             }
             /*if (lightViewMatrix != null) {
                 Matrix4fe modelLightViewMatrix = transformation.buildModelLightViewMatrix(modelMatrix, lightViewMatrix);
@@ -154,13 +162,13 @@ public class InstancedMesh extends Mesh {
             }*/
 
             i++;
+            index++;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
         glBufferData(GL_ARRAY_BUFFER, instanceDataBuffer, GL_DYNAMIC_DRAW);
 
-        glDrawElementsInstanced(
-                GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, gameItems.size());
+        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, gameItems.size());
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

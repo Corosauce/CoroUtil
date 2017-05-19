@@ -151,83 +151,84 @@ public class Renderer {
         }
 
         //temp hack to test until redesign
-        InstancedMesh mesh = null;
+        InstancedMesh mesh = (InstancedMesh) gameItems.get(0).getMesh();
 
         int i = 0;
 
         // Render each gameItem
-        for(GameItem gameItem : gameItems) {
+        if (true) {
+            for (GameItem gameItem : gameItems) {
 
-            mesh = (InstancedMesh)gameItem.getMesh();
+                mesh = (InstancedMesh) gameItem.getMesh();
 
-            /*Vector3f itemPos = gameItem.getPosition();
-            float posx = itemPos.x + displxInc * 0.01f;
-            float posy = itemPos.y + displyInc * 0.01f;
-            float posz = itemPos.z + displzInc * 0.01f;
-            gameItem.setPosition(posx, posy, posz);
+                /*Vector3f itemPos = gameItem.getPosition();
+                float posx = itemPos.x + displxInc * 0.01f;
+                float posy = itemPos.y + displyInc * 0.01f;
+                float posz = itemPos.z + displzInc * 0.01f;
+                gameItem.setPosition(posx, posy, posz);
 
-            // Update scale
-            float scale = gameItem.getScale();
-            scale += scaleInc * 0.05f;
-            if ( scale < 0 ) {
-                scale = 0;
+                // Update scale
+                float scale = gameItem.getScale();
+                scale += scaleInc * 0.05f;
+                if ( scale < 0 ) {
+                    scale = 0;
+                }
+                gameItem.setScale(scale);*/
+
+                float zz = (float) Math.sin(Math.toRadians((mc.theWorld.getTotalWorldTime() * 5) % 360));
+
+                //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
+
+                float wat = 1F;
+
+                gameItem.setPosition(291F * wat, 78F, (4930F * wat)/* + (zz * 25) - 50*/);
+
+                gameItem.setPosition(-0F * wat, -100F, (0F * wat)/* + (zz * 25) - 50*/);
+
+                float x = (float) (10D - mc.getRenderManager().renderPosX);
+                float y = (float) (100D - mc.getRenderManager().renderPosY);
+                float z = (float) (10D - mc.getRenderManager().renderPosZ);
+
+                gameItem.setPosition(x, y, z);
+
+                gameItem.setPosition(-0, 0, 3);
+
+                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.005F)) * ((float) i * 0.005F);
+                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.005F)) * ((float) i * 0.005F);
+
+                gameItem.setPosition(10 + xxx, 109, 0 + zzz);
+
+                //gameItem.setPosition(10 + ((float)i*1), 109 + ((float)i*0), 0 + ((float)i*1));
+
+                gameItem.setScale(2F);
+
+
+                // Update rotation angle
+                /*float rotation = gameItem.getRotation().z + 1.5f;
+                if ( rotation > 360 ) {
+                    rotation = 0;
+                }
+                gameItem.setRotation(rotation, rotation, rotation);*/
+
+                gameItem.getRotation().y += 10;
+
+                //gameItem.setRotation(0, 0, 0);
+
+                Matrix4fe matOffset = new Matrix4fe();
+                matOffset.identity();
+                matOffset.translate(0, 0, 0);
+
+                //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixMC(gameItem);
+                //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixOffset(gameItem, viewMatrix, matOffset);
+                //shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
+                // Render the mes for this game item
+
+                //GL11.glCullFace(1);
+
+                //gameItem.getMesh().render();
+
+                i++;
             }
-            gameItem.setScale(scale);*/
-
-            float zz = (float)Math.sin(Math.toRadians((mc.theWorld.getTotalWorldTime() * 5) % 360));
-
-            //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
-
-            float wat = 1F;
-
-            gameItem.setPosition(291F * wat, 78F, (4930F * wat)/* + (zz * 25) - 50*/);
-
-            gameItem.setPosition(-0F * wat, -100F, (0F * wat)/* + (zz * 25) - 50*/);
-
-            float x = (float)(10D - mc.getRenderManager().renderPosX);
-            float y = (float)(100D - mc.getRenderManager().renderPosY);
-            float z = (float)(10D - mc.getRenderManager().renderPosZ);
-
-            gameItem.setPosition(x, y, z);
-
-            gameItem.setPosition(-0, 0, 3);
-
-            float xxx = (float)Math.sin(Math.PI * ((float)i*0.005F)) * ((float)i*0.005F);
-            float zzz = (float)Math.cos(Math.PI * ((float)i*0.005F)) * ((float)i*0.005F);
-
-            gameItem.setPosition(10 + xxx, 109, 0 + zzz);
-
-            gameItem.setPosition(10, 109, 0 + ((float)i*5));
-
-            gameItem.setScale(2F);
-
-
-
-            // Update rotation angle
-            /*float rotation = gameItem.getRotation().z + 1.5f;
-            if ( rotation > 360 ) {
-                rotation = 0;
-            }
-            gameItem.setRotation(rotation, rotation, rotation);*/
-
-            gameItem.getRotation().y+=10;
-
-            //gameItem.setRotation(0, 0, 0);
-
-            Matrix4fe matOffset = new Matrix4fe();
-            matOffset.identity();
-            matOffset.translate(0, 0, 0);
-
-            //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixMC(gameItem);
-            //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixOffset(gameItem, viewMatrix, matOffset);
-            //shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            // Render the mes for this game item
-
-            //GL11.glCullFace(1);
-
-            //gameItem.getMesh().render();
-
-            i++;
         }
 
         mesh.renderListInstanced(gameItems, transformation, viewMatrix);

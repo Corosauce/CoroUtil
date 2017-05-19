@@ -39,16 +39,22 @@ public class Mesh {
 
     public Mesh(float[] positions, float[] textCoords, int[] indices) {
 
+
+        float[] normals = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
+        int[] jointIndices = createEmptyIntArray(MAX_WEIGHTS * positions.length / 3, 0);
+        float[] weights = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
+
         vertexCount = indices.length;
 
         FloatBuffer verticesBuffer = null;
         IntBuffer indicesBuffer = null;
         FloatBuffer textCoordsBuffer = null;
+        FloatBuffer vecNormalsBuffer = null;
+        IntBuffer jointIndicesBuffer = null;
+        FloatBuffer weightsBuffer = null;
         try {
 
-            verticesBuffer = BufferUtils.createFloatBuffer(positions.length);//MemoryUtil.memAllocFloat(vertices.length);
-            //vertexCount = positions.length;
-            verticesBuffer.put(positions).flip();
+
 
             // Create the VAO and bind to it
             vaoId = glGenVertexArrays();
@@ -59,6 +65,8 @@ public class Mesh {
             // Create the VBO and bint to it
             int posVboId = glGenBuffers();
             vboIdList.add(posVboId);
+            verticesBuffer = BufferUtils.createFloatBuffer(positions.length);//MemoryUtil.memAllocFloat(vertices.length);
+            verticesBuffer.put(positions).flip();
             glBindBuffer(GL_ARRAY_BUFFER, posVboId);
             glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
             // Define structure of the data
@@ -77,6 +85,33 @@ public class Mesh {
 
             //????
             //glEnableVertexAttribArray(1);
+
+            // Vertex normals VBO
+            int vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            vecNormalsBuffer = BufferUtils.createFloatBuffer(normals.length);
+            vecNormalsBuffer.put(normals).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, vecNormalsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+
+            // Weights
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            weightsBuffer = BufferUtils.createFloatBuffer(weights.length);
+            weightsBuffer.put(weights).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, weightsBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(3, 4, GL_FLOAT, false, 0, 0);
+
+            // Joint indices
+            vboId = glGenBuffers();
+            vboIdList.add(vboId);
+            jointIndicesBuffer = BufferUtils.createIntBuffer(jointIndices.length);
+            jointIndicesBuffer.put(jointIndices).flip();
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            glBufferData(GL_ARRAY_BUFFER, jointIndicesBuffer, GL_STATIC_DRAW);
+            glVertexAttribPointer(4, 4, GL_FLOAT, false, 0, 0);
 
             //index vbo
             int idxVboId = glGenBuffers();
@@ -124,18 +159,18 @@ public class Mesh {
         glBindVertexArray(getVaoId());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-        /*glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(2);
         glEnableVertexAttribArray(3);
-        glEnableVertexAttribArray(4);*/
+        glEnableVertexAttribArray(4);
     }
 
     protected void endRender() {
         // Restore state
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
-        /*glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(2);
         glDisableVertexAttribArray(3);
-        glDisableVertexAttribArray(4);*/
+        glDisableVertexAttribArray(4);
         glBindVertexArray(0);
 
         //glBindTexture(GL_TEXTURE_2D, 0);

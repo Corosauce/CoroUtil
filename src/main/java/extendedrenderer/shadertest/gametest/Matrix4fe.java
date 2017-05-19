@@ -618,8 +618,32 @@ public class Matrix4fe extends Matrix4f {
 
     public FloatBuffer get(int index, FloatBuffer buffer) {
         //MemUtil.INSTANCE.put(this, index, buffer);
-        put0(this, buffer);
+        //put0(this, buffer);
+        if(index == 0) {
+            this.put0(this, buffer);
+        } else {
+            this.putN(this, index, buffer);
+        }
         return buffer;
+    }
+
+    private void putN(Matrix4f m, int offset, FloatBuffer dest) {
+        dest.put(offset, m.m00);
+        dest.put(offset + 1, m.m01);
+        dest.put(offset + 2, m.m02);
+        dest.put(offset + 3, m.m03);
+        dest.put(offset + 4, m.m10);
+        dest.put(offset + 5, m.m11);
+        dest.put(offset + 6, m.m12);
+        dest.put(offset + 7, m.m13);
+        dest.put(offset + 8, m.m20);
+        dest.put(offset + 9, m.m21);
+        dest.put(offset + 10, m.m22);
+        dest.put(offset + 11, m.m23);
+        dest.put(offset + 12, m.m30);
+        dest.put(offset + 13, m.m31);
+        dest.put(offset + 14, m.m32);
+        dest.put(offset + 15, m.m33);
     }
 
     private void put0(Matrix4f m, FloatBuffer dest) {
