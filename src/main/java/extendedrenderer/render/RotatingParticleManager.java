@@ -290,6 +290,8 @@ public class RotatingParticleManager
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         }
+
+
         
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
@@ -350,6 +352,19 @@ public class RotatingParticleManager
         //ArrayDeque<Particle>[][] entry = fxLayers.get(1);
 
         debugParticleRenderCount = 0;
+
+        if (Main.gameEngine == null) {
+            Main.initUnthreaded();
+            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+            try {
+                //EventHandler.shaderTest.init();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        GlStateManager.depthMask(false);
+        Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
             for (int i_nf = 0; i_nf < 3; ++i_nf) {

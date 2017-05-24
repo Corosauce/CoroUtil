@@ -175,7 +175,7 @@ public class Renderer {
                 }
                 gameItem.setScale(scale);*/
 
-                float zz = (float) Math.sin(Math.toRadians((mc.theWorld.getTotalWorldTime() * 5) % 360));
+                float zz = (float) Math.sin(Math.toRadians(((mc.theWorld.getTotalWorldTime()+(i*2)) * 3) % 360)) * 3F;
 
                 //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
 
@@ -193,14 +193,15 @@ public class Renderer {
 
                 gameItem.setPosition(-0, 0, 3);
 
-                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.005F)) * ((float) i * 0.005F);
-                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.005F)) * ((float) i * 0.005F);
+                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.082F);
+                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.082F);
+                float yyy = zz;
 
-                gameItem.setPosition(10 + xxx, 109, 0 + zzz);
+                gameItem.setPosition(10 + xxx, 109 + yyy + (i * 0.002F), 0 + zzz);
 
                 //gameItem.setPosition(10 + ((float)i*1), 109 + ((float)i*0), 0 + ((float)i*1));
 
-                gameItem.setScale(2F);
+                gameItem.setScale(1F);
 
 
                 // Update rotation angle
@@ -210,13 +211,13 @@ public class Renderer {
                 }
                 gameItem.setRotation(rotation, rotation, rotation);*/
 
-                gameItem.getRotation().y += 10;
+                gameItem.getRotation().y = 0;
 
                 //gameItem.setRotation(0, 0, 0);
 
-                Matrix4fe matOffset = new Matrix4fe();
+                /*Matrix4fe matOffset = new Matrix4fe();
                 matOffset.identity();
-                matOffset.translate(0, 0, 0);
+                matOffset.translate(0, 0, 0);*/
 
                 //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixMC(gameItem);
                 //Matrix4fe modelViewMatrix = transformation.getModelViewMatrixOffset(gameItem, viewMatrix, matOffset);

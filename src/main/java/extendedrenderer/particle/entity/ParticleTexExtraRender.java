@@ -165,9 +165,19 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				/*int height = entityIn.worldObj.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
-				int i = 15728640;//this.getBrightnessForRender(partialTicks);
+				int i = this.getBrightnessForRender(partialTicks);
+				//i = 15728640;
 				int j = i >> 16 & 65535;
 				int k = i & 65535;
+
+				//range between 0 and 240 for first value, second value always 0
+				j = 240;
+				k = 120;
+
+				/*int what = 13 << 20 | 15 << 4;
+				int what2 = what >> 16 & 65535;
+				int what3 = what & 65535;*/
+
 				Vec3d[] avec3d = new Vec3d[] {
 						new Vec3d((double)(-rotationX * scale1 - rotationXY * scale1), (double)(-rotationZ * scale1), (double)(-rotationYZ * scale1 - rotationXZ * scale1)),
 						new Vec3d((double)(-rotationX * scale2 + rotationXY * scale2), (double)(rotationZ * scale2), (double)(-rotationYZ * scale2 + rotationXZ * scale2)),

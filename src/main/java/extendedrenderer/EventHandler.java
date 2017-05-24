@@ -56,17 +56,7 @@ public class EventHandler {
     public void worldRender(RenderWorldLastEvent event)
     {
 
-        if (Main.gameEngine == null) {
-            Main.initUnthreaded();
-            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
-            try {
-                //EventHandler.shaderTest.init();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
 
-        Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
 		Minecraft mc = Minecraft.getMinecraft();
 

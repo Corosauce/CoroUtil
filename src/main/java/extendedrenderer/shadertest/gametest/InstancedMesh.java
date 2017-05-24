@@ -122,28 +122,37 @@ public class InstancedMesh extends Mesh {
     }
 
     private void renderChunkInstanced(List<GameItem> gameItems, Transformation transformation, Matrix4fe viewMatrix) {
-        this.instanceDataBuffer.clear();
+        //this.instanceDataBuffer.clear();
 
         int i = 0;
         int index = 0;
 
         //temp
-        boolean billBoard = true;
+        boolean billBoard = false;
+
+
 
         //Texture text = getMaterial().getTexture();
-        for (int ii = 0; i < gameItems.size(); ii++) {
+        for (int ii = 0; ii < gameItems.size(); ii++) {
         //for (GameItem gameItem : gameItems) {
-            GameItem gameItem = gameItems.get(i);
+            GameItem gameItem = gameItems.get(ii);
 
             Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem);
             if (viewMatrix != null) {
-                /*if (billBoard) {
+                if (billBoard) {
                     viewMatrix.transpose3x3(modelMatrix);
-                }*/
+                }
 
                 //if (index != 0) {
+                for (int iii = 0; iii < posExtra.size(); iii++) {
                     Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+                    modelViewMatrix.mul(posExtra.get(iii));
                     modelViewMatrix.get(INSTANCE_SIZE_FLOATS * i, instanceDataBuffer);
+
+
+                    i++;
+                    index++;
+                }
                 //}
 
             }
@@ -160,15 +169,12 @@ public class InstancedMesh extends Mesh {
                 this.instanceDataBuffer.put(buffPos, textXOffset);
                 this.instanceDataBuffer.put(buffPos + 1, textYOffset);
             }*/
-
-            i++;
-            index++;
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
         glBufferData(GL_ARRAY_BUFFER, instanceDataBuffer, GL_DYNAMIC_DRAW);
 
-        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, gameItems.size());
+        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, i);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
