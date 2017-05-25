@@ -57,7 +57,7 @@ public class DummyGame implements IGameLogic {
                 0, 1, 3, 3, 1, 2
         };
 
-        int instances = 500;
+        int instances = 1500;
         int instancesRender = instances * InstancedMesh.extraRenders;
 
         Mesh mesh = new InstancedMesh(positions, texCoords, indices, instancesRender);

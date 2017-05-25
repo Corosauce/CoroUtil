@@ -59,8 +59,9 @@ public class Transformation {
     }
 
     public Matrix4fe buildModelViewMatrix(Matrix4fe modelMatrix, Matrix4fe viewMatrix) {
-        Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
-        return viewCurr.mul(modelMatrix);
+        /*Matrix4fe viewCurr = new Matrix4fe(viewMatrix);
+        return viewCurr.mul(modelMatrix);*/
+        return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
     }
 
     public Matrix4fe getModelViewMatrixOffset(GameItem gameItem, Matrix4fe viewMatrix, Matrix4fe offsetMatrix) {
@@ -98,10 +99,18 @@ public class Transformation {
 
     public Matrix4fe buildModelMatrix(GameItem gameItem) {
         Vector3f rotation = gameItem.getRotation();
-        return modelMatrix.identity().translate(gameItem.getPosition()).
+
+        //TODO: quaternion usage to make rotation math faster
+
+        /*return modelMatrix.identity().translate(gameItem.getPosition()).
                 rotateX((float)Math.toRadians(-rotation.x)).
                 rotateY((float)Math.toRadians(-rotation.y)).
                 rotateZ((float)Math.toRadians(-rotation.z)).
-                scale(gameItem.getScale());
+                scale(gameItem.getScale());*/
+
+        return modelMatrix.translationRotateScale(
+                gameItem.getPosition().x, gameItem.getPosition().y, gameItem.getPosition().z,
+                rotation.x, rotation.y, rotation.z, 0/*rotation.w*/,
+                gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
     }
 }

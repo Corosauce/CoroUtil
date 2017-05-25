@@ -733,7 +733,7 @@ public class Matrix4fe extends Matrix4f {
         return dest;
     }
 
-    public Matrix4f mulAffine(Matrix4fe right, Matrix4fe dest) {
+    public Matrix4fe mulAffine(Matrix4fe right, Matrix4fe dest) {
         float nm00 = this.m00 * right.m00() + this.m10 * right.m01() + this.m20 * right.m02();
         float nm01 = this.m01 * right.m00() + this.m11 * right.m01() + this.m21 * right.m02();
         float nm02 = this.m02 * right.m00() + this.m12 * right.m01() + this.m22 * right.m02();
@@ -770,7 +770,7 @@ public class Matrix4fe extends Matrix4f {
         return dest;
     }
 
-    public Matrix4f transpose3x3(Matrix4fe dest) {
+    public Matrix4fe transpose3x3(Matrix4fe dest) {
         float nm00 = this.m00;
         float nm01 = this.m10;
         float nm02 = this.m20;
@@ -791,5 +791,38 @@ public class Matrix4fe extends Matrix4f {
         dest._m22(nm22);
         dest._properties(0);
         return dest;
+    }
+
+    public Matrix4fe translationRotateScale(float tx, float ty, float tz, float qx, float qy, float qz, float qw, float sx, float sy, float sz) {
+        float dqx = qx + qx;
+        float dqy = qy + qy;
+        float dqz = qz + qz;
+        float q00 = dqx * qx;
+        float q11 = dqy * qy;
+        float q22 = dqz * qz;
+        float q01 = dqx * qy;
+        float q02 = dqx * qz;
+        float q03 = dqx * qw;
+        float q12 = dqy * qz;
+        float q13 = dqy * qw;
+        float q23 = dqz * qw;
+        this._m00(sx - (q11 + q22) * sx);
+        this._m01((q01 + q23) * sx);
+        this._m02((q02 - q13) * sx);
+        this._m03(0.0F);
+        this._m10((q01 - q23) * sy);
+        this._m11(sy - (q22 + q00) * sy);
+        this._m12((q12 + q03) * sy);
+        this._m13(0.0F);
+        this._m20((q02 + q13) * sz);
+        this._m21((q12 - q03) * sz);
+        this._m22(sz - (q11 + q00) * sz);
+        this._m23(0.0F);
+        this._m30(tx);
+        this._m31(ty);
+        this._m32(tz);
+        this._m33(1.0F);
+        this._properties(2);
+        return this;
     }
 }

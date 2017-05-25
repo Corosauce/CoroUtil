@@ -33,6 +33,8 @@ public class InstancedMesh extends Mesh {
 
     private FloatBuffer instanceDataBuffer;
 
+    private int vboSizeMesh = 5;
+
     public InstancedMesh(float[] positions, float[] textCoords, int[] indices, int numInstances) {
         super(positions, textCoords, indices);
 
@@ -45,7 +47,7 @@ public class InstancedMesh extends Mesh {
         vboIdList.add(instanceDataVBO);
         instanceDataBuffer = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
         glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
-        int start = 5;
+        int start = vboSizeMesh;
         int strideStart = 0;
         for (int i = 0; i < 4; i++) {
             glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
@@ -83,7 +85,7 @@ public class InstancedMesh extends Mesh {
     protected void initRender() {
         super.initRender();
 
-        int start = 5;
+        int start = vboSizeMesh;
         int numElements = 4 * 2 + 1;
         for (int i = 0; i < numElements; i++) {
             glEnableVertexAttribArray(start + i);
@@ -92,7 +94,7 @@ public class InstancedMesh extends Mesh {
 
     @Override
     protected void endRender() {
-        int start = 5;
+        int start = vboSizeMesh;
         int numElements = 4 * 2 + 1;
         for (int i = 0; i < numElements; i++) {
             glDisableVertexAttribArray(start + i);
