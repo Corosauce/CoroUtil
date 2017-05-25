@@ -98,19 +98,39 @@ public class Transformation {
     }
 
     public Matrix4fe buildModelMatrix(GameItem gameItem) {
+        return buildModelMatrix(gameItem, null);
+    }
+
+    public Matrix4fe buildModelMatrix(GameItem gameItem, Vector3f posCustom) {
         Vector3f rotation = gameItem.getRotation();
 
         //TODO: quaternion usage to make rotation math faster
 
-        /*return modelMatrix.identity().translate(gameItem.getPosition()).
+        return modelMatrix.identity().translate(posCustom != null ? posCustom : gameItem.getPosition()).
                 rotateX((float)Math.toRadians(-rotation.x)).
                 rotateY((float)Math.toRadians(-rotation.y)).
                 rotateZ((float)Math.toRadians(-rotation.z)).
-                scale(gameItem.getScale());*/
+                scale(gameItem.getScale());
 
-        return modelMatrix.translationRotateScale(
+        //using translationRotateScale instead of above per call code doesnt seem to show higher fps, but cant hurt anyways
+        //upon further testing, this doesnt actually work by just forcing 0 or 1 for w param, needs actual quaternion handled rotation
+        /*return modelMatrix.translationRotateScale(
                 gameItem.getPosition().x, gameItem.getPosition().y, gameItem.getPosition().z,
-                rotation.x, rotation.y, rotation.z, 0/*rotation.w*/,
-                gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
+                rotation.x, rotation.y, rotation.z, 1*//*rotation.w*//*,
+                gameItem.getScale(), gameItem.getScale(), gameItem.getScale());*/
+    }
+
+    public Matrix4fe buildModelMatrixPhase1Translate(GameItem gameItem) {
+        return modelMatrix.identity().translate(gameItem.getPosition());
+    }
+
+    public Matrix4fe buildModelMatrixPhase2RotateScale(GameItem gameItem) {
+        Vector3f rotation = gameItem.getRotation();
+
+        return modelMatrix.
+                rotateX((float)Math.toRadians(-rotation.x)).
+                rotateY((float)Math.toRadians(-rotation.y)).
+                rotateZ((float)Math.toRadians(-rotation.z)).
+                scale(gameItem.getScale());
     }
 }

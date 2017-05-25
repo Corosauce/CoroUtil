@@ -156,7 +156,7 @@ public class Renderer {
         int i = 0;
 
         // Render each gameItem
-        if (true) {
+        if (false) {
             for (GameItem gameItem : gameItems) {
 
                 mesh = (InstancedMesh) gameItem.getMesh();
@@ -193,11 +193,11 @@ public class Renderer {
 
                 gameItem.setPosition(-0, 0, 3);
 
-                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.082F);
-                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.082F);
+                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.0082F);
+                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.0082F);
                 float yyy = zz;
 
-                gameItem.setPosition(10 + xxx, 109 + yyy + (i * 0.002F), 0 + zzz);
+                gameItem.setPosition(10 + xxx, 109/* + yyy + (i * 0.002F)*/, 0 + zzz);
 
                 //gameItem.setPosition(10 + ((float)i*1), 109 + ((float)i*0), 0 + ((float)i*1));
 
@@ -211,9 +211,23 @@ public class Renderer {
                 }
                 gameItem.setRotation(rotation, rotation, rotation);*/
 
-                gameItem.getRotation().y = 0;
+                /*gameItem.getRotation().x += 0.2F;
+                gameItem.getRotation().z += 0.4F;
+                gameItem.getRotation().y += 0.6F;*/
 
-                //gameItem.setRotation(0, 0, 0);
+                if (gameItem.getRotation().x > 360) {
+                    gameItem.getRotation().x = 0;
+                }
+
+                if (gameItem.getRotation().y > 360) {
+                    gameItem.getRotation().y = 0;
+                }
+
+                if (gameItem.getRotation().z > 360) {
+                    gameItem.getRotation().z = 0;
+                }
+
+                gameItem.setRotation(0, 0, 0);
 
                 /*Matrix4fe matOffset = new Matrix4fe();
                 matOffset.identity();

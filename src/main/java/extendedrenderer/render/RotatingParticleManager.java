@@ -275,6 +275,7 @@ public class RotatingParticleManager
         //Particle.field_190016_K = entityIn.getLook(partialTicks);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
@@ -363,13 +364,24 @@ public class RotatingParticleManager
             }
         }
 
-        GlStateManager.depthMask(false);
+        //GlStateManager.depthMask(false);
+
+        //testing no blending (so far notice no fps change)
+        /*GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_BLEND);*/
+
+        //screen door transparency
+        //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
+
         Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
+        //do cloud layer, then funnel layer
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
             for (int i_nf = 0; i_nf < 3; ++i_nf) {
                 final int i = i_nf;
 
+                //do non depth mask (for transparent ones), then depth mask
                 for (int j = 0; j < 2; ++j) {
                     if (!entry[i][j].isEmpty()) {
                         switch (j) {

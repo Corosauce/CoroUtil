@@ -1,7 +1,9 @@
 package extendedrenderer.shadertest.gametest;
 
+import CoroUtil.util.CoroUtilParticle;
 import org.lwjgl.BufferUtils;
 
+import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.List;
 
@@ -132,29 +134,52 @@ public class InstancedMesh extends Mesh {
         //temp
         boolean billBoard = false;
 
+        boolean testSkip = false;
 
+        int amountToRender = gameItems.size() * posExtra.size();
 
         //Texture text = getMaterial().getTexture();
-        for (int ii = 0; ii < gameItems.size(); ii++) {
+        for (int ii = 0; !testSkip && ii < gameItems.size(); ii++) {
         //for (GameItem gameItem : gameItems) {
             GameItem gameItem = gameItems.get(ii);
 
-            Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem);
+
+
             if (viewMatrix != null) {
-                if (billBoard) {
-                    viewMatrix.transpose3x3(modelMatrix);
-                }
+
 
                 //if (index != 0) {
                 for (int iii = 0; iii < posExtra.size(); iii++) {
+
+                    //CoroUtilParticle.rainPositions[ii].xCoord;
+
+                    Vector3f pos = gameItem.getPosition();
+                    Vector3f posCustom = null;
+
+                    if (iii != 0) {
+                        posCustom = new Vector3f(pos.getX() + (float)CoroUtilParticle.rainPositions[iii].xCoord,
+                                pos.getY() + (float)CoroUtilParticle.rainPositions[iii].yCoord,
+                                pos.getZ() + (float)CoroUtilParticle.rainPositions[iii].zCoord);
+                    }
+
+                    //get model matrix with extra render position factored in
+                    Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem, posCustom);
+
+                    if (billBoard) {
+                        viewMatrix.transpose3x3(modelMatrix);
+                    }
+
+                    //adjust to perspective and camera
                     Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
-                    modelViewMatrix.mul(posExtra.get(iii));
+                    //upload to buffer
                     modelViewMatrix.get(INSTANCE_SIZE_FLOATS * i, instanceDataBuffer);
 
 
                     i++;
                     index++;
                 }
+
+
                 //}
 
             }
@@ -174,9 +199,9 @@ public class InstancedMesh extends Mesh {
         }
 
         glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
-        glBufferData(GL_ARRAY_BUFFER, instanceDataBuffer, GL_DYNAMIC_DRAW);
+        if (!testSkip) glBufferData(GL_ARRAY_BUFFER, instanceDataBuffer, GL_DYNAMIC_DRAW);
 
-        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, i);
+        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, amountToRender);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
