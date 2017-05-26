@@ -53,18 +53,18 @@ public class Mesh {
             posExtra.add(matOffset);
         }
 
-        float[] normals = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
+        /*float[] normals = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
         int[] jointIndices = createEmptyIntArray(MAX_WEIGHTS * positions.length / 3, 0);
-        float[] weights = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
+        float[] weights = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);*/
 
         vertexCount = indices.length;
 
         FloatBuffer verticesBuffer = null;
         IntBuffer indicesBuffer = null;
         FloatBuffer textCoordsBuffer = null;
-        FloatBuffer vecNormalsBuffer = null;
+        /*FloatBuffer vecNormalsBuffer = null;
         IntBuffer jointIndicesBuffer = null;
-        FloatBuffer weightsBuffer = null;
+        FloatBuffer weightsBuffer = null;*/
         try {
 
 
@@ -142,7 +142,8 @@ public class Mesh {
         } finally {
             /**
              * TODO: test if we need to actually free the memory since we have to use BufferUtils.createFloatBuffer instead of MemoryUtil.memAllocFloat
-             * It's not trivial because I want to make it optional and using jemalloc requires explicit je_free calls to avoid leaking memory. Existing usages of BufferUtils do not have that requirement and will have to be adjusted accordingly.
+             * "It's not trivial because I want to make it optional and using jemalloc requires explicit je_free calls to avoid leaking memory.
+             * Existing usages of BufferUtils do not have that requirement and will have to be adjusted accordingly."
              *
              * BufferUtils is more automatic, doesnt need freeing, but can be slower and risks memory fragmentation, MemoryUtil gives more control and responsibility
              */

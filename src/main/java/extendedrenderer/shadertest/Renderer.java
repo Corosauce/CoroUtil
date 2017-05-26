@@ -11,6 +11,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Project;
+import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Matrix4f;
 import java.io.File;
@@ -156,7 +157,7 @@ public class Renderer {
         int i = 0;
 
         // Render each gameItem
-        if (false) {
+        if (true) {
             for (GameItem gameItem : gameItems) {
 
                 mesh = (InstancedMesh) gameItem.getMesh();
@@ -193,15 +194,15 @@ public class Renderer {
 
                 gameItem.setPosition(-0, 0, 3);
 
-                float xxx = (float) Math.sin(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.0082F);
-                float zzz = (float) Math.cos(Math.PI * ((float) i * 0.02F)) * ((float) i * 0.0082F);
+                float xxx = (float) Math.sin(Math.PI * ((float) (i+zz*0.5F) * 0.02F)) * ((float) i * 0.022F);
+                float zzz = (float) Math.cos(Math.PI * ((float) (i+zz*0.5F) * 0.02F)) * ((float) i * 0.022F);
                 float yyy = zz;
 
-                gameItem.setPosition(10 + xxx, 109/* + yyy + (i * 0.002F)*/, 0 + zzz);
+                gameItem.setPosition(10 + xxx, 109 + yyy + (i * 0.02F), 0 + zzz);
 
                 //gameItem.setPosition(10 + ((float)i*1), 109 + ((float)i*0), 0 + ((float)i*1));
 
-                gameItem.setScale(1F);
+                gameItem.setScale(3F);
 
 
                 // Update rotation angle
@@ -215,7 +216,10 @@ public class Renderer {
                 gameItem.getRotation().z += 0.4F;
                 gameItem.getRotation().y += 0.6F;*/
 
-                if (gameItem.getRotation().x > 360) {
+                gameItem.getRotation().setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(45)));
+                //gameItem.getRotation().setFromAxisAngle(new Vector4f(0, 0, 15, (float)Math.toRadians(15)));
+
+                /*if (gameItem.getRotation().x > 360) {
                     gameItem.getRotation().x = 0;
                 }
 
@@ -225,9 +229,9 @@ public class Renderer {
 
                 if (gameItem.getRotation().z > 360) {
                     gameItem.getRotation().z = 0;
-                }
+                }*/
 
-                gameItem.setRotation(0, 0, 0);
+                //gameItem.setRotation(0, 0, 0);
 
                 /*Matrix4fe matOffset = new Matrix4fe();
                 matOffset.identity();

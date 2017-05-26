@@ -35,6 +35,11 @@ public class InstancedMesh extends Mesh {
 
     private FloatBuffer instanceDataBuffer;
 
+    /**
+     * TODO: despite the mesh only being a size of 2 vbos instead of 5, lowering this to 2 breaks something somehow (no rendering)
+     * need to figure out where to fix so i can optimize memory usage
+     * not even sure if the memory is unoptimized, theres just gaps in the memory used probably
+     */
     private int vboSizeMesh = 5;
 
     public InstancedMesh(float[] positions, float[] textCoords, int[] indices, int numInstances) {
@@ -126,7 +131,10 @@ public class InstancedMesh extends Mesh {
     }
 
     private void renderChunkInstanced(List<GameItem> gameItems, Transformation transformation, Matrix4fe viewMatrix) {
-        //this.instanceDataBuffer.clear();
+
+        boolean testSkip = false;
+
+        if (!testSkip) this.instanceDataBuffer.clear();
 
         int i = 0;
         int index = 0;
@@ -134,7 +142,6 @@ public class InstancedMesh extends Mesh {
         //temp
         boolean billBoard = false;
 
-        boolean testSkip = false;
 
         int amountToRender = gameItems.size() * posExtra.size();
 

@@ -1,5 +1,7 @@
 package extendedrenderer.shadertest.gametest;
 
+import org.lwjgl.util.vector.Quaternion;
+
 import javax.vecmath.Vector3f;
 
 /**
@@ -11,7 +13,8 @@ public class GameItem {
 
     private float scale;
 
-    private Vector3f rotation;
+    //private Vector3f rotation;
+    private Quaternion rotation;
 
     private Mesh mesh;
 
@@ -19,7 +22,7 @@ public class GameItem {
         this.mesh = mesh;
         position = new Vector3f(0, 0, 0);
         scale = 1;
-        rotation = new Vector3f(0, 0, 0);
+        rotation = new Quaternion();
     }
 
     public Vector3f getPosition() {
@@ -40,7 +43,11 @@ public class GameItem {
         this.scale = scale;
     }
 
-    public Vector3f getRotation() {
+    /*public Vector3f getRotation() {
+        return rotation;
+    }*/
+
+    public Quaternion getRotation() {
         return rotation;
     }
 

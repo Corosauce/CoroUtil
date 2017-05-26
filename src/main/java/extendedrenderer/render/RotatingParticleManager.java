@@ -50,7 +50,7 @@ public class RotatingParticleManager
     /** Reference to the World object. */
     protected World worldObj;
     /**
-     * Second dimension: 0 = GlStateManager.depthMask true aka transparent textures, 1 = false
+     * Second dimension: 0 = GlStateManager.depthMask false aka transparent textures, 1 = true
      */
     public final List<ArrayDeque<Particle>[][]> fxLayers = new ArrayList<>();
     private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
@@ -354,17 +354,9 @@ public class RotatingParticleManager
 
         debugParticleRenderCount = 0;
 
-        if (Main.gameEngine == null) {
-            Main.initUnthreaded();
-            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
-            try {
-                //EventHandler.shaderTest.init();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
 
-        //GlStateManager.depthMask(false);
+
+        GlStateManager.depthMask(false);
 
         //testing no blending (so far notice no fps change)
         /*GL11.glDepthMask(true);
@@ -374,10 +366,20 @@ public class RotatingParticleManager
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
+        if (Main.gameEngine == null) {
+            Main.initUnthreaded();
+            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+            try {
+                //EventHandler.shaderTest.init();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
         Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
         //do cloud layer, then funnel layer
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
+            //do each texture mode, 0 and 1 are the only ones used now
             for (int i_nf = 0; i_nf < 3; ++i_nf) {
                 final int i = i_nf;
 

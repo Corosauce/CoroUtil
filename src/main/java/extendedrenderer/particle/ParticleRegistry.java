@@ -39,7 +39,9 @@ public class ParticleRegistry {
 	public static void init(TextureStitchEvent.Pre event) {
 		
 		//optifine breaks (removes) forge added method setTextureEntry, dont use it
-		
+
+		ParticleMeshBufferManager.cleanup();
+
 		squareGrey = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
 		smoke = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
 		smokeTest = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
@@ -67,6 +69,11 @@ public class ParticleRegistry {
 		debris_1 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_1"));
 		debris_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_2"));
 		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
+
+		ParticleMeshBufferManager.setupMeshForParticle(rain_white);
+		ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);
+
+		System.out.println("?");
 	}
 	
 	public static class TextureAtlasSpriteImpl extends TextureAtlasSprite {
