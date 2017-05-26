@@ -4,6 +4,9 @@ import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.util.Vec3;
+import extendedrenderer.shadertest.gametest.InstancedMesh;
+import extendedrenderer.shadertest.gametest.Matrix4fe;
+import extendedrenderer.shadertest.gametest.Transformation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
@@ -425,6 +428,12 @@ public class EntityRotFX extends Particle implements IWindHandler
 		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
 				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
+
+	public void renderParticleForShader(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+                                        float partialTicks, float rotationX, float rotationZ,
+                                        float rotationYZ, float rotationXY, float rotationXZ) {
+
+    }
 
 	@Override
 	public float getWindWeight() {

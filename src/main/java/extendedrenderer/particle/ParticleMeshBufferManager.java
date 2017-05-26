@@ -2,6 +2,7 @@ package extendedrenderer.particle;
 
 import extendedrenderer.shadertest.gametest.InstancedMesh;
 import extendedrenderer.shadertest.gametest.Mesh;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.HashMap;
@@ -50,5 +51,9 @@ public class ParticleMeshBufferManager {
             entry.getValue().cleanup();
         }
         lookupParticleToMesh.clear();
+    }
+
+    public static InstancedMesh getMesh(TextureAtlasSprite sprite) {
+        return lookupParticleToMesh.get(sprite);
     }
 }

@@ -1,6 +1,7 @@
 package extendedrenderer.shadertest.gametest;
 
 
+import extendedrenderer.particle.entity.EntityRotFX;
 import org.lwjgl.util.vector.Quaternion;
 
 import javax.vecmath.Vector3f;
@@ -60,8 +61,6 @@ public class Transformation {
     public Matrix4fe buildModelMatrix(GameItem gameItem, Vector3f posCustom) {
         Quaternion q = gameItem.getRotation();
 
-        //TODO: quaternion usage to make rotation math faster
-
         boolean quat = true;
 
         if (!quat) {
@@ -82,5 +81,15 @@ public class Transformation {
                     q.x, q.y, q.z, q.w/*rotation.w*/,
                     gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
         }
+    }
+
+    public Matrix4fe buildModelMatrix(EntityRotFX gameItem, Vector3f posCustom) {
+        Quaternion q = new Quaternion();//gameItem.getRotation();
+
+        Vector3f vecPos = posCustom != null ? posCustom : new Vector3f((float)gameItem.posX, (float)gameItem.posY, (float)gameItem.posZ);
+        return modelMatrix.translationRotateScale(
+                vecPos.x, vecPos.y, vecPos.z,
+                q.x, q.y, q.z, q.w,
+                gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
     }
 }

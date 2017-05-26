@@ -26,14 +26,16 @@ public class InstancedMesh extends Mesh {
     private static final int MATRIX_SIZE_BYTES = MATRIX_SIZE_FLOATS * FLOAT_SIZE_BYTES;
 
     private static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES * 2 + FLOAT_SIZE_BYTES * 2;
-    
-    private static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS * 2 + 2;
+
+    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS * 2 + 2;
 
     private final int numInstances;
 
-    private final int instanceDataVBO;
+    public final int instanceDataVBO;
 
-    private FloatBuffer instanceDataBuffer;
+    public FloatBuffer instanceDataBuffer;
+
+    public int curBufferPos = 0;
 
     /**
      * TODO: despite the mesh only being a size of 2 vbos instead of 5, lowering this to 2 breaks something somehow (no rendering)
@@ -89,7 +91,7 @@ public class InstancedMesh extends Mesh {
     }
 
     @Override
-    protected void initRender() {
+    public void initRender() {
         super.initRender();
 
         int start = vboSizeMesh;
@@ -100,7 +102,7 @@ public class InstancedMesh extends Mesh {
     }
 
     @Override
-    protected void endRender() {
+    public void endRender() {
         int start = vboSizeMesh;
         int numElements = 4 * 2 + 1;
         for (int i = 0; i < numElements; i++) {

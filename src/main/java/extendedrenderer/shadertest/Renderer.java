@@ -3,6 +3,8 @@ package extendedrenderer.shadertest;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import extendedrenderer.particle.ParticleMeshBufferManager;
+import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,9 +34,9 @@ public class Renderer {
 
     private static final float Z_FAR = 1000.f;
 
-    private ShaderProgram shaderProgram;
+    public ShaderProgram shaderProgram;
 
-    private Transformation transformation;
+    public Transformation transformation;
 
     public Renderer() {
         transformation = new Transformation();
@@ -152,7 +154,13 @@ public class Renderer {
         }
 
         //temp hack to test until redesign
-        InstancedMesh mesh = (InstancedMesh) gameItems.get(0).getMesh();
+        InstancedMesh mesh = null;
+
+        mesh = ParticleMeshBufferManager.getMesh(ParticleRegistry.rain_white);
+
+        if (mesh == null) {
+            mesh = (InstancedMesh) gameItems.get(0).getMesh();
+        }
 
         int i = 0;
 
@@ -160,7 +168,7 @@ public class Renderer {
         if (true) {
             for (GameItem gameItem : gameItems) {
 
-                mesh = (InstancedMesh) gameItem.getMesh();
+                //mesh = (InstancedMesh) gameItem.getMesh();
 
                 /*Vector3f itemPos = gameItem.getPosition();
                 float posx = itemPos.x + displxInc * 0.01f;

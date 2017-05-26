@@ -5,7 +5,7 @@ package extendedrenderer.particle;
  */
 public class ShaderManager {
 
-    public static boolean canUseShaders = true;
+    private static boolean canUseShaders = true;
 
     public static void init() {
         /**
@@ -13,6 +13,10 @@ public class ShaderManager {
          * - GLSL 3.1 (3.5?)
          * - instanced element rendering
          */
+    }
+
+    public static boolean canUseShaders() {
+        return canUseShaders;
     }
 
 }

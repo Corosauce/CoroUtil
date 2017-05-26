@@ -70,8 +70,8 @@ public class ParticleRegistry {
 		debris_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_2"));
 		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
 
-		ParticleMeshBufferManager.setupMeshForParticle(rain_white);
-		ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);
+
+		//ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);
 
 		System.out.println("?");
 	}
