@@ -10,6 +10,7 @@ import extendedrenderer.EventHandler;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.shadertest.Renderer;
 import extendedrenderer.shadertest.gametest.Main;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
@@ -52,7 +53,7 @@ public class RotatingParticleManager
     /**
      * Second dimension: 0 = GlStateManager.depthMask false aka transparent textures, 1 = true
      */
-    public final List<ArrayDeque<Particle>[][]> fxLayers = new ArrayList<>();
+    public final HashMap<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> fxLayers = new HashMap<>();
     private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
     private final TextureManager renderer;
     private final Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
@@ -72,13 +73,29 @@ public class RotatingParticleManager
         this.worldObj = worldIn;
         this.renderer = rendererIn;
 
+
+
+        /*shaderTest = new Renderer();
+        try {
+            shaderTest.init();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }*/
+
+
+        //this.registerVanillaParticles();
+    }
+
+    public void initNewArrayData(TextureAtlasSprite sprite) {
+        List<ArrayDeque<Particle>[][]> list = new ArrayList<>();
+
         //main default layer
-        fxLayers.add(0, new ArrayDeque[4][]);
+        list.add(0, new ArrayDeque[4][]);
 
         //layer for tornado funnel
-        fxLayers.add(1, new ArrayDeque[4][]);
+        list.add(1, new ArrayDeque[4][]);
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
+        for (ArrayDeque<Particle>[][] entry : list) {
             for (int i = 0; i < 4; ++i)
             {
                 entry[i] = new ArrayDeque[2];
@@ -90,15 +107,7 @@ public class RotatingParticleManager
             }
         }
 
-        /*shaderTest = new Renderer();
-        try {
-            shaderTest.init();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }*/
-
-
-        //this.registerVanillaParticles();
+        fxLayers.put(sprite, list);
     }
 
     public void registerParticle(int id, IParticleFactory particleFactory)
@@ -175,7 +184,11 @@ public class RotatingParticleManager
                     renderOrder = ((EntityRotFX) particle).renderOrder;
                 }
 
-                ArrayDeque<Particle>[][] entry = fxLayers.get(renderOrder);
+                if (!fxLayers.containsKey(particle.particleTexture)) {
+                    initNewArrayData(particle.particleTexture);
+                }
+
+                ArrayDeque<Particle>[][] entry = fxLayers.get(particle.particleTexture).get(renderOrder);
 
                 if (entry[j][k].size() >= 16384) {
                     entry[j][k].removeFirst();
@@ -197,9 +210,12 @@ public class RotatingParticleManager
         for (int i = 0; i < 2; ++i)
         {
             //this.worldObj.theProfiler.startSection(i + "");
-            for (ArrayDeque<Particle>[][] entry : fxLayers) {
-                this.tickParticleList(entry[layer][i]);
+            for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+                for (ArrayDeque<Particle>[][] entry2 : entry1.getValue()) {
+                    this.tickParticleList(entry2[layer][i]);
+                }
             }
+
             //this.worldObj.theProfiler.endSection();
         }
 
@@ -214,7 +230,7 @@ public class RotatingParticleManager
 
             while (iterator.hasNext())
             {
-                Particle particle = (Particle)iterator.next();
+                Particle particle = iterator.next();
                 this.tickParticle(particle);
 
                 if (!particle.isAlive())
@@ -377,59 +393,62 @@ public class RotatingParticleManager
         }
         Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
-        //do cloud layer, then funnel layer
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            //do each texture mode, 0 and 1 are the only ones used now
-            for (int i_nf = 0; i_nf < 3; ++i_nf) {
-                final int i = i_nf;
+        //do sprite/mesh list
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+            //do cloud layer, then funnel layer
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                //do each texture mode, 0 and 1 are the only ones used now
+                for (int i_nf = 0; i_nf < 3; ++i_nf) {
+                    final int i = i_nf;
 
-                //do non depth mask (for transparent ones), then depth mask
-                for (int j = 0; j < 2; ++j) {
-                    if (!entry[i][j].isEmpty()) {
-                        switch (j) {
-                            case 0:
-                                GlStateManager.depthMask(false);
-                                break;
-                            case 1:
-                                GlStateManager.depthMask(true);
-                        }
+                    //do non depth mask (for transparent ones), then depth mask
+                    for (int j = 0; j < 2; ++j) {
+                        if (!entry[i][j].isEmpty()) {
+                            switch (j) {
+                                case 0:
+                                    GlStateManager.depthMask(false);
+                                    break;
+                                case 1:
+                                    GlStateManager.depthMask(true);
+                            }
 
-                        switch (i) {
-                            case 0:
-                            default:
-                                this.renderer.bindTexture(PARTICLE_TEXTURES);
-                                break;
-                            case 1:
-                                this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                        }
+                            switch (i) {
+                                case 0:
+                                default:
+                                    this.renderer.bindTexture(PARTICLE_TEXTURES);
+                                    break;
+                                case 1:
+                                    this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                            }
 
-                        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                        Tessellator tessellator = Tessellator.getInstance();
-                        VertexBuffer vertexbuffer = tessellator.getBuffer();
-                        vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+                            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                            Tessellator tessellator = Tessellator.getInstance();
+                            VertexBuffer vertexbuffer = tessellator.getBuffer();
+                            vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
-                        for (final Particle particle : entry[i][j]) {
-                            //try {
+                            for (final Particle particle : entry[i][j]) {
+                                //try {
                                 particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
                                 debugParticleRenderCount++;
-                            /*} catch (Throwable throwable) {
-                                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
-                                CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
-                                crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
-                                    public String call() throws Exception {
-                                        return particle.toString();
-                                    }
-                                });
-                                crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>() {
-                                    public String call() throws Exception {
-                                        return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
-                                    }
-                                });
-                                throw new ReportedException(crashreport);
-                            }*/
-                        }
+                                /*} catch (Throwable throwable) {
+                                    CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
+                                    CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
+                                    crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
+                                        public String call() throws Exception {
+                                            return particle.toString();
+                                        }
+                                    });
+                                    crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>() {
+                                        public String call() throws Exception {
+                                            return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
+                                        }
+                                    });
+                                    throw new ReportedException(crashreport);
+                                }*/
+                            }
 
-                        tessellator.draw();
+                            tessellator.draw();
+                        }
                     }
                 }
             }
@@ -463,16 +482,18 @@ public class RotatingParticleManager
         float f4 = f1 * MathHelper.sin(entityIn.rotationPitch * 0.017453292F);
         float f5 = MathHelper.cos(entityIn.rotationPitch * 0.017453292F);
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i = 0; i < 2; ++i) {
-                Queue<Particle> queue = entry[3][i];
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < 2; ++i) {
+                    Queue<Particle> queue = entry[3][i];
 
-                if (!queue.isEmpty()) {
-                    Tessellator tessellator = Tessellator.getInstance();
-                    VertexBuffer vertexbuffer = tessellator.getBuffer();
+                    if (!queue.isEmpty()) {
+                        Tessellator tessellator = Tessellator.getInstance();
+                        VertexBuffer vertexbuffer = tessellator.getBuffer();
 
-                    for (Particle particle : queue) {
-                        particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);
+                        for (Particle particle : queue) {
+                            particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);
+                        }
                     }
                 }
             }
@@ -483,10 +504,12 @@ public class RotatingParticleManager
     {
         this.worldObj = worldIn;
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 2; ++j) {
-                    entry[i][j].clear();
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < 4; ++i) {
+                    for (int j = 0; j < 2; ++j) {
+                        entry[i][j].clear();
+                    }
                 }
             }
         }
