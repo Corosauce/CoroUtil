@@ -3,6 +3,8 @@ package extendedrenderer.particle.entity;
 import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
+import CoroUtil.util.CoroUtilMath;
+import CoroUtil.util.CoroUtilParticle;
 import CoroUtil.util.Vec3;
 import extendedrenderer.shadertest.gametest.InstancedMesh;
 import extendedrenderer.shadertest.gametest.Matrix4fe;
@@ -22,6 +24,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
+import org.lwjgl.util.vector.Quaternion;
+
+import javax.vecmath.Vector3f;
 
 @SideOnly(Side.CLIENT)
 public class EntityRotFX extends Particle implements IWindHandler
@@ -90,6 +95,8 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     private boolean slantParticleToWind = false;
 
+    public Quaternion rotation;
+
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -98,6 +105,8 @@ public class EntityRotFX extends Particle implements IWindHandler
         //this.setMaxAge(100);
         
         this.entityID = par1World.rand.nextInt(100000);
+
+        rotation = new Quaternion();
     }
 
     public boolean isSlantParticleToWind() {
@@ -171,6 +180,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     @Override
     public void onUpdate() {
     	super.onUpdate();
+
+        //if (this.entityID % 400 == 0) System.out.println("onUpdate time: " + this.worldObj.getTotalWorldTime());
     	
     	if (!isVanillaMotionDampen()) {
     		//cancel motion dampening (which is basically air resistance)
@@ -433,6 +444,21 @@ public class EntityRotFX extends Particle implements IWindHandler
                                         float partialTicks, float rotationX, float rotationZ,
                                         float rotationYZ, float rotationXY, float rotationXZ) {
 
+        if (mesh.curBufferPos >= mesh.numInstances) return;
+
+        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks/* - this.interpPosX*/);
+        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks/* - this.interpPosY*/);
+        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
+        //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
+        Vector3f pos = new Vector3f(-posX, posY, -posZ);
+
+        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+
+        //adjust to perspective and camera
+        Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+        //upload to buffer
+        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
+        
     }
 
 	@Override
@@ -527,5 +553,11 @@ public class EntityRotFX extends Particle implements IWindHandler
     @Override
     public int getBrightnessForRender(float p_189214_1_) {
         return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.worldObj.getSunBrightness(1F))*/;
+    }
+
+    public void updateQuaternion() {
+
+        //tested that negative values of rotations match minecraft rotations
+        CoroUtilMath.rotation(rotation, (float)Math.toRadians(-rotationPitch), (float)Math.toRadians(-rotationYaw), 0);
     }
 }

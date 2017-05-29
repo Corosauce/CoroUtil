@@ -6,7 +6,7 @@ import java.util.Random;
 public class CoroUtilParticle {
 
     public static Vec3[] rainPositions;
-    public static int maxRainDrops = 200;
+    public static int maxRainDrops = 2000;
     
     public static Random rand = new Random();
     

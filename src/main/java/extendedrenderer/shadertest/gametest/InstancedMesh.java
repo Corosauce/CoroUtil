@@ -29,7 +29,7 @@ public class InstancedMesh extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS * 2 + 2;
 
-    private final int numInstances;
+    public final int numInstances;
 
     public final int instanceDataVBO;
 
@@ -145,7 +145,7 @@ public class InstancedMesh extends Mesh {
         boolean billBoard = false;
 
 
-        int amountToRender = gameItems.size() * posExtra.size();
+        int amountToRender = gameItems.size() * Mesh.extraRenders;
 
         //Texture text = getMaterial().getTexture();
         for (int ii = 0; !testSkip && ii < gameItems.size(); ii++) {
@@ -158,7 +158,7 @@ public class InstancedMesh extends Mesh {
 
 
                 //if (index != 0) {
-                for (int iii = 0; iii < posExtra.size(); iii++) {
+                for (int iii = 0; iii < Mesh.extraRenders; iii++) {
 
                     //CoroUtilParticle.rainPositions[ii].xCoord;
 

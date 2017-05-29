@@ -1,5 +1,7 @@
 package extendedrenderer.render;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.*;
 
@@ -17,6 +19,7 @@ import extendedrenderer.shadertest.Renderer;
 import extendedrenderer.shadertest.ShaderProgram;
 import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -81,6 +84,8 @@ public class RotatingParticleManager
     public static float sandstormFogAmount = 0F;
 
     public static int debugParticleRenderCount;
+
+    public static int lastAmountToRender;
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
@@ -384,7 +389,7 @@ public class RotatingParticleManager
 
         debugParticleRenderCount = 0;
 
-        GlStateManager.depthMask(false);
+        //GlStateManager.depthMask(false);
 
         //testing no blending (so far notice no fps change)
         /*GL11.glDepthMask(true);
@@ -396,7 +401,10 @@ public class RotatingParticleManager
 
         if (Main.gameEngine == null) {
             Main.initUnthreaded();
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);
+
             //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
             try {
                 //EventHandler.shaderTest.init();
@@ -404,6 +412,11 @@ public class RotatingParticleManager
                 ex.printStackTrace();
             }
         }
+        if (ParticleMeshBufferManager.getMesh(ParticleRegistry.leaf) == null) {
+            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);
+        }
+        GlStateManager.disableCull();
         //Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
         Transformation transformation = null;
@@ -415,6 +428,8 @@ public class RotatingParticleManager
 
         int glCalls = 0;
         int trueRenderCount = 0;
+        int bufferSize = 0;
+        int particles = 0;
 
         if (useShaders) {
             ShaderProgram shaderProgram = Main.gameLogic.renderer.shaderProgram;
@@ -452,7 +467,7 @@ public class RotatingParticleManager
             shaderProgram.setUniform("texture_sampler", 0);
         }
 
-        GlStateManager.disableCull();
+
 
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
@@ -494,30 +509,71 @@ public class RotatingParticleManager
                                     mesh.instanceDataBuffer.clear();
                                     mesh.curBufferPos = 0;
 
+                                    int amountToRender = entry[i][j].size() * Mesh.extraRenders * 1;
+
+                                    //mesh.instanceDataBuffer.limit(100000 * mesh.INSTANCE_SIZE_FLOATS);
+                                    mesh.instanceDataBuffer.limit(amountToRender * mesh.INSTANCE_SIZE_FLOATS);
+
+                                    //int extraBufferSize = 30000;
+
+                                    //rebuffer when theres a difference of 1000, also making sure theres 1000 extra when resizing
+                                    /*boolean resize = false;
+                                    if (amountToRender > lastAmountToRender) {
+                                        resize = true;
+                                    } else if (amountToRender + extraBufferSize < lastAmountToRender) {
+                                        resize = true;
+                                    }
+
+                                    if (resize) {
+                                        System.out.println("resizing buffer to " + (amountToRender + extraBufferSize));
+                                        System.out.println("p: " + entry[i][j].size());
+                                        mesh.instanceDataBuffer = BufferUtils.createFloatBuffer((amountToRender + extraBufferSize) * InstancedMesh.INSTANCE_SIZE_FLOATS);
+                                        lastAmountToRender = amountToRender + extraBufferSize;
+                                    }*/
+
+                                    //mesh.instanceDataBuffer = BufferUtils.createFloatBuffer(100000 * InstancedMesh.INSTANCE_SIZE_FLOATS);
+
+                                    //ByteArrayOutputStream test = new ByteArrayOutputStream();
+
+                                    particles = entry[i][j].size();
+
                                     if (true) {
                                         for (final Particle particle : entry[i][j]) {
                                             if (particle instanceof EntityRotFX) {
                                                 EntityRotFX part = (EntityRotFX) particle;
-                                                for (int iii = 0; iii < mesh.posExtra.size(); iii++) {
-                                                    float posX = (float)(part.prevPosX + (part.posX - part.prevPosX) * (double)partialTicks/* - part.interpPosX*/);
-                                                    float posY = (float)(part.prevPosY + (part.posY - part.prevPosY) * (double)partialTicks/* - part.interpPosY*/);
-                                                    float posZ = (float)(part.prevPosZ + (part.posZ - part.prevPosZ) * (double)partialTicks/* - part.interpPosZ*/);
-                                                    //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
-                                                    Vector3f pos = new Vector3f(-posX, posY, -posZ);
-                                                    Vector3f posCustom = null;
 
-                                                    if (iii != 0) {
-                                                        pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
-                                                                pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
-                                                                pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+
+                                                boolean newMethod = true;
+
+                                                if (newMethod) {
+                                                    part.rotationPitch = 90;
+                                                    part.rotationYaw = 0;
+
+                                                    part.updateQuaternion();
+                                                    part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+                                                } else {
+
+                                                    for (int iii = 0; iii < Mesh.extraRenders; iii++) {
+                                                        float posX = (float) (part.prevPosX + (part.posX - part.prevPosX) * (double) partialTicks/* - part.interpPosX*/);
+                                                        float posY = (float) (part.prevPosY + (part.posY - part.prevPosY) * (double) partialTicks/* - part.interpPosY*/);
+                                                        float posZ = (float) (part.prevPosZ + (part.posZ - part.prevPosZ) * (double) partialTicks/* - part.interpPosZ*/);
+                                                        //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
+                                                        Vector3f pos = new Vector3f(-posX, posY, -posZ);
+                                                        Vector3f posCustom = null;
+
+                                                        if (iii != 0) {
+                                                            pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+                                                                    pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+                                                                    pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+                                                        }
+
+                                                        Matrix4fe modelMatrix = transformation.buildModelMatrix(part, pos);
+
+                                                        //adjust to perspective and camera
+                                                        Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+                                                        //upload to buffer
+                                                        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
                                                     }
-
-                                                    Matrix4fe modelMatrix = transformation.buildModelMatrix(part, pos);
-
-                                                    //adjust to perspective and camera
-                                                    Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
-                                                    //upload to buffer
-                                                    modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
                                                 }
                                             }
                                         }
@@ -526,12 +582,19 @@ public class RotatingParticleManager
                                     glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
                                     glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
 
+
+
+                                    //ByteBuffer wat = BufferUtils.
+
+                                    //glBufferData(GL_ARRAY_BUFFER, , GL_DYNAMIC_DRAW);
+
                                     //System.out.println("rendercount: " + mesh.curBufferPos);
 
                                     glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
 
                                     glCalls++;
                                     trueRenderCount += mesh.curBufferPos;
+                                    //bufferSize = mesh.instanceDataBuffer.capacity();
 
                                     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -543,6 +606,14 @@ public class RotatingParticleManager
 
                                     for (final Particle particle : entry[i][j]) {
                                         //try {
+
+                                        if (particle instanceof EntityRotFX) {
+                                            EntityRotFX part = (EntityRotFX) particle;
+                                            //part.rotationPitch = 0;
+                                            //part.rotationYaw = 45;
+                                            part.rotationPitch = 90;
+                                            part.rotationYaw = 0;
+                                        }
                                         particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
                                         debugParticleRenderCount++;
                                 /*} catch (Throwable throwable) {
@@ -584,9 +655,13 @@ public class RotatingParticleManager
             Main.gameLogic.renderer.shaderProgram.unbind();
         }
 
-        //System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
-        //System.out.println("glCalls: " + glCalls);
-        //System.out.println("trueRenderCount: " + trueRenderCount);
+
+        if (worldObj.getTotalWorldTime() % 60 == 0) {
+            System.out.println("particles: " + particles);
+            System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
+            System.out.println("trueRenderCount: " + trueRenderCount);
+            System.out.println("glCalls: " + glCalls);
+        }
         
         if (fog) {
         	GlStateManager.disableFog();

@@ -1,6 +1,7 @@
 package extendedrenderer.shadertest;
 
 
+import CoroUtil.util.CoroUtilMath;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import extendedrenderer.particle.ParticleMeshBufferManager;
@@ -13,6 +14,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.glu.Project;
+import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Matrix4f;
@@ -184,7 +186,9 @@ public class Renderer {
                 }
                 gameItem.setScale(scale);*/
 
-                float zz = (float) Math.sin(Math.toRadians(((mc.theWorld.getTotalWorldTime()+(i*2)) * 3) % 360)) * 3F;
+                long time = mc.theWorld.getTotalWorldTime();
+
+                float zz = (float) Math.sin(Math.toRadians(((time+(i*2)) * 3) % 360)) * 3F;
 
                 //gameItem.setPosition((float)mc.thePlayer.posX, (float)mc.thePlayer.posY, (float)mc.thePlayer.posZ + (zz * 25) - 50);
 
@@ -224,7 +228,18 @@ public class Renderer {
                 gameItem.getRotation().z += 0.4F;
                 gameItem.getRotation().y += 0.6F;*/
 
-                gameItem.getRotation().setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(45)));
+                //gameItem.getRotation().setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(45)));
+                float rotX = (float)Math.toRadians(time % 360);
+                float rotY = (float)Math.toRadians(time % 360) * 2F;
+                float rotZ = (float)Math.toRadians(time % 360) * 3F;
+
+                rotX = 45;
+                rotY = 0;
+                rotZ = 45;
+
+                CoroUtilMath.rotation(gameItem.getRotation(), rotX, rotY, rotZ);
+
+
                 //gameItem.getRotation().setFromAxisAngle(new Vector4f(0, 0, 15, (float)Math.toRadians(15)));
 
                 /*if (gameItem.getRotation().x > 360) {

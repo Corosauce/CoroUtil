@@ -38,7 +38,7 @@ public class Mesh {
 
     public static final int MAX_WEIGHTS = 4;
 
-    public List<Matrix4fe> posExtra = new ArrayList<>();
+    //public List<Matrix4fe> posExtra = new ArrayList<>();
 
     public static int extraRenders = 10;
 
@@ -46,12 +46,12 @@ public class Mesh {
 
         float radius = 10;
         Random rand = new Random();
-        for (int i = 0; i < extraRenders; i++) {
+        /*for (int i = 0; i < extraRenders; i++) {
             Matrix4fe matOffset = new Matrix4fe();
             matOffset.identity();
             matOffset.translate(rand.nextFloat() * radius - rand.nextFloat() * radius, rand.nextFloat() * radius - rand.nextFloat() * radius, rand.nextFloat() * radius - rand.nextFloat() * radius);
             posExtra.add(matOffset);
-        }
+        }*/
 
         /*float[] normals = createEmptyFloatArray(MAX_WEIGHTS * positions.length / 3, 0);
         int[] jointIndices = createEmptyIntArray(MAX_WEIGHTS * positions.length / 3, 0);

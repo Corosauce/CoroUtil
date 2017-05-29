@@ -1,6 +1,10 @@
 package extendedrenderer.particle.entity;
 
 import extendedrenderer.render.RotatingParticleManager;
+import extendedrenderer.shadertest.gametest.InstancedMesh;
+import extendedrenderer.shadertest.gametest.Matrix4fe;
+import extendedrenderer.shadertest.gametest.Mesh;
+import extendedrenderer.shadertest.gametest.Transformation;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -10,6 +14,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
+
+import javax.vecmath.Vector3f;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 
@@ -68,8 +74,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
 		} else {
 			if (this.isSlantParticleToWind()) {
-				rotationXZ = (float) -this.motionZ;
-				rotationXY = (float) -this.motionX;
+				//rotationXZ = (float) -this.motionZ;
+				//rotationXY = (float) -this.motionX;
 			}
 			//rotationXZ = 6.28F;
 			//rotationXY = 1;
@@ -130,7 +136,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
 
         //test
-		//rainDrops = 10;
+		rainDrops = 10;
 
 		//catch code hotload crash, doesnt help much anyways
 		try {
@@ -211,6 +217,38 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 
         
+	}
+
+	public void renderParticleForShader(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+										float partialTicks, float rotationX, float rotationZ,
+										float rotationYZ, float rotationXY, float rotationXZ) {
+
+		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks/* - this.interpPosX*/);
+		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks/* - this.interpPosY*/);
+		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
+		//Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
+
+		for (int iii = 0; iii < Mesh.extraRenders * 1; iii++) {
+
+			if (mesh.curBufferPos >= mesh.numInstances) return;
+
+			Vector3f pos = new Vector3f(-posX, posY, -posZ);
+			Vector3f posCustom = null;
+
+			if (iii != 0) {
+				pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+						pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+						pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+			}
+
+			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+
+			//adjust to perspective and camera
+			Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+			//upload to buffer
+			modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
+		}
+
 	}
 
 }

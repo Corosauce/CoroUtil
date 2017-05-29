@@ -79,17 +79,17 @@ public class Transformation {
             return modelMatrix.translationRotateScale(
                     vecPos.x, vecPos.y, vecPos.z,
                     q.x, q.y, q.z, q.w/*rotation.w*/,
-                    gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
+                    gameItem.getScale() * 1.5F, gameItem.getScale() * 1.5F, gameItem.getScale() * 1.5F);
         }
     }
 
     public Matrix4fe buildModelMatrix(EntityRotFX gameItem, Vector3f posCustom) {
-        Quaternion q = new Quaternion();//gameItem.getRotation();
+        Quaternion q = gameItem.rotation;
 
         Vector3f vecPos = posCustom != null ? posCustom : new Vector3f((float)gameItem.posX, (float)gameItem.posY, (float)gameItem.posZ);
         return modelMatrix.translationRotateScale(
                 vecPos.x, vecPos.y, vecPos.z,
                 q.x, q.y, q.z, q.w,
-                gameItem.getScale(), gameItem.getScale(), gameItem.getScale());
+                gameItem.getScale() * 0.1F * 1.5F, gameItem.getScale() * 0.1F * 1.5F, gameItem.getScale() * 0.1F * 1.5F);
     }
 }
