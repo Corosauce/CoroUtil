@@ -148,7 +148,7 @@ public class InstancedMesh extends Mesh {
         int amountToRender = gameItems.size() * Mesh.extraRenders;
 
         //Texture text = getMaterial().getTexture();
-        for (int ii = 0; !testSkip && ii < gameItems.size(); ii++) {
+        for (int ii = 0; /*!testSkip && */ii < gameItems.size(); ii++) {
         //for (GameItem gameItem : gameItems) {
             GameItem gameItem = gameItems.get(ii);
 
@@ -164,15 +164,23 @@ public class InstancedMesh extends Mesh {
 
                     Vector3f pos = gameItem.getPosition();
                     Vector3f posCustom = null;
+                    Matrix4fe modelMatrix = null;
 
                     if (iii != 0) {
                         posCustom = new Vector3f(pos.getX() + (float)CoroUtilParticle.rainPositions[iii].xCoord,
                                 pos.getY() + (float)CoroUtilParticle.rainPositions[iii].yCoord,
                                 pos.getZ() + (float)CoroUtilParticle.rainPositions[iii].zCoord);
+                        modelMatrix = gameItem.modelMatrix;//new Matrix4fe(gameItem.modelMatrix);
+                        modelMatrix._m30(posCustom.getX());
+                        modelMatrix._m31(posCustom.getY());
+                        modelMatrix._m32(posCustom.getZ());
+                    } else {
+                        gameItem.modelMatrix = transformation.buildModelMatrix(gameItem, pos);
+                        modelMatrix = gameItem.modelMatrix;
                     }
 
                     //get model matrix with extra render position factored in
-                    Matrix4fe modelMatrix = transformation.buildModelMatrix(gameItem, posCustom);
+                    //modelMatrix = transformation.buildModelMatrix(gameItem, posCustom);
 
                     if (billBoard) {
                         viewMatrix.transpose3x3(modelMatrix);

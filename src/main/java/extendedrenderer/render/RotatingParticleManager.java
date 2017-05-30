@@ -9,12 +9,14 @@ import javax.annotation.Nullable;
 import javax.vecmath.Vector3f;
 
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.util.CoroUtilMath;
 import CoroUtil.util.CoroUtilParticle;
 import extendedrenderer.EventHandler;
 import extendedrenderer.particle.ParticleMeshBufferManager;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;
+import extendedrenderer.particle.entity.ParticleTexExtraRender;
 import extendedrenderer.shadertest.Renderer;
 import extendedrenderer.shadertest.ShaderProgram;
 import extendedrenderer.shadertest.gametest.*;
@@ -53,6 +55,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -86,6 +90,8 @@ public class RotatingParticleManager
     public static int debugParticleRenderCount;
 
     public static int lastAmountToRender;
+
+    public static boolean useShaders;
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
@@ -296,7 +302,7 @@ public class RotatingParticleManager
     {
 
 
-
+        //if (true) return;
 
 
         float f = ActiveRenderInfo.getRotationX();
@@ -312,6 +318,7 @@ public class RotatingParticleManager
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
+        //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
 
@@ -396,14 +403,17 @@ public class RotatingParticleManager
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_BLEND);*/
 
+
+
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
         if (Main.gameEngine == null) {
             Main.initUnthreaded();
-            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);
+            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
+            /*ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);*/
 
             //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
             try {
@@ -412,19 +422,27 @@ public class RotatingParticleManager
                 ex.printStackTrace();
             }
         }
-        if (ParticleMeshBufferManager.getMesh(ParticleRegistry.leaf) == null) {
-            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);
-        }
         GlStateManager.disableCull();
         //Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
+
+        //if (true) return;
 
         Transformation transformation = null;
         Matrix4fe viewMatrix = null;
 
-        boolean useShaders = ShaderManager.canUseShaders();
+        useShaders = ShaderManager.canUseShaders();
+
+        if (worldObj.getTotalWorldTime() % 60 < 30) {
+            //useShaders = false;
+        }
 
         //useShaders = false;
+
+        //useShaders = !useShaders;
+
+        //
+
+
 
         int glCalls = 0;
         int trueRenderCount = 0;
@@ -448,31 +466,85 @@ public class RotatingParticleManager
 
                 float posScale = 1.0F;
 
-                camera.setPosition((float) mc.getRenderViewEntity().posX * posScale,
-                        (float) -mc.getRenderViewEntity().posY/* * posScale*/,
-                        (float) mc.getRenderViewEntity().posZ * posScale);
+                Entity entity = mc.getRenderViewEntity();
+
+                double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
+                double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
+                double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
+
+                y += 1.62F;
+
+                /*camera.setPosition((float) mc.getRenderViewEntity().posX,
+                        (float) -mc.getRenderViewEntity().posY,
+                        (float) mc.getRenderViewEntity().posZ);*/
+
+                camera.setPosition((float) x,
+                        (float) -y,
+                        (float) z);
 
                 //always 0 apparently, maybe for spectator mode
-                float pitch = (float)mc.entityRenderer.cameraPitch;
+                /*float pitch = (float)mc.entityRenderer.cameraPitch;
                 float yaw = (float)mc.entityRenderer.cameraYaw;
 
                 pitch = mc.getRenderViewEntity().rotationPitch;
-                yaw = mc.getRenderViewEntity().rotationYaw;
+                yaw = mc.getRenderViewEntity().rotationYaw;*/
+
+                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks/* + 180.0F*/;
+                float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
 
                 camera.setRotation(pitch, yaw, 0);
             }
 
             viewMatrix = transformation.getViewMatrix(camera);
 
+            boolean alternateCameraCapture = false;
+            if (alternateCameraCapture) {
+                //store camera matrix
+                GL11.glPushMatrix();
+                //er.orientCamera(partialTicks);
+                Entity entity = mc.getRenderViewEntity();
+                GlStateManager.translate(0, 0, 0.05);
+                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks/* + 180.0F*/;
+                float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
+                GlStateManager.rotate(0, 0.0F, 0.0F, 1.0F);
+                GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
+                float f22 = entity.getEyeHeight();
+                GlStateManager.translate(0.0F, -f22, 0.0F);
+                //extra
+                GlStateManager.translate(0.0F, -entity.posY, 0.0F);
+                //viewMatrix = new Matrix4fe();
+                FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
+                GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
+                buf2.rewind();
+                //Matrix4fe.get(viewMatrix, 0, buf2);
+                //Matrix4fe.get(viewMatrix, 0, ActiveRenderInfo.MODELVIEW);
+                GL11.glPopMatrix();
+            }
+
+
             shaderProgram.setUniform("texture_sampler", 0);
         }
 
-
+        float rotYawOverride = 0;
+        float rotPitchOverride = 0;
 
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
 
             InstancedMesh mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+
+            //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.cloud256) continue;
+
+            //TODO: register if missing, maybe relocate this
+            if (mesh == null) {
+                ParticleMeshBufferManager.setupMeshForParticle(entry1.getKey());
+                mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+            }
+
+            //TEMP
+            //mesh = null;
+
             if (mesh != null) {
                 //do cloud layer, then funnel layer
                 for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
@@ -486,9 +558,13 @@ public class RotatingParticleManager
                                 switch (j) {
                                     case 0:
                                         GlStateManager.depthMask(false);
+                                        GL11.glEnable(GL11.GL_ALPHA_TEST);
+                                        /*GlStateManager.depthMask(true);
+                                        GL11.glDisable(GL11.GL_ALPHA_TEST);*/
                                         break;
                                     case 1:
                                         GlStateManager.depthMask(true);
+                                        GL11.glDisable(GL11.GL_ALPHA_TEST);
                                 }
 
                                 switch (i) {
@@ -509,7 +585,12 @@ public class RotatingParticleManager
                                     mesh.instanceDataBuffer.clear();
                                     mesh.curBufferPos = 0;
 
-                                    int amountToRender = entry[i][j].size() * Mesh.extraRenders * 1;
+                                    int amountToRender = entry[i][j].size()/* * Mesh.extraRenders * 1*/;
+
+                                    //TODO: predict amount, not hardcode weirdness
+                                    if (entry1.getKey() == ParticleRegistry.rain_white) {
+                                        amountToRender = entry[i][j].size() * Mesh.extraRenders * 10;
+                                    }
 
                                     //mesh.instanceDataBuffer.limit(100000 * mesh.INSTANCE_SIZE_FLOATS);
                                     mesh.instanceDataBuffer.limit(amountToRender * mesh.INSTANCE_SIZE_FLOATS);
@@ -546,10 +627,17 @@ public class RotatingParticleManager
                                                 boolean newMethod = true;
 
                                                 if (newMethod) {
-                                                    part.rotationPitch = 90;
-                                                    part.rotationYaw = 0;
+                                                    //part.rotationPitch = rotPitchOverride;
+                                                    //part.rotationYaw = rotYawOverride;
 
-                                                    part.updateQuaternion();
+                                                    //part.updateQuaternion();
+                                                    //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
+                                                    Quaternion qY = new Quaternion();
+                                                    qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw)));
+                                                    Quaternion qX = new Quaternion();
+                                                    qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-part.rotationPitch)));
+                                                    Quaternion.mul(qY, qX, part.rotation);
+                                                    //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
                                                     part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
                                                 } else {
 
@@ -611,8 +699,8 @@ public class RotatingParticleManager
                                             EntityRotFX part = (EntityRotFX) particle;
                                             //part.rotationPitch = 0;
                                             //part.rotationYaw = 45;
-                                            part.rotationPitch = 90;
-                                            part.rotationYaw = 0;
+                                            //part.rotationPitch = 90;
+                                            //part.rotationYaw = 0;
                                         }
                                         particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
                                         debugParticleRenderCount++;

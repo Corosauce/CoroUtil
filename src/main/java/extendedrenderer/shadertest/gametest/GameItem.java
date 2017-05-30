@@ -14,9 +14,11 @@ public class GameItem {
     private float scale;
 
     //private Vector3f rotation;
-    private Quaternion rotation;
+    public Quaternion rotation;
 
     private Mesh mesh;
+
+    public Matrix4fe modelMatrix;
 
     public GameItem(Mesh mesh) {
         this.mesh = mesh;

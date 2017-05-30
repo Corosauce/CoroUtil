@@ -558,6 +558,6 @@ public class EntityRotFX extends Particle implements IWindHandler
     public void updateQuaternion() {
 
         //tested that negative values of rotations match minecraft rotations
-        CoroUtilMath.rotation(rotation, (float)Math.toRadians(-rotationPitch), (float)Math.toRadians(-rotationYaw), 0);
+        //CoroUtilMath.rotation(rotation, (float)Math.toRadians(-rotationPitch), (float)Math.toRadians(-rotationYaw), 0);
     }
 }

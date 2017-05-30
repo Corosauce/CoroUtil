@@ -136,7 +136,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
 
         //test
-		rainDrops = 10;
+		rainDrops = 100;
 
 		//catch code hotload crash, doesnt help much anyways
 		try {
@@ -228,7 +228,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
 		//Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
 
-		for (int iii = 0; iii < Mesh.extraRenders * 1; iii++) {
+		for (int iii = 0; iii < (this.noExtraParticles ? 1 : Mesh.extraRenders * 10); iii++) {
 
 			if (mesh.curBufferPos >= mesh.numInstances) return;
 
@@ -240,6 +240,12 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 						pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
 						pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
 			}
+
+			//TODO: fix coords, retest all, assume all wrong
+			/*if (this.isDontRenderUnderTopmostBlock()) {
+				int height = this.worldObj.getPrecipitationHeight(new BlockPos(pos.x, posY, pos.z)).getY();
+				if (pos.y <= height) continue;
+			}*/
 
 			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
 

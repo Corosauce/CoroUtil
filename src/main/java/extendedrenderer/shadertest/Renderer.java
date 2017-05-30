@@ -158,7 +158,7 @@ public class Renderer {
         //temp hack to test until redesign
         InstancedMesh mesh = null;
 
-        mesh = ParticleMeshBufferManager.getMesh(ParticleRegistry.rain_white);
+        //mesh = ParticleMeshBufferManager.getMesh(ParticleRegistry.rain_white);
 
         if (mesh == null) {
             mesh = (InstancedMesh) gameItems.get(0).getMesh();
@@ -167,7 +167,7 @@ public class Renderer {
         int i = 0;
 
         // Render each gameItem
-        if (true) {
+        if (false) {
             for (GameItem gameItem : gameItems) {
 
                 //mesh = (InstancedMesh) gameItem.getMesh();
@@ -214,7 +214,7 @@ public class Renderer {
 
                 //gameItem.setPosition(10 + ((float)i*1), 109 + ((float)i*0), 0 + ((float)i*1));
 
-                gameItem.setScale(3F);
+                gameItem.setScale(1F);
 
 
                 // Update rotation angle
@@ -229,15 +229,20 @@ public class Renderer {
                 gameItem.getRotation().y += 0.6F;*/
 
                 //gameItem.getRotation().setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(45)));
-                float rotX = (float)Math.toRadians(time % 360);
-                float rotY = (float)Math.toRadians(time % 360) * 2F;
-                float rotZ = (float)Math.toRadians(time % 360) * 3F;
+                float rotX = (float)Math.toRadians((time+1) % 360);
+                float rotY = (float)Math.toRadians((time+1) % 360) * 2F;
+                float rotZ = (float)Math.toRadians((time+1) % 360) * 3F;
 
-                rotX = 45;
-                rotY = 0;
-                rotZ = 45;
+                //rotX = 45;
+                //rotY = 0;
+                //rotZ = 0;
 
-                CoroUtilMath.rotation(gameItem.getRotation(), rotX, rotY, rotZ);
+                Quaternion qY = new Quaternion();
+                qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-rotY)));
+                Quaternion qX = new Quaternion();
+                qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-rotX)));
+                Quaternion.mul(qY, qX, gameItem.rotation);
+                //CoroUtilMath.rotation(gameItem.getRotation(), rotX, rotY, rotZ);
 
 
                 //gameItem.getRotation().setFromAxisAngle(new Vector4f(0, 0, 15, (float)Math.toRadians(15)));
