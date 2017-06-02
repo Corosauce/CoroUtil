@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import javax.vecmath.Vector3f;
 
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.CoroUtilMath;
 import CoroUtil.util.CoroUtilParticle;
 import extendedrenderer.EventHandler;
@@ -432,7 +433,7 @@ public class RotatingParticleManager
 
         useShaders = ShaderManager.canUseShaders();
 
-        if (worldObj.getTotalWorldTime() % 60 < 30) {
+        if (worldObj.getTotalWorldTime() % 120 < 60) {
             //useShaders = false;
         }
 
@@ -497,33 +498,55 @@ public class RotatingParticleManager
 
             viewMatrix = transformation.getViewMatrix(camera);
 
+            /**
+             * TODO: getting closer to actually working, still needs some fixes though, rain moves ahead of me when i move in a direction
+             * rain falls through trees which suggests coords are wrong again
+             */
             boolean alternateCameraCapture = false;
             if (alternateCameraCapture) {
+
+                //might be redundant or not needed
+                //GL11.glMatrixMode(GL11.GL_MODELVIEW);
+
                 //store camera matrix
                 GL11.glPushMatrix();
-                //er.orientCamera(partialTicks);
+                //reset matrix
+                GL11.glLoadIdentity();
+                er.orientCamera(partialTicks);
+                //er.setupCameraTransform(partialTicks, 2);
                 Entity entity = mc.getRenderViewEntity();
-                GlStateManager.translate(0, 0, 0.05);
-                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks/* + 180.0F*/;
+
+                double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
+                double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
+                double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
+
+                /*GlStateManager.translate(0, 0, 0.05);
+                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
+                //float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F;
                 float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
                 GlStateManager.rotate(0, 0.0F, 0.0F, 1.0F);
                 GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
                 GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
                 float f22 = entity.getEyeHeight();
-                GlStateManager.translate(0.0F, -f22, 0.0F);
+                GlStateManager.translate(0.0F, -f22, 0.0F);*/
+
                 //extra
-                GlStateManager.translate(0.0F, -entity.posY, 0.0F);
-                //viewMatrix = new Matrix4fe();
+                //GlStateManager.translate(0.0F, -entity.posY, 0.0F);
+                GlStateManager.translate(x, -y, z);
+
+                viewMatrix = new Matrix4fe();
                 FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
                 GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
                 buf2.rewind();
-                //Matrix4fe.get(viewMatrix, 0, buf2);
+                Matrix4fe.get(viewMatrix, 0, buf2);
                 //Matrix4fe.get(viewMatrix, 0, ActiveRenderInfo.MODELVIEW);
                 GL11.glPopMatrix();
             }
 
 
             shaderProgram.setUniform("texture_sampler", 0);
+
+            CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(worldObj, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
         }
 
         float rotYawOverride = 0;
@@ -534,7 +557,7 @@ public class RotatingParticleManager
 
             InstancedMesh mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
 
-            //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.cloud256) continue;
+            //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.rain_white_trans) continue;
 
             //TODO: register if missing, maybe relocate this
             if (mesh == null) {
@@ -556,15 +579,24 @@ public class RotatingParticleManager
                         for (int j = 0; j < 2; ++j) {
                             if (!entry[i][j].isEmpty()) {
                                 switch (j) {
+
+                                    /**
+                                     * TODO: make sure alpha test toggling doesnt interfere with anything else
+                                     * with it on, it speeds up rendering of non transparent particles, does it also allow for full transparent particle pixels?
+                                     */
+
                                     case 0:
                                         GlStateManager.depthMask(false);
-                                        GL11.glEnable(GL11.GL_ALPHA_TEST);
-                                        /*GlStateManager.depthMask(true);
-                                        GL11.glDisable(GL11.GL_ALPHA_TEST);*/
+                                        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+                                        //GL11.glEnable(GL11.GL_DEPTH_TEST);
+                                        /*GL11.glEnable(GL11.GL_ALPHA_TEST);
+                                        GL11.glEnable(GL11.GL_BLEND);*/
                                         break;
                                     case 1:
                                         GlStateManager.depthMask(true);
-                                        GL11.glDisable(GL11.GL_ALPHA_TEST);
+                                        //GL11.glEnable(GL11.GL_DEPTH_TEST);
+                                        /*GL11.glDisable(GL11.GL_ALPHA_TEST);
+                                        GL11.glDisable(GL11.GL_BLEND);*/
                                 }
 
                                 switch (i) {
@@ -593,28 +625,6 @@ public class RotatingParticleManager
                                     }
 
                                     //mesh.instanceDataBuffer.limit(100000 * mesh.INSTANCE_SIZE_FLOATS);
-                                    mesh.instanceDataBuffer.limit(amountToRender * mesh.INSTANCE_SIZE_FLOATS);
-
-                                    //int extraBufferSize = 30000;
-
-                                    //rebuffer when theres a difference of 1000, also making sure theres 1000 extra when resizing
-                                    /*boolean resize = false;
-                                    if (amountToRender > lastAmountToRender) {
-                                        resize = true;
-                                    } else if (amountToRender + extraBufferSize < lastAmountToRender) {
-                                        resize = true;
-                                    }
-
-                                    if (resize) {
-                                        System.out.println("resizing buffer to " + (amountToRender + extraBufferSize));
-                                        System.out.println("p: " + entry[i][j].size());
-                                        mesh.instanceDataBuffer = BufferUtils.createFloatBuffer((amountToRender + extraBufferSize) * InstancedMesh.INSTANCE_SIZE_FLOATS);
-                                        lastAmountToRender = amountToRender + extraBufferSize;
-                                    }*/
-
-                                    //mesh.instanceDataBuffer = BufferUtils.createFloatBuffer(100000 * InstancedMesh.INSTANCE_SIZE_FLOATS);
-
-                                    //ByteArrayOutputStream test = new ByteArrayOutputStream();
 
                                     particles = entry[i][j].size();
 
@@ -666,6 +676,8 @@ public class RotatingParticleManager
                                             }
                                         }
                                     }
+
+                                    mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 
                                     glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
                                     glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);

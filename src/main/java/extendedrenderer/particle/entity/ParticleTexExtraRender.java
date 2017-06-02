@@ -1,5 +1,8 @@
 package extendedrenderer.particle.entity;
 
+import CoroUtil.util.CoroUtilBlockLightCache;
+import CoroUtil.util.Vec3;
+import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shadertest.gametest.InstancedMesh;
 import extendedrenderer.shadertest.gametest.Matrix4fe;
@@ -12,8 +15,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
+import net.minecraft.world.chunk.Chunk;
 
 import javax.vecmath.Vector3f;
 
@@ -24,13 +29,21 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	private int extraParticlesBaseAmount = 5;
 
 	public boolean noExtraParticles = false;
+
+	//public float[] cachedLight;
 	
 	public ParticleTexExtraRender(World worldIn, double posXIn, double posYIn,
 			double posZIn, double mX, double mY, double mZ,
 			TextureAtlasSprite par8Item) {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
-		
-		
+
+		/*cachedLight = new float[CoroUtilParticle.rainPositions.length];
+		if (worldObj.getTotalWorldTime() % 5 == 0) {
+			for (int i = 0; i < cachedLight.length; i++) {
+				Vec3 vec = CoroUtilParticle.rainPositions[i];
+				cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
+			}
+		}*/
 	}
 
 	public int getSeverityOfRainRate() {
@@ -58,6 +71,13 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		if (this.posY <= height) this.setExpired();*/
 
 		//this.setExpired();
+
+		/*if (worldObj.getTotalWorldTime() % 5 == 0) {
+			for (int i = 0; i < cachedLight.length; i++) {
+				Vec3 vec = CoroUtilParticle.rainPositions[i];
+				//cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
+			}
+		}*/
 	}
 
 	@Override
@@ -133,14 +153,20 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			f3 = this.particleTexture.getInterpolatedV(8);*/
         }
 
-		int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
+		//int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
 
         //test
-		rainDrops = 100;
+		//rainDrops = 100;
 
 		//catch code hotload crash, doesnt help much anyways
 		try {
-			for (int ii = 0; ii < (noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops)); ii++) {
+			for (int ii = 0; ii < renderAmount/*(noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops))*/; ii++) {
 				float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
 				float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY) + fixY;
 				float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
@@ -228,12 +254,18 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
 		//Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
 
-		for (int iii = 0; iii < (this.noExtraParticles ? 1 : Mesh.extraRenders * 10); iii++) {
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
+
+		for (int iii = 0; iii < renderAmount/*(this.noExtraParticles ? 1 : Mesh.extraRenders * 10)*/; iii++) {
 
 			if (mesh.curBufferPos >= mesh.numInstances) return;
 
-			Vector3f pos = new Vector3f(-posX, posY, -posZ);
-			Vector3f posCustom = null;
+			Vector3f pos = new Vector3f(posX, posY, posZ);
 
 			if (iii != 0) {
 				pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
@@ -241,18 +273,54 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 						pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
 			}
 
+			/*if (worldObj.getTotalWorldTime() % 60 == 0) {
+				if (this.getParticleTexture() == ParticleRegistry.test_texture) {
+					System.out.println(pos + "");
+				}
+			}*/
+
 			//TODO: fix coords, retest all, assume all wrong
 			/*if (this.isDontRenderUnderTopmostBlock()) {
 				int height = this.worldObj.getPrecipitationHeight(new BlockPos(pos.x, posY, pos.z)).getY();
 				if (pos.y <= height) continue;
 			}*/
 
+			if (this.isDontRenderUnderTopmostBlock()) {
+				int height = this.worldObj.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
+				if (pos.y <= height) continue;
+			}
+
 			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
 
 			//adjust to perspective and camera
 			Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
 			//upload to buffer
-			modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
+			modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
+
+			//brightness
+			float brightness = 1;//cachedLight[iii];//getBrightnessCached();
+			//brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
+			//brightness = this.brightnessCache;
+			brightness = CoroUtilBlockLightCache.brightnessPlayer;
+			boolean test = false;
+			if (test) {
+				BlockPos posB = new BlockPos(pos.x, pos.y, pos.z);
+				float brightnessSky = 0F;//worldObj.getSunBrightness(partialTicks);
+
+				float brightnessBlock = 0F;//worldObj.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, posB) / 15F;
+
+				Chunk chunk = this.worldObj.getChunkFromBlockCoords(posB);
+				brightnessBlock = chunk.getLightFor(EnumSkyBlock.BLOCK, posB) / 15F;
+
+				brightness = brightnessSky;
+				if (brightnessBlock > brightnessSky) {
+					brightness = brightnessBlock;
+				}
+			}
+			//brightness = getBrightnessToUse(pos, partialTicks);
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
+
+			mesh.curBufferPos++;
 		}
 
 	}

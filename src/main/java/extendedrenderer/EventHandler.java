@@ -3,6 +3,7 @@ package extendedrenderer;
 import java.nio.FloatBuffer;
 
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.shadertest.gametest.Main;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -61,6 +62,10 @@ public class EventHandler {
             if (mc.theWorld != null) {
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
+
+                    if (mc.theWorld.getTotalWorldTime() % 60 == 0) {
+                        CoroUtilBlockLightCache.clear();
+                    }
                 }
                 //if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
                     //lastWorldTime = mc.theWorld.getTotalWorldTime();

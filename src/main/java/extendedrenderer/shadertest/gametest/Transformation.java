@@ -103,7 +103,7 @@ public class Transformation {
 
         if (quat) {
             return modelMatrix.translationRotateScale(
-                    vecPos.x, vecPos.y, vecPos.z,
+                    -vecPos.x, vecPos.y, -vecPos.z,
                     q.x, q.y, q.z, q.w,
                     scaleAdj, scaleAdj, scaleAdj);
         } else {

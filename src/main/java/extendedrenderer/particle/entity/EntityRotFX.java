@@ -3,6 +3,7 @@ package extendedrenderer.particle.entity;
 import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
+import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.CoroUtilMath;
 import CoroUtil.util.CoroUtilParticle;
 import CoroUtil.util.Vec3;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -97,6 +99,10 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     public Quaternion rotation;
 
+    public boolean fastLight = false;
+
+    public float brightnessCache = 0.5F;
+
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -107,6 +113,8 @@ public class EntityRotFX extends Particle implements IWindHandler
         this.entityID = par1World.rand.nextInt(100000);
 
         rotation = new Quaternion();
+
+        brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(worldObj, (float)posX, (float)posY, (float)posZ);
     }
 
     public boolean isSlantParticleToWind() {
@@ -245,7 +253,9 @@ public class EntityRotFX extends Particle implements IWindHandler
             this.setAlphaF(val);
         }
 
-
+        if (worldObj.getTotalWorldTime() % 5 == 0) {
+            brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(worldObj, (float)posX, (float)posY, (float)posZ);
+        }
     }
 
     public void startDeath() {
@@ -450,14 +460,22 @@ public class EntityRotFX extends Particle implements IWindHandler
         float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks/* - this.interpPosY*/);
         float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
-        Vector3f pos = new Vector3f(-posX, posY, -posZ);
+        Vector3f pos = new Vector3f(posX, posY, posZ);
 
         Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
 
         //adjust to perspective and camera
         Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
         //upload to buffer
-        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
+        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
+
+        //brightness
+        float brightness;
+        //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
+        brightness = brightnessCache;
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
+
+        mesh.curBufferPos++;
         
     }
 
@@ -560,4 +578,29 @@ public class EntityRotFX extends Particle implements IWindHandler
         //tested that negative values of rotations match minecraft rotations
         //CoroUtilMath.rotation(rotation, (float)Math.toRadians(-rotationPitch), (float)Math.toRadians(-rotationYaw), 0);
     }
+
+    /**
+     * Costly method, use cached value
+     *
+     * @param pos
+     * @param partialTicks
+     * @return
+     */
+    /*public float getBrightnessNonLightmap(BlockPos pos, float partialTicks) {
+        //TODO: performance test light getting methods
+        //BlockPos posB = new BlockPos(pos.x, pos.y, pos.z);
+        float brightnessSky = worldObj.getSunBrightness(partialTicks);
+        float brightnessBlock = worldObj.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, pos) / 15F;
+
+        float brightness = brightnessSky;
+        if (brightnessBlock > brightnessSky) {
+            brightness = brightnessBlock;
+        }
+        return brightness;
+
+    }
+
+    public float getBrightnessCached() {
+        return brightnessCache;
+    }*/
 }

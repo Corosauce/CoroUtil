@@ -75,7 +75,7 @@ public class Mesh {
 
 
 
-            // Create the VBO and bint to it
+            // Create the VBO and bind to it
             int posVboId = glGenBuffers();
             vboIdList.add(posVboId);
             verticesBuffer = BufferUtils.createFloatBuffer(positions.length);//MemoryUtil.memAllocFloat(vertices.length);
