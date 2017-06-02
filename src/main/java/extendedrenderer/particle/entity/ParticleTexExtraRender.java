@@ -265,12 +265,14 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 			if (mesh.curBufferPos >= mesh.numInstances) return;
 
-			Vector3f pos = new Vector3f(posX, posY, posZ);
+			Vector3f pos;
 
 			if (iii != 0) {
-				pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
-						pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
-						pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+				pos = new Vector3f(posX + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+						posY + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+						posZ + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+			} else {
+				pos = new Vector3f(posX, posY, posZ);
 			}
 
 			/*if (worldObj.getTotalWorldTime() % 60 == 0) {
@@ -298,26 +300,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
 
 			//brightness
-			float brightness = 1;//cachedLight[iii];//getBrightnessCached();
+			float brightness;
 			//brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
 			//brightness = this.brightnessCache;
 			brightness = CoroUtilBlockLightCache.brightnessPlayer;
-			boolean test = false;
-			if (test) {
-				BlockPos posB = new BlockPos(pos.x, pos.y, pos.z);
-				float brightnessSky = 0F;//worldObj.getSunBrightness(partialTicks);
 
-				float brightnessBlock = 0F;//worldObj.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, posB) / 15F;
-
-				Chunk chunk = this.worldObj.getChunkFromBlockCoords(posB);
-				brightnessBlock = chunk.getLightFor(EnumSkyBlock.BLOCK, posB) / 15F;
-
-				brightness = brightnessSky;
-				if (brightnessBlock > brightnessSky) {
-					brightness = brightnessBlock;
-				}
-			}
-			//brightness = getBrightnessToUse(pos, partialTicks);
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
 			mesh.curBufferPos++;
