@@ -203,8 +203,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				int k = i & 65535;
 
 				//range between 0 and 240 for first value, second value always 0
-				j = 240;
-				k = 120;
+				//j = 240;
+				//k = 120;
 
 				/*int what = 13 << 20 | 15 << 4;
 				int what2 = what >> 16 & 65535;
@@ -305,7 +305,19 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			//brightness = this.brightnessCache;
 			brightness = CoroUtilBlockLightCache.brightnessPlayer;
 
+			//brightness to buffer
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
+
+			//rgba to buffer
+			int rgbaIndex = 0;
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
 			mesh.curBufferPos++;
 		}

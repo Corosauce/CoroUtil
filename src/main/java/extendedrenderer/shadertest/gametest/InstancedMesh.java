@@ -25,9 +25,9 @@ public class InstancedMesh extends Mesh {
 
     public static final int MATRIX_SIZE_BYTES = MATRIX_SIZE_FLOATS * FLOAT_SIZE_BYTES;
 
-    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES/* * 2 + FLOAT_SIZE_BYTES * 2*/;
+    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 5/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
-    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1;// * 2 + 2;
+    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1 + 4;// * 2 + 2;
 
     public final int numInstances;
 
@@ -65,8 +65,22 @@ public class InstancedMesh extends Mesh {
             strideStart += VECTOR4F_SIZE_BYTES;
         }
 
+        //TODO: might become UV lightmap coord in future
         //brightness
         glVertexAttribPointer(start, 1, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        glVertexAttribDivisor(start, 1);
+        start++;
+        strideStart += FLOAT_SIZE_BYTES;
+
+        /**
+         * TODO: rbg and alpha for colorization
+         * storm darkening uses lower rgb values to darken
+         * everything uses alpha for fading in and out
+         *
+         */
+
+        //rgba
+        glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;

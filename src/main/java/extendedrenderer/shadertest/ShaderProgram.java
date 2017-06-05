@@ -23,6 +23,7 @@ public class ShaderProgram {
     private int vertexShaderAttributeVertexNormal = 2;
     private int vertexShaderAttributeModelViewMatrix = 5;
     private int vertexShaderAttributeBrightness = 9;
+    private int vertexShaderAttributeRGBA = 10;
     //private int vertexShaderAttributeTexOffset = 13;
 
     private Map<String, Integer> uniforms;
@@ -89,6 +90,7 @@ public class ShaderProgram {
             glBindAttribLocation(programId, vertexShaderAttributeVertexNormal, "vertexNormal");
             glBindAttribLocation(programId, vertexShaderAttributeModelViewMatrix, "modelViewMatrix");
             glBindAttribLocation(programId, vertexShaderAttributeBrightness, "brightness");
+            glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
         }
 
         return shaderId;
