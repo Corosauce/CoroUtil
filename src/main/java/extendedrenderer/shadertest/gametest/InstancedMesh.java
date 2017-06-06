@@ -1,19 +1,18 @@
 package extendedrenderer.shadertest.gametest;
 
 import CoroUtil.util.CoroUtilParticle;
+import extendedrenderer.particle.ShaderManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import static org.lwjgl.opengl.ARBDrawInstanced.glDrawElementsInstancedARB;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
-import static org.lwjgl.opengl.GL33.glVertexAttribDivisor;
 
 public class InstancedMesh extends Mesh {
 
@@ -41,26 +40,28 @@ public class InstancedMesh extends Mesh {
      * TODO: despite the mesh only being a size of 2 vbos instead of 5, lowering this to 2 breaks something somehow (no rendering)
      * need to figure out where to fix so i can optimize memory usage
      * not even sure if the memory is unoptimized, theres just gaps in the memory used probably
+     *
+     * fixed, didnt account for attrib location values in shader program
      */
-    private int vboSizeMesh = 5;
+    public static int vboSizeMesh = 2;
 
     public InstancedMesh(float[] positions, float[] textCoords, int[] indices, int numInstances) {
         super(positions, textCoords, indices);
 
         this.numInstances = numInstances;
 
-        glBindVertexArray(vaoId);
+        ShaderManager.glBindVertexArray(vaoId);
 
         // Model View Matrix
         instanceDataVBO = glGenBuffers();
         vboIdList.add(instanceDataVBO);
         instanceDataBuffer = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
-        glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
         int start = vboSizeMesh;
         int strideStart = 0;
         for (int i = 0; i < 4; i++) {
             glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
-            glVertexAttribDivisor(start, 1);
+            ShaderManager.glVertexAttribDivisor(start, 1);
             start++;
             strideStart += VECTOR4F_SIZE_BYTES;
         }
@@ -68,7 +69,7 @@ public class InstancedMesh extends Mesh {
         //TODO: might become UV lightmap coord in future
         //brightness
         glVertexAttribPointer(start, 1, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
-        glVertexAttribDivisor(start, 1);
+        ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += FLOAT_SIZE_BYTES;
 
@@ -81,7 +82,7 @@ public class InstancedMesh extends Mesh {
 
         //rgba
         glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
-        glVertexAttribDivisor(start, 1);
+        ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;
 
@@ -97,8 +98,8 @@ public class InstancedMesh extends Mesh {
         /*glVertexAttribPointer(start, 2, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         glVertexAttribDivisor(start, 1);*/
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+        ShaderManager.glBindVertexArray(0);
     }
 
     @Override
@@ -238,7 +239,7 @@ public class InstancedMesh extends Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, instanceDataVBO);
         if (!testSkip) glBufferData(GL_ARRAY_BUFFER, instanceDataBuffer, GL_DYNAMIC_DRAW);
 
-        glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, amountToRender);
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, getVertexCount(), GL_UNSIGNED_INT, 0, amountToRender);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

@@ -21,6 +21,7 @@ import extendedrenderer.particle.entity.ParticleTexExtraRender;
 import extendedrenderer.shadertest.Renderer;
 import extendedrenderer.shadertest.ShaderProgram;
 import extendedrenderer.shadertest.gametest.*;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.lwjgl.BufferUtils;
@@ -31,12 +32,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEmitter;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -64,7 +59,6 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL31.glDrawElementsInstanced;
 
 @SideOnly(Side.CLIENT)
 public class RotatingParticleManager
@@ -431,7 +425,7 @@ public class RotatingParticleManager
         Transformation transformation = null;
         Matrix4fe viewMatrix = null;
 
-        useShaders = ShaderManager.canUseShaders();
+        useShaders = ShaderManager.canUseShadersInstancedRendering();
 
         if (worldObj.getTotalWorldTime() % 120 < 60) {
             //useShaders = false;
@@ -679,8 +673,8 @@ public class RotatingParticleManager
 
                                     mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 
-                                    glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-                                    glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+                                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
 
 
 
@@ -690,13 +684,13 @@ public class RotatingParticleManager
 
                                     //System.out.println("rendercount: " + mesh.curBufferPos);
 
-                                    glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
+                                    ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
 
                                     glCalls++;
                                     trueRenderCount += mesh.curBufferPos;
                                     //bufferSize = mesh.instanceDataBuffer.capacity();
 
-                                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                                     mesh.endRender();
                                 } else {
