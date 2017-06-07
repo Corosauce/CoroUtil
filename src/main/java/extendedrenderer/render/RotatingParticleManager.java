@@ -455,10 +455,13 @@ public class RotatingParticleManager
             Matrix4fe.get(mat, 0, buf);
 
             //modify far distance, 4x as far
-            float zNear = 0.05F;
-            float zFar = (float)(mc.gameSettings.renderDistanceChunks * 16) * 4F;
-            mat.m22 = ((zFar + zNear) / (zNear - zFar));
-            mat.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+            boolean distantRendering = true;
+            if (distantRendering) {
+                float zNear = 0.05F;
+                float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
+                mat.m22 = ((zFar + zNear) / (zNear - zFar));
+                mat.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+            }
 
             shaderProgram.setUniform("projectionMatrix", mat);
 

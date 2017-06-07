@@ -8,6 +8,11 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 	//Externally updated variables, adjusting how templated behavior works
 	public int curTick = 0;
 	public int ticksMax = 1;
+
+
+
+	//TODO: temp, for comparing until done
+	public static boolean newCloudWay = false;
 	
 	public ParticleBehaviorFog(Vec3 source) {
 		super(source);
@@ -54,9 +59,11 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		float sizeBase = (float) (500+(rand.nextDouble()*40));
 
 		//TEST
-		sizeBase += 500;
-		particle.setMaxAge(50+rand.nextInt(10));
-		particle.rotationPitch = -90+rand.nextInt(5)-rand.nextInt(5);
+		if (newCloudWay) {
+			sizeBase += 500;
+			particle.setMaxAge(5000 + rand.nextInt(10));
+			particle.rotationPitch = -90 + rand.nextInt(5) - rand.nextInt(5);
+		}
 
 		particle.setScale(sizeBase);
 		//particle.spawnY = (float) particle.posY;
