@@ -427,8 +427,8 @@ public class RotatingParticleManager
 
         useShaders = ShaderManager.canUseShadersInstancedRendering();
 
-        if (worldObj.getTotalWorldTime() % 120 < 60) {
-            //useShaders = false;
+        if (worldObj.getTotalWorldTime() % 20 < 10) {
+            useShaders = false;
         }
 
         //useShaders = false;
@@ -496,7 +496,7 @@ public class RotatingParticleManager
              * TODO: getting closer to actually working, still needs some fixes though, rain moves ahead of me when i move in a direction
              * rain falls through trees which suggests coords are wrong again
              */
-            boolean alternateCameraCapture = false;
+            boolean alternateCameraCapture = true;
             if (alternateCameraCapture) {
 
                 //might be redundant or not needed
@@ -505,8 +505,8 @@ public class RotatingParticleManager
                 //store camera matrix
                 GL11.glPushMatrix();
                 //reset matrix
-                GL11.glLoadIdentity();
-                er.orientCamera(partialTicks);
+                //GL11.glLoadIdentity();
+                //er.orientCamera(partialTicks);
                 //er.setupCameraTransform(partialTicks, 2);
                 Entity entity = mc.getRenderViewEntity();
 
@@ -526,7 +526,7 @@ public class RotatingParticleManager
 
                 //extra
                 //GlStateManager.translate(0.0F, -entity.posY, 0.0F);
-                GlStateManager.translate(x, -y, z);
+                GlStateManager.translate(-x, -y, -z);
 
                 viewMatrix = new Matrix4fe();
                 FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
@@ -637,7 +637,7 @@ public class RotatingParticleManager
                                                     //part.updateQuaternion();
                                                     //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
                                                     Quaternion qY = new Quaternion();
-                                                    qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw)));
+                                                    qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw - 180F)));
                                                     Quaternion qX = new Quaternion();
                                                     qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-part.rotationPitch)));
                                                     Quaternion.mul(qY, qX, part.rotation);
