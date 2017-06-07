@@ -249,9 +249,9 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 										float partialTicks, float rotationX, float rotationZ,
 										float rotationYZ, float rotationXY, float rotationXZ) {
 
-		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks/* - this.interpPosX*/);
-		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks/* - this.interpPosY*/);
-		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
+		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks);
+		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks);
+		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks);
 		//Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
 
 		int renderAmount = 0;
@@ -261,7 +261,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
 		}
 
-		for (int iii = 0; iii < renderAmount/*(this.noExtraParticles ? 1 : Mesh.extraRenders * 10)*/; iii++) {
+		for (int iii = 0; iii < renderAmount; iii++) {
 
 			if (mesh.curBufferPos >= mesh.numInstances) return;
 
@@ -275,22 +275,15 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				pos = new Vector3f(posX, posY, posZ);
 			}
 
-			/*if (worldObj.getTotalWorldTime() % 60 == 0) {
-				if (this.getParticleTexture() == ParticleRegistry.test_texture) {
-					System.out.println(pos + "");
-				}
-			}*/
-
-			//TODO: fix coords, retest all, assume all wrong
-			/*if (this.isDontRenderUnderTopmostBlock()) {
-				int height = this.worldObj.getPrecipitationHeight(new BlockPos(pos.x, posY, pos.z)).getY();
-				if (pos.y <= height) continue;
-			}*/
-
 			if (this.isDontRenderUnderTopmostBlock()) {
 				int height = this.worldObj.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
 				if (pos.y <= height) continue;
 			}
+
+			//adjust to relative to camera positions finally
+			pos.x -= interpPosX;
+			pos.y -= interpPosY;
+			pos.z -= interpPosZ;
 
 			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
 

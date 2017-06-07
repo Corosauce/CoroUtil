@@ -428,7 +428,7 @@ public class RotatingParticleManager
         useShaders = ShaderManager.canUseShadersInstancedRendering();
 
         if (worldObj.getTotalWorldTime() % 20 < 10) {
-            useShaders = false;
+            //useShaders = false;
         }
 
         //useShaders = false;
@@ -455,96 +455,19 @@ public class RotatingParticleManager
             Matrix4fe.get(mat, 0, buf);
             shaderProgram.setUniform("projectionMatrix", mat);
 
-            Camera camera = Main.gameLogic.camera;
-
-            if (mc.getRenderViewEntity() != null) {
-
-                float posScale = 1.0F;
-
-                Entity entity = mc.getRenderViewEntity();
-
-                double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
-                double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
-                double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
-
-                y += 1.62F;
-
-                /*camera.setPosition((float) mc.getRenderViewEntity().posX,
-                        (float) -mc.getRenderViewEntity().posY,
-                        (float) mc.getRenderViewEntity().posZ);*/
-
-                camera.setPosition((float) x,
-                        (float) -y,
-                        (float) z);
-
-                //always 0 apparently, maybe for spectator mode
-                /*float pitch = (float)mc.entityRenderer.cameraPitch;
-                float yaw = (float)mc.entityRenderer.cameraYaw;
-
-                pitch = mc.getRenderViewEntity().rotationPitch;
-                yaw = mc.getRenderViewEntity().rotationYaw;*/
-
-                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks/* + 180.0F*/;
-                float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-
-                camera.setRotation(pitch, yaw, 0);
-            }
-
-            viewMatrix = transformation.getViewMatrix(camera);
-
-            /**
-             * TODO: getting closer to actually working, still needs some fixes though, rain moves ahead of me when i move in a direction
-             * rain falls through trees which suggests coords are wrong again
-             */
             boolean alternateCameraCapture = true;
             if (alternateCameraCapture) {
-
-                //might be redundant or not needed
-                //GL11.glMatrixMode(GL11.GL_MODELVIEW);
-
-                //store camera matrix
-                GL11.glPushMatrix();
-                //reset matrix
-                //GL11.glLoadIdentity();
-                //er.orientCamera(partialTicks);
-                //er.setupCameraTransform(partialTicks, 2);
-                Entity entity = mc.getRenderViewEntity();
-
-                double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * (double)partialTicks;
-                double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks;
-                double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * (double)partialTicks;
-
-                /*GlStateManager.translate(0, 0, 0.05);
-                float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks;
-                //float yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks + 180.0F;
-                float pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks;
-                GlStateManager.rotate(0, 0.0F, 0.0F, 1.0F);
-                GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-                GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
-                float f22 = entity.getEyeHeight();
-                GlStateManager.translate(0.0F, -f22, 0.0F);*/
-
-                //extra
-                //GlStateManager.translate(0.0F, -entity.posY, 0.0F);
-                GlStateManager.translate(-x, -y, -z);
-
                 viewMatrix = new Matrix4fe();
                 FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
                 GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
                 buf2.rewind();
                 Matrix4fe.get(viewMatrix, 0, buf2);
-                //Matrix4fe.get(viewMatrix, 0, ActiveRenderInfo.MODELVIEW);
-                GL11.glPopMatrix();
             }
-
 
             shaderProgram.setUniform("texture_sampler", 0);
 
             CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(worldObj, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
         }
-
-        float rotYawOverride = 0;
-        float rotPitchOverride = 0;
 
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
@@ -558,9 +481,6 @@ public class RotatingParticleManager
                 ParticleMeshBufferManager.setupMeshForParticle(entry1.getKey());
                 mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
             }
-
-            //TEMP
-            //mesh = null;
 
             if (mesh != null) {
                 //do cloud layer, then funnel layer
@@ -610,16 +530,6 @@ public class RotatingParticleManager
 
                                     mesh.instanceDataBuffer.clear();
                                     mesh.curBufferPos = 0;
-
-                                    int amountToRender = entry[i][j].size()/* * Mesh.extraRenders * 1*/;
-
-                                    //TODO: predict amount, not hardcode weirdness
-                                    if (entry1.getKey() == ParticleRegistry.rain_white) {
-                                        amountToRender = entry[i][j].size() * Mesh.extraRenders * 10;
-                                    }
-
-                                    //mesh.instanceDataBuffer.limit(100000 * mesh.INSTANCE_SIZE_FLOATS);
-
                                     particles = entry[i][j].size();
 
                                     if (true) {
@@ -627,46 +537,14 @@ public class RotatingParticleManager
                                             if (particle instanceof EntityRotFX) {
                                                 EntityRotFX part = (EntityRotFX) particle;
 
+                                                Quaternion qY = new Quaternion();
+                                                qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw - 180F)));
+                                                Quaternion qX = new Quaternion();
+                                                qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-part.rotationPitch)));
+                                                Quaternion.mul(qY, qX, part.rotation);
+                                                //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
+                                                part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
 
-                                                boolean newMethod = true;
-
-                                                if (newMethod) {
-                                                    //part.rotationPitch = rotPitchOverride;
-                                                    //part.rotationYaw = rotYawOverride;
-
-                                                    //part.updateQuaternion();
-                                                    //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
-                                                    Quaternion qY = new Quaternion();
-                                                    qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw - 180F)));
-                                                    Quaternion qX = new Quaternion();
-                                                    qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-part.rotationPitch)));
-                                                    Quaternion.mul(qY, qX, part.rotation);
-                                                    //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
-                                                    part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
-                                                } else {
-
-                                                    for (int iii = 0; iii < Mesh.extraRenders; iii++) {
-                                                        float posX = (float) (part.prevPosX + (part.posX - part.prevPosX) * (double) partialTicks/* - part.interpPosX*/);
-                                                        float posY = (float) (part.prevPosY + (part.posY - part.prevPosY) * (double) partialTicks/* - part.interpPosY*/);
-                                                        float posZ = (float) (part.prevPosZ + (part.posZ - part.prevPosZ) * (double) partialTicks/* - part.interpPosZ*/);
-                                                        //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
-                                                        Vector3f pos = new Vector3f(-posX, posY, -posZ);
-                                                        Vector3f posCustom = null;
-
-                                                        if (iii != 0) {
-                                                            pos = new Vector3f(pos.getX() + (float) CoroUtilParticle.rainPositions[iii].xCoord,
-                                                                    pos.getY() + (float) CoroUtilParticle.rainPositions[iii].yCoord,
-                                                                    pos.getZ() + (float) CoroUtilParticle.rainPositions[iii].zCoord);
-                                                        }
-
-                                                        Matrix4fe modelMatrix = transformation.buildModelMatrix(part, pos);
-
-                                                        //adjust to perspective and camera
-                                                        Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
-                                                        //upload to buffer
-                                                        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos++), mesh.instanceDataBuffer);
-                                                    }
-                                                }
                                             }
                                         }
                                     }
@@ -675,14 +553,6 @@ public class RotatingParticleManager
 
                                     OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
                                     ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
-
-
-
-                                    //ByteBuffer wat = BufferUtils.
-
-                                    //glBufferData(GL_ARRAY_BUFFER, , GL_DYNAMIC_DRAW);
-
-                                    //System.out.println("rendercount: " + mesh.curBufferPos);
 
                                     ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
 
