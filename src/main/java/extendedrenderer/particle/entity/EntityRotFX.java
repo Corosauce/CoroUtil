@@ -95,6 +95,10 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     public float avoidTerrainAngle = 0;
 
+    //halp
+    public float rotationAroundCenter = 0;
+    public float rotationSpeedAroundCenter = 0;
+
     private boolean slantParticleToWind = false;
 
     public Quaternion rotation;
@@ -255,6 +259,11 @@ public class EntityRotFX extends Particle implements IWindHandler
 
         if (worldObj.getTotalWorldTime() % 5 == 0) {
             brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(worldObj, (float)posX, (float)posY, (float)posZ);
+        }
+
+        rotationAroundCenter += rotationSpeedAroundCenter;
+        if (rotationAroundCenter >= 360) {
+            rotationAroundCenter -= 360;
         }
     }
 
