@@ -115,6 +115,9 @@ public class RotatingParticleManager
         //layer for tornado funnel
         list.add(1, new ArrayDeque[4][]);
 
+        //close up stuff like precipitation
+        list.add(2, new ArrayDeque[4][]);
+
         for (ArrayDeque<Particle>[][] entry : list) {
             for (int i = 0; i < 4; ++i)
             {
@@ -405,6 +408,10 @@ public class RotatingParticleManager
 
         if (Main.gameEngine == null) {
             Main.initUnthreaded();
+
+
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
             //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
             /*ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
 
@@ -547,11 +554,8 @@ public class RotatingParticleManager
                                             if (particle instanceof EntityRotFX) {
                                                 EntityRotFX part = (EntityRotFX) particle;
 
-                                                Quaternion qY = new Quaternion();
-                                                qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-part.rotationYaw - 180F)));
-                                                Quaternion qX = new Quaternion();
-                                                qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-part.rotationPitch)));
-                                                Quaternion.mul(qY, qX, part.rotation);
+                                                part.updateQuaternion(entityIn);
+
                                                 //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
                                                 part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
 

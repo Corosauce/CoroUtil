@@ -11,6 +11,7 @@ import extendedrenderer.shadertest.gametest.InstancedMesh;
 import extendedrenderer.shadertest.gametest.Matrix4fe;
 import extendedrenderer.shadertest.gametest.Transformation;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
 
@@ -67,6 +69,9 @@ public class EntityRotFX extends Particle implements IWindHandler
     public boolean killOnCollide = false;
 	
 	public boolean facePlayer = false;
+
+	//facePlayer will override this
+    public boolean facePlayerYaw = false;
 	
 	public boolean vanillaMotionDampen = true;
 
@@ -89,6 +94,8 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     private boolean killWhenUnderTopmostBlock = false;
 
+    public int killWhenUnderCameraAtLeast = 0;
+
     private float ticksFadeOutMaxOnDeath = -1;
     private float ticksFadeOutCurOnDeath = 0;
     protected boolean fadingOut = false;
@@ -106,6 +113,10 @@ public class EntityRotFX extends Particle implements IWindHandler
     public boolean fastLight = false;
 
     public float brightnessCache = 0.5F;
+
+    public boolean rotateOrderXY = false;
+
+    public float extraYRotation = 0;
 
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
@@ -217,6 +228,14 @@ public class EntityRotFX extends Particle implements IWindHandler
                     startDeath();
                 }
             }
+
+            //case: when on high pillar and rain is falling far below you, start killing it / fading it out
+            if (killWhenUnderCameraAtLeast != 0) {
+                Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+                if (this.posY < ent.posY - killWhenUnderCameraAtLeast) {
+                    startDeath();
+                }
+            }
         }
 
     	if (!collisionSpeedDampen) {
@@ -235,7 +254,7 @@ public class EntityRotFX extends Particle implements IWindHandler
         if (!fadingOut) {
             if (ticksFadeInMax > 0 && this.getAge() < ticksFadeInMax) {
                 //System.out.println("particle.getAge(): " + particle.getAge());
-                this.setAlphaF(this.getAge() / ticksFadeInMax);
+                this.setAlphaF((float)this.getAge() / ticksFadeInMax);
                 //particle.setAlphaF(1);
             } else if (ticksFadeOutMax > 0 && this.getAge() > this.getMaxAge() - ticksFadeOutMax) {
                 float count = this.getAge() - (this.getMaxAge() - ticksFadeOutMax);
@@ -264,6 +283,11 @@ public class EntityRotFX extends Particle implements IWindHandler
         rotationAroundCenter += rotationSpeedAroundCenter;
         if (rotationAroundCenter >= 360) {
             rotationAroundCenter -= 360;
+        }
+
+        if (slantParticleToWind) {
+            double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
+            rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
     }
 
@@ -593,10 +617,24 @@ public class EntityRotFX extends Particle implements IWindHandler
         return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.worldObj.getSunBrightness(1F))*/;
     }
 
-    public void updateQuaternion() {
+    public void updateQuaternion(Entity camera) {
 
-        //tested that negative values of rotations match minecraft rotations
-        //CoroUtilMath.rotation(rotation, (float)Math.toRadians(-rotationPitch), (float)Math.toRadians(-rotationYaw), 0);
+        if (this.facePlayer) {
+            this.rotationYaw = camera.rotationYaw;
+            this.rotationPitch = camera.rotationPitch;
+        } else if (facePlayerYaw) {
+            this.rotationYaw = camera.rotationYaw;
+        }
+
+        Quaternion qY = new Quaternion();
+        Quaternion qX = new Quaternion();
+        qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-this.rotationYaw - 180F)));
+        qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-this.rotationPitch)));
+        if (this.rotateOrderXY) {
+            Quaternion.mul(qX, qY, this.rotation);
+        } else {
+            Quaternion.mul(qY, qX, this.rotation);
+        }
     }
 
     /**

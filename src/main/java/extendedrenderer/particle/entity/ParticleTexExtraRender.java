@@ -19,8 +19,11 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
 import net.minecraft.world.chunk.Chunk;
+import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
+import java.util.Random;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 
@@ -78,6 +81,15 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				//cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
 			}
 		}*/
+
+		if (isSlantParticleToWind()) {
+			rotationYaw = (float)Math.toDegrees(Math.atan2(motionZ, motionX)) - 90;
+			double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
+			//motionXZ = motionX/* + motionZ*/;
+			rotationPitch = -(float)Math.toDegrees(Math.atan2(motionXZ, Math.abs(motionY)));
+			rotationPitch = rotationPitch;
+			//rotationPitch = -45;
+		}
 	}
 
 	@Override
@@ -198,7 +210,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
 				int i = this.getBrightnessForRender(partialTicks);
-				//i = 15728640;
+				i = 15728640;
 				int j = i >> 16 & 65535;
 				int k = i & 65535;
 
@@ -315,6 +327,34 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			mesh.curBufferPos++;
 		}
 
+	}
+
+	@Override
+	public void updateQuaternion(Entity camera) {
+
+		if (this.facePlayer) {
+			this.rotationYaw = camera.rotationYaw;
+			this.rotationPitch = camera.rotationPitch;
+		} else if (facePlayerYaw) {
+			this.rotationYaw = camera.rotationYaw;
+		}
+
+		Quaternion qY = new Quaternion();
+		Quaternion qX = new Quaternion();
+		qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-this.rotationYaw - 180F)));
+		qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-this.rotationPitch)));
+		if (this.rotateOrderXY) {
+			Quaternion.mul(qX, qY, this.rotation);
+		} else {
+			Quaternion.mul(qY, qX, this.rotation);
+
+			if (extraYRotation != 0) {
+				//float rot = (new Random()).nextFloat() * 360F;
+				qY = new Quaternion();
+				qY.setFromAxisAngle(new Vector4f(0, 1, 0, extraYRotation));
+				Quaternion.mul(this.rotation, qY, this.rotation);
+			}
+		}
 	}
 
 }

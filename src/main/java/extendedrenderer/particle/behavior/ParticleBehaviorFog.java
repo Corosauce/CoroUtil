@@ -61,8 +61,9 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		//TEST
 		if (newCloudWay) {
 			sizeBase += 500;
-			particle.setMaxAge(500 + rand.nextInt(10));
 			particle.rotationPitch = -90 + rand.nextInt(5) - rand.nextInt(5);
+			particle.setTicksFadeInMax(20);
+			particle.setTicksFadeOutMax(20);
 		}
 
 		particle.setScale(sizeBase);
