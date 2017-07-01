@@ -79,8 +79,12 @@ public class CoroUtilPath {
 		        int gatherX = (int)Math.floor(center.posX + ((double)(-Math.sin((rotationYaw+randLook) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
 		        int gatherY = (int)center.posY;//Math.floor(center.posY-0.5 + (double)(-MathHelper.sin(center.rotationPitch / 180.0F * 3.1415927F) * dist) - 0D); //center.posY - 0D;
 		        int gatherZ = (int)Math.floor(center.posZ + ((double)(Math.cos((rotationYaw+randLook) / 180.0F * 3.1415927F)/* * Math.cos(center.rotationPitch / 180.0F * 3.1415927F)*/) * dist));
-		        
-		        Block block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
+
+		        BlockPos pos = new BlockPos(gatherX, gatherY, gatherZ);
+
+				if (!world.isBlockLoaded(pos)) return false;
+
+		        Block block = world.getBlockState(pos).getBlock();
 		        int tries = 0;
 		        if (!CoroUtilBlock.isAir(block)) {
 		        	int offset = -5;
@@ -96,7 +100,9 @@ public class CoroUtilPath {
 		        } else {
 		        	//int offset = 0;
 		        	while (tries < 30) {
-		        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(block.getDefaultState(), world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) break;
+		        		if (!CoroUtilBlock.isAir(block) && block.isSideSolid(block.getDefaultState(), world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
+		        			break;
+						}
 		        		gatherY -= 1;//offset++;
 		        		block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
 			        	tries++;
