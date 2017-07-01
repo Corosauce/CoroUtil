@@ -391,7 +391,7 @@ public class RotatingParticleManager
             }
         }
 
-        System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
+        //System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
         
         if (fog) {
         	GlStateManager.disableFog();
