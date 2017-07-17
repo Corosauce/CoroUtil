@@ -18,16 +18,16 @@ public class TargetEnemy extends Selector {
 
 	//0 = nothing to attack, 1 = attacking, 2 = sanity check says no
 	//no longer forces a moveto
-	
+
 	public IBTAgent entInt;
 	public EntityLiving ent;
-	
+
 	public float rangeHunt = 16;
 	public BlockCoord holdPos = null; //if not null, center scan and best target scan is based from this instead of entity, shouldnt cancel active target, and should have a range higher than enemy projectile ranges
 	//public float rangeStray = 8;
 	public int scanRate = -1;
 	public int randRate = -1;
-	
+
 	public TargetEnemy(Behavior parParent, IBTAgent parEnt, float parRange, BlockCoord parHoldPos, int parScanRate, int parRandRate) {
 		super(parParent);
 		entInt = parEnt;
@@ -38,7 +38,7 @@ public class TargetEnemy extends Selector {
 		randRate = parRandRate;
 		//rangeStray = parStray;
 	}
-	
+
 	public boolean sanityCheck(Entity target) {
 		/*if (ent.getHealth() < ent.getMaxHealth() / 4F * 2) {
 			return false;
@@ -48,27 +48,27 @@ public class TargetEnemy extends Selector {
 
 	@Override
 	public EnumBehaviorState tick() {
-		
+
 		//TEMP!
 		//rangeHunt = 16;
-		
+
 		boolean xRay = false;
-		
+
 		EntityLivingBase protectEnt = ent;
 		Random rand = new Random();
-		
+
 		AIBTAgent ai = entInt.getAIBTAgent();
-		
-		if ((scanRate == -1 || ent.worldObj.getTotalWorldTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
+
+		if ((scanRate == -1 || ent.world.getTotalWorldTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
 			boolean found = false;
 			boolean sanityAborted = false;
 			Entity clEnt = null;
 			float closest = 9999F;
 	    	List list = null;
 	    	if (holdPos != null) {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	} else {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	}
 	        for(int j = 0; j < list.size(); j++)
 	        {
@@ -120,17 +120,17 @@ public class TargetEnemy extends Selector {
 				if (children.size() > 1) return children.get(1).tick();
 			}
 		}
-		
+
 		if (ai.blackboard.getTarget() == null && sanityCheck(null)) {
 			//System.out.println("subjob");
 			if (children.size() > 0) return children.get(0).tick();
 		}
-		
+
 		if (!sanityCheck(null)) {
 			if (children.size() > 2) return children.get(2).tick();
 		}
-		
+
 		return super.tick();
 	}
-	
+
 }

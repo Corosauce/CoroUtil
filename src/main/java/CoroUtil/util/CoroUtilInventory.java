@@ -18,17 +18,17 @@ public class CoroUtilInventory {
             	String itemName = CoroUtilItem.getNameByItem(is.getItem());
             	if (itemName != null) {
             		if (itemName.equals(id)) {
-            			count += is.stackSize;
+            			count += is.getCount();
             		}
             	} else {
             		System.out.println("CoroUtilInventory.getItemCount found nameless item " + is.getItem() + " in inventory, its not registered properly!");
             	}
             }
         }
-		
+
 		return count;
 	}
-	
+
 	public static boolean isChest(Block block) {
 		if (block instanceof BlockChest) {
 			return true;
@@ -36,16 +36,16 @@ public class CoroUtilInventory {
 			return false;
 		}
 	}
-	
+
 	public static void chestOpen(World world, int x, int y, int z) {
 		//System.out.println("new ai chest open called, needs tracking for closing chest");
 		chestStateSend(world, x, y, z, false);
 	}
-	
+
 	public static void chestClose(World world, int x, int y, int z) {
 		chestStateSend(world, x, y, z, true);
 	}
-	
+
 	//TODO: 1.8 redesign to pass along entity reference
 	public static void chestStateSend(World world, int x, int y, int z, boolean close) {
 		/*if (isChest(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
@@ -59,9 +59,9 @@ public class CoroUtilInventory {
 			}
 		}*/
 	}
-	
+
 	/*public static boolean chestTryTransfer(World world, ICoroAI ai, int x, int y, int z) {
-    	
+
     	TileEntity tEnt = (TileEntityChest)world.getTileEntity(new BlockPos(x, y, z));
 		if (tEnt instanceof TileEntityChest) {
 			TileEntityChest chest = (TileEntityChest)tEnt;
@@ -71,5 +71,5 @@ public class CoroUtilInventory {
 		}
 		return false;
     }*/
-	
+
 }

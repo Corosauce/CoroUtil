@@ -8,11 +8,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.packet.INBTPacketHandler;
 
 public class EventHandlerPacket {
-	
+
 	//if im going to load nbt, i probably should package it at the VERY end of the packet so it loads properly
 	//does .payload continue from where i last read or is it whole thing?
 	//maybe i should just do nbt only
-	
+
 	//changes from 1.6.4 to 1.7.2:
 	//all nbt now:
 	//- inv writes stack to nbt, dont use buffer
@@ -22,14 +22,14 @@ public class EventHandlerPacket {
 
 	@SideOnly(Side.CLIENT)
 	public World getClientWorld() {
-		return Minecraft.getMinecraft().theWorld;
+		return Minecraft.getMinecraft().world;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public EntityPlayer getClientPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public INBTPacketHandler getClientDataInterface() {
 		if (Minecraft.getMinecraft().currentScreen instanceof INBTPacketHandler) {
@@ -37,22 +37,22 @@ public class EventHandlerPacket {
 		}
 		return null;
 	}
-	
+
 	/*@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
-		
+
 		try {
 			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.packet.payload());
-			
+
 			String command = nbt.getString("command");
-			
+
 			//System.out.println("CoroUtil packet command from server: " + command);
-			
+
 			if (command.equals("CoroAI_Inv")) {
 				int entID = nbt.getInteger("entID");
 				ItemStack is = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("itemstack"));
-				
+
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity instanceof ICoroAI) {
 					if (entity instanceof EntityLivingBase) {
@@ -68,16 +68,16 @@ public class EventHandlerPacket {
 				if (nbtHandler != null) {
 					nbtHandler.nbtDataFromServer(nbt);
 				}
-				
+
 			} else if (command.equals("CoroAI_Ent")) {
-				
+
 				int entID = nbt.getInteger("entityID");
-				
+
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity instanceof IEntityPacket) {
 					((IEntityPacket) entity).handleNBTFromServer(nbt.getCompoundTag("abilities"));
 				}
-				
+
 				NBTTagCompound abilities = nbt.getCompoundTag("abilities");
 				Iterator it = abilities.func_150296_c().iterator();
                 while (it.hasNext()) {
@@ -87,16 +87,16 @@ public class EventHandlerPacket {
 			} else if (command.equals("QuestData")) {
 				//receiving quest data for a specific player
 				NBTTagCompound data = nbt.getCompoundTag("data");
-				
+
 				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(getClientPlayer());
-				
+
 				//clear quests since we reload fully to sync
 				quests.reset();
 				quests.nbtLoad(data);
 			} else if (command.equals("Ent_Motion")) {
-				
+
 				int entID = nbt.getInteger("entityID");
-				
+
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity != null) {
 					entity.motionX += nbt.getDouble("motionX");
@@ -104,31 +104,31 @@ public class EventHandlerPacket {
 					entity.motionZ += nbt.getDouble("motionZ");
 				}
 			}
-			
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	@SubscribeEvent
 	public void onPacketFromClient(FMLNetworkEvent.ServerCustomPacketEvent event) {
 		EntityPlayer entP = ((NetHandlerPlayServer)event.handler).playerEntity;
-		
+
 		try {
 			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.packet.payload());
-			
+
 			String command = nbt.getString("command");
-			
+
 			//System.out.println("CoroUtil packet command from client: " + command);
-			
+
 			if (command.equals("CoroAI_TEntCmd")) {
 				int dimID = nbt.getInteger("dimID");
 				int x = nbt.getInteger("x");
 				int y = nbt.getInteger("y");
 				int z = nbt.getInteger("z");
 				NBTTagCompound nbtData = nbt.getCompoundTag("data");
-				
+
 				World world = DimensionManager.getWorld(dimID);
 				if (world != null) {
 					TileEntity tEnt = world.getTileEntity(new BlockPos(x, y, z));
@@ -148,5 +148,5 @@ public class EventHandlerPacket {
 			ex.printStackTrace();
 		}
 	}*/
-	
+
 }

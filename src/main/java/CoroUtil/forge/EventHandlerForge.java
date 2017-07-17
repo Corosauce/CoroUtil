@@ -38,15 +38,15 @@ public class EventHandlerForge {
 	public void deathEvent(LivingDeathEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 	}
-	
+
 	@SubscribeEvent
 	public void pickupEvent(EntityItemPickupEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 	}
-	
+
 	@SubscribeEvent
 	public void worldSave(Save event) {
-		
+
 		//this is called for every dimension
 		//check server side because some mods invoke saving client side (bad standard)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
@@ -55,7 +55,7 @@ public class EventHandlerForge {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void worldLoad(Load event) {
 		if (!event.getWorld().isRemote) {
@@ -66,65 +66,65 @@ public class EventHandlerForge {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void breakBlockHarvest(HarvestDropsEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 		DynamicDifficulty.handleHarvest(event);
 	}
-	
+
 	@SubscribeEvent
 	public void breakBlockPlayer(BreakEvent event) {
 		PlayerQuestManager.i().onEvent(event);
 	}
-	
+
 	@SubscribeEvent
 	public void blockPlayerInteract(PlayerInteractEvent event) {
 		if (!event.getWorld().isRemote) {
 			try {
-				
+
 				//an event is fired where its air and has no chunk X or Z, cancel this
 				//if (event.action == Action.RIGHT_CLICK_AIR) return;
 				if (event instanceof RightClickEmpty) return;
-				
+
 				if (ConfigCoroAI.trackPlayerData) {
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.getWorld()).getChunkData(event.getPos().getX() / 16, event.getPos().getZ() / 16);
 					cdp.addToPlayerActivityInteract(event.getEntityPlayer().getGameProfile().getId(), 1);
 				}
-				
+
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public void entityHurt(LivingHurtEvent event) {
 		Headshots.hookLivingHurt(event);
 		DynamicDifficulty.logDamage(event);
 	}
-	
+
 	@SubscribeEvent
 	public void entityKilled(LivingDeathEvent event) {
 		DynamicDifficulty.logDeath(event);
 	}
-	
+
 	@SubscribeEvent
 	public void entityTick(LivingUpdateEvent event) {
-		
+
 		EntityLivingBase ent = event.getEntityLiving();
-		if (!ent.worldObj.isRemote) {
+		if (!ent.world.isRemote) {
 			if (ent instanceof EntityPlayer) {
 				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
 			}
 		}
-		
+
 		if (ConfigCoroAI.desirePathDerp) {
-			
+
 			int walkOnRate = 5;
-			
-			if (!ent.worldObj.isRemote) {
-				if (ent.worldObj.getTotalWorldTime() % walkOnRate == 0) {
+
+			if (!ent.world.isRemote) {
+				if (ent.world.getTotalWorldTime() % walkOnRate == 0) {
 					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
 					if (ent instanceof EntityPlayer) {
 						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((EntityPlayer) ent, 0.1F);
@@ -132,31 +132,31 @@ public class EventHandlerForge {
 					}
 					if (speed > 0.08) {
 						//System.out.println(entityId + " - speed: " + speed);
-						int newX = MathHelper.floor_double(ent.posX);
-						int newY = MathHelper.floor_double(ent.getEntityBoundingBox().minY - 1);
-						int newZ = MathHelper.floor_double(ent.posZ);
-						IBlockState state = ent.worldObj.getBlockState(new BlockPos(newX, newY, newZ));
+						int newX = MathHelper.floor(ent.posX);
+						int newY = MathHelper.floor(ent.getEntityBoundingBox().minY - 1);
+						int newZ = MathHelper.floor(ent.posZ);
+						IBlockState state = ent.world.getBlockState(new BlockPos(newX, newY, newZ));
 						Block id = state.getBlock();
-						
+
 						//check for block that can have beaten path data
-						
+
 						if (id == Blocks.GRASS) {
-							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
-							
+							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.world).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
+
 							//add depending on a weight?
 							bdp.walkedOnAmount += 0.25F;
-							
+
 							//System.out.println("inc walk amount: " + bdp.walkedOnAmount);
-							
+
 							if (bdp.walkedOnAmount > 5F) {
 								//System.out.println("dirt!!!");
-								if (ent.worldObj.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
-									ent.worldObj.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
+								if (ent.world.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
+									ent.world.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
 								}
-								
+
 								//BlockRegistry.dirtPath.blockID);
 								//cleanup for memory
-								WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).removeBlockData(newX, newY, newZ);
+								WorldDirectorManager.instance().getBlockDataGrid(ent.world).removeBlockData(newX, newY, newZ);
 								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
 							}
 						}

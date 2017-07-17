@@ -1,7 +1,6 @@
 package CoroUtil.util;
 
-import java.util.Random;
-
+import com.google.common.collect.Multimap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeMap;
@@ -12,7 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
-import com.google.common.collect.Multimap;
+import java.util.Random;
 
 public class CoroUtilItem {
 
@@ -21,7 +20,7 @@ public class CoroUtilItem {
 		//item.setTextureName(nameTex);
     	return item;
     }
-	
+
 	public static Item getItemByName(String name) {
 		try {
 			Object obj = Item.REGISTRY.getObject(new ResourceLocation(name));
@@ -35,11 +34,11 @@ public class CoroUtilItem {
 		}
 		return null;
 	}
-	
+
 	public static String getNameByItem(Item item) {
 		return Item.REGISTRY.getNameForObject(item).toString();
 	}
-	
+
 	public static float getLeftClickDamage(ItemStack is) {
 		if (is.getItem() == null) return 0;
 		AttributeMap attributes = new AttributeMap();
@@ -53,23 +52,23 @@ public class CoroUtilItem {
 			return 1;
 		}
 	}
-	
+
 	public static EntityItem tossItemFromEntity(Entity parEnt, ItemStack p_146097_1_, boolean p_146097_2_, boolean p_146097_3_)
     {
-		
+
 		Random rand = new Random();
-		
+
         if (p_146097_1_ == null)
         {
             return null;
         }
-        else if (p_146097_1_.stackSize == 0)
+        else if (p_146097_1_.getCount() == 0)
         {
             return null;
         }
         else
         {
-            EntityItem entityitem = new EntityItem(parEnt.worldObj, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
+            EntityItem entityitem = new EntityItem(parEnt.world, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
             //TODO: 1.8 fix if method is still used
             System.out.println("TODO: missing added delay before pickup");
             //entityitem.delayBeforeCanPickup = 40;
@@ -104,12 +103,12 @@ public class CoroUtilItem {
                 entityitem.motionZ += Math.sin((double)f1) * (double)f;
             }
 
-            parEnt.worldObj.spawnEntityInWorld(entityitem);
+            parEnt.world.spawnEntity(entityitem);
             //this.addStat(StatList.dropStat, 1);
             return entityitem;
         }
     }
-	
-	
-	
+
+
+
 }

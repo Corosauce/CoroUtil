@@ -1,7 +1,11 @@
 package CoroUtil.entity.projectile;
 
-import java.util.List;
-
+import CoroUtil.bt.IBTAgent;
+import CoroUtil.util.Vec3;
+import extendedrenderer.ExtendedRenderer;
+import extendedrenderer.particle.ParticleRegistry;
+import extendedrenderer.particle.behavior.ParticleBehaviorTrail;
+import extendedrenderer.particle.entity.EntityRotFX;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,17 +15,13 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.bt.IBTAgent;
-import CoroUtil.util.Vec3;
-import extendedrenderer.ExtendedRenderer;
-import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.behavior.ParticleBehaviorTrail;
-import extendedrenderer.particle.entity.EntityRotFX;
+
+import java.util.List;
 
 public class EntityFireBall extends EntityProjectileBase
 {
 	public int ticksInAir;
-	
+
 	@SideOnly(Side.CLIENT)
 	public boolean hasDeathTicked;
 
@@ -29,7 +29,7 @@ public class EntityFireBall extends EntityProjectileBase
 	{
 		super(world);
 	}
-	
+
 	public EntityFireBall(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase target, double parSpeed)
     {
 		super(par1World, par2EntityLivingBase, target, parSpeed);
@@ -38,7 +38,7 @@ public class EntityFireBall extends EntityProjectileBase
 	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed, float parYaw, float parPitch)
 	{
 		super(world, entityliving, parSpeed);
-		
+
 		float speed = 0.7F;
 		float f = 0.4F;
         this.motionX = (double)(-MathHelper.sin(-parYaw / 180.0F * (float)Math.PI) * MathHelper.cos(-parPitch / 180.0F * (float)Math.PI) * f);
@@ -46,11 +46,11 @@ public class EntityFireBall extends EntityProjectileBase
         this.motionY = (double)(-MathHelper.sin((-parPitch + this.func_70183_g()) / 180.0F * (float)Math.PI) * f);
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, speed, 1.0F);
 	}
-	
+
 	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed)
 	{
 		super(world, entityliving, parSpeed);
-		
+
 		float speed = 0.7F;
 		float f = 0.4F;
         this.motionX = (double)(-MathHelper.sin(-this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(-this.rotationPitch / 180.0F * (float)Math.PI) * f);
@@ -63,19 +63,19 @@ public class EntityFireBall extends EntityProjectileBase
 	{
 		super(world, d, d1, d2);
 	}
-	
+
 	@Override
 	public void onUpdate()
     {
 		super.onUpdate();
-		
+
 		noClip = false;
-		
-		if (!this.worldObj.isRemote)
+
+		if (!this.world.isRemote)
         {
-			
+
 			ticksInAir++;
-			
+
 			if (ticksInAir > 200) {
 				setDead();
 			}
@@ -90,18 +90,18 @@ public class EntityFireBall extends EntityProjectileBase
         	tickAnimate();
         }
     }
-	
+
 	@Override
 	protected float getGravityVelocity() {
 		return 0F;
 	}
-	
+
 	@Override
 	public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
 		RayTraceResult movingobjectposition = null;
-		
+
         Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -130,15 +130,15 @@ public class EntityFireBall extends EntityProjectileBase
 	@Override
 	protected void onImpact(RayTraceResult movingobjectposition)
 	{
-		
+
 		try {
 			if (movingobjectposition.entityHit != null)
 			{
-				if (!worldObj.isRemote)
+				if (!world.isRemote)
 				{
-					
+
 					float damage = 5;
-					
+
 					if (movingobjectposition.entityHit instanceof IBTAgent && getThrower() instanceof IBTAgent) {
 						if (((IBTAgent) getThrower()).getAIBTAgent().isEnemy(movingobjectposition.entityHit)) {
 							/*if (movingobjectposition.entityHit instanceof IEpochEntity && getThrower() instanceof IEpochEntity) {
@@ -147,60 +147,60 @@ public class EntityFireBall extends EntityProjectileBase
 								movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), damage);
 							//}
 							movingobjectposition.entityHit.setFire(3);
-							if (!worldObj.isRemote) {
+							if (!world.isRemote) {
 								setDead();
 							} else {
 								tickDeath();
 							}
 						} else {
-	
+
 						}
 					} else {
 						movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), damage);
-						if (!worldObj.isRemote) {
+						if (!world.isRemote) {
 							setDead();
 						} else {
 							tickDeath();
 						}
 					}
-					
-					
-					
+
+
+
 				}
 			}
 		} catch (Exception ex) {
 			//owner entity agent was cleaned up
 			//ex.printStackTrace();
 		}
-		
+
 		super.onImpact(movingobjectposition);
 	}
-	
+
 	@Override
 	public void setDead() {
-		if (worldObj.isRemote) tickDeath();
+		if (world.isRemote) tickDeath();
 		super.setDead();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public void tickAnimate() {
 		int amount = 10 / (Minecraft.getMinecraft().gameSettings.particleSetting+1);
-		
+
 		double speed = 0.15D;
     	double speedInheritFactor = 0.5D;
-    	
+
     	//while (particleBehavior.particles.size() < 200) {
     	for (int i = 0; i < amount; i++) {
-	    	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().theWorld, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
+	    	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().world, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
     		double randRange = 0.5D;
-	    	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, posX - 0.5D*randRange + rand.nextDouble()*randRange, posY - 0.5D*randRange + rand.nextDouble()*randRange, posZ - 0.5D*randRange + rand.nextDouble()*randRange, 0, 0, 0/*(rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed*/);
+	    	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().world, ParticleRegistry.squareGrey, posX - 0.5D*randRange + rand.nextDouble()*randRange, posY - 0.5D*randRange + rand.nextDouble()*randRange, posZ - 0.5D*randRange + rand.nextDouble()*randRange, 0, 0, 0/*(rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed*/);
 	    	particleBehavior.initParticle(entityfx);
 	    	entityfx.callUpdatePB = false;
 			ExtendedRenderer.rotEffRenderer.addEffect(entityfx);
 			particleBehavior.particles.add(entityfx);
     	}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public void tickDeath() {
 		if (!hasDeathTicked) {
