@@ -188,8 +188,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		        	
 		            EntityPlayer var5 = (EntityPlayer)world.playerEntities.get(i);
 		            
-		            int pChunkX = MathHelper.floor_double(var5.posX / 16.0D);
-		            int pChunkZ = MathHelper.floor_double(var5.posZ / 16.0D);
+		            int pChunkX = MathHelper.floor(var5.posX / 16.0D);
+		            int pChunkZ = MathHelper.floor(var5.posZ / 16.0D);
 		            
 		            for (int xx = -playerRadius; xx <= playerRadius; ++xx)
 		            {
@@ -267,8 +267,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public Biome getBiomeGenForCoords(BlockPos pos) {
-		return this.worldObj.getBiomeGenForCoords(pos);
+	public Biome getBiome(BlockPos pos) {
+		return this.worldObj.getBiome(pos);
 	}
 
 	/*@SideOnly(Side.CLIENT)

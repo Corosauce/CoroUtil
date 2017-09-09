@@ -144,7 +144,7 @@ public class ChunkDataPoint
         float f = pathpoint.xCoord - xCoord;
         float f1 = pathpoint.yCoord - yCoord;
         float f2 = pathpoint.zCoord - zCoord;
-        return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
+        return MathHelper.sqrt(f * f + f1 * f1 + f2 * f2);
     }
 
     public boolean equals(Object obj)

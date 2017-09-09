@@ -59,16 +59,16 @@ public class TargetEnemy extends Selector {
 		
 		AIBTAgent ai = entInt.getAIBTAgent();
 		
-		if ((scanRate == -1 || ent.worldObj.getTotalWorldTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
+		if ((scanRate == -1 || ent.world.getTotalWorldTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
 			boolean found = false;
 			boolean sanityAborted = false;
 			Entity clEnt = null;
 			float closest = 9999F;
 	    	List list = null;
 	    	if (holdPos != null) {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	} else {
-	    		list = ent.worldObj.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	}
 	        for(int j = 0; j < list.size(); j++)
 	        {

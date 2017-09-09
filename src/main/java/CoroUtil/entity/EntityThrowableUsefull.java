@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
@@ -146,7 +147,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      */
     public void setThrowableHeading(double par1, double par3, double par5, float par7, float par8)
     {
-        float f2 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
+        float f2 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
         par1 /= (double)f2;
         par3 /= (double)f2;
         par5 /= (double)f2;
@@ -159,7 +160,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.motionX = par1;
         this.motionY = par3;
         this.motionZ = par5;
-        float f3 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+        float f3 = MathHelper.sqrt(par1 * par1 + par5 * par5);
         this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
         this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, (double)f3) * 180.0D / Math.PI);
         this.ticksInGround = 0;
@@ -178,7 +179,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
-            float f = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+            float f = MathHelper.sqrt(par1 * par1 + par5 * par5);
             this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
             this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, (double)f) * 180.0D / Math.PI);
         }
@@ -205,7 +206,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         
         if (this.inGround)
         {
-            Block i = this.worldObj.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
+            Block i = this.world.getBlockState(new BlockPos(this.xTile, this.yTile, this.zTile)).getBlock();
 
             if (i == this.inTile)
             {
@@ -237,7 +238,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
         Vec3 vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-        RayTraceResult movingobjectposition = this.worldObj.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
+        RayTraceResult movingobjectposition = this.world.rayTraceBlocks(vec3.toMCVec(), vec31.toMCVec());
         vec3 = new Vec3(this.posX, this.posY, this.posZ);
         vec31 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
@@ -246,7 +247,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             vec31 = new Vec3(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
         }
 
-        if (!this.worldObj.isRemote)
+        if (!this.world.isRemote)
         {
         	RayTraceResult temp = tickEntityCollision(vec3, vec31);
         	if (temp != null) movingobjectposition = temp;
@@ -268,9 +269,9 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.posY += this.motionY;
         this.posZ += this.motionZ;*/
         
-        this.moveEntity(motionX, motionY, motionZ);
+        this.move(MoverType.SELF, motionX, motionY, motionZ);
         
-        float f1 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+        float f1 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
         this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
 
         for (this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f1) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
@@ -308,7 +309,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             for (int k = 0; k < 4; ++k)
             {
                 float f4 = 0.25F;
-                this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
+                this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
             }
 
             f2 = 0.8F;
@@ -382,7 +383,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             d1 = (p_70625_1_.getEntityBoundingBox().minY + p_70625_1_.getEntityBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
         }
 
-        double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+        double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
         float f2 = (float)(Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
         float f3 = (float)(-(Math.atan2(d1, d3) * 180.0D / Math.PI));
         this.rotationPitch = this.updateRotation(this.rotationPitch, f3, p_70625_3_);
@@ -411,7 +412,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -509,7 +510,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     {
         if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0)
         {
-            this.thrower = this.worldObj.getPlayerEntityByName(this.throwerName);
+            this.thrower = this.world.getPlayerEntityByName(this.throwerName);
         }
 
         return this.thrower;

@@ -63,7 +63,7 @@ public class SelectorMoveToCoords extends Selector {
 				
 				//for 5th gen AI, removed nopath check, path timeouts managed internally now
 				
-				//if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).worldObj.getWorldTime() % 20 == 0) {
+				//if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).world.getWorldTime() % 20 == 0) {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
 					//ent.getAIBTAgent().moveTo(coordsRef[0]);
@@ -101,7 +101,7 @@ public class SelectorMoveToCoords extends Selector {
 	public boolean canBeSeen(Vec3d pos)
     {
 		EntityLivingBase entL = ((EntityLivingBase)ent);
-        return entL.worldObj.rayTraceBlocks(new Vec3d(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
+        return entL.world.rayTraceBlocks(new Vec3d(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	
 }

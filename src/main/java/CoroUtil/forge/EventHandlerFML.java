@@ -102,15 +102,15 @@ public class EventHandlerFML {
 	@SubscribeEvent
 	public void tickRender(RenderTickEvent event) {
 		//test CoroUtil context render all quests
-		if (FMLClientHandler.instance().getClient().theWorld != null && FMLClientHandler.instance().getClient().thePlayer != null) {
+		if (FMLClientHandler.instance().getClient().world != null && FMLClientHandler.instance().getClient().player != null) {
 			if (event.phase == Phase.END) {
-				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(FMLClientHandler.instance().getClient().thePlayer);
+				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(FMLClientHandler.instance().getClient().player);
 				
 				//quests.renderQuestOverlay();
 				if (soundTest == null) soundTest = new SoundTest();
 				
-				if (timeLast != FMLClientHandler.instance().getClient().theWorld.getTotalWorldTime()) {
-					timeLast = FMLClientHandler.instance().getClient().theWorld.getTotalWorldTime();
+				if (timeLast != FMLClientHandler.instance().getClient().world.getTotalWorldTime()) {
+					timeLast = FMLClientHandler.instance().getClient().world.getTotalWorldTime();
 					if (soundTest.active) {
 						soundTest.tick();
 					}

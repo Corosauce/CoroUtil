@@ -46,7 +46,7 @@ public class RotatingParticleManager
 {
     private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
     /** Reference to the World object. */
-    protected World worldObj;
+    protected World world;
     /**
      * Second dimension: 0 = GlStateManager.depthMask true aka transparent textures, 1 = false
      */
@@ -67,7 +67,7 @@ public class RotatingParticleManager
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
-        this.worldObj = worldIn;
+        this.world = worldIn;
         this.renderer = rendererIn;
 
         //main default layer
@@ -99,7 +99,7 @@ public class RotatingParticleManager
 
     public void emitParticleAtEntity(Entity entityIn, EnumParticleTypes particleTypes)
     {
-        this.particleEmitters.add(new ParticleEmitter(this.worldObj, entityIn, particleTypes));
+        this.particleEmitters.add(new ParticleEmitter(this.world, entityIn, particleTypes));
     }
 
     /**
@@ -112,7 +112,7 @@ public class RotatingParticleManager
 
         if (iparticlefactory != null)
         {
-            Particle particle = iparticlefactory.getEntityFX(particleId, this.worldObj, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
+            Particle particle = iparticlefactory.createParticle(particleId, this.world, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
 
             if (particle != null)
             {
@@ -183,18 +183,18 @@ public class RotatingParticleManager
 
     private void updateEffectLayer(int layer)
     {
-        //this.worldObj.theProfiler.startSection(layer + "");
+        //this.world.theProfiler.startSection(layer + "");
 
         for (int i = 0; i < 2; ++i)
         {
-            //this.worldObj.theProfiler.startSection(i + "");
+            //this.world.theProfiler.startSection(i + "");
             for (ArrayDeque<Particle>[][] entry : fxLayers) {
                 this.tickParticleList(entry[layer][i]);
             }
-            //this.worldObj.theProfiler.endSection();
+            //this.world.theProfiler.endSection();
         }
 
-        //this.worldObj.theProfiler.endSection();
+        //this.world.theProfiler.endSection();
     }
 
     private void tickParticleList(Queue<Particle> p_187240_1_)
@@ -258,7 +258,7 @@ public class RotatingParticleManager
         Particle.interpPosX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
         Particle.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
         Particle.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-        Particle.field_190016_K = entityIn.getLook(partialTicks);
+        Particle.cameraViewDir = entityIn.getLook(partialTicks);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
@@ -318,7 +318,7 @@ public class RotatingParticleManager
 	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	            
 	            Entity entity = mc.getRenderViewEntity();
-	            IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.theWorld, entity, partialTicks);
+	            IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.world, entity, partialTicks);
 	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
 	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
 	            
@@ -438,7 +438,7 @@ public class RotatingParticleManager
 
     public void clearEffects(@Nullable World worldIn)
     {
-        this.worldObj = worldIn;
+        this.world = worldIn;
 
         //pre shader branch way
         for (ArrayDeque<Particle>[][] entry : fxLayers) {

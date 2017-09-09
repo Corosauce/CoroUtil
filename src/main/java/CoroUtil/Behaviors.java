@@ -68,7 +68,7 @@ public class Behaviors {
 			
 
             if(ticks > 150) {
-                if(me.worldObj.rand.nextInt(10) == 0) {
+                if(me.world.rand.nextInt(10) == 0) {
                     //System.out.println("idle trigger! - " + ticks);
                 	
                     if (me instanceof c_IEnhPF) {
@@ -133,7 +133,7 @@ public class Behaviors {
 		boolean found = false;
 		//followTriggerDist = 32F;
 		//if (me.getEntityToAttack() == null) {
-			List ents = me.worldObj.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().addCoord((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
+			List ents = me.world.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().addCoord((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {

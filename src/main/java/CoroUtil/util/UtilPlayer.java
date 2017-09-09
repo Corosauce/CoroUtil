@@ -21,9 +21,9 @@ public class UtilPlayer {
 		EntityPlayer entP = player;//tryGetCursedPlayer(cursedPlayers.get(i));
 		
 		for (int armorIndex = 0; armorIndex < 4; armorIndex++) {
-			ItemStack stack = entP.inventory.armorInventory[armorIndex];
+			ItemStack stack = entP.inventory.armorInventory.get(armorIndex);
 			
-			if (stack != null) {
+			if (!stack.isEmpty()) {
 				//testing enchantment debug
 				/*if (stack.getEnchantmentTagList() == null || stack.getEnchantmentTagList().hasNoTags()) {
 					stack.addEnchantment(Enchantment.protection, 5);
@@ -37,7 +37,7 @@ public class UtilPlayer {
 		}
 		
 		//randomization appears to be in play for this
-		armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.getArmorInventoryList(), DamageSource.generic);
+		armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.getArmorInventoryList(), DamageSource.GENERIC);
 		
 		//new plan here for 1.6
 		//remove attrib from ent for current item
@@ -51,15 +51,15 @@ public class UtilPlayer {
 		//initial removal of current weap attrib
 		if (calculateWeapon) {
 			ItemStack itemstack = entP.inventory.getCurrentItem();
-			if (itemstack != null) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 			
-			for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.length; slotIndex++) {
-				if (entP.inventory.mainInventory[slotIndex] != null) {
+			for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.size(); slotIndex++) {
+				if (!entP.inventory.mainInventory.get(slotIndex).isEmpty()) {
 					//if (entP.inventory.mainInventory[slotIndex].getItem() == ParticleMan.itemGlove) hasGlove = true;
 					
-					itemstack = entP.inventory.mainInventory[slotIndex];
+					itemstack = entP.inventory.mainInventory.get(slotIndex);
 	
-	                if (itemstack != null)
+	                if (!itemstack.isEmpty())
 	                {
 	                	//add attrib
 	                	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
@@ -78,7 +78,7 @@ public class UtilPlayer {
 	
 	                if (entP instanceof EntityLivingBase)
 	                {
-	                	if (itemstack != null) {
+	                	if (!itemstack.isEmpty()) {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
 	                        f1 = EnchantmentHelper.getModifierForCreature(itemstack, EnumCreatureAttribute.UNDEFINED);
 	                        //i += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)par1Entity);
@@ -87,7 +87,7 @@ public class UtilPlayer {
 	                
 	                float dmg = f + f1;
 	
-					if (itemstack != null)
+					if (!itemstack.isEmpty())
 	                {
 						//remove attrib
 						entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
@@ -101,7 +101,7 @@ public class UtilPlayer {
 			
 			//readd of current weapon attrib
 			itemstack = entP.inventory.getCurrentItem();
-			if (itemstack != null) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
 		}
 		
 		//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);

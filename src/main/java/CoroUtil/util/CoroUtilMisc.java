@@ -25,7 +25,7 @@ public class CoroUtilMisc {
             d2 = (par1Entity.getEntityBoundingBox().minY + par1Entity.getEntityBoundingBox().maxY) / 2.0D - (entToRotate.posY + (double)entToRotate.getEyeHeight());
         }
 
-        double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1);
+        double d3 = (double)MathHelper.sqrt(d0 * d0 + d1 * d1);
         float f2 = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
         float f3 = (float)(-(Math.atan2(d2, d3) * 180.0D / Math.PI));
         entToRotate.rotationPitch = updateRotation(entToRotate.rotationPitch, f3, par3);
@@ -73,7 +73,7 @@ public class CoroUtilMisc {
 	}*/
 	
 	public static BlockCoord vecToChunkCoords(Vec3 parVec) {
-		return new BlockCoord(MathHelper.floor_double(parVec.xCoord), MathHelper.floor_double(parVec.yCoord), MathHelper.floor_double(parVec.zCoord));
+		return new BlockCoord(MathHelper.floor(parVec.xCoord), MathHelper.floor(parVec.yCoord), MathHelper.floor(parVec.zCoord));
 	}
 	
 	public static BlockCoord addCoords(BlockCoord coords1, BlockCoord coords2) {
@@ -85,7 +85,7 @@ public class CoroUtilMisc {
 	}
 	
 	public static void sendCommandSenderMsg(ICommandSender entP, String msg) {
-		entP.addChatMessage(new TextComponentString(msg));
+		entP.sendMessage(new TextComponentString(msg));
 	}
 
     public static float adjVal(float source, float target, float adj) {

@@ -69,7 +69,7 @@ public class Wander extends Selector {
 	        	for (int l = 0; l < 10; l++)
 	            {
 	            	float i1 = (float) (ent.posX + (rand.nextFloat()*wanderRange - (wanderRange/2)));
-	            	float j1 = (float) ent.posY;//MathHelper.floor_double((ent.posY + (double)rand.nextInt((int)wanderRange/2)) - wanderRange/4);
+	            	float j1 = (float) ent.posY;//MathHelper.floor((ent.posY + (double)rand.nextInt((int)wanderRange/2)) - wanderRange/4);
 	            	float k1 = (float) (ent.posZ + (rand.nextFloat()*wanderRange - (wanderRange/2)));
 	                float f1 = 1F;//getBlockPathWeight(i1, j1, k1);
 	                if (f1 > f)

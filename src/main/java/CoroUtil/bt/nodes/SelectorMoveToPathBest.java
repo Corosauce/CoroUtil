@@ -52,7 +52,7 @@ public class SelectorMoveToPathBest extends Selector {
 			entInt.getAIBTAgent().pathNav.setPath(blackboard.pathMoveToPathFar, blackboard.agent.moveSpeed);
 			if (blackboard.pathMoveToPathFar == null || blackboard.pathMoveToPathFar.isFinished()) {
 				lastAttemptFailed = true;
-				lastPathTime = ent.worldObj.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
+				lastPathTime = ent.world.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
 			} else {
 				lastAttemptFailed = false;
 			}
@@ -62,23 +62,23 @@ public class SelectorMoveToPathBest extends Selector {
 			
 			//if (ent.getNavigator().noPath()/*blackboard.pathMoveToPathFar == null || blackboard.pathMoveToPathFar.isFinished()*/) {
 			//test for stalling movement
-			if ((entInt.getAIBTAgent().pathNav.noPath()/* && !lastAttemptFailed*/)/* || lastPathTime + repathDelay < ent.worldObj.getTotalWorldTime()*/) {
+			if ((entInt.getAIBTAgent().pathNav.noPath()/* && !lastAttemptFailed*/)/* || lastPathTime + repathDelay < ent.world.getTotalWorldTime()*/) {
 				if (ent.onGround || ent.isInWater() || blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
 					if (!blackboard.isWaitingForPath.getValue()) {
 						//System.out.println("request out - " + ent.entityId);
 						
 						//TEMP CANCELLING THREAD
 						blackboard.requestPathFar(blackboard.posMoveTo, pathfindRangeFar);
-						lastRequestTime = ent.worldObj.getTotalWorldTime();
+						lastRequestTime = ent.world.getTotalWorldTime();
 					} else {
-						//System.out.println((lastRequestTime + repathWaitTime) - ent.worldObj.getTotalWorldTime());
-						if (lastRequestTime + repathWaitTime < ent.worldObj.getTotalWorldTime()) {
+						//System.out.println((lastRequestTime + repathWaitTime) - ent.world.getTotalWorldTime());
+						if (lastRequestTime + repathWaitTime < ent.world.getTotalWorldTime()) {
 							//System.out.println("threaded path request timed out, retrying");
 							blackboard.isWaitingForPath.setValue(false); //reset attempt
 							blackboard.resetReceived();
 						}
 					}
-					lastPathTime = ent.worldObj.getTotalWorldTime();
+					lastPathTime = ent.world.getTotalWorldTime();
 				}
 				//tick child while waiting (temp insta pathing) - causing issues
 				//System.out.println("insta path while wait");

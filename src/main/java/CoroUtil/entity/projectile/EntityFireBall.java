@@ -71,7 +71,7 @@ public class EntityFireBall extends EntityProjectileBase
 		
 		noClip = false;
 		
-		if (!this.worldObj.isRemote)
+		if (!this.world.isRemote)
         {
 			
 			ticksInAir++;
@@ -101,7 +101,7 @@ public class EntityFireBall extends EntityProjectileBase
 		RayTraceResult movingobjectposition = null;
 		
         Entity entity = null;
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -134,7 +134,7 @@ public class EntityFireBall extends EntityProjectileBase
 		try {
 			if (movingobjectposition.entityHit != null)
 			{
-				if (!worldObj.isRemote)
+				if (!world.isRemote)
 				{
 					
 					float damage = 5;
@@ -147,7 +147,7 @@ public class EntityFireBall extends EntityProjectileBase
 								movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), damage);
 							//}
 							movingobjectposition.entityHit.setFire(3);
-							if (!worldObj.isRemote) {
+							if (!world.isRemote) {
 								setDead();
 							} else {
 								tickDeath();
@@ -157,7 +157,7 @@ public class EntityFireBall extends EntityProjectileBase
 						}
 					} else {
 						movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), damage);
-						if (!worldObj.isRemote) {
+						if (!world.isRemote) {
 							setDead();
 						} else {
 							tickDeath();
@@ -178,7 +178,7 @@ public class EntityFireBall extends EntityProjectileBase
 	
 	@Override
 	public void setDead() {
-		if (worldObj.isRemote) tickDeath();
+		if (world.isRemote) tickDeath();
 		super.setDead();
 	}
 	
@@ -191,9 +191,9 @@ public class EntityFireBall extends EntityProjectileBase
     	
     	//while (particleBehavior.particles.size() < 200) {
     	for (int i = 0; i < amount; i++) {
-	    	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().theWorld, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
+	    	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().world, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
     		double randRange = 0.5D;
-	    	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, posX - 0.5D*randRange + rand.nextDouble()*randRange, posY - 0.5D*randRange + rand.nextDouble()*randRange, posZ - 0.5D*randRange + rand.nextDouble()*randRange, 0, 0, 0/*(rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed*/);
+	    	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().world, ParticleRegistry.squareGrey, posX - 0.5D*randRange + rand.nextDouble()*randRange, posY - 0.5D*randRange + rand.nextDouble()*randRange, posZ - 0.5D*randRange + rand.nextDouble()*randRange, 0, 0, 0/*(rand.nextDouble() - rand.nextDouble()) * speed, 0.03D(rand.nextDouble() - rand.nextDouble()) * speed, (rand.nextDouble() - rand.nextDouble()) * speed*/);
 	    	particleBehavior.initParticle(entityfx);
 	    	entityfx.callUpdatePB = false;
 			ExtendedRenderer.rotEffRenderer.addEffect(entityfx);

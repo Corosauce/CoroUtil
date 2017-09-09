@@ -90,12 +90,12 @@ public class CoroUtil {
 	    		}
 	    		
 	    		//Iterator<Class<? extends Entity>> it2 = EntityList.stringToClassMapping.values().iterator();
-	    		Iterator<Map.Entry<String, Class<? extends Entity>>> it2 = EntityList.NAME_TO_CLASS.entrySet().iterator();
+	    		/*Iterator<Map.Entry<String, Class<? extends Entity>>> it2 = EntityList.NAME_TO_CLASS.entrySet().iterator();
 	    		while (it2.hasNext()) {
 	    			Entry<String, Class<? extends Entity>> entReg = it2.next();
 	    			
 	    			System.out.println(entReg.getKey() + " - " + entReg.getValue());
-	    		}
+	    		}*/
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

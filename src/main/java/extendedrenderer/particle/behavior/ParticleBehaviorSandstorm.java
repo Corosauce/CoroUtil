@@ -121,7 +121,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - particle.aboveGroundHeight, particle.getPosZ());
 				IBlockState state = particle.getWorld().getBlockState(pos);
 				//if particle is near ground, push it up to keep from landing
-				if (!state.getBlock().isAir(state, particle.worldObj, pos)) {
+				if (!state.getBlock().isAir(state, particle.world, pos)) {
 					if (particle.motionY < particle.bounceSpeedMax) {
 						particle.motionY += particle.bounceSpeed;
 					}
@@ -130,7 +130,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					double aheadMultiplier = 20D;
 					BlockPos posAhead = new BlockPos(particle.getPosX() + (particle.getMotionX() * aheadMultiplier), particle.getPosY() - particle.aboveGroundHeight, particle.getPosZ() + (particle.getMotionZ() * aheadMultiplier));
 					IBlockState stateAhead = particle.getWorld().getBlockState(posAhead);
-					if (!stateAhead.getBlock().isAir(stateAhead, particle.worldObj, posAhead)) {
+					if (!stateAhead.getBlock().isAir(stateAhead, particle.world, posAhead)) {
 						if (particle.motionY < particle.bounceSpeedMaxAhead) {
 							particle.motionY += particle.bounceSpeedAhead;
 						}

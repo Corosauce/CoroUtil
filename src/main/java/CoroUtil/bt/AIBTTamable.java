@@ -53,7 +53,7 @@ public class AIBTTamable {
 	}
 	
 	public void updateCache() {
-		ownerCachedInstance = agent.ent.worldObj.getPlayerEntityByName(owner);
+		ownerCachedInstance = agent.ent.world.getPlayerEntityByName(owner);
 	}
 	
 	public EntityLivingBase getPlayerCached() {

@@ -42,7 +42,7 @@ public class EventHandler {
         if (event.phase == TickEvent.Phase.START) {
 
             Minecraft mc = Minecraft.getMinecraft();
-            if (mc.theWorld != null) {
+            if (mc.world != null) {
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
 
@@ -64,10 +64,10 @@ public class EventHandler {
 		Minecraft mc = Minecraft.getMinecraft();
 
         //update world reference and clear old effects on world change or on no world
-        if (lastWorld != mc.theWorld) {
+        if (lastWorld != mc.world) {
             CoroUtil.dbg("CoroUtil: resetting rotating particle renderer");
-            ExtendedRenderer.rotEffRenderer.clearEffects(mc.theWorld);
-            lastWorld = mc.theWorld;
+            ExtendedRenderer.rotEffRenderer.clearEffects(mc.world);
+            lastWorld = mc.world;
         }
 
 		/*if (mc.theWorld != null) {

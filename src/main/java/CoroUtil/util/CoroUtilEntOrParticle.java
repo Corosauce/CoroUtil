@@ -117,14 +117,14 @@ public class CoroUtilEntOrParticle {
 	
 	public static World getWorld(Object obj) {
 		if (obj instanceof Entity) {
-			return ((Entity)obj).worldObj;
+			return ((Entity)obj).world;
 		} else {
 			return getWorldParticle(obj);
 		}
 	}
 
 	private static World getWorldParticle(Object obj) {
-		return ((Particle)obj).worldObj;
+		return ((Particle)obj).world;
 	}
 
 	public static double getDistance(Object obj, double x, double y, double z)
@@ -132,7 +132,7 @@ public class CoroUtilEntOrParticle {
 		double d0 = getPosX(obj) - x;
 		double d1 = getPosY(obj) - y;
 		double d2 = getPosZ(obj) - z;
-		return (double) MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+		return (double) MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
 	}
 
 	public static void setPosX(Object obj, double val) {

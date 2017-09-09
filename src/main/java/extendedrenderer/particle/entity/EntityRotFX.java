@@ -186,7 +186,7 @@ public class EntityRotFX extends Particle implements IWindHandler
             }
 
             if (killWhenUnderTopmostBlock) {
-                int height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+                int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
                 if (this.posY <= height) {
                     startDeath();
                 }
@@ -195,7 +195,7 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     	if (!collisionSpeedDampen) {
             //if (this.isCollided()) {
-            if (this.isCollided) {
+            if (this.onGround) {
                 this.motionX /= 0.699999988079071D;
                 this.motionZ /= 0.699999988079071D;
             }
@@ -260,7 +260,7 @@ public class EntityRotFX extends Particle implements IWindHandler
         weatherEffect = true;
         ExtendedRenderer.rotEffRenderer.addEffect(this);
         //RELOCATED TO CODE AFTER CALLING spawnAsWeatherEffect(), also uses list in WeatherManagerClient
-        //this.worldObj.addWeatherEffect(this);
+        //this.world.addWeatherEffect(this);
     }
 
     public int getAge()
@@ -380,19 +380,19 @@ public class EntityRotFX extends Particle implements IWindHandler
 	}
 	
 	public World getWorld() {
-		return this.worldObj;
+		return this.world;
 	}
 	
 	public void setCanCollide(boolean val) {
-		this.field_190017_n = val;
+		this.canCollide = val;
 	}
 	
 	public boolean getCanCollide() {
-		return this.field_190017_n;
+		return this.canCollide;
 	}
 	
 	public boolean isCollided() {
-		return this.isCollided;
+		return this.onGround;
 	}
 	
 	public double getDistance(double x, double y, double z)
@@ -400,7 +400,7 @@ public class EntityRotFX extends Particle implements IWindHandler
         double d0 = this.posX - x;
         double d1 = this.posY - y;
         double d2 = this.posZ - z;
-        return (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+        return (double)MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
 	
 	@Override
@@ -447,46 +447,46 @@ public class EntityRotFX extends Particle implements IWindHandler
     
     //override to fix isCollided check
     @Override
-    public void moveEntity(double x, double y, double z)
+    public void move(double x, double y, double z)
     {
         double yy = y;
         double xx = x;
         double zz = z;
 
-        if (this.field_190017_n)
+        if (this.canCollide)
         {
-            List<AxisAlignedBB> list = this.worldObj.getCollisionBoxes((Entity)null, this.getEntityBoundingBox().addCoord(x, y, z));
+            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().addCoord(x, y, z));
 
             for (AxisAlignedBB axisalignedbb : list)
             {
-                y = axisalignedbb.calculateYOffset(this.getEntityBoundingBox(), y);
+                y = axisalignedbb.calculateYOffset(this.getBoundingBox(), y);
             }
 
-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, y, 0.0D));
+            this.setBoundingBox(this.getBoundingBox().offset(0.0D, y, 0.0D));
 
             for (AxisAlignedBB axisalignedbb1 : list)
             {
-                x = axisalignedbb1.calculateXOffset(this.getEntityBoundingBox(), x);
+                x = axisalignedbb1.calculateXOffset(this.getBoundingBox(), x);
             }
 
-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, 0.0D, 0.0D));
+            this.setBoundingBox(this.getBoundingBox().offset(x, 0.0D, 0.0D));
 
             for (AxisAlignedBB axisalignedbb2 : list)
             {
-                z = axisalignedbb2.calculateZOffset(this.getEntityBoundingBox(), z);
+                z = axisalignedbb2.calculateZOffset(this.getBoundingBox(), z);
             }
 
-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, 0.0D, z));
+            this.setBoundingBox(this.getBoundingBox().offset(0.0D, 0.0D, z));
         }
         else
         {
-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
+            this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
         }
 
         this.resetPositionToBB();
         //was y != y before
         //this.isCollided = yy != y && yy < 0.0D;
-        this.isCollided = yy != y || xx != x || zz != z;
+        this.onGround = yy != y || xx != x || zz != z;
 
         if (xx != x)
         {
@@ -517,6 +517,6 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     @Override
     public int getBrightnessForRender(float p_189214_1_) {
-        return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.worldObj.getSunBrightness(1F))*/;
+        return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.world.getSunBrightness(1F))*/;
     }
 }

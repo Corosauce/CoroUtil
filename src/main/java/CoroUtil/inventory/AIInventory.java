@@ -145,7 +145,7 @@ public class AIInventory {
 
             for (i = 0; i < inventory.invList.length; ++i)
             {
-            	inventory.invList[i] = ItemStack.loadItemStackFromNBT(nbttaglist.getCompoundTagAt(i));
+            	inventory.invList[i] = new ItemStack(nbttaglist.getCompoundTagAt(i));
             }
         }
 	}/*
@@ -163,7 +163,7 @@ public class AIInventory {
 				//here, we probably want to do what EntityPlayer.attackTargetEntityWithCurrentItem does, get the attribute
 				dmg = CoroUtilItem.getLeftClickDamage(is);
 				
-				ent.attackEntityFrom(DamageSource.causePlayerDamage(getFakePlayer(entOwner.worldObj)), dmg);
+				ent.attackEntityFrom(DamageSource.causePlayerDamage(getFakePlayer(entOwner.world)), dmg);
 				//item.hitEntity(is, entOwner, par3EntityLivingBase)
 			}
 		}
@@ -178,9 +178,9 @@ public class AIInventory {
 			if (item != null) {
 				//special fishing exception
 				if (item instanceof ItemTropicalFishingRod) {
-					((ItemTropicalFishingRod)item).onItemRightClickSpecial(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj), entOwner);
+					((ItemTropicalFishingRod)item).onItemRightClickSpecial(is, entOwner.world, getFakePlayer(entOwner.world), entOwner);
 				} else {
-					item.onItemRightClick(is, entOwner.worldObj, getFakePlayer(entOwner.worldObj));
+					item.onItemRightClick(is, entOwner.world, getFakePlayer(entOwner.world));
 				//}
 			}
 		}
@@ -197,7 +197,7 @@ public class AIInventory {
 	}
 	
 	public void tickItemPickupScan() {
-    	List var3 = entOwner.worldObj.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().expand(2.0D, 1.0D, 2.0D));
+    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().expand(2.0D, 1.0D, 2.0D));
     	
         if(var3 != null) {
             for(int var4 = 0; var4 < var3.size(); ++var4) {
@@ -215,7 +215,7 @@ public class AIInventory {
 	public void collideWithItem(EntityItem parItem) {
 		ItemStack is = parItem.getEntityItem();
 		inventory.addItemStackToInventory(is);
-		if (is.stackSize <= 0)
+		if (is.getCount() <= 0)
         {
 			parItem.setDead();
         }

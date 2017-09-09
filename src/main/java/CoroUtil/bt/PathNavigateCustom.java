@@ -22,7 +22,7 @@ import CoroUtil.util.Vec3;
 public class PathNavigateCustom
 {
     private EntityLivingBase theEntity;
-    private World worldObj;
+    private World world;
 
     /** The PathEntity being followed. */
     private Path currentPath;
@@ -76,7 +76,7 @@ public class PathNavigateCustom
     public PathNavigateCustom(EntityLivingBase par1EntityLiving, World par2World)
     {
         this.theEntity = par1EntityLiving;
-        this.worldObj = par2World;
+        this.world = par2World;
         this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
         this.pathFinder = getPathFinder();
     }
@@ -156,8 +156,8 @@ public class PathNavigateCustom
      */
     public Path getPathToXYZ(double x, double y, double z)
     {
-    	return this.getPathToPos(new BlockPos(MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z)));
-        //return !this.canNavigate() ? null : this.worldObj.getEntityPathToXYZ(this.theEntity, MathHelper.floor_double(x), (int)y, MathHelper.floor_double(z), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+    	return this.getPathToPos(new BlockPos(MathHelper.floor(x), (int)y, MathHelper.floor(z)));
+        //return !this.canNavigate() ? null : this.world.getEntityPathToXYZ(this.theEntity, MathHelper.floor(x), (int)y, MathHelper.floor(z), this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     }
     
     public Path getPathToPos(BlockPos pos)
@@ -169,12 +169,12 @@ public class PathNavigateCustom
         else
         {
             float f = this.getPathSearchRange();
-            this.worldObj.theProfiler.startSection("pathfind");
+            this.world.theProfiler.startSection("pathfind");
             BlockPos blockpos = new BlockPos(this.theEntity);
             int i = (int)(f + 8.0F);
-            ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
+            ChunkCache chunkcache = new ChunkCache(this.world, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
-            this.worldObj.theProfiler.endSection();
+            this.world.theProfiler.endSection();
             return pathentity;
         }
     }
@@ -184,7 +184,7 @@ public class PathNavigateCustom
      */
     public boolean tryMoveToXYZ(double par1, double par3, double par5, double par7)
     {
-    	Path pathentity = this.getPathToXYZ((double)MathHelper.floor_double(par1), (double)((int)par3), (double)MathHelper.floor_double(par5));
+    	Path pathentity = this.getPathToXYZ((double)MathHelper.floor(par1), (double)((int)par3), (double)MathHelper.floor(par5));
         return this.setPath(pathentity, par7);
     }
 
@@ -193,7 +193,7 @@ public class PathNavigateCustom
      */
     public Path getPathToEntityLiving(Entity par1Entity)
     {
-        //return !this.canNavigate() ? null : this.worldObj.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
+        //return !this.canNavigate() ? null : this.world.getPathEntityToEntity(this.theEntity, par1Entity, this.getPathSearchRange(), this.canPassOpenWoodenDoors, this.canPassClosedWoodenDoors, this.avoidsWater, this.canSwimOnSurface);
     	
     	if (!this.canNavigate())
         {
@@ -202,12 +202,12 @@ public class PathNavigateCustom
         else
         {
             float f = this.getPathSearchRange();
-            this.worldObj.theProfiler.startSection("pathfind");
+            this.world.theProfiler.startSection("pathfind");
             BlockPos blockpos = (new BlockPos(this.theEntity)).up();
             int i = (int)(f + 16.0F);
-            ChunkCache chunkcache = new ChunkCache(this.worldObj, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
+            ChunkCache chunkcache = new ChunkCache(this.world, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
-            this.worldObj.theProfiler.endSection();
+            this.world.theProfiler.endSection();
             return pathentity;
         }
     }
@@ -305,11 +305,11 @@ public class PathNavigateCustom
         //make AI able to hop/climb out of water with a 1 high wall around it to fix
         
         //System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
-        //if (MathHelper.floor_double(vec3.zCoord) > -17 && MathHelper.floor_double(vec3.zCoord) < -13) {
+        //if (MathHelper.floor(vec3.zCoord) > -17 && MathHelper.floor(vec3.zCoord) < -13) {
         	//System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
         	
         	PathPoint pp = this.currentPath.getPathPointFromIndex(this.currentPath.getCurrentPathIndex());
-        	Block block = this.theEntity.worldObj.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
+        	Block block = this.theEntity.world.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
         	//System.out.println("block type for next node: " + block);
         	
         	if (block.getMaterial(block.getDefaultState()) == Material.WATER || block.getMaterial(block.getDefaultState()) == Material.LAVA) {
@@ -355,7 +355,7 @@ public class PathNavigateCustom
             
         }
 
-        k = MathHelper.ceiling_float_int(this.theEntity.width);
+        k = MathHelper.ceil(this.theEntity.width);
         int l = (int)this.theEntity.height + 1;
         int i1 = k;
 
@@ -409,7 +409,7 @@ public class PathNavigateCustom
         if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
             int i = (int)this.theEntity.getEntityBoundingBox().minY;
-            Block block = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ))).getBlock();
+            Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
             int k = 0;
 
             do
@@ -420,7 +420,7 @@ public class PathNavigateCustom
                 }
 
                 ++i;
-                block = this.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(this.theEntity.posX), i, MathHelper.floor_double(this.theEntity.posZ))).getBlock();
+                block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
                 ++k;
             }
             while (k <= 16);
@@ -455,13 +455,13 @@ public class PathNavigateCustom
      */
     private void removeSunnyPath()
     {
-        if (!this.worldObj.canBlockSeeSky(new BlockPos(MathHelper.floor_double(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor_double(this.theEntity.posZ))))
+        if (!this.world.canBlockSeeSky(new BlockPos(MathHelper.floor(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor(this.theEntity.posZ))))
         {
             for (int i = 0; i < this.currentPath.getCurrentPathLength(); ++i)
             {
                 PathPoint pathpoint = this.currentPath.getPathPointFromIndex(i);
 
-                if (this.worldObj.canBlockSeeSky(new BlockPos(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord)))
+                if (this.world.canBlockSeeSky(new BlockPos(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord)))
                 {
                     this.currentPath.setCurrentPathLength(i - 1);
                     return;
@@ -476,8 +476,8 @@ public class PathNavigateCustom
      */
     private boolean isDirectPathBetweenPoints(Vec3d par1Vec3, Vec3d par2Vec3, int par3, int par4, int par5)
     {
-        int l = MathHelper.floor_double(par1Vec3.xCoord);
-        int i1 = MathHelper.floor_double(par1Vec3.zCoord);
+        int l = MathHelper.floor(par1Vec3.xCoord);
+        int i1 = MathHelper.floor(par1Vec3.zCoord);
         double d0 = par2Vec3.xCoord - par1Vec3.xCoord;
         double d1 = par2Vec3.zCoord - par1Vec3.zCoord;
         double d2 = d0 * d0 + d1 * d1;
@@ -521,8 +521,8 @@ public class PathNavigateCustom
                 d7 /= d1;
                 int j1 = d0 < 0.0D ? -1 : 1;
                 int k1 = d1 < 0.0D ? -1 : 1;
-                int l1 = MathHelper.floor_double(par2Vec3.xCoord);
-                int i2 = MathHelper.floor_double(par2Vec3.zCoord);
+                int l1 = MathHelper.floor(par2Vec3.xCoord);
+                int i2 = MathHelper.floor(par2Vec3.zCoord);
                 int j2 = l1 - l;
                 int k2 = i2 - i1;
 
@@ -577,7 +577,7 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                    	Block block = this.worldObj.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
+                    	Block block = this.world.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
                         Material material = block.getMaterial(block.getDefaultState());
 
                         if (material == Material.AIR)
@@ -614,9 +614,9 @@ public class PathNavigateCustom
 
             if (d0 * p_179692_8_ + d1 * p_179692_10_ >= 0.0D)
             {
-                Block block = this.worldObj.getBlockState(blockpos).getBlock();
+                Block block = this.world.getBlockState(blockpos).getBlock();
 
-                if (!block.isPassable(this.worldObj, blockpos))
+                if (!block.isPassable(this.world, blockpos))
                 {
                     return false;
                 }

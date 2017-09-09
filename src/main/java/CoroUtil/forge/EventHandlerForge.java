@@ -113,7 +113,7 @@ public class EventHandlerForge {
 	public void entityTick(LivingUpdateEvent event) {
 		
 		EntityLivingBase ent = event.getEntityLiving();
-		if (!ent.worldObj.isRemote) {
+		if (!ent.world.isRemote) {
 			if (ent instanceof EntityPlayer) {
 				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
 			}
@@ -123,8 +123,8 @@ public class EventHandlerForge {
 			
 			int walkOnRate = 5;
 			
-			if (!ent.worldObj.isRemote) {
-				if (ent.worldObj.getTotalWorldTime() % walkOnRate == 0) {
+			if (!ent.world.isRemote) {
+				if (ent.world.getTotalWorldTime() % walkOnRate == 0) {
 					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
 					if (ent instanceof EntityPlayer) {
 						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((EntityPlayer) ent, 0.1F);
@@ -132,16 +132,16 @@ public class EventHandlerForge {
 					}
 					if (speed > 0.08) {
 						//System.out.println(entityId + " - speed: " + speed);
-						int newX = MathHelper.floor_double(ent.posX);
-						int newY = MathHelper.floor_double(ent.getEntityBoundingBox().minY - 1);
-						int newZ = MathHelper.floor_double(ent.posZ);
-						IBlockState state = ent.worldObj.getBlockState(new BlockPos(newX, newY, newZ));
+						int newX = MathHelper.floor(ent.posX);
+						int newY = MathHelper.floor(ent.getEntityBoundingBox().minY - 1);
+						int newZ = MathHelper.floor(ent.posZ);
+						IBlockState state = ent.world.getBlockState(new BlockPos(newX, newY, newZ));
 						Block id = state.getBlock();
 						
 						//check for block that can have beaten path data
 						
 						if (id == Blocks.GRASS) {
-							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
+							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.world).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
 							
 							//add depending on a weight?
 							bdp.walkedOnAmount += 0.25F;
@@ -150,13 +150,13 @@ public class EventHandlerForge {
 							
 							if (bdp.walkedOnAmount > 5F) {
 								//System.out.println("dirt!!!");
-								if (ent.worldObj.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
-									ent.worldObj.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
+								if (ent.world.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
+									ent.world.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
 								}
 								
 								//BlockRegistry.dirtPath.blockID);
 								//cleanup for memory
-								WorldDirectorManager.instance().getBlockDataGrid(ent.worldObj).removeBlockData(newX, newY, newZ);
+								WorldDirectorManager.instance().getBlockDataGrid(ent.world).removeBlockData(newX, newY, newZ);
 								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
 							}
 						}

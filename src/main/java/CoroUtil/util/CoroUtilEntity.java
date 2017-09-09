@@ -18,12 +18,12 @@ public class CoroUtilEntity {
 
 	public static boolean canCoordBeSeen(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(x, y, z)) == null;
+        return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
     public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
     {
-        return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
+        return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
     public static double getDistance(Entity ent, BlockCoord coords)
@@ -31,7 +31,7 @@ public class CoroUtilEntity {
         double d3 = ent.posX - coords.posX;
         double d4 = ent.posY - coords.posY;
         double d5 = ent.posZ - coords.posZ;
-        return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
+        return (double)MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
     }
 	
 	public static double getDistance(Entity ent, TileEntity tEnt)
@@ -39,7 +39,7 @@ public class CoroUtilEntity {
         double d3 = ent.posX - tEnt.getPos().getX();
         double d4 = ent.posY - tEnt.getPos().getY();
         double d5 = ent.posZ - tEnt.getPos().getZ();
-        return (double)MathHelper.sqrt_double(d3 * d3 + d4 * d4 + d5 * d5);
+        return (double)MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
     }
 	
 	public static Vec3 getTargetVector(EntityLivingBase parEnt, EntityLivingBase target) {
@@ -67,7 +67,7 @@ public class CoroUtilEntity {
 	}
 	
 	public static EntityPlayer getPlayerByUUID(UUID uuid) {
-		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerList().iterator();
+		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().iterator();
         EntityPlayerMP entityplayermp;
         
         while (iterator.hasNext()) {

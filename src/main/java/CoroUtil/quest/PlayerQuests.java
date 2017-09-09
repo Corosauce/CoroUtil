@@ -67,7 +67,7 @@ public class PlayerQuests {
 	
 	//warning, might become invalid upon player teleport, other scenarios, perhaps track player dimension id and username only, instead of instance
 	public World getWorld() {
-		return getPlayer().worldObj;
+		return getPlayer().world;
 	}
 	
 	public EntityPlayer getPlayer() {

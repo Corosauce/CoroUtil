@@ -62,7 +62,7 @@ public class Flee extends Selector {
 				}
 			} else {//if (ent.getDistanceToEntity(blackboard.lastFleeTarget) > fleeRange) {
 				//System.out.println("flee home");
-				//if (ent.worldObj.getTotalWorldTime() % 20 == 0) {
+				//if (ent.world.getTotalWorldTime() % 20 == 0) {
 					if (blackboard.fleeToCoords != null) {
 						blackboard.setMoveTo(new Vec3(blackboard.fleeToCoords.posX, blackboard.fleeToCoords.posY, blackboard.fleeToCoords.posZ));
 						//entInt.getAIBTAgent().setMoveTo(blackboard.fleeToCoords.posX, blackboard.fleeToCoords.posY, blackboard.fleeToCoords.posZ);

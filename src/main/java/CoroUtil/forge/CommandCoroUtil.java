@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -34,7 +35,7 @@ import CoroUtil.util.CoroUtilItem;
 public class CommandCoroUtil extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "coroutil";
 	}
 
@@ -95,15 +96,15 @@ public class CommandCoroUtil extends CommandBase {
 					}
 
 					for (int i = 0; i < count; i++) {
-						Entity ent = EntityList.createEntityByName(prefix + mobToSpawn, world);
+						Entity ent = EntityList.createEntityByIDFromName(new ResourceLocation(prefix + mobToSpawn), world);
 						
-						if (ent == null) ent = EntityList.createEntityByName(mobToSpawn, world);
+						if (ent == null) ent = EntityList.createEntityByIDFromName(new ResourceLocation(mobToSpawn), world);
 						
 						if (ent == null) {
 							List<String> entsToSpawn = listEntitiesSpawnable(mobToSpawn);
 							if (entsToSpawn.size() > 0) {
 								for (int j = 0; j < entsToSpawn.size(); j++) {
-									Entity ent2 = EntityList.createEntityByName(entsToSpawn.get(j), world);
+									Entity ent2 = EntityList.createEntityByIDFromName(new ResourceLocation(entsToSpawn.get(j)), world);
 									if (ent2 != null) {
 										CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
 										spawnEntity(player, ent2);
@@ -224,19 +225,19 @@ public class CommandCoroUtil extends CommandBase {
 		
 		
 		//temp
-		//ent.setPosition(69, player.worldObj.getHeightValue(69, 301), 301);
-		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.worldObj.getHeightValue(44, 301), 301);
+		//ent.setPosition(69, player.world.getHeightValue(69, 301), 301);
+		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.world.getHeightValue(44, 301), 301);
 		
-		player.worldObj.spawnEntityInWorld(ent);
+		player.world.spawnEntity(ent);
 		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
-		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.worldObj.getDifficultyForLocation(new BlockPos(ent)), null);
+		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
 		//if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {
 		List<String> entNames = new ArrayList<String>();
         
-		Iterator it = EntityList.NAME_TO_CLASS.keySet().iterator();
+		Iterator it = EntityList.getEntityNameList().iterator();
 		
 		while (it.hasNext()) {
 			String entry = (String) it.next();
@@ -301,7 +302,7 @@ public class CommandCoroUtil extends CommandBase {
             if (entClass != null && (entName == null || /*EntityList.getEntityString(ent)*/entClass.toLowerCase().contains(entName.toLowerCase()))) {
             	
             	if (indexStart <= matches) {
-            		listData.add("pos: " + MathHelper.floor_double(ent.posX) + ", " + MathHelper.floor_double(ent.posY) + ", " + MathHelper.floor_double(ent.posZ) + ", " + entClass);
+            		listData.add("pos: " + MathHelper.floor(ent.posX) + ", " + MathHelper.floor(ent.posY) + ", " + MathHelper.floor(ent.posZ) + ", " + entClass);
             		if (listData.size() >= 10) {
             			return listData;
             		}
@@ -345,11 +346,11 @@ public class CommandCoroUtil extends CommandBase {
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
     {
-        return par1ICommandSender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
+        return par1ICommandSender.canUseCommand(this.getRequiredPermissionLevel(), this.getName());
     }
 
 	@Override
-	public String getCommandUsage(ICommandSender icommandsender) {
+	public String getUsage(ICommandSender icommandsender) {
 		return "Magic dev method!";
 	}
 	

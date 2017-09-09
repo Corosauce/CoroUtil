@@ -39,7 +39,7 @@ public class CoroUtilPath {
 	 */
 	public static boolean tryMoveToXYZLongDist(EntityLiving ent, double x, double y, double z, double moveSpeedAmp) {
 		
-		World world = ent.worldObj;
+		World world = ent.world;
 		
 		boolean success = false;
 		
@@ -54,16 +54,16 @@ public class CoroUtilPath {
 				success = ent.getNavigator().tryMoveToXYZ(x, y, z, moveSpeedAmp);
 				//System.out.println("success? " + success + "- move to player: " + ent + " -> " + player);
 			} else {
-		        /*int x = MathHelper.floor_double(player.posX);
-		        int y = MathHelper.floor_double(player.posY);
-		        int z = MathHelper.floor_double(player.posZ);*/
+		        /*int x = MathHelper.floor(player.posX);
+		        int y = MathHelper.floor(player.posY);
+		        int z = MathHelper.floor(player.posZ);*/
 		        
 		        double d = x+0.5F - ent.posX;
 		        double d2 = z+0.5F - ent.posZ;
 		        double d1;
 		        d1 = y+0.5F - (ent.posY + (double)ent.getEyeHeight());
 		        
-		        double d3 = MathHelper.sqrt_double(d * d + d2 * d2);
+		        double d3 = MathHelper.sqrt(d * d + d2 * d2);
 		        float f2 = (float)((Math.atan2(d2, d) * 180D) / 3.1415927410125732D) - 90F;
 		        float f3 = (float)(-((Math.atan2(d1, d3) * 180D) / 3.1415927410125732D));
 		        float rotationPitch = -f3;//-ent.updateRotation(rotationPitch, f3, 180D);

@@ -25,9 +25,9 @@ public class BlockCoord {
     }
     
     public BlockCoord(Entity ent) {
-    	this.posX = MathHelper.floor_double(ent.posX);
-    	this.posY = MathHelper.floor_double(ent.posY);
-    	this.posZ = MathHelper.floor_double(ent.posZ);
+    	this.posX = MathHelper.floor(ent.posX);
+    	this.posY = MathHelper.floor(ent.posY);
+    	this.posZ = MathHelper.floor(ent.posZ);
     }
     
     public boolean equals(Object p_equals_1_)

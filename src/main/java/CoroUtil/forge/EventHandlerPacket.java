@@ -22,12 +22,12 @@ public class EventHandlerPacket {
 
 	@SideOnly(Side.CLIENT)
 	public World getClientWorld() {
-		return Minecraft.getMinecraft().theWorld;
+		return Minecraft.getMinecraft().world;
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public EntityPlayer getClientPlayer() {
-		return Minecraft.getMinecraft().thePlayer;
+		return Minecraft.getMinecraft().player;
 	}
 	
 	@SideOnly(Side.CLIENT)

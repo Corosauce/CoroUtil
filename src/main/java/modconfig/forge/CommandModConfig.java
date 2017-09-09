@@ -19,21 +19,21 @@ import CoroUtil.util.CoroUtilMisc;
 public class CommandModConfig extends CommandBase {
 
 	@Override
-	public String getCommandName() {
+	public String getName() {
 		return "config";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender icommandsender) {
+	public String getUsage(ICommandSender icommandsender) {
 		return "Magic dev method!";
 	}
 	
 	@Override
-	public List getTabCompletionOptions(MinecraftServer server, ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos)
+	public List getTabCompletions(MinecraftServer server, ICommandSender par1ICommandSender, String[] par2ArrayOfStr, BlockPos pos)
     {
-		List<String> list = new ArrayList<String>(ConfigMod.configLookup.get(getCommandName()).valsBoolean.keySet());
-		list.addAll(ConfigMod.configLookup.get(getCommandName()).valsInteger.keySet());
-		list.addAll(ConfigMod.configLookup.get(getCommandName()).valsString.keySet());
+		List<String> list = new ArrayList<String>(ConfigMod.configLookup.get(getName()).valsBoolean.keySet());
+		list.addAll(ConfigMod.configLookup.get(getName()).valsInteger.keySet());
+		list.addAll(ConfigMod.configLookup.get(getName()).valsString.keySet());
         return list;
     }
 
@@ -63,7 +63,7 @@ public class CommandModConfig extends CommandBase {
 						if (var2.length > 2) {
 							Object obj = ConfigMod.getField(var2[modid], var2[field]);
 							if (obj != null) {
-								var1.addChatMessage(new TextComponentString(var2[field] + " = " + obj));
+								var1.sendMessage(new TextComponentString(var2[field] + " = " + obj));
 							} else {
 								CoroUtilMisc.sendCommandSenderMsg(var1, "failed to get " + var2[field]);
 							}
@@ -140,7 +140,7 @@ public class CommandModConfig extends CommandBase {
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
     {
-        return par1ICommandSender.canCommandSenderUseCommand(this.getRequiredPermissionLevel(), this.getCommandName());
+        return par1ICommandSender.canUseCommand(this.getRequiredPermissionLevel(), this.getName());
     }
 	
 	@Override

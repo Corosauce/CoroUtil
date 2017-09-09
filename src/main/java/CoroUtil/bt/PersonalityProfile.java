@@ -306,11 +306,11 @@ public class PersonalityProfile {
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		if (rangeOverride) {
-			CoroUtil.eventChannel.sendToDimension(packet, agent.ent.worldObj.provider.getDimension());
-			//PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.worldObj.provider.dimensionId);
+			CoroUtil.eventChannel.sendToDimension(packet, agent.ent.world.provider.getDimension());
+			//PacketDispatcher.sendPacketToAllInDimension(packet, agent.ent.world.provider.dimensionId);
 		} else {
-			CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
-			//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
+			CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.world.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+			//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.world.provider.dimensionId, packet);
 		}
 	}
 	
@@ -321,8 +321,8 @@ public class PersonalityProfile {
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
 		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
-		CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.worldObj.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
-		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.worldObj.provider.dimensionId, packet);
+		CoroUtil.eventChannel.sendToAllAround(packet, new NetworkRegistry.TargetPoint(agent.ent.world.provider.getDimension(), agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange));
+		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.world.provider.dimensionId, packet);
 	}
 	
 	public void nbtSyncRead(NBTTagCompound par1nbtTagCompound) {
@@ -419,7 +419,7 @@ public class PersonalityProfile {
 	public boolean hookHitBy(DamageSource par1DamageSource, float par2) {
 		
 		Entity ent = par1DamageSource.getEntity();
-		if (!agent.ent.worldObj.isRemote) {
+		if (!agent.ent.world.isRemote) {
 			if (ent != null && agent.isEnemy(ent)) {
 				if (agent.blackboard.getTarget() == null) {
 					agent.blackboard.setTarget(ent);

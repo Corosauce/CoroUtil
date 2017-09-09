@@ -88,7 +88,7 @@ public class BlackboardBase implements IPFCallback {
 			return target;		
 		} else {
 			if (targetID != -1) {
-				Entity ent = agent.ent.worldObj.getEntityByID(targetID);
+				Entity ent = agent.ent.world.getEntityByID(targetID);
 				if (ent != null) {
 					setTarget(ent);
 				}
@@ -98,7 +98,7 @@ public class BlackboardBase implements IPFCallback {
 	}
 	
 	public void setTarget(int parID) {
-		Entity ent = agent.ent.worldObj.getEntityByID(parID);
+		Entity ent = agent.ent.world.getEntityByID(parID);
 		if (ent != null) {
 			setTarget(ent);
 		}
@@ -157,7 +157,7 @@ public class BlackboardBase implements IPFCallback {
 	public void requestPathFar(Vec3 parPos, int pathRange) {
 		if (canFlyPath.getValue() || canSwimPath.getValue()) {
 			//System.out.println("request TEST FLYING/SWIMMING PATH pf set: " + parPos);
-			PFJobData job = new PFJobData(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange);
+			PFJobData job = new PFJobData(agent.ent, MathHelper.floor(parPos.xCoord), MathHelper.floor(parPos.yCoord), MathHelper.floor(parPos.zCoord), pathRange);
 			job.callback = this;
 			job.canUseLadder = true;
 			job.useFlyPathfinding = canFlyPath.getValue();
@@ -165,7 +165,7 @@ public class BlackboardBase implements IPFCallback {
 			PFQueue.tryPath(job);
 		} else {
 			//System.out.println("request pf set: " + parPos);
-			PFQueue.tryPath(agent.ent, MathHelper.floor_double(parPos.xCoord), MathHelper.floor_double(parPos.yCoord), MathHelper.floor_double(parPos.zCoord), pathRange, 0, this);
+			PFQueue.tryPath(agent.ent, MathHelper.floor(parPos.xCoord), MathHelper.floor(parPos.yCoord), MathHelper.floor(parPos.zCoord), pathRange, 0, this);
 		}
 		isWaitingForPath.setValue(true);
 		isPathReceived.setValue(false);
@@ -190,7 +190,7 @@ public class BlackboardBase implements IPFCallback {
 			for (int i = 0; i < list.size(); i++) {
 				PFCallbackItem item = list.get(i);
 				
-				if (!item.ent.isDead && OldUtil.chunkExists(item.ent.worldObj, MathHelper.floor_double(item.ent.posX / 16), MathHelper.floor_double(item.ent.posZ / 16))) {
+				if (!item.ent.isDead && OldUtil.chunkExists(item.ent.world, MathHelper.floor(item.ent.posX / 16), MathHelper.floor(item.ent.posZ / 16))) {
 					setPathFar(item.pe);
 					//item.ent.getNavigator().setPath(item.pe, item.speed);
 				}

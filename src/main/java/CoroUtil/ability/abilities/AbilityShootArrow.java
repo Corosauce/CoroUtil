@@ -87,11 +87,11 @@ public class AbilityShootArrow extends Ability {
 	public void tickChargeUp() {
 		super.tickChargeUp();
 		
-		if (owner.worldObj.isRemote) {
+		if (owner.world.isRemote) {
 			
 			Random rand = new Random();
 			//double speed = 0.3D;
-			//owner.worldObj.spawnParticle("flame", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, (rand.nextDouble() - 0.5D) * speed, (rand.nextDouble() - 0.5D) * speed, (rand.nextDouble() - 0.5D) * speed);
+			//owner.world.spawnParticle("flame", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, (rand.nextDouble() - 0.5D) * speed, (rand.nextDouble() - 0.5D) * speed, (rand.nextDouble() - 0.5D) * speed);
 			//flame hugeexplosion
 			
 			//debug
@@ -107,8 +107,8 @@ public class AbilityShootArrow extends Ability {
 		        	double speed = 0.15D;
 		        	double speedInheritFactor = 0.5D;
 		        	
-		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().theWorld, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
-		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().theWorld, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.getEntityBoundingBox().minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().world, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
+		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().world, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.getEntityBoundingBox().minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
 		        	particleBehavior.initParticle(entityfx);
 		        	float f = 0.0F + (rand.nextFloat() * 0.4F);
 		        	entityfx.setRBGColorF(f, f, f);
@@ -149,11 +149,11 @@ public class AbilityShootArrow extends Ability {
 			return;
 		}
 		
-		//System.out.println("isRemote: " + owner.worldObj.isRemote);
-		if (owner.worldObj.isRemote) {
+		//System.out.println("isRemote: " + owner.world.isRemote);
+		if (owner.world.isRemote) {
 			particleBehavior.particles.clear();
 			Random rand = new Random();
-			//owner.worldObj.spawnParticle("largeexplode", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
+			//owner.world.spawnParticle("largeexplode", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
 		} else {
 			
 			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof EntityLivingBase && ((EntityLivingBase)target).deathTime > 0))) {
@@ -171,13 +171,13 @@ public class AbilityShootArrow extends Ability {
 						EntityProjectileBase prj = null;
 						
 						if (projectileType == EntityProjectileBase.PRJTYPE_FIREBALL) {
-				        	//prj = new EntityArrow(owner.worldObj, owner, (EntityLivingBase)target, 1.7);
+				        	//prj = new EntityArrow(owner.world, owner, (EntityLivingBase)target, 1.7);
 				        } else if (projectileType == EntityProjectileBase.PRJTYPE_ICEBALL) {
 				        	//block = Block.ice;
 				        }
 						
 						if (prj != null) {
-							owner.worldObj.spawnEntityInWorld(prj);
+							owner.world.spawnEntity(prj);
 						}
 					}
 				}

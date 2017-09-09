@@ -223,7 +223,7 @@ public class GuiConfigEditor extends GuiScreen
     			//HostileWorlds.dbg("difference for " + info.name);
     			
     			if (!clientMode) {
-    				//this.mc.thePlayer.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
+    				//this.mc.player.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
     				ConfigMod.eventChannel.sendToServer(PacketHelper.getModConfigPacketForClientToServer("set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text));
     			} else {
     				if (ConfigMod.updateField(getCategory(), getData().configData.get(i).name, getData().configData.get(i).editBox.text)) {
@@ -253,7 +253,7 @@ public class GuiConfigEditor extends GuiScreen
     	scrollPane.registerScrollButtons(null, 7, 8);
     	
     	if (!clientMode) {
-    		this.mc.thePlayer.sendChatMessage("/config update " + getCategory());
+    		this.mc.player.sendChatMessage("/config update " + getCategory());
     	} else {
     		ConfigMod.populateData(getCategory());
     	}

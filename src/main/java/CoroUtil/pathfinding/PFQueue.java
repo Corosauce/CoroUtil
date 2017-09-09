@@ -190,8 +190,8 @@ public class PFQueue implements Runnable {
     
     public static boolean getPath(Entity var1, Entity var2, float var3, int priority, IPFCallback parCallback) {
 		if(var1 != null && var2 != null) {
-			//(par2 - (double)(par1Entity.width / 2.0F)), MathHelper.floor_double(par4), MathHelper.floor_double(par6 - (double)(par1Entity.width / 2.0F))
-			//return tryPath(var1, MathHelper.floor_double(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
+			//(par2 - (double)(par1Entity.width / 2.0F)), MathHelper.floor(par4), MathHelper.floor(par6 - (double)(par1Entity.width / 2.0F))
+			//return tryPath(var1, MathHelper.floor(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
 			
 			//ok, we're adding 0.5 here to try to fix an issue when target ent is standing on half slab, might fix stairs issues too?
 			return tryPath(var1, (int)Math.floor(var2.posX), (int)Math.floor(var2.getEntityBoundingBox().minY + 0.5), (int)Math.floor(var2.posZ), var3, priority, parCallback);
@@ -286,7 +286,7 @@ public class PFQueue implements Runnable {
 	    	/*PFQueueItem job = new PFQueueItem(var1, x, y, z, var2, priority, parCallback);
 	    	job.coordSize = parCoordSize;
 	    	if (var1 != null) { 
-	    		job.dimensionID = var1.worldObj.provider.dimensionId;
+	    		job.dimensionID = var1.world.provider.dimensionId;
 	    	} else {
 	    		job.dimensionID = parCoordSize.dimensionId;
 	    	}*/
@@ -328,12 +328,12 @@ public class PFQueue implements Runnable {
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority, IPFCallback parCallback, ChunkCoordinatesSize parCoordSize) {
     	
     	//DESTINATION - Adjust if in air, assumes they are gravity bound
-    	if (var1 != null && CoroUtilBlock.isAir(var1.worldObj.getBlockState(new BlockPos(x, y-1, z)).getBlock())) {
-    		while (CoroUtilBlock.isAir(var1.worldObj.getBlockState(new BlockPos(x, --y, z)).getBlock()) && y > 0) { y--; }    				
+    	if (var1 != null && CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, y-1, z)).getBlock())) {
+    		while (CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, --y, z)).getBlock()) && y > 0) { y--; }    				
     	}
     	
     	//SOURCE - might not work right - fix fence horror, find the near air block
-    	/*int id = var1.worldObj.getBlockId(MathHelper.floor_double(var1.posX), MathHelper.floor_double(var1.boundingBox.minY), MathHelper.floor_double(var1.posZ)x, y-1, z);
+    	/*int id = var1.world.getBlockId(MathHelper.floor(var1.posX), MathHelper.floor(var1.boundingBox.minY), MathHelper.floor(var1.posZ)x, y-1, z);
     	if (id != 0 && Block.blocksList[id] instanceof BlockFence) {
     		System.out.println("fence fix test");
     		Random rand = new Random();
@@ -422,7 +422,7 @@ public class PFQueue implements Runnable {
 	    	/*PFQueueItem job = new PFQueueItem(var1, x, y, z, var2, priority, parCallback);
 	    	job.coordSize = parCoordSize;
 	    	if (var1 != null) {
-	    		job.dimensionID = var1.worldObj.provider.dimensionId;
+	    		job.dimensionID = var1.world.provider.dimensionId;
 	    	} else {
 	    		job.dimensionID = parCoordSize.dimensionId;
 	    	}*/

@@ -48,7 +48,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		super.onUpdate();
 
 
-		/*int height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+		/*int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
 		if (this.posY <= height) this.setExpired();*/
 
 		//this.setExpired();
@@ -107,7 +107,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			float offset = 0;
 			float posBottom = (float)(this.posY - 10D);
 
-			float height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+			float height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
 
 			if (posBottom < height) {
 				float diff = height - posBottom;
@@ -154,7 +154,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 				//prevent precip under overhangs/inside for extra render
 				if (this.isDontRenderUnderTopmostBlock()) {
-					int height = this.worldObj.getPrecipitationHeight(new BlockPos(this.posX + xx, this.posY, this.posZ + zz)).getY();
+					int height = this.world.getPrecipitationHeight(new BlockPos(this.posX + xx, this.posY, this.posZ + zz)).getY();
 					if (this.posY + yy <= height) continue;
 				}
 
@@ -162,7 +162,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 					RotatingParticleManager.debugParticleRenderCount++;
 				}
 
-				/*int height = entityIn.worldObj.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
+				/*int height = entityIn.world.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
 				int i = 15728640;//this.getBrightnessForRender(partialTicks);

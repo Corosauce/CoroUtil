@@ -213,27 +213,27 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         this.rotationPitchB += this.rotationPitchVel;
         this.rotationYawB += this.rotationYawVel;
         
-        if (!worldObj.isRemote) {
+        if (!world.isRemote) {
         	
         	if (posY < 0) {
         		this.setDead();
         		return;
         	}
         	
-        	int curX = MathHelper.floor_double(posX);
-	    	int curY = MathHelper.floor_double(posY);
-	    	int curZ = MathHelper.floor_double(posZ);
-	    	Block idCurPos = worldObj.getBlockState(new BlockPos(curX, curY, curZ)).getBlock();
+        	int curX = MathHelper.floor(posX);
+	    	int curY = MathHelper.floor(posY);
+	    	int curZ = MathHelper.floor(posZ);
+	    	Block idCurPos = world.getBlockState(new BlockPos(curX, curY, curZ)).getBlock();
         	
 	        if (blockifyDelay != -1 && age > blockifyDelay) {
 		    	
 	        	//should always raytrace ahead if motion > 1
 	        	
-		    	int aheadEndX = MathHelper.floor_double(posX + (motionX));
-		    	int aheadEndY = MathHelper.floor_double(posY + (motionY));
-		    	int aheadEndZ = MathHelper.floor_double(posZ + (motionZ));
+		    	int aheadEndX = MathHelper.floor(posX + (motionX));
+		    	int aheadEndY = MathHelper.floor(posY + (motionY));
+		    	int aheadEndZ = MathHelper.floor(posZ + (motionZ));
 		    	
-		    	IBlockState id = worldObj.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ));
+		    	IBlockState id = world.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ));
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
@@ -242,10 +242,10 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    	motion = motion.normalize();
 			    	
 			    	for (double curDist = 0; curDist < aheadDistEnd; curDist += 0.5D) {
-			    		int aheadX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
-				    	int aheadY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
-				    	int aheadZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    	IBlockState idCheck = worldObj.getBlockState(new BlockPos(aheadX, aheadY, aheadZ));
+			    		int aheadX = MathHelper.floor(posX + (motion.xCoord*curDist));
+				    	int aheadY = MathHelper.floor(posY + (motion.yCoord*curDist));
+				    	int aheadZ = MathHelper.floor(posZ + (motion.zCoord*curDist));
+				    	IBlockState idCheck = world.getBlockState(new BlockPos(aheadX, aheadY, aheadZ));
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -258,10 +258,10 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			
 			    			curDist -= 0.5D;
 			    			
-			    			int tryX = MathHelper.floor_double(posX + (motion.xCoord*curDist));
-					    	int tryY = MathHelper.floor_double(posY + (motion.yCoord*curDist));
-					    	int tryZ = MathHelper.floor_double(posZ + (motion.zCoord*curDist));
-				    		IBlockState idTry = worldObj.getBlockState(new BlockPos(tryX, tryY, tryZ));
+			    			int tryX = MathHelper.floor(posX + (motion.xCoord*curDist));
+					    	int tryY = MathHelper.floor(posY + (motion.yCoord*curDist));
+					    	int tryZ = MathHelper.floor(posZ + (motion.zCoord*curDist));
+				    		IBlockState idTry = world.getBlockState(new BlockPos(tryX, tryY, tryZ));
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);
@@ -324,7 +324,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	
     	if (blockToEntCollision) {
         	double size = 0.5D;
-	        List entities = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(size, size, size));
+	        List entities = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(size, size, size));
 	        
 	        for (int i = 0; entities != null && i < entities.size(); ++i)
 	        {
@@ -435,7 +435,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public void blockify(int x, int y, int z) {
-    	worldObj.setBlockState(new BlockPos(x, y, z), Block.getBlockById(blockID).getDefaultState(), 3);
+    	world.setBlockState(new BlockPos(x, y, z), Block.getBlockById(blockID).getDefaultState(), 3);
     	setDead();
     }
     

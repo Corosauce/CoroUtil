@@ -60,10 +60,10 @@ public class AbilityAttackMelee extends Ability {
 			return;
 		}
 		
-		//System.out.println("isRemote: " + owner.worldObj.isRemote);
-		if (owner.worldObj.isRemote) {
+		//System.out.println("isRemote: " + owner.world.isRemote);
+		if (owner.world.isRemote) {
 			Random rand = new Random();
-			//owner.worldObj.spawnParticle("largesmoke", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
+			//owner.world.spawnParticle("largesmoke", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
 		} else {
 			
 			if (switchToMeleeSlot) {

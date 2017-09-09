@@ -94,7 +94,7 @@ public class AIBTAgent {
 		tamable = new AIBTTamable(this);
 		profile = new PersonalityProfile(this);
 		//profile.init();
-		pathNav = new PathNavigateCustom(ent, ent.worldObj);
+		pathNav = new PathNavigateCustom(ent, ent.world);
 		pathNav.setAvoidsWater(false);
 		pathNav.setCanSwim(true);
 		moveHelper = new EntityMoveHelperCustom(ent);
@@ -240,7 +240,7 @@ public class AIBTAgent {
 	
 	public void tickAI() {
 		
-		if (ent.worldObj == null || ent.worldObj.provider == null) return;
+		if (ent.world == null || ent.world.provider == null) return;
 		
 		if (btSenses != null) btSenses.tick();
 		if (btAI != null) btAI.tick();
@@ -285,7 +285,7 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		Block block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor_double(ent.posZ))).getBlock();
+		Block block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor(ent.posZ))).getBlock();
 		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -293,7 +293,7 @@ public class AIBTAgent {
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			block = ent.worldObj.getBlockState(new BlockPos(MathHelper.floor_double(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor_double(ent.posZ))).getBlock();
+			block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor(ent.posZ))).getBlock();
 			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -337,7 +337,7 @@ public class AIBTAgent {
 	
 	public void tickLiving() {
         if (profile.abilities.size() > 0) {
-        	/*if (ent.worldObj.isRemote) {
+        	/*if (ent.world.isRemote) {
         		System.out.println("SDfsdfsdf");
         	}*/
 			profile.tickAbilities();
@@ -349,7 +349,7 @@ public class AIBTAgent {
 			//ent.onGround = false;
 			
 			//hacky fall fix for flying
-			if (ent.worldObj.isRemote) {
+			if (ent.world.isRemote) {
 				//if (ent.motionY < 0.00) {
 					ent.motionY = 0D;
 				//}
@@ -396,7 +396,7 @@ public class AIBTAgent {
 	//TODO: readd 1.8.8
 	/*public ManagedLocation getManagedLocation() {
 		if (coordsManagedLocation != null) {
-			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.world);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			if (ml instanceof ManagedLocation) {
 				return (ManagedLocation) ml;
@@ -466,8 +466,8 @@ public class AIBTAgent {
     			tickDespawn = 0;
     		}
 
-    		if (ent.worldObj.getTotalWorldTime() % 20 == 0) {
-    			EntityPlayer entityplayer = ent.worldObj.getClosestPlayerToEntity(ent, -1.0D);
+    		if (ent.world.getTotalWorldTime() % 20 == 0) {
+    			EntityPlayer entityplayer = ent.world.getClosestPlayerToEntity(ent, -1.0D);
 
     			if (entityplayer != null)
     			{
@@ -515,7 +515,7 @@ public class AIBTAgent {
     	entInv.cleanup();
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
-			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.worldObj);
+			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.world);
 			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
 			//TODO: readd 1.8.8
 			/*if (ml != null && ml instanceof ManagedLocation) {

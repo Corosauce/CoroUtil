@@ -48,9 +48,9 @@ public class SelectorMoveToPathClose extends Selector {
 				if (children.size() > 0) return children.get(0).tick();
 			} else {
 				if (ent.onGround || ent.isInWater()) {
-					if ((entInt.getAIBTAgent().pathNav.noPath() && !lastAttemptFailed) || (lastPathTime + repathDelay < ent.worldObj.getTotalWorldTime() && ent.worldObj.getTotalWorldTime() % 20 == 0)) {
-						//System.out.println(distToPos + " insta pathing - " + ent.entityId + " - " + (lastPathTime + repathDelay - ent.worldObj.getTotalWorldTime()));
-						lastPathTime = ent.worldObj.getTotalWorldTime();
+					if ((entInt.getAIBTAgent().pathNav.noPath() && !lastAttemptFailed) || (lastPathTime + repathDelay < ent.world.getTotalWorldTime() && ent.world.getTotalWorldTime() % 20 == 0)) {
+						//System.out.println(distToPos + " insta pathing - " + ent.entityId + " - " + (lastPathTime + repathDelay - ent.world.getTotalWorldTime()));
+						lastPathTime = ent.world.getTotalWorldTime();
 						if (partialPathing) {
 							if (lastPathTime % 5 == 0) {
 								//PFQueue based retry code goes here
@@ -61,21 +61,21 @@ public class SelectorMoveToPathClose extends Selector {
 								float dist = 16;//+rand.nextInt(10);
 								float distY = retryStage;
 								float randY = rand.nextFloat()*distY - rand.nextFloat()*distY;
-								int coordX = MathHelper.floor_double(ent.posX+(vec.xCoord*dist));
-								int coordY = MathHelper.floor_double(ent.posY+((vec.yCoord*dist) + randY));
-								int coordZ = MathHelper.floor_double(ent.posZ+(vec.zCoord*dist));
-		    			        Block id = ent.worldObj.getBlockState(new BlockPos(coordX, coordY, coordZ)).getBlock();
+								int coordX = MathHelper.floor(ent.posX+(vec.xCoord*dist));
+								int coordY = MathHelper.floor(ent.posY+((vec.yCoord*dist) + randY));
+								int coordZ = MathHelper.floor(ent.posZ+(vec.zCoord*dist));
+		    			        Block id = ent.world.getBlockState(new BlockPos(coordX, coordY, coordZ)).getBlock();
 		    			        int tries = 0;
 		    			        if (CoroUtilBlock.isAir(id)) {
-		    			        	Block idUp = ent.worldObj.getBlockState(new BlockPos(coordX, coordY+1, coordZ)).getBlock();
-		    			        	Block idDown = ent.worldObj.getBlockState(new BlockPos(coordX, coordY-1, coordZ)).getBlock();
+		    			        	Block idUp = ent.world.getBlockState(new BlockPos(coordX, coordY+1, coordZ)).getBlock();
+		    			        	Block idDown = ent.world.getBlockState(new BlockPos(coordX, coordY-1, coordZ)).getBlock();
 		    			        	if (CoroUtilBlock.isAir(idDown) && CoroUtilBlock.isAir(idUp)) {
 		    			        		//System.out.println("trying partial");
-		    			        		PathEntity result = ent.worldObj.getEntityPathToXYZ(ent, coordX, coordY, coordZ, pathfindRange, false, false, true, true);
+		    			        		PathEntity result = ent.world.getEntityPathToXYZ(ent, coordX, coordY, coordZ, pathfindRange, false, false, true, true);
 		    							if (result == null || result.isFinished() || result.getCurrentPathLength() <= 2) {
 		    								//System.out.println("try failed");
 		    								lastAttemptFailed = true;
-		    								lastPathTime = ent.worldObj.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
+		    								lastPathTime = ent.world.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
 		    							} else {
 			    			        		retryStage = 0;
 		    								//System.out.println("try success");
@@ -89,11 +89,11 @@ public class SelectorMoveToPathClose extends Selector {
 		    			        if (retryStage >= retryStageMax) retryStage = 0;
 							}
 						} else {
-							PathEntity result = ent.worldObj.getEntityPathToXYZ(ent, MathHelper.floor_double(blackboard.posMoveTo.xCoord), MathHelper.floor_double(blackboard.posMoveTo.yCoord), MathHelper.floor_double(blackboard.posMoveTo.zCoord), pathfindRange, false, false, true, true);
+							PathEntity result = ent.world.getEntityPathToXYZ(ent, MathHelper.floor(blackboard.posMoveTo.xCoord), MathHelper.floor(blackboard.posMoveTo.yCoord), MathHelper.floor(blackboard.posMoveTo.zCoord), pathfindRange, false, false, true, true);
 							if (result == null || result.isFinished() || result.getCurrentPathLength() <= 2) {
 								//System.out.println("try failed");
 								lastAttemptFailed = true;
-								lastPathTime = ent.worldObj.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
+								lastPathTime = ent.world.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
 							} else {
 								//System.out.println("try success");
 								lastAttemptFailed = false;

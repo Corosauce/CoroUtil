@@ -63,13 +63,13 @@ public class CoroUtilItem {
         {
             return null;
         }
-        else if (p_146097_1_.stackSize == 0)
+        else if (p_146097_1_.getCount() == 0)
         {
             return null;
         }
         else
         {
-            EntityItem entityitem = new EntityItem(parEnt.worldObj, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
+            EntityItem entityitem = new EntityItem(parEnt.world, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
             //TODO: 1.8 fix if method is still used
             System.out.println("TODO: missing added delay before pickup");
             //entityitem.delayBeforeCanPickup = 40;
@@ -104,7 +104,7 @@ public class CoroUtilItem {
                 entityitem.motionZ += Math.sin((double)f1) * (double)f;
             }
 
-            parEnt.worldObj.spawnEntityInWorld(entityitem);
+            parEnt.world.spawnEntity(entityitem);
             //this.addStat(StatList.dropStat, 1);
             return entityitem;
         }

@@ -19,7 +19,7 @@ public class DynamicDifficultyUtil {
 	public static float getDifficultyAveragedForArea(EntityLivingBase spawnedEntity, int x, int y, int z) {
 		
 		//TODO: cache so there is less player lookup thrashing for spawn candidate code
-		EntityPlayer player = spawnedEntity.worldObj.getClosestPlayerToEntity(spawnedEntity, -1);
+		EntityPlayer player = spawnedEntity.world.getClosestPlayerToEntity(spawnedEntity, -1);
 		
 		if (player != null) {
 			return getDifficultyAveragedForArea(player, x, y, z);

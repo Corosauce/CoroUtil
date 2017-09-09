@@ -70,7 +70,7 @@ public class Ability {
 	public void tick() {
 		
 		//particle ticking
-		if (owner.worldObj.isRemote) {
+		if (owner.world.isRemote) {
 			if (particleBehavior == null) {
 				particleBehavior = new ParticleBehaviorCharge(new Vec3(owner.posX, owner.posY, owner.posZ));
 				particleBehavior.sourceEntity = owner;
@@ -79,7 +79,7 @@ public class Ability {
 			}
 		}
 		
-		//System.out.println("Ability.tick(), isRemote: " + owner.worldObj.isRemote + " - name: " + name + " - charge: " + curTickCharge + " - perform: " + curTickPerform + " - cooldown: " + curTickCooldown);
+		//System.out.println("Ability.tick(), isRemote: " + owner.world.isRemote + " - name: " + name + " - charge: " + curTickCharge + " - perform: " + curTickPerform + " - cooldown: " + curTickCooldown);
 		
 		if (curTickCharge < ticksToCharge) {
 			curTickCharge++;
@@ -133,7 +133,7 @@ public class Ability {
 	}
 	
 	public void setFinishedPerform() {
-		//System.out.println("perform finish - " + owner.worldObj.isRemote);
+		//System.out.println("perform finish - " + owner.world.isRemote);
 		curTickPerform = ticksToPerform;
 		isActive = false;
 		isCoolingDown = true;

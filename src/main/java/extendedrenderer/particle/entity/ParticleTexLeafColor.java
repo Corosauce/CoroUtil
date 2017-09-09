@@ -15,7 +15,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
 		IBlockState state = worldIn.getBlockState(pos);
-		int i = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, this.worldObj, pos, 0);
+		int i = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, this.world, pos, 0);
         this.particleRed *= (float)(i >> 16 & 255) / 255.0F;
         this.particleGreen *= (float)(i >> 8 & 255) / 255.0F;
         this.particleBlue *= (float)(i & 255) / 255.0F;

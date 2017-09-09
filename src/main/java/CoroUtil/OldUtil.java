@@ -381,7 +381,7 @@ public class OldUtil {
 	
     public static EntityPlayer getFirstPlayer() {
     	//if (mc == null) mc = ModLoader.getMinecraftInstance();
-    	//return mc.thePlayer;
+    	//return mc.player;
     	return null;
     }
     
@@ -428,12 +428,12 @@ public class OldUtil {
     public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
     public static boolean chunkExists(World world, int x, int z) { return world.isBlockLoaded(new BlockPos(x * 16, 128, z * 16)); } //fixed for 1.5
     
-    public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor_double(ent.posX), MathHelper.floor_double(ent.posY), MathHelper.floor_double(ent.posZ)); }
+    public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor(ent.posX), MathHelper.floor(ent.posY), MathHelper.floor(ent.posZ)); }
     public static double getDistance(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, coords.posY, coords.posZ); }
     public static double getDistanceXZ(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.distanceSq(coords2.posX, coords.posY, coords2.posZ)); }
     public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(new Vec3d(parVec.xCoord, parVec.yCoord, parVec.zCoord), new Vec3d(posX, posY, posZ)) == null; }
-    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.worldObj.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(posX, posY, posZ)) == null; }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(posX, posY, posZ)) == null; }
     public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(new Vec3d(posX, posY, posZ), new Vec3d(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }
