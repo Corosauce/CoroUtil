@@ -4,6 +4,8 @@ import java.nio.FloatBuffer;
 
 import CoroUtil.config.ConfigCoroAI;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
@@ -31,8 +33,29 @@ import CoroUtil.forge.CoroUtil;
 public class EventHandler {
 
 	
-	public long lastWorldTime;
+	//public long lastWorldTime;
     public World lastWorld;
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void tickClient(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START) {
+
+            Minecraft mc = Minecraft.getMinecraft();
+            if (mc.theWorld != null) {
+                if (!isPaused()) {
+                    ExtendedRenderer.rotEffRenderer.updateEffects();
+
+
+                }
+                //if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
+                //lastWorldTime = mc.theWorld.getTotalWorldTime();
+
+
+                //}
+            }
+        }
+    }
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
@@ -47,7 +70,7 @@ public class EventHandler {
             lastWorld = mc.theWorld;
         }
 
-		if (mc.theWorld != null) {
+		/*if (mc.theWorld != null) {
 
             if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
                 lastWorldTime = mc.theWorld.getTotalWorldTime();
@@ -56,7 +79,7 @@ public class EventHandler {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
                 }
             }
-        }
+        }*/
 
         if (ConfigCoroAI.disableParticleRenderer) return;
 
@@ -84,6 +107,7 @@ public class EventHandler {
 	
 	@SideOnly(Side.CLIENT)
     public boolean isPaused() {
+        if (FMLClientHandler.instance().getClient().isGamePaused()) return true;
     	//if (FMLClientHandler.instance().getClient().getIntegratedServer() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread().isGamePaused()) return true;
     	return false;
     }
