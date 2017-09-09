@@ -6,6 +6,7 @@ import java.util.*;
 import javax.annotation.Nullable;
 
 import CoroUtil.config.ConfigCoroAI;
+import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.entity.EntityRotFX;
 import org.lwjgl.opengl.GL11;
 
@@ -435,6 +436,7 @@ public class RotatingParticleManager
         }
     }
 
+    //deprecated? or maybe clear() was redundant
     public void clearEffects(@Nullable World worldIn)
     {
         this.worldObj = worldIn;
@@ -448,6 +450,35 @@ public class RotatingParticleManager
         }
 
         this.particleEmitters.clear();
+    }
+
+    public void clear() {
+        //System.out.println("TODO: UNCOMMENT AFTER BUGFIX RELEASE!!!");
+        //shader way
+			/*for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
+				for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+					for (int i = 0; i < entry.length; i++) {
+						for (int j = 0; j < entry[i].length; j++) {
+							if (entry[i][j] != null) {
+								entry[i][j].clear();
+							}
+						}
+
+					}
+				}
+			}*/
+
+        //pre shader way
+        for (ArrayDeque<Particle>[][] entry : ExtendedRenderer.rotEffRenderer.fxLayers) {
+            for (int i = 0; i < entry.length; i++) {
+                for (int j = 0; j < entry[i].length; j++) {
+                    if (entry[i][j] != null) {
+                        entry[i][j].clear();
+                    }
+                }
+
+            }
+        }
     }
     
     public String getStatistics()
