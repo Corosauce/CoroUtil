@@ -13,6 +13,7 @@ import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.CoroUtilMath;
 import CoroUtil.util.CoroUtilParticle;
 import extendedrenderer.EventHandler;
+import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.ParticleMeshBufferManager;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
@@ -700,6 +701,34 @@ public class RotatingParticleManager
         }
 
         this.particleEmitters.clear();
+    }
+
+    public void clear() {
+        //shader way
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < entry.length; i++) {
+                    for (int j = 0; j < entry[i].length; j++) {
+                        if (entry[i][j] != null) {
+                            entry[i][j].clear();
+                        }
+                    }
+
+                }
+            }
+        }
+
+        //pre shader way
+        /*for (ArrayDeque<Particle>[][] entry : ExtendedRenderer.rotEffRenderer.fxLayers) {
+            for (int i = 0; i < entry.length; i++) {
+                for (int j = 0; j < entry[i].length; j++) {
+                    if (entry[i][j] != null) {
+                        entry[i][j].clear();
+                    }
+                }
+
+            }
+        }*/
     }
     
     public String getStatistics()
