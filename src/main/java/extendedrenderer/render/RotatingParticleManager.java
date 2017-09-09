@@ -436,40 +436,12 @@ public class RotatingParticleManager
         }
     }
 
-    //deprecated? or maybe clear() was redundant
     public void clearEffects(@Nullable World worldIn)
     {
         this.worldObj = worldIn;
 
+        //pre shader branch way
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i = 0; i < 4; ++i) {
-                for (int j = 0; j < 2; ++j) {
-                    entry[i][j].clear();
-                }
-            }
-        }
-
-        this.particleEmitters.clear();
-    }
-
-    public void clear() {
-        //System.out.println("TODO: UNCOMMENT AFTER BUGFIX RELEASE!!!");
-        //shader way
-			/*for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
-				for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
-					for (int i = 0; i < entry.length; i++) {
-						for (int j = 0; j < entry[i].length; j++) {
-							if (entry[i][j] != null) {
-								entry[i][j].clear();
-							}
-						}
-
-					}
-				}
-			}*/
-
-        //pre shader way
-        for (ArrayDeque<Particle>[][] entry : ExtendedRenderer.rotEffRenderer.fxLayers) {
             for (int i = 0; i < entry.length; i++) {
                 for (int j = 0; j < entry[i].length; j++) {
                     if (entry[i][j] != null) {
@@ -479,6 +451,22 @@ public class RotatingParticleManager
 
             }
         }
+
+        //shader way
+        /*for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < entry.length; i++) {
+                    for (int j = 0; j < entry[i].length; j++) {
+                        if (entry[i][j] != null) {
+                            entry[i][j].clear();
+                        }
+                    }
+
+                }
+            }
+        }*/
+
+        this.particleEmitters.clear();
     }
     
     public String getStatistics()
