@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -104,8 +104,8 @@ public class GuiConfigEditor extends GuiScreen
 
             drawGuiContainerClippingScrollLayer(0, 0, 0);
 
-            this.drawString(this.fontRendererObj, "Config for: " + getCategory(), startX + 10, startY + 10, 16777215);
-            this.drawString(this.fontRendererObj, (curIndex + 1) + "/" + ConfigMod.liveEditConfigs.size(), startX + xSize - 60, startY + 10, 16777215);
+            this.drawString(this.fontRenderer, "Config for: " + getCategory(), startX + 10, startY + 10, 16777215);
+            this.drawString(this.fontRenderer, (curIndex + 1) + "/" + ConfigMod.liveEditConfigs.size(), startX + xSize - 60, startY + 10, 16777215);
         } catch (Exception ex) {
             //ignore
         }
@@ -126,7 +126,7 @@ public class GuiConfigEditor extends GuiScreen
     	
         GL11.glDisable(GL11.GL_TEXTURE_2D);
     	Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
     	/*tessellator.startDrawingQuads();
     	tessellator.setColorRGBA_I(13027014, 255);
         tessellator.addVertexWithUV((double)startX + x1, (double)y1, 0.0D, 0.0D, 1.0D);
@@ -407,7 +407,7 @@ public class GuiConfigEditor extends GuiScreen
     {
         float f = 0.00390625F / 2F;
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
         vertexbuffer.pos((double)(x + 0), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + 0) * f), (double)((float)(textureY + height) * f)).endVertex();
         vertexbuffer.pos((double)(x + width), (double)(y + height), (double)this.zLevel).tex((double)((float)(textureX + width) * f), (double)((float)(textureY + height) * f)).endVertex();

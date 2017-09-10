@@ -418,7 +418,7 @@ public class PersonalityProfile {
 	
 	public boolean hookHitBy(DamageSource par1DamageSource, float par2) {
 		
-		Entity ent = par1DamageSource.getEntity();
+		Entity ent = par1DamageSource.getTrueSource();
 		if (!agent.ent.world.isRemote) {
 			if (ent != null && agent.isEnemy(ent)) {
 				if (agent.blackboard.getTarget() == null) {

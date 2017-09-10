@@ -24,8 +24,8 @@ public class Headshots {
 						
 						//System.out.println("source damage: " + source.getSourceOfDamage());
 						
-						if (source.getSourceOfDamage() instanceof EntityArrow) {
-							double realPosY = source.getSourceOfDamage().posY + source.getSourceOfDamage().motionY;
+						if (source.getImmediateSource() instanceof EntityArrow) {
+							double realPosY = source.getImmediateSource().posY + source.getImmediateSource().motionY;
 							double arrowHeight = realPosY - event.getEntity().getEntityBoundingBox().minY;
 							/*System.out.println("arrow height: " + arrowHeight);
 							System.out.println("mob: " + event.getEntity());*/

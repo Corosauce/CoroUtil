@@ -28,7 +28,7 @@ public class Vec3
     }
     
     public Vec3(Vec3d pos) {
-    	this(pos.xCoord, pos.yCoord, pos.zCoord);
+    	this(pos.x, pos.y, pos.z);
     }
     
     public Vec3(BlockPos pos) {

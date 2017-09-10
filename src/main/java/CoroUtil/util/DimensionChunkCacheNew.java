@@ -128,10 +128,10 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		    		for (int i = 0; i < chunks.size(); i++) {
 		    			Chunk chunk = (Chunk) chunks.get(i);
 		    			
-		    			if ((int)chunk.xPosition < minX) minX = chunk.xPosition;
-			            if ((int)chunk.zPosition < minZ) minZ = chunk.zPosition;
-			            if ((int)chunk.xPosition > maxX) maxX = chunk.xPosition;
-			            if ((int)chunk.zPosition > maxZ) maxZ = chunk.zPosition;
+		    			if ((int)chunk.x < minX) minX = chunk.x;
+			            if ((int)chunk.z < minZ) minZ = chunk.z;
+			            if ((int)chunk.x > maxX) maxX = chunk.x;
+			            if ((int)chunk.z > maxZ) maxZ = chunk.z;
 		    		}
 		    		
 		    		/*minX -= 4;
@@ -150,7 +150,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		    		
 		    		for (int i = 0; i < chunks.size(); i++) {
 		    			Chunk chunk = (Chunk) chunks.get(i);
-		    			this.chunkArray[chunk.xPosition - this.chunkX][chunk.zPosition - this.chunkZ] = chunk;
+		    			this.chunkArray[chunk.x - this.chunkX][chunk.z - this.chunkZ] = chunk;
 		    			chunkCount++;
 		    		}
 	    		}

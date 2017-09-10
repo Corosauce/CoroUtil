@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
@@ -344,7 +344,7 @@ public abstract class GuiBetterSlot
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_FOG);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         drawContainerBackground(tessellator);
         j1 = this.width / 2/* - 92*/ - 16;
         k1 = this.top + 4 - (int)this.amountScrolled;
@@ -517,7 +517,7 @@ public abstract class GuiBetterSlot
     protected void overlayBackground(int par1, int par2, int par3, int par4)
     {
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -541,7 +541,7 @@ public abstract class GuiBetterSlot
 
     protected void drawContainerBackground(Tessellator tessellator)
     {
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

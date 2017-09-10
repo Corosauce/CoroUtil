@@ -230,7 +230,7 @@ public class PlayerQuests {
 		int startY = 10;
 		
 		Minecraft mc = FMLClientHandler.instance().getClient();
-		mc.fontRendererObj.drawStringWithShadow("Quests:", startX, startY, 0xFFFFFF);
+		mc.fontRenderer.drawStringWithShadow("Quests:", startX, startY, 0xFFFFFF);
 		
 		startY += 20;
 		int questSpacing = 40;
@@ -255,9 +255,9 @@ public class PlayerQuests {
 				qStr = "Type: " + activeQuests.get(i).questType;
 			}*/
 			
-			mc.fontRendererObj.drawStringWithShadow(ChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
-			mc.fontRendererObj.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
-			mc.fontRendererObj.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRenderer.drawStringWithShadow(ChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRenderer.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRenderer.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
 		}
 	}
 	

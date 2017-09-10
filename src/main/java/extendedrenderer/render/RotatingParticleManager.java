@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -159,7 +159,7 @@ public class RotatingParticleManager
             for (Particle particle = (Particle)this.queueEntityFX.poll(); particle != null; particle = (Particle)this.queueEntityFX.poll())
             {
                 int j = particle.getFXLayer();
-                int k = particle.isTransparent() ? 0 : 1;
+                int k = particle.shouldDisableDepth() ? 0 : 1;
 
                 int renderOrder = 0;
                 if (particle instanceof EntityRotFX) {
@@ -227,14 +227,14 @@ public class RotatingParticleManager
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Rotating Particle");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
             final int i = particle.getFXLayer();
-            crashreportcategory.setDetail("Rotating Particle", new ICrashReportDetail<String>()
+            crashreportcategory.addDetail("Rotating Particle", new ICrashReportDetail<String>()
             {
                 public String call() throws Exception
                 {
                     return particle.toString();
                 }
             });
-            crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>()
+            crashreportcategory.addDetail("Particle Type", new ICrashReportDetail<String>()
             {
                 public String call() throws Exception
                 {
@@ -362,7 +362,7 @@ public class RotatingParticleManager
 
                         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                         Tessellator tessellator = Tessellator.getInstance();
-                        VertexBuffer vertexbuffer = tessellator.getBuffer();
+                        BufferBuilder vertexbuffer = tessellator.getBuffer();
                         vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
                         for (final Particle particle : entry[i][j]) {
@@ -426,7 +426,7 @@ public class RotatingParticleManager
 
                 if (!queue.isEmpty()) {
                     Tessellator tessellator = Tessellator.getInstance();
-                    VertexBuffer vertexbuffer = tessellator.getBuffer();
+                    BufferBuilder vertexbuffer = tessellator.getBuffer();
 
                     for (Particle particle : queue) {
                         particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);

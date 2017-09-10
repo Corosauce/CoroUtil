@@ -169,12 +169,12 @@ public class PathNavigateCustom
         else
         {
             float f = this.getPathSearchRange();
-            this.world.theProfiler.startSection("pathfind");
+            this.world.profiler.startSection("pathfind");
             BlockPos blockpos = new BlockPos(this.theEntity);
             int i = (int)(f + 8.0F);
             ChunkCache chunkcache = new ChunkCache(this.world, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, pos, f);
-            this.world.theProfiler.endSection();
+            this.world.profiler.endSection();
             return pathentity;
         }
     }
@@ -202,12 +202,12 @@ public class PathNavigateCustom
         else
         {
             float f = this.getPathSearchRange();
-            this.world.theProfiler.startSection("pathfind");
+            this.world.profiler.startSection("pathfind");
             BlockPos blockpos = (new BlockPos(this.theEntity)).up();
             int i = (int)(f + 16.0F);
             ChunkCache chunkcache = new ChunkCache(this.world, blockpos.add(-i, -i, -i), blockpos.add(i, i, i), 0);
             Path pathentity = null;//this.pathFinder.createEntityPathTo(chunkcache, this.theEntity, par1Entity, f);
-            this.world.theProfiler.endSection();
+            this.world.profiler.endSection();
             return pathentity;
         }
     }
@@ -286,7 +286,7 @@ public class PathNavigateCustom
 
                 if (vec3 != null)
                 {
-                    ((IBTAgent)this.theEntity).getAIBTAgent().moveHelper.setMoveTo(vec3.xCoord, vec3.yCoord, vec3.zCoord, this.speed);
+                    ((IBTAgent)this.theEntity).getAIBTAgent().moveHelper.setMoveTo(vec3.x, vec3.y, vec3.z, this.speed);
                 }
             }
         }
@@ -309,7 +309,7 @@ public class PathNavigateCustom
         	//System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
         	
         	PathPoint pp = this.currentPath.getPathPointFromIndex(this.currentPath.getCurrentPathIndex());
-        	Block block = this.theEntity.world.getBlockState(new BlockPos(pp.xCoord, pp.yCoord, pp.zCoord)).getBlock();
+        	Block block = this.theEntity.world.getBlockState(new BlockPos(pp.x, pp.y, pp.z)).getBlock();
         	//System.out.println("block type for next node: " + block);
         	
         	if (block.getMaterial(block.getDefaultState()) == Material.WATER || block.getMaterial(block.getDefaultState()) == Material.LAVA) {
@@ -322,7 +322,7 @@ public class PathNavigateCustom
         if (adjY == 0) {
 	        for (int j = this.currentPath.getCurrentPathIndex(); j < this.currentPath.getCurrentPathLength(); ++j)
 	        {
-	            if (this.currentPath.getPathPointFromIndex(j).yCoord != (int)vec3.yCoord)
+	            if (this.currentPath.getPathPointFromIndex(j).y != (int)vec3.y)
 	            {
 	                i = j;
 	                break;
@@ -461,7 +461,7 @@ public class PathNavigateCustom
             {
                 PathPoint pathpoint = this.currentPath.getPathPointFromIndex(i);
 
-                if (this.world.canBlockSeeSky(new BlockPos(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord)))
+                if (this.world.canBlockSeeSky(new BlockPos(pathpoint.x, pathpoint.y, pathpoint.z)))
                 {
                     this.currentPath.setCurrentPathLength(i - 1);
                     return;
@@ -476,10 +476,10 @@ public class PathNavigateCustom
      */
     private boolean isDirectPathBetweenPoints(Vec3d par1Vec3, Vec3d par2Vec3, int par3, int par4, int par5)
     {
-        int l = MathHelper.floor(par1Vec3.xCoord);
-        int i1 = MathHelper.floor(par1Vec3.zCoord);
-        double d0 = par2Vec3.xCoord - par1Vec3.xCoord;
-        double d1 = par2Vec3.zCoord - par1Vec3.zCoord;
+        int l = MathHelper.floor(par1Vec3.x);
+        int i1 = MathHelper.floor(par1Vec3.z);
+        double d0 = par2Vec3.x - par1Vec3.x;
+        double d1 = par2Vec3.z - par1Vec3.z;
         double d2 = d0 * d0 + d1 * d1;
 
         if (d2 < 1.0E-8D)
@@ -494,7 +494,7 @@ public class PathNavigateCustom
             par3 += 2;
             par5 += 2;
 
-            if (!this.isSafeToStandAt(l, (int)par1Vec3.yCoord, i1, par3, par4, par5, par1Vec3, d0, d1))
+            if (!this.isSafeToStandAt(l, (int)par1Vec3.y, i1, par3, par4, par5, par1Vec3, d0, d1))
             {
                 return false;
             }
@@ -504,8 +504,8 @@ public class PathNavigateCustom
                 par5 -= 2;
                 double d4 = 1.0D / Math.abs(d0);
                 double d5 = 1.0D / Math.abs(d1);
-                double d6 = (double)(l * 1) - par1Vec3.xCoord;
-                double d7 = (double)(i1 * 1) - par1Vec3.zCoord;
+                double d6 = (double)(l * 1) - par1Vec3.x;
+                double d7 = (double)(i1 * 1) - par1Vec3.z;
 
                 if (d0 >= 0.0D)
                 {
@@ -521,8 +521,8 @@ public class PathNavigateCustom
                 d7 /= d1;
                 int j1 = d0 < 0.0D ? -1 : 1;
                 int k1 = d1 < 0.0D ? -1 : 1;
-                int l1 = MathHelper.floor(par2Vec3.xCoord);
-                int i2 = MathHelper.floor(par2Vec3.zCoord);
+                int l1 = MathHelper.floor(par2Vec3.x);
+                int i2 = MathHelper.floor(par2Vec3.z);
                 int j2 = l1 - l;
                 int k2 = i2 - i1;
 
@@ -546,7 +546,7 @@ public class PathNavigateCustom
                         k2 = i2 - i1;
                     }
                 }
-                while (this.isSafeToStandAt(l, (int)par1Vec3.yCoord, i1, par3, par4, par5, par1Vec3, d0, d1));
+                while (this.isSafeToStandAt(l, (int)par1Vec3.y, i1, par3, par4, par5, par1Vec3, d0, d1));
 
                 return false;
             }
@@ -572,8 +572,8 @@ public class PathNavigateCustom
             {
                 for (int j2 = l1; j2 < l1 + par6; ++j2)
                 {
-                    double d2 = (double)i2 + 0.5D - par7Vec3.xCoord;
-                    double d3 = (double)j2 + 0.5D - par7Vec3.zCoord;
+                    double d2 = (double)i2 + 0.5D - par7Vec3.x;
+                    double d3 = (double)j2 + 0.5D - par7Vec3.z;
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
@@ -609,8 +609,8 @@ public class PathNavigateCustom
     {
         for (BlockPos blockpos : BlockPos.getAllInBox(new BlockPos(p_179692_1_, p_179692_2_, p_179692_3_), new BlockPos(p_179692_1_ + p_179692_4_ - 1, p_179692_2_ + p_179692_5_ - 1, p_179692_3_ + p_179692_6_ - 1)))
         {
-            double d0 = (double)blockpos.getX() + 0.5D - p_179692_7_.xCoord;
-            double d1 = (double)blockpos.getZ() + 0.5D - p_179692_7_.zCoord;
+            double d0 = (double)blockpos.getX() + 0.5D - p_179692_7_.x;
+            double d1 = (double)blockpos.getZ() + 0.5D - p_179692_7_.z;
 
             if (d0 * p_179692_8_ + d1 * p_179692_10_ >= 0.0D)
             {

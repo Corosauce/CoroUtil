@@ -6,7 +6,7 @@ import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.util.Vec3;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -404,7 +404,7 @@ public class EntityRotFX extends Particle implements IWindHandler
     }
 	
 	@Override
-	public void renderParticle(VertexBuffer worldRendererIn, Entity entityIn,
+	public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
 			float partialTicks, float rotationX, float rotationZ,
 			float rotationYZ, float rotationXY, float rotationXZ) {
 		
@@ -437,7 +437,7 @@ public class EntityRotFX extends Particle implements IWindHandler
 	}
     
     @Override
-    public boolean isTransparent() {
+    public boolean shouldDisableDepth() {
     	return isTransparent;
     }
     
@@ -455,7 +455,7 @@ public class EntityRotFX extends Particle implements IWindHandler
 
         if (this.canCollide)
         {
-            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().addCoord(x, y, z));
+            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().expand(x, y, z));
 
             for (AxisAlignedBB axisalignedbb : list)
             {

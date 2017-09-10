@@ -8,7 +8,7 @@ import modconfig.ModConfigData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
@@ -175,8 +175,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 
         if (data.get(index) == null || data.get(index).editBox == null) return;
 
-        int stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(data.get(index).name);
-        config.drawString(mc.fontRendererObj, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
+        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(data.get(index).name);
+        config.drawString(mc.fontRenderer, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
         /*for (int x = 0; x < options.keyBindings.length; x++)
@@ -192,7 +192,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         int maxWidth = (config.xSize / 2) - 45;
         //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
         
-        value = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(value, maxWidth);
+        value = Minecraft.getMinecraft().fontRenderer.trimStringToWidth(value, maxWidth);
 
         String str = (conflict ? ChatFormatting.RED : "") + value;//options.getOptionDisplayString(index);
         str = (index == selected ? ChatFormatting.WHITE + "> " + ChatFormatting.YELLOW + "??? " + ChatFormatting.WHITE + "<" : str);
@@ -217,11 +217,11 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-            int l2 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(s);
+            int l2 = Minecraft.getMinecraft().fontRenderer.getStringWidth(s);
             int i2 = hover_x_min;
             int k2 = hover_y_min - 10;
             drawGradientRect(i2 - 3, k2 - 3, i2 + l2 + 3, k2 + 8 + 3, 0xc0000000, 0xc0000000);
-            Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, i2, k2, -1);
+            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
     }
@@ -245,7 +245,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glShadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         
         /*tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(f1, f2, f3, f);

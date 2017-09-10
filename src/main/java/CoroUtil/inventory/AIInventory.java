@@ -213,7 +213,7 @@ public class AIInventory {
     }
 	
 	public void collideWithItem(EntityItem parItem) {
-		ItemStack is = parItem.getEntityItem();
+		ItemStack is = parItem.getItem();
 		inventory.addItemStackToInventory(is);
 		if (is.getCount() <= 0)
         {
