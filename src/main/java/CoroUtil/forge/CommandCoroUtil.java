@@ -222,12 +222,6 @@ public class CommandCoroUtil extends CommandBase {
 		
 		ent.setPosition(finalX, finalY, finalZ);
 		
-		
-		
-		//temp
-		//ent.setPosition(69, player.world.getHeightValue(69, 301), 301);
-		//((JobGroupHorde)((ICoroAI) ent).getAIAgent().jobMan.priJob).attackCoord = new BlockCoord(44, player.world.getHeightValue(44, 301), 301);
-		
 		player.world.spawnEntity(ent);
 		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
