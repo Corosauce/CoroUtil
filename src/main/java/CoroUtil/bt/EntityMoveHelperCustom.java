@@ -16,7 +16,7 @@ public class EntityMoveHelperCustom
     /** The speed at which the entity should move */
     private double speed;
     private boolean update;
-    
+
     public boolean canSwimInWater; //used for navigating under the water without strait up float forcing (float code is elsewhere usually)
     public boolean canFly; //used for navigating flying paths
 
@@ -52,20 +52,20 @@ public class EntityMoveHelperCustom
 
     public void onUpdateMoveHelper()
     {
-    	
+
     	//System.out.println("custom mover updating");
-    	
+
     	if (entity instanceof EntityLiving) {
     		((EntityLiving)this.entity).setMoveForward(0.0F);
     	} else {
     		System.out.println("EntityMoveHelperCustom being used on non EntityLiving entity, needs code patch");
     	}
-        
+
 
         if (this.update)
         {
             this.update = false;
-            int i = MathHelper.floor_double(this.entity.getEntityBoundingBox().minY + 0.5D);
+            int i = MathHelper.floor(this.entity.getEntityBoundingBox().minY + 0.5D);
             double d0 = this.posX - this.entity.posX;
             double d1 = this.posZ - this.entity.posZ;
             double d2 = this.posY - (double)i;
@@ -75,19 +75,19 @@ public class EntityMoveHelperCustom
             {
                 float f = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - 90.0F;
                 this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f, 90.0F);
-                
+
                 float extraSpeed = 1F;
-                
+
                 if (entity.isInWater()) {
                 	extraSpeed = 4F;
                 }
-                
+
                 this.entity.setAIMoveSpeed((float)(extraSpeed * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
-                
+
                 if (canFly || canSwimInWater) {
                 	this.entity.jumpMovementFactor = (float)(0.5F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
                 }
-                
+
                 /*if (d2 > 0.0D) {
 	                if (entity.onGround) {
 	    				((EntityLiving)this.entity).getJumpHelper().setJumping();
@@ -99,13 +99,13 @@ public class EntityMoveHelperCustom
                 	if (entity instanceof EntityLiving) {
                 		if (canFly || canSwimInWater) {
                 			//System.out.println("fly up test");
-                			
-                			
-                			
+
+
+
                 			/*if (entity.isInWater()) {
                 				extraY = 10F;
                 			}*/
-                			
+
                 			entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 		} else {
                 			((EntityLiving)this.entity).getJumpHelper().setJumping();
@@ -121,7 +121,7 @@ public class EntityMoveHelperCustom
                 		}
                 	}
                 }
-                
+
                 if (d2 > 0.0D) {
                 	if (entity.isInWater() || entity.onGround) {
                 		entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();

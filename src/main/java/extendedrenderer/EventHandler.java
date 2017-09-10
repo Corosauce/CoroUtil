@@ -1,35 +1,20 @@
 package extendedrenderer;
 
-import java.nio.FloatBuffer;
-
-import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.Project;
-
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import CoroUtil.forge.CoroUtil;
+import extendedrenderer.particle.ParticleRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import extendedrenderer.particle.ParticleRegistry;
-import CoroUtil.forge.CoroUtil;
 
 public class EventHandler {
 
-	
+
 	public long lastWorldTime;
     public World lastWorld;
 
@@ -40,16 +25,16 @@ public class EventHandler {
 		Minecraft mc = Minecraft.getMinecraft();
 
         //update world reference and clear old effects on world change or on no world
-        if (lastWorld != mc.theWorld) {
+        if (lastWorld != mc.world) {
             CoroUtil.dbg("CoroUtil: resetting rotating particle renderer");
-            ExtendedRenderer.rotEffRenderer.clearEffects(mc.theWorld);
-            lastWorld = mc.theWorld;
+            ExtendedRenderer.rotEffRenderer.clearEffects(mc.world);
+            lastWorld = mc.world;
         }
 
-		if (mc.theWorld != null) {
+		if (mc.world != null) {
 
-            if (mc.theWorld.getWorldInfo().getWorldTime() != lastWorldTime) {
-                lastWorldTime = mc.theWorld.getWorldInfo().getWorldTime();
+            if (mc.world.getWorldInfo().getWorldTime() != lastWorldTime) {
+                lastWorldTime = mc.world.getWorldInfo().getWorldTime();
 
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
@@ -62,7 +47,7 @@ public class EventHandler {
 		er.enableLightmap();
         mc.mcProfiler.endStartSection("litParticles");
         //particlemanager.renderLitParticles(entity, partialTicks);
-        ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        ExtendedRenderer.rotEffRenderer.renderLitParticles(mc.getRenderViewEntity(), event.getPartialTicks());
         RenderHelper.disableStandardItemLighting();
         //private method, cant use.... for now
         //er.setupFog(0, event.getPartialTicks());
@@ -72,19 +57,19 @@ public class EventHandler {
         //GlStateManager.loadIdentity();
         //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
         //GlStateManager.matrixMode(5888);
-        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
         er.disableLightmap();
-        
+
         //old code call
         //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
     }
-	
+
 	@SideOnly(Side.CLIENT)
     public boolean isPaused() {
     	//if (FMLClientHandler.instance().getClient().getIntegratedServer() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread().isGamePaused()) return true;
     	return false;
     }
-	
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(TextureStitchEvent.Pre event) {

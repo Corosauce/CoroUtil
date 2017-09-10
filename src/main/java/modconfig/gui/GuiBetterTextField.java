@@ -3,15 +3,13 @@ package modconfig.gui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiBetterTextField extends Gui
@@ -564,9 +562,9 @@ public class GuiBetterTextField extends Gui
             par2 = par4;
             par4 = i1;
         }
-        
+
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         GlStateManager.color(0.0F, 0.0F, 255.0F, 255.0F);
         GlStateManager.disableTexture2D();
         GlStateManager.enableColorLogic();

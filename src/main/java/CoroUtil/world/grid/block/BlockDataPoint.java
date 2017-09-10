@@ -9,7 +9,7 @@ import net.minecraft.util.math.MathHelper;
 public class BlockDataPoint
 {
 	public BlockDataGrid grid;
-	
+
 	//Mandatory data
     public int xCoord;
     public int yCoord;
@@ -17,13 +17,13 @@ public class BlockDataPoint
     public final int hash;
 
     //Feature specific data
-    
+
     //runtime instance data
     public float health;
     public long lastTickTime; //uses gettotalworldtime
     public float walkedOnAmount; //beaten paths
     public byte creationType;
-    
+
     //static/dependant on source block type data
     public Block blockID; //cache for quick weight type lookup
     public int blockMeta;
@@ -39,11 +39,11 @@ public class BlockDataPoint
     public static byte CREATETYPE_PLAYER = 2; //for when players place
     //public static byte CREATETYPE_RES_UNKNOWN = 0; //default no marking needed
     //public static byte CREATETYPE_RES_EPOCH = 1; //for when generation sets a resource block
-    
+
     //placement type used for:
     //- resource blocks
     //- marking WIP buildings with npc/player
-    
+
 
     public BlockDataPoint(BlockDataGrid parGrid, int i, int j, int k)
     {
@@ -64,7 +64,7 @@ public class BlockDataPoint
     	blockID = state.getBlock();
     	blockMeta = state.getBlock().getMetaFromState(state);
     }
-    
+
     public boolean isRemovable() {
     	if (health < BlockStaticDataMap.getBlockMaxHealth(blockID)) {
     		return false;
@@ -88,7 +88,7 @@ public class BlockDataPoint
         float f = pathpoint.xCoord - xCoord;
         float f1 = pathpoint.yCoord - yCoord;
         float f2 = pathpoint.zCoord - zCoord;
-        return MathHelper.sqrt_float(f * f + f1 * f1 + f2 * f2);
+        return MathHelper.sqrt(f * f + f1 * f1 + f2 * f2);
     }
 
     public boolean equals(Object obj)
@@ -113,12 +113,12 @@ public class BlockDataPoint
     {
         return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
     }
-    
+
     public void readFromNBT(NBTTagCompound nbt) {
-    	
+
     	blockID = Block.getBlockById(nbt.getInteger("blockID"));
     	blockMeta = nbt.getInteger("blockMeta");
-    	
+
     	health = nbt.getFloat("health");
     	lastTickTime = nbt.getLong("lastTickTime");
     	creationType = nbt.getByte("creationType");
@@ -127,15 +127,15 @@ public class BlockDataPoint
     	yCoord = nbt.getInteger("yCoord");  -- read in from init
     	zCoord = nbt.getInteger("zCoord");*/
     }
-    
+
     public NBTTagCompound writeToNBT() {
     	NBTTagCompound nbt = new NBTTagCompound();
-    	
-    	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits 
-    	
+
+    	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits
+
     	nbt.setInteger("blockID", Block.getIdFromBlock(blockID));
     	nbt.setInteger("blockMeta", blockMeta);
-    	
+
     	nbt.setFloat("health", health);
     	nbt.setLong("lastTickTime", lastTickTime);
     	nbt.setByte("creationType", creationType);
@@ -143,18 +143,18 @@ public class BlockDataPoint
     	nbt.setInteger("xCoord", xCoord);
     	nbt.setInteger("yCoord", yCoord);
     	nbt.setInteger("zCoord", zCoord);
-    	
+
     	return nbt;
     }
-    
+
     public void tickUpdate() {
     	long curTickTime = grid.world.getTotalWorldTime();
-    	
+
     	//code that scales based on ticktime diff goes here
-    	
+
     	lastTickTime = curTickTime;
     }
-    
+
     public void cleanup() {
     	grid = null;
     }

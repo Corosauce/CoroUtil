@@ -5,7 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 public class BlockCoord {
-	
+
 	public int posX;
 	public int posY;
 	public int posZ;
@@ -23,13 +23,13 @@ public class BlockCoord {
         this.posY = p_i1355_1_.posY;
         this.posZ = p_i1355_1_.posZ;
     }
-    
+
     public BlockCoord(Entity ent) {
-    	this.posX = MathHelper.floor_double(ent.posX);
-    	this.posY = MathHelper.floor_double(ent.posY);
-    	this.posZ = MathHelper.floor_double(ent.posZ);
+    	this.posX = MathHelper.floor(ent.posX);
+    	this.posY = MathHelper.floor(ent.posY);
+    	this.posZ = MathHelper.floor(ent.posZ);
     }
-    
+
     public boolean equals(Object p_equals_1_)
     {
         if (!(p_equals_1_ instanceof BlockCoord))
@@ -47,28 +47,28 @@ public class BlockCoord {
     {
         return this.posX + this.posZ << 8 + this.posY << 16;
     }
-    
+
     public String toString()
     {
         return "Pos{x=" + this.posX + ", y=" + this.posY + ", z=" + this.posZ + '}';
     }
-    
+
     public int getX() {
     	return posX;
     }
-    
+
     public int getY() {
     	return posY;
     }
-    
+
     public int getZ() {
     	return posZ;
     }
-    
+
     public double getDistanceSquared(double toX, double toY, double toZ) {
     	return distanceSq(toX, toY, toZ);
     }
-    
+
     public double distanceSq(double toX, double toY, double toZ)
     {
         double d0 = (double)this.getX() - toX;
@@ -76,9 +76,9 @@ public class BlockCoord {
         double d2 = (double)this.getZ() - toZ;
         return d0 * d0 + d1 * d1 + d2 * d2;
     }
-    
+
     public BlockPos toBlockPos() {
     	return new BlockPos(posX, posY, posZ);
     }
-	
+
 }

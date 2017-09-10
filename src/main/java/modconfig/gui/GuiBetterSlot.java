@@ -1,18 +1,17 @@
 package modconfig.gui;
 
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiBetterSlot
@@ -230,9 +229,9 @@ public abstract class GuiBetterSlot
         this.mouseY = par2;
         this.drawBackground();
         int k = this.getSize();
-        
+
         //System.out.println("SIZE: " + k);
-        
+
         int l = this.getScrollBarX();
         int i1 = l + 6;
         int j1;
@@ -344,13 +343,13 @@ public abstract class GuiBetterSlot
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_FOG);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         drawContainerBackground(tessellator);
         j1 = this.width / 2/* - 92*/ - 16;
         k1 = this.top + 4 - (int)this.amountScrolled;
 
         //System.out.println(height + " - " + bottom);
-        
+
         if (this.field_77243_s)
         {
             this.func_77222_a(j1, k1, tessellator);
@@ -383,7 +382,7 @@ public abstract class GuiBetterSlot
                     tessellator.addVertexWithUV((double)(j3 - 1), (double)(j2 - 1), 0.0D, 1.0D, 0.0D);
                     tessellator.addVertexWithUV((double)(i3 + 1), (double)(j2 - 1), 0.0D, 0.0D, 0.0D);
                     tessellator.draw();*/
-                    
+
                     vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
                     vertexbuffer.pos((double)i3, (double)(j2 + i2 + 2), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 0).endVertex();
                     vertexbuffer.pos((double)j3, (double)(j2 + i2 + 2), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 0).endVertex();
@@ -396,8 +395,8 @@ public abstract class GuiBetterSlot
                     vertexbuffer.pos((double)(j3 - 1), (double)(j2 - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 0).endVertex();
                     vertexbuffer.pos((double)(i3 + 1), (double)(j2 - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 0).endVertex();
                     tessellator.draw();
-                    
-                    
+
+
                     GL11.glEnable(GL11.GL_TEXTURE_2D);
                 }
 
@@ -474,23 +473,23 @@ public abstract class GuiBetterSlot
             tessellator.addVertexWithUV((double)(i1 - 1), (double)i3, 0.0D, 1.0D, 0.0D);
             tessellator.addVertexWithUV((double)l, (double)i3, 0.0D, 0.0D, 0.0D);
             tessellator.draw();*/
-            
-            
-            
+
+
+
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
             vertexbuffer.pos((double)l, (double)this.bottom, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 0).endVertex();
             vertexbuffer.pos((double)i1, (double)this.bottom, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 0).endVertex();
             vertexbuffer.pos((double)i1, (double)this.top, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
             vertexbuffer.pos((double)l, (double)this.top, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
             tessellator.draw();
-            
+
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
             vertexbuffer.pos((double)l, (double)(i3 + i2), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
             vertexbuffer.pos((double)i1, (double)(i3 + i2), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
             vertexbuffer.pos((double)i1, (double)i3, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 0).endVertex();
             vertexbuffer.pos((double)l, (double)i3, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 0).endVertex();
             tessellator.draw();
-            
+
             vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
             vertexbuffer.pos((double)l, (double)(i3 + i2 - 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
             vertexbuffer.pos((double)(i1 - 1), (double)(i3 + i2 - 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
@@ -517,7 +516,7 @@ public abstract class GuiBetterSlot
     protected void overlayBackground(int par1, int par2, int par3, int par4)
     {
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -530,7 +529,7 @@ public abstract class GuiBetterSlot
         tessellator.addVertexWithUV((double)this.width, (double)par1, 0.0D, (double)((float)this.width / f), (double)((float)par1 / f));
         tessellator.addVertexWithUV(0.0D, (double)par1, 0.0D, 0.0D, (double)((float)par1 / f));
         tessellator.draw();*/
-        
+
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         vertexbuffer.pos(0.0D, (double)par2, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
         vertexbuffer.pos((double)this.width, (double)par2, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
@@ -541,7 +540,7 @@ public abstract class GuiBetterSlot
 
     protected void drawContainerBackground(Tessellator tessellator)
     {
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
         //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -553,7 +552,7 @@ public abstract class GuiBetterSlot
         tess.addVertexWithUV((double)right, (double)top,    0.0D, (double)(right / height), (double)((top    + (int)amountScrolled) / height));
         tess.addVertexWithUV((double)left,  (double)top,    0.0D, (double)(left  / height), (double)((top    + (int)amountScrolled) / height));
         tess.draw();*/
-        
+
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
         vertexbuffer.pos((double)left,  (double)bottom, 0.0D).tex((double)(left  / height), (double)((bottom + (int)amountScrolled) / height)).color(0, 0, 0, 255).endVertex();
         vertexbuffer.pos((double)right, (double)bottom, 0.0D).tex((double)(right / height), (double)((bottom + (int)amountScrolled) / height)).color(0, 0, 0, 255).endVertex();

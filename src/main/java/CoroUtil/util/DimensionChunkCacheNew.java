@@ -1,11 +1,9 @@
 package CoroUtil.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import CoroUtil.OldUtil;
+import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.pathfinding.PFQueue;
 import com.google.common.collect.Lists;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -23,18 +21,19 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.OldUtil;
-import CoroUtil.config.ConfigCoroAI;
-import CoroUtil.pathfinding.PFQueue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DimensionChunkCacheNew implements IBlockAccess {
 
 	public static List<Integer> listBlacklistIDs = new ArrayList<Integer>();
     public static List<String> listBlacklistNamess = new ArrayList<String>();
-    
+
     //Static lookup and cache updating
     public static HashMap<Integer, DimensionChunkCacheNew> dimCacheLookup = new HashMap<Integer, DimensionChunkCacheNew>();
-    
+
     public int chunkX;
     public int chunkZ;
     public int chunkXMax;
@@ -45,55 +44,55 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     private boolean hasExtendedLevels;
 
     /** Reference to the World object. */
-    private World worldObj;
-    
+    private World world;
+
     public static void updateAllWorldCache() {
     	//System.out.println("Updating PFCache");
     	WorldServer[] worlds = DimensionManager.getWorlds();
-    	
+
     	for (int i = 0; i < worlds.length; i++) {
     		WorldServer world = worlds[i];
-    		
+
     		boolean skip = false;
-    		
+
     		//world.chunkExists(par1, par2)
     		//if (i == 0) {
     		if (!ConfigCoroAI.chunkCacheOverworldOnly || i == 0) {
-    			
+
     		} else {
     			skip = true;
     		}
-    		
+
     		if (listBlacklistIDs.contains(i)) {
     			skip = true;
     		}
-    		
+
     		for (int j = 0; j < listBlacklistNamess.size(); j++) {
     			if (world != null && world.provider.getDimensionType().getName().contains(listBlacklistNamess.get(j))) {
         			skip = true;
         			break;
         		}
     		}
-    		
-    		
+
+
     		if (!skip) {
     			dimCacheLookup.put(world.provider.getDimension(), new DimensionChunkCacheNew(world, true));
     		}
     	}
     }
-    
+
     public DimensionChunkCacheNew(World world, boolean useLoadedChunks/*, int par2, int par3, int par4, int par5, int par6, int par7*/)
     {
 		int chunkCount = 0;
-		
+
     	try {
 	    	int minX = 0;
 	    	int minZ = 0;
 	    	int maxX = 0;
 	    	int maxZ = 0;
-	    	
+
 	    	List chunks = Lists.newArrayList(((ChunkProviderServer)world.getChunkProvider()).getLoadedChunks());
-    		
+
 	    	if (chunks == null) {
 	    		try {
     				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
@@ -103,10 +102,10 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	    		/*try {
 	    			chunks = (ArrayList)OldUtil.getPrivateValue(ChunkProviderServer.class, world.getChunkProvider(), "loadedChunks");
 	    		} catch (Exception ex) {
-	    			
+
 	    		}*/
 	    	}
-    		
+
     		if (chunks == null) {
     			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
     				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
@@ -114,66 +113,66 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getDimensionType().getName());
     			}
     		}
-	    	
+
 	    	if (chunks != null && useLoadedChunks) {
-	    		
+
 	    		//dont forget to readapt this for 1.7.10
 	    		//in 1.7.10, i think func_152380_a can return null, so null check our chunks variable
 	    		//just added null check for 1.7.2
 	    		//Mrbysco was having issues for it in 1.7.10
-	    		
-	    		
-	    		
+
+
+
 	    		if (chunks != null) {
 		    		for (int i = 0; i < chunks.size(); i++) {
 		    			Chunk chunk = (Chunk) chunks.get(i);
-		    			
-		    			if ((int)chunk.xPosition < minX) minX = chunk.xPosition;
-			            if ((int)chunk.zPosition < minZ) minZ = chunk.zPosition;
-			            if ((int)chunk.xPosition > maxX) maxX = chunk.xPosition;
-			            if ((int)chunk.zPosition > maxZ) maxZ = chunk.zPosition;
+
+		    			if (chunk.x < minX) minX = chunk.x;
+			            if (chunk.z < minZ) minZ = chunk.z;
+			            if (chunk.x > maxX) maxX = chunk.x;
+			            if (chunk.z > maxZ) maxZ = chunk.z;
 		    		}
-		    		
+
 		    		/*minX -= 4;
 			    	minZ -= 4;
 			    	maxX += 4;
 			    	maxZ += 4;*/
-		    		
-		    		this.worldObj = world;
+
+		    		this.world = world;
 		    		this.chunkX = minX;
 			        this.chunkZ = minZ;
 			        int var8 = maxX;
 			        int var9 = maxZ;
-			        
+
 		    		this.chunkArray = new Chunk[var8 - this.chunkX + 1][var9 - this.chunkZ + 1];
 		    		this.hasExtendedLevels = true;
-		    		
+
 		    		for (int i = 0; i < chunks.size(); i++) {
 		    			Chunk chunk = (Chunk) chunks.get(i);
-		    			this.chunkArray[chunk.xPosition - this.chunkX][chunk.zPosition - this.chunkZ] = chunk;
+		    			this.chunkArray[chunk.x - this.chunkX][chunk.z - this.chunkZ] = chunk;
 		    			chunkCount++;
 		    		}
 	    		}
-	    		
+
 	    	} else if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
 		    	byte playerRadius = 8;
-		    	
+
 		    	for (int i = 0; i < world.playerEntities.size(); ++i)
 		        {
-		            EntityPlayer var5 = (EntityPlayer)world.playerEntities.get(i);
-		            
+		            EntityPlayer var5 = world.playerEntities.get(i);
+
 		            if ((int)var5.posX < minX) minX = (int)var5.posX;
 		            if ((int)var5.posZ < minZ) minZ = (int)var5.posZ;
 		            if ((int)var5.posX > maxX) maxX = (int)var5.posX;
 		            if ((int)var5.posZ > maxZ) maxZ = (int)var5.posZ;
 		        }
-		    	
+
 		    	minX -= (playerRadius * 16);
 		    	minZ -= (playerRadius * 16);
 		    	maxX += (playerRadius * 16);
 		    	maxZ += (playerRadius * 16);
-		    	
-		    	this.worldObj = world;
+
+		    	this.world = world;
 		        this.chunkX = minX >> 4;
 		        this.chunkZ = minZ >> 4;
 		        int var8 = maxX >> 4;
@@ -182,36 +181,36 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		        this.chunkZMax = var9;
 		        this.chunkArray = new Chunk[var8 - this.chunkX + 1][var9 - this.chunkZ + 1];
 		        this.hasExtendedLevels = true;
-		        
+
 		        for (int i = 0; i < world.playerEntities.size(); ++i)
 		        {
-		        	
-		            EntityPlayer var5 = (EntityPlayer)world.playerEntities.get(i);
-		            
-		            int pChunkX = MathHelper.floor_double(var5.posX / 16.0D);
-		            int pChunkZ = MathHelper.floor_double(var5.posZ / 16.0D);
-		            
+
+		            EntityPlayer var5 = world.playerEntities.get(i);
+
+		            int pChunkX = MathHelper.floor(var5.posX / 16.0D);
+		            int pChunkZ = MathHelper.floor(var5.posZ / 16.0D);
+
 		            for (int xx = -playerRadius; xx <= playerRadius; ++xx)
 		            {
 		                for (int zz = -playerRadius; zz <= playerRadius; ++zz)
 		                {
 		                	if (pChunkX + xx - this.chunkX >= 0 && pChunkZ + zz - this.chunkZ >= 0 && this.chunkArray[pChunkX + xx - this.chunkX][pChunkZ + zz - this.chunkZ] == null) {
 		                		Chunk var12 = world.getChunkFromChunkCoords(pChunkX + xx, pChunkZ + zz);
-		
+
 		                        if (var12 != null)
 		                        {
 		                        	//System.out.println("adding to array!");
 		                        	chunkCount++;
 		                            this.chunkArray[pChunkX + xx - this.chunkX][pChunkZ + zz - this.chunkZ] = var12;
 		                        }
-		                	}                	
+		                	}
 		                }
 		            }
 		        }
 	    	}
-	        
+
 	        PFQueue.lastChunkCacheCount = chunkCount;
-	        
+
     	} catch (Exception ex) {
     		ex.printStackTrace();
     		System.out.println("DimensionChunkCache crash, tell Corosus");
@@ -219,7 +218,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     	}
         //System.out.println("Total Cached Chunks for Dim " + world.provider.dimensionId + ": " + chunkCount);
     }
-	
+
 	@Override
 	public TileEntity getTileEntity(BlockPos pos) {
 		int i = (pos.getX() >> 4) - this.chunkX;
@@ -229,7 +228,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
         return this.chunkArray[i][j].getTileEntity(pos, Chunk.EnumCreateEntityType.IMMEDIATE);
 	}
 
-	
+
 	@Override
 	public int getCombinedLight(BlockPos pos, int lightValue) {
 		return 0;
@@ -267,8 +266,8 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public Biome getBiomeGenForCoords(BlockPos pos) {
-		return this.worldObj.getBiomeGenForCoords(pos);
+	public Biome getBiome(BlockPos pos) {
+		return this.world.getBiome(pos);
 	}
 
 	/*@SideOnly(Side.CLIENT)
@@ -286,7 +285,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public WorldType getWorldType() {
-		return this.worldObj.getWorldType();
+		return this.world.getWorldType();
 	}
 
 	@Override

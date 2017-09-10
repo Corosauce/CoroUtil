@@ -1,10 +1,8 @@
 package CoroUtil.packet;
 
+import CoroUtil.forge.CoroUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.io.IOException;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
@@ -15,23 +13,24 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.forge.CoroUtil;
+
+import java.io.IOException;
 
 public class PacketHelper {
-	
+
 	//1.7 plan, for the existing packets, we add the old 'channel' as a command string, so we can use 1 event channel, then just convert existing code to buffer way
-	
+
 	//in handler, WE MUST MODIFY TO READ THE STRING FOR COMMAND!
-	
+
 	//dont forget to test tile datawatchers
-	
+
 	//modify to be fully nbt! less headache!
 
 	@SideOnly(Side.CLIENT)
 	public static void sendClientPacket(Packet packet) {
-		FMLClientHandler.instance().getClient().thePlayer.connection.sendPacket(packet);
+		FMLClientHandler.instance().getClient().player.connection.sendPacket(packet);
 	}
-	
+
 	/*public static void writeNBTTagCompound(NBTTagCompound par0NBTTagCompound, DataOutputStream par1DataOutputStream) throws IOException
     {
         if (par0NBTTagCompound == null)
@@ -60,13 +59,13 @@ public class PacketHelper {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static FMLProxyPacket createPacketForNBTHandler(String parChannel, String packetChannel, NBTTagCompound parNBT) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
-		
+
 		ByteBuf byteBuf = Unpooled.buffer();
-		
+
 		try {
 			ByteBufUtils.writeUTF8String(byteBuf, parChannel);
 			//writeNBTTagCompound(parNBT, dos);
@@ -74,7 +73,7 @@ public class PacketHelper {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		/*Packet250CustomPayload pkt = new Packet250CustomPayload();
 		pkt.channel = parChannel;
 		pkt.data = bos.toByteArray();
@@ -82,29 +81,29 @@ public class PacketHelper {
 		pkt.isChunkDataPacket = false;*/
 		return new FMLProxyPacket(new PacketBuffer(byteBuf), packetChannel/*CoroAI.eventChannelName*/);
 	}
-	
+
 	public static FMLProxyPacket createPacketForTEntDWClient(TileEntity tEnt, String name, Object val) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
-		
+
 		CoroUtil.dbg("createPacketForTEntDWClient incomplete");
 		ByteBuf byteBuf = Unpooled.buffer();
-		
+
 		/*TileHandler tileHandler = ((ITilePacket)tEnt).getTileHandler();
-		
+
 		WatchableObject wo = new WatchableObject((Integer)tileHandler.tileDataWatcher.dataTypes.get(val.getClass()), tileHandler.mapNameToID.get(name), val);
-		
+
 		try {
 			ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntDW");
 			writeTEntToPacket(tEnt, byteBuf);
 			TileDataWatcher.writeWatchableObject(byteBuf, wo);
-			
+
 			//this is the watchable object terminator indicator required for proper packet reading
 			dos.writeByte(127);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		
+
 		/*Packet250CustomPayload pkt = new Packet250CustomPayload();
 		pkt.channel = "CoroAI_TEntDW";
 		pkt.data = bos.toByteArray();
@@ -112,16 +111,16 @@ public class PacketHelper {
 		pkt.isChunkDataPacket = false;*/
 		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
-	
+
 	public static FMLProxyPacket createPacketForTEntDWServer(TileEntity tEnt) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
-		
+
 		CoroUtil.dbg("createPacketForTEntDWServer incomplete");
 		ByteBuf byteBuf = Unpooled.buffer();
-		
+
 		/*TileDataWatcher tileDataWatcher = ((ITilePacket)tEnt).getTileHandler().tileDataWatcher;
-		
+
 		try {
 			ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntDW");
 			writeTEntToPacket(tEnt, dos);
@@ -129,7 +128,7 @@ public class PacketHelper {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		
+
 		/*Packet250CustomPayload pkt = new Packet250CustomPayload();
 		pkt.channel = "CoroAI_TEntDW";
 		pkt.data = bos.toByteArray();
@@ -137,14 +136,14 @@ public class PacketHelper {
 		pkt.isChunkDataPacket = false;*/
 		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
-	
+
 	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, NBTTagCompound data) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream(); //was ...(140);
         DataOutputStream dos = new DataOutputStream(bos);*/
 
         ByteBuf byteBuf = Unpooled.buffer();
         NBTTagCompound nbtSendData = new NBTTagCompound();
-        
+
         try
         {
         	nbtSendData.setString("command", "CoroAI_TEntCmd");
@@ -160,7 +159,7 @@ public class PacketHelper {
         	byteBuf.writeInt(tEnt.zCoord);*/
         	ByteBufUtils.writeTag(byteBuf, nbtSendData);
         	//writeNBTTagCompound(data, dos);
-            
+
         }
         catch (Exception ex)
         {
@@ -171,10 +170,10 @@ public class PacketHelper {
         pkt.channel = "CoroAI_TEntCmd";
         pkt.data = bos.toByteArray();
         pkt.length = bos.size();*/
-        
+
         return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
-	
+
 	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
     {
 		return ByteBufUtils.readTag(fullBuffer);
@@ -192,10 +191,10 @@ public class PacketHelper {
             //return CompressedStreamTools.decompress(abyte);
         }*/
     }
-	
+
 	public static FMLProxyPacket getNBTPacket(NBTTagCompound parNBT, String parChannel) {
         ByteBuf byteBuf = Unpooled.buffer();
-        
+
         try {
         	//byteBuf.writeBytes(CompressedStreamTools.compress(parNBT));
         	ByteBufUtils.writeTag(byteBuf, parNBT);
@@ -205,7 +204,7 @@ public class PacketHelper {
 
         return new FMLProxyPacket(new PacketBuffer(byteBuf), parChannel);
     }
-	
+
 	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {
 		NBTTagCompound data = new NBTTagCompound();
 		data.setString("command", "Ent_Motion");
@@ -215,5 +214,5 @@ public class PacketHelper {
 		data.setDouble("motionZ", motionZ);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
-	
+
 }

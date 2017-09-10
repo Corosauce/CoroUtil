@@ -22,15 +22,15 @@ public class Vec3
     {
         return new Vec3(p_72443_0_, p_72443_2_, p_72443_4_);
     }*/
-    
+
     public Vec3(Vec3 pos) {
     	this(pos.xCoord, pos.yCoord, pos.zCoord);
     }
-    
+
     public Vec3(Vec3d pos) {
-    	this(pos.xCoord, pos.yCoord, pos.zCoord);
+    	this(pos.x, pos.y, pos.z);
     }
-    
+
     public Vec3(BlockPos pos) {
     	this(pos.getX(), pos.getY(), pos.getZ());
     }
@@ -85,7 +85,7 @@ public class Vec3
      */
     public Vec3 normalize()
     {
-        double d0 = (double)MathHelper.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
+        double d0 = (double)MathHelper.sqrt(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
         return d0 < 1.0E-4D ? new Vec3(0.0D, 0.0D, 0.0D) : new Vec3(this.xCoord / d0, this.yCoord / d0, this.zCoord / d0);
     }
 
@@ -127,7 +127,7 @@ public class Vec3
         double d0 = p_72438_1_.xCoord - this.xCoord;
         double d1 = p_72438_1_.yCoord - this.yCoord;
         double d2 = p_72438_1_.zCoord - this.zCoord;
-        return (double)MathHelper.sqrt_double(d0 * d0 + d1 * d1 + d2 * d2);
+        return (double)MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
     /**
@@ -157,7 +157,7 @@ public class Vec3
      */
     public double lengthVector()
     {
-        return (double)MathHelper.sqrt_double(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
+        return (double)MathHelper.sqrt(this.xCoord * this.xCoord + this.yCoord * this.yCoord + this.zCoord * this.zCoord);
     }
 
     /**
@@ -266,11 +266,11 @@ public class Vec3
         double d2 = this.zCoord;
         this.setComponents(d0, d1, d2);
     }
-    
+
     public net.minecraft.util.math.Vec3d toMCVec() {
     	return new net.minecraft.util.math.Vec3d(this.xCoord, this.yCoord, this.zCoord);
     }
-    
+
     public BlockPos toBlockPos() {
     	return new BlockPos(this.xCoord, this.yCoord, this.zCoord);
     }

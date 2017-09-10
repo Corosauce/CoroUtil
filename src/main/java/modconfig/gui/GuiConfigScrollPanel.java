@@ -1,24 +1,22 @@
 package modconfig.gui;
 
-import java.util.List;
-
+import com.mojang.realmsclient.gui.ChatFormatting;
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
 import modconfig.ModConfigData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class GuiConfigScrollPanel extends GuiBetterSlot
@@ -57,7 +55,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         	/*if (selected == -1)
             {
                 selected = i;
-                
+
                 //config.configData.get(selected).editBox.textboxKeyTyped(c, i);
             }
             else
@@ -68,12 +66,12 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             }*/
         }
     }
-    
+
     protected void mouseClicked(int par1, int par2, int par3)
     {
     	boolean anyHasFocus = false;
     	for (int i = 0; i < config.getData().configData.size(); i++) {
-    		
+
     		try {
 	    		config.getData().configData.get(i).editBox.mouseClicked(par1, par2, par3);
 	    		if (config.getData().configData.get(i).editBox.isFocused()) {
@@ -90,7 +88,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
     				config.configData.get(i).markForUpdate = true;
     			}
     		}*/
-    				
+
     		//}
     	}
     	if (!anyHasFocus) {
@@ -110,18 +108,18 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 
     @Override
     protected void drawBackground() {}
-    
+
     @Override
     protected void drawContainerBackground(Tessellator tess) {
     	/*this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         float height = 32.0F;
-        
+
         int startX = (this.width - config.xSize) / 2;
         int startY = (this.height - config.ySize) / 2;
         int left = startX - 50 + 3;
         int right = left + config.xSize - 6;
-        
+
         tess.startDrawingQuads();
         tess.setColorOpaque_I(2105376);
         tess.addVertexWithUV((double)left,  (double)bottom, 0.0D, (double)(left  / height), (double)((bottom + (int)amountScrolled) / height));
@@ -175,8 +173,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 
         if (data.get(index) == null || data.get(index).editBox == null) return;
 
-        int stringWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(data.get(index).name);
-        config.drawString(mc.fontRendererObj, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
+        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(data.get(index).name);
+        config.drawString(mc.fontRenderer, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
         /*for (int x = 0; x < options.keyBindings.length; x++)
@@ -187,12 +185,12 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
                 break;
             }
         }*/
-        
+
         String value = data.get(index).value.toString();
         int maxWidth = (config.xSize / 2) - 45;
         //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
-        
-        value = Minecraft.getMinecraft().fontRendererObj.trimStringToWidth(value, maxWidth);
+
+        value = Minecraft.getMinecraft().fontRenderer.trimStringToWidth(value, maxWidth);
 
         String str = (conflict ? ChatFormatting.RED : "") + value;//options.getOptionDisplayString(index);
         str = (index == selected ? ChatFormatting.WHITE + "> " + ChatFormatting.YELLOW + "??? " + ChatFormatting.WHITE + "<" : str);
@@ -203,7 +201,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         data.get(index).editBox.yPos = yPosition/* + (height - 8) / 2*/;
         //config.configData.get(index).editBox.text = config.configData.get(index).value.toString();
         data.get(index).editBox.drawTextBox();
-        
+
         int hover_x_min = xPosition - stringWidth + 15;
         int hover_y_min = yPosition;
         int hover_x_max = xPosition - 15;
@@ -217,15 +215,15 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-            int l2 = Minecraft.getMinecraft().fontRendererObj.getStringWidth(s);
+            int l2 = Minecraft.getMinecraft().fontRenderer.getStringWidth(s);
             int i2 = hover_x_min;
             int k2 = hover_y_min - 10;
             drawGradientRect(i2 - 3, k2 - 3, i2 + l2 + 3, k2 + 8 + 3, 0xc0000000, 0xc0000000);
-            Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, i2, k2, -1);
+            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
     }
-    
+
     /**
      * Draws a rectangle with a vertical gradient between the specified colors.
      */
@@ -245,8 +243,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glShadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer vertexbuffer = tessellator.getBuffer();
-        
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
+
         /*tessellator.startDrawingQuads();
         tessellator.setColorRGBA_F(f1, f2, f3, f);
         tessellator.addVertex((double)par3, (double)par2, (double)0);
@@ -255,14 +253,14 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         tessellator.addVertex((double)par1, (double)par4, (double)0);
         tessellator.addVertex((double)par3, (double)par4, (double)0);
         tessellator.draw();*/
-        
+
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_COLOR);
         vertexbuffer.pos((double)par3, (double)par2, (double)0).color(f1, f2, f3, f).endVertex();
         vertexbuffer.pos((double)par1, (double)par2, (double)0).color(f1, f2, f3, f).endVertex();
         vertexbuffer.pos((double)par1, (double)par4, (double)0).color(f5, f6, f7, f4).endVertex();
         vertexbuffer.pos((double)par3, (double)par4, (double)0).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
-        
+
         GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -285,7 +283,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             //KeyBinding.resetKeyBindingArrayAndHash();
             return false;
         } else {
-        	
+
         }
         return true;
     }

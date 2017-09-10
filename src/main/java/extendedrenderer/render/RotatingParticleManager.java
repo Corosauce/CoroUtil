@@ -1,24 +1,15 @@
 package extendedrenderer.render;
 
-import java.nio.FloatBuffer;
-import java.util.*;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Queues;
 import extendedrenderer.particle.entity.EntityRotFX;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEmitter;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -31,20 +22,20 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
+import javax.annotation.Nullable;
+import java.nio.FloatBuffer;
+import java.util.*;
 
 @SideOnly(Side.CLIENT)
 public class RotatingParticleManager
 {
     private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
     /** Reference to the World object. */
-    protected World worldObj;
+    protected World world;
     /**
      * Second dimension: 0 = GlStateManager.depthMask true aka transparent textures, 1 = false
      */
@@ -53,9 +44,9 @@ public class RotatingParticleManager
     private final TextureManager renderer;
     private final Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
     private final Queue<Particle> queueEntityFX = Queues.<Particle>newArrayDeque();
-    
+
     //ExtendedRenderer Additions
-    
+
     private final FloatBuffer fogColorBuffer = GLAllocation.createDirectFloatBuffer(16);
 
     //a hack to enable fog for particles when weather2 sandstorm is active
@@ -63,7 +54,7 @@ public class RotatingParticleManager
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
-        this.worldObj = worldIn;
+        this.world = worldIn;
         this.renderer = rendererIn;
 
         //main default layer
@@ -95,7 +86,7 @@ public class RotatingParticleManager
 
     public void emitParticleAtEntity(Entity entityIn, EnumParticleTypes particleTypes)
     {
-        this.particleEmitters.add(new ParticleEmitter(this.worldObj, entityIn, particleTypes));
+        this.particleEmitters.add(new ParticleEmitter(this.world, entityIn, particleTypes));
     }
 
     /**
@@ -104,11 +95,11 @@ public class RotatingParticleManager
     @Nullable
     public Particle spawnEffectParticle(int particleId, double xCoord, double yCoord, double zCoord, double xSpeed, double ySpeed, double zSpeed, int... parameters)
     {
-        IParticleFactory iparticlefactory = (IParticleFactory)this.particleTypes.get(Integer.valueOf(particleId));
+        IParticleFactory iparticlefactory = this.particleTypes.get(particleId);
 
         if (iparticlefactory != null)
         {
-            Particle particle = iparticlefactory.getEntityFX(particleId, this.worldObj, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
+            Particle particle = iparticlefactory.createParticle(particleId, this.world, xCoord, yCoord, zCoord, xSpeed, ySpeed, zSpeed, parameters);
 
             if (particle != null)
             {
@@ -152,10 +143,10 @@ public class RotatingParticleManager
 
         if (!this.queueEntityFX.isEmpty())
         {
-            for (Particle particle = (Particle)this.queueEntityFX.poll(); particle != null; particle = (Particle)this.queueEntityFX.poll())
+            for (Particle particle = this.queueEntityFX.poll(); particle != null; particle = this.queueEntityFX.poll())
             {
                 int j = particle.getFXLayer();
-                int k = particle.isTransparent() ? 0 : 1;
+                int k = (particle.particleAlpha < 1) ? 0 : 1;
 
                 int renderOrder = 0;
                 if (particle instanceof EntityRotFX) {
@@ -179,18 +170,18 @@ public class RotatingParticleManager
 
     private void updateEffectLayer(int layer)
     {
-        //this.worldObj.theProfiler.startSection(layer + "");
+        //this.world.theProfiler.startSection(layer + "");
 
         for (int i = 0; i < 2; ++i)
         {
-            //this.worldObj.theProfiler.startSection(i + "");
+            //this.world.theProfiler.startSection(i + "");
             for (ArrayDeque<Particle>[][] entry : fxLayers) {
                 this.tickParticleList(entry[layer][i]);
             }
-            //this.worldObj.theProfiler.endSection();
+            //this.world.theProfiler.endSection();
         }
 
-        //this.worldObj.theProfiler.endSection();
+        //this.world.theProfiler.endSection();
     }
 
     private void tickParticleList(Queue<Particle> p_187240_1_)
@@ -223,14 +214,14 @@ public class RotatingParticleManager
             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Rotating Particle");
             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
             final int i = particle.getFXLayer();
-            crashreportcategory.setDetail("Rotating Particle", new ICrashReportDetail<String>()
+            crashreportcategory.addDetail("Rotating Particle", new ICrashReportDetail<String>()
             {
                 public String call() throws Exception
                 {
                     return particle.toString();
                 }
             });
-            crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>()
+            crashreportcategory.addDetail("Particle Type", new ICrashReportDetail<String>()
             {
                 public String call() throws Exception
                 {
@@ -254,23 +245,23 @@ public class RotatingParticleManager
         Particle.interpPosX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
         Particle.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
         Particle.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-        Particle.field_190016_K = entityIn.getLook(partialTicks);
+        Particle.cameraViewDir = entityIn.getLook(partialTicks);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
-        
+
         GlStateManager.disableCull();
-        
+
         //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
         int mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
         int mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        
+
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
-        
+
         //TODO: requires AT for EntityRenderer
         boolean testGLUOverride = false;
         if (testGLUOverride) {
@@ -279,13 +270,13 @@ public class RotatingParticleManager
 	        Project.gluPerspective(er.getFOVModifier(partialTicks, true), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, er.farPlaneDistance * 4.0F);
 	        GlStateManager.matrixMode(5888);*/
         }
-        
+
         boolean fog = true;
         if (fog) {
         	boolean ATmode = true;
-        	
+
         	//TODO: make match other fog states
-        	
+
         	if (ATmode) {
         		//TODO: add AT if this will be used
 
@@ -301,25 +292,25 @@ public class RotatingParticleManager
                 /**/
         	} else {
         		//incomplete copy
-	        	float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
-	        	float fogColorGreen = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175082_R");
-	        	float fogColorBlue = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175081_S");
+	        	float fogColorRed = Minecraft.getMinecraft().entityRenderer.fogColorRed;
+	        	float fogColorGreen = Minecraft.getMinecraft().entityRenderer.fogColorGreen;
+	        	float fogColorBlue = Minecraft.getMinecraft().entityRenderer.fogColorBlue;
 	        	GlStateManager.glFog(2918, this.setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
 	            GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
 	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-	            
+
 	            Entity entity = mc.getRenderViewEntity();
-	            IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.theWorld, entity, partialTicks);
+	            IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.world, entity, partialTicks);
 	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
 	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
-	            
+
 	            GlStateManager.setFogDensity(1F);
-	            
+
 	            GlStateManager.enableColorMaterial();
 	            GlStateManager.enableFog();
 	            GlStateManager.colorMaterial(1028, 4608);
         	}
-            
+
             /*GlStateManager.setFogStart(0);
             GlStateManager.setFogEnd(100);*/
         }
@@ -351,7 +342,7 @@ public class RotatingParticleManager
 
                         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                         Tessellator tessellator = Tessellator.getInstance();
-                        VertexBuffer vertexbuffer = tessellator.getBuffer();
+                        BufferBuilder vertexbuffer = tessellator.getBuffer();
                         vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
                         for (final Particle particle : entry[i][j]) {
@@ -360,12 +351,12 @@ public class RotatingParticleManager
                             } catch (Throwable throwable) {
                                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
                                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
-                                crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
+                                crashreportcategory.addDetail("Particle", new ICrashReportDetail<String>() {
                                     public String call() throws Exception {
                                         return particle.toString();
                                     }
                                 });
-                                crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>() {
+                                crashreportcategory.addDetail("Particle Type", new ICrashReportDetail<String>() {
                                     public String call() throws Exception {
                                         return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
                                     }
@@ -379,15 +370,15 @@ public class RotatingParticleManager
                 }
             }
         }
-        
+
         if (fog) {
         	GlStateManager.disableFog();
         }
-        
+
         //restore original mipmap state
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
         GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
-        
+
         GlStateManager.enableCull();
 
         GlStateManager.depthMask(true);
@@ -410,7 +401,7 @@ public class RotatingParticleManager
 
                 if (!queue.isEmpty()) {
                     Tessellator tessellator = Tessellator.getInstance();
-                    VertexBuffer vertexbuffer = tessellator.getBuffer();
+                    BufferBuilder vertexbuffer = tessellator.getBuffer();
 
                     for (Particle particle : queue) {
                         particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);
@@ -422,7 +413,7 @@ public class RotatingParticleManager
 
     public void clearEffects(@Nullable World worldIn)
     {
-        this.worldObj = worldIn;
+        this.world = worldIn;
 
         for (ArrayDeque<Particle>[][] entry : fxLayers) {
             for (int i = 0; i < 4; ++i) {
@@ -434,7 +425,7 @@ public class RotatingParticleManager
 
         this.particleEmitters.clear();
     }
-    
+
     public String getStatistics()
     {
     	int count = 0;
@@ -444,7 +435,7 @@ public class RotatingParticleManager
     	//item sheet seems only one used now
         return "" + count;
     }
-    
+
     private FloatBuffer setFogColorBuffer(float red, float green, float blue, float alpha)
     {
         this.fogColorBuffer.clear();

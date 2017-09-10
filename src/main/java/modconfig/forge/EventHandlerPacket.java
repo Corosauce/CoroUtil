@@ -1,8 +1,6 @@
 package modconfig.forge;
 
-import java.util.Collections;
-import java.util.Iterator;
-
+import CoroUtil.packet.PacketHelper;
 import modconfig.ConfigComparatorName;
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
@@ -16,7 +14,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import CoroUtil.packet.PacketHelper;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 public class EventHandlerPacket {
 
@@ -27,9 +27,9 @@ public class EventHandlerPacket {
 		try {
 			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 			String command = nbt.getString("command");
-			
+
 			//System.out.println("command: " + command);
-			
+
 			if (command.equals("setData")) {
 				String modID = nbt.getString("modID");
 				NBTTagCompound nbtEntries = nbt.getCompoundTag("entries");
@@ -53,27 +53,27 @@ public class EventHandlerPacket {
 			} else if (command.equals("openGUI")) {
 				Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
 			}
-			
+
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		
+
 	}
-	
+
 	@SubscribeEvent
 	public void onPacketFromClient(FMLNetworkEvent.ServerCustomPacketEvent event) {
-		EntityPlayer entP = ((NetHandlerPlayServer)event.getHandler()).playerEntity;
-		
+		EntityPlayer entP = ((NetHandlerPlayServer)event.getHandler()).player;
+
 		try {
 			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 			String command = nbt.getString("command");
-			
+
 			//System.out.println("command: " + command);
-			
+
 			if (command.equals("setData")) {
 				String data = nbt.getString("data");
-				
-				if (entP instanceof EntityPlayerMP) {
+
+				if (entP != null) {
 					CommandModConfig.parseSetCommand((EntityPlayerMP)entP, data.split(" "));
 				}
 			}
@@ -81,5 +81,5 @@ public class EventHandlerPacket {
 			ex.printStackTrace();
 		}
 	}
-	
+
 }
