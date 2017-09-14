@@ -36,14 +36,14 @@ public class ExtendedRenderer {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-    	
+		MinecraftForge.EVENT_BUS.register(new extendedrenderer.EventHandler());
     }
     
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
     	proxy.init();
-    	MinecraftForge.EVENT_BUS.register(new extendedrenderer.EventHandler());
+
     }
     
     @Mod.EventHandler
