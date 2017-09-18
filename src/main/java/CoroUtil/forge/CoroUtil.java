@@ -39,7 +39,11 @@ public class CoroUtil {
 	public static CoroUtil instance;
 	public static String modID = "coroutil";
 
-	public static final String version = "${version}";
+
+	//public static final String version = "${version}";
+	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production
+	//TODO: find a way to perminently do this for dev only
+	public static final String version = "1.1.20";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
