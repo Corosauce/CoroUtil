@@ -15,6 +15,13 @@ public class UtilMining {
     	//System.out.println("check: " + block);
     	
     	IBlockState state = world.getBlockState(pos.toBlockPos());
+
+
+		/**TODO: check BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, entityPlayer); if is
+		 * event.setCanceled(preCancelEvent);
+		 * MinecraftForge.EVENT_BUS.post(event);
+		 * needs fakeplayer
+		 */
     	
     	//dont mine tile entities
     	if (world.getTileEntity(pos.toBlockPos()) != null) {

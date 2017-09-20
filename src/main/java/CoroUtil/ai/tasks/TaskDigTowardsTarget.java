@@ -329,7 +329,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
                 }
             } else {
                 Block.spawnAsEntity(entity.worldObj, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1));
-                entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
+				entity.worldObj.setBlockToAir(posCurMining.toBlockPos());
             }
 
 			setMiningBlock(null, null);
