@@ -12,6 +12,7 @@ import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -87,40 +88,46 @@ public class CommandCoroUtil extends CommandBase {
 				} else if (var2[0].equalsIgnoreCase("spawn") && player != null) {
 					
 					String prefix = "";
-					String mobToSpawn = var2[1];
-					
-					int count = 1;
-					
-					if (var2.length > 2) {
-						count = Integer.valueOf(var2[2]);
-					}
+					if (var2.length > 1) {
+						String mobToSpawn = var2[1];
 
-					for (int i = 0; i < count; i++) {
-						Entity ent = EntityList.createEntityByIDFromName(new ResourceLocation(prefix + mobToSpawn), world);
-						
-						if (ent == null) ent = EntityList.createEntityByIDFromName(new ResourceLocation(mobToSpawn), world);
-						
-						if (ent == null) {
-							List<String> entsToSpawn = listEntitiesSpawnable(mobToSpawn);
-							if (entsToSpawn.size() > 0) {
-								for (int j = 0; j < entsToSpawn.size(); j++) {
-									Entity ent2 = EntityList.createEntityByIDFromName(new ResourceLocation(entsToSpawn.get(j)), world);
-									if (ent2 != null) {
-										CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
-										spawnEntity(player, ent2);
+						int count = 1;
+
+						if (var2.length > 2) {
+							count = Integer.valueOf(var2[2]);
+						}
+
+						for (int i = 0; i < count; i++) {
+							Entity ent = EntityList.createEntityByIDFromName(new ResourceLocation(prefix + mobToSpawn), world);
+
+							if (ent == null)
+								ent = EntityList.createEntityByIDFromName(new ResourceLocation(mobToSpawn), world);
+
+							if (ent == null) {
+								List<String> entsToSpawn = listEntitiesSpawnable(mobToSpawn);
+								if (entsToSpawn.size() > 0) {
+									for (int j = 0; j < entsToSpawn.size(); j++) {
+										Entity ent2 = EntityList.createEntityByIDFromName(new ResourceLocation(entsToSpawn.get(j)), world);
+										boolean livingOnly = true;
+										if (ent2 != null && (!livingOnly || ent2 instanceof EntityLivingBase)) {
+											CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
+											spawnEntity(player, ent2);
+										}
 									}
+								} else {
+									CoroUtilMisc.sendCommandSenderMsg(player, "found nothing to spawn");
 								}
 							} else {
-								CoroUtilMisc.sendCommandSenderMsg(player, "found nothing to spawn");
-							}
-						} else {
-							if (ent != null) {
-								
-								CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
-								spawnEntity(player, ent);
-								
+								if (ent != null) {
+
+									CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+									spawnEntity(player, ent);
+
+								}
 							}
 						}
+					} else {
+						CoroUtilMisc.sendCommandSenderMsg(player, "eg: 'coroutil spawn zombie 1', or 'coroutil spawn <ALL>' (spawns every spawnable possible, might crash game)");
 					}
 				} else if (var2[0].equalsIgnoreCase("get")) {
 	        		if (var2[1].equalsIgnoreCase("count")) {
@@ -234,10 +241,10 @@ public class CommandCoroUtil extends CommandBase {
 		Iterator it = EntityList.getEntityNameList().iterator();
 		
 		while (it.hasNext()) {
-			String entry = (String) it.next();
+			ResourceLocation entry = (ResourceLocation) it.next();
 			
-			if (entry.toLowerCase().contains(entName.toLowerCase())) {
-				entNames.add(entry);
+			if (entName.equals("<ALL>") || entry.toString().toLowerCase().contains(entName.toLowerCase())) {
+				entNames.add(entry.toString());
 			}
 		}
 		
