@@ -71,6 +71,7 @@ public class GuiConfigEditor extends GuiScreen
     	return getConfigData(getCategory());
     }
     
+    @Override
     public void updateScreen()
     {
     	try {
@@ -90,6 +91,7 @@ public class GuiConfigEditor extends GuiScreen
         //++this.updateCounter;
     }
 
+    @Override
     public void drawScreen(int var1, int var2, float var3)
     {
         //this.drawDefaultBackground();
@@ -209,9 +211,10 @@ public class GuiConfigEditor extends GuiScreen
         //for ()
     }
     
+    @Override
     public boolean doesGuiPauseGame()
     {
-        return false;
+        return true;
     }
     
     //this part needs to check against the client data, not the reflection lookup on the config class
@@ -311,6 +314,7 @@ public class GuiConfigEditor extends GuiScreen
         
     }
     
+    @Override
     protected void keyTyped(char par1, int par2)
     {
     	try {
@@ -335,6 +339,7 @@ public class GuiConfigEditor extends GuiScreen
     	
     }
     
+    @Override
     protected void mouseClicked(int par1, int par2, int par3)
     {
     	try {
@@ -347,6 +352,7 @@ public class GuiConfigEditor extends GuiScreen
 		}
 	}
 
+    @Override
     protected void actionPerformed(GuiButton var1)
     {
         if (var1.id == G_RESET) {
@@ -403,6 +409,7 @@ public class GuiConfigEditor extends GuiScreen
         }
     }
     
+    @Override
     public void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height)
     {
         float f = 0.00390625F / 2F;
