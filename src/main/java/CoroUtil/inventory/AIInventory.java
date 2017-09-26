@@ -197,7 +197,7 @@ public class AIInventory {
 	}
 	
 	public void tickItemPickupScan() {
-    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().expand(2.0D, 1.0D, 2.0D));
+    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().grow(2.0D, 1.0D, 2.0D));
     	
         if(var3 != null) {
             for(int var4 = 0; var4 < var3.size(); ++var4) {

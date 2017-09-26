@@ -66,9 +66,9 @@ public class TargetEnemy extends Selector {
 			float closest = 9999F;
 	    	List list = null;
 	    	if (holdPos != null) {
-	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).grow(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	} else {
-	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().expand(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().grow(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	}
 	        for(int j = 0; j < list.size(); j++)
 	        {

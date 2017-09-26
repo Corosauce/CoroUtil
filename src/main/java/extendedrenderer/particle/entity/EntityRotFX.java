@@ -455,7 +455,7 @@ public class EntityRotFX extends Particle implements IWindHandler
 
         if (this.canCollide)
         {
-            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().expand(x, y, z));
+            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().grow(x, y, z));
 
             for (AxisAlignedBB axisalignedbb : list)
             {

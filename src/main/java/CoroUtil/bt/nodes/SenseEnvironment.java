@@ -71,7 +71,7 @@ public class SenseEnvironment extends LeafAction {
 				//boolean sanityAborted = false;
 				Entity clEnt = null;
 				float closest = 9999F;
-		    	List list = blackboard.agent.ent.world.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.getEntityBoundingBox().expand(huntRange, huntRange/2, huntRange));
+		    	List list = blackboard.agent.ent.world.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.getEntityBoundingBox().grow(huntRange, huntRange/2, huntRange));
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);

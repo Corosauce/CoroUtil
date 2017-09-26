@@ -101,7 +101,7 @@ public class EntityFireBall extends EntityProjectileBase
 		RayTraceResult movingobjectposition = null;
 		
         Entity entity = null;
-        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).expand(0.5D, 1D, 0.5D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(this.motionX, this.motionY, this.motionZ).grow(0.5D, 1D, 0.5D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 

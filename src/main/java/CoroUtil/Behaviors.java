@@ -133,7 +133,7 @@ public class Behaviors {
 		boolean found = false;
 		//followTriggerDist = 32F;
 		//if (me.getEntityToAttack() == null) {
-			List ents = me.world.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().expand((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
+			List ents = me.world.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().grow((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {

@@ -412,7 +412,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 
@@ -423,7 +423,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             if (entity1.canBeCollidedWith() && (entity1 != entityliving || this.ticksInAir >= 5))
             {
                 float f = 0.3F;
-                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().expand((double)f, (double)f, (double)f);
+                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow((double)f, (double)f, (double)f);
                 RayTraceResult movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
 
                 if (movingobjectposition1 != null)
