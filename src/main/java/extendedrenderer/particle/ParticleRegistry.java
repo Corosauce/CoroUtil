@@ -37,6 +37,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite debris_1;
 	public static TextureAtlasSprite debris_2;
 	public static TextureAtlasSprite debris_3;
+	public static TextureAtlasSprite fish_1;
 	public static TextureAtlasSprite test_texture;
 	
 	public static void init(TextureStitchEvent.Pre event) {
@@ -75,6 +76,7 @@ public class ParticleRegistry {
 		debris_1 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_1"));
 		debris_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_2"));
 		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
+		fish_1 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/fish_1"));
 
 
 		//ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);
