@@ -1,13 +1,27 @@
 package extendedrenderer.render;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.*;
 
 import javax.annotation.Nullable;
+import javax.vecmath.Vector3f;
 
 import CoroUtil.config.ConfigCoroAI;
-import extendedrenderer.ExtendedRenderer;
+import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.particle.ParticleMeshBufferManager;
+import extendedrenderer.particle.ParticleRegistry;
+import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;
+import extendedrenderer.particle.entity.ParticleTexExtraRender;
+import extendedrenderer.shadertest.Renderer;
+import extendedrenderer.shadertest.ShaderProgram;
+import extendedrenderer.shadertest.gametest.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.block.state.IBlockState;
@@ -15,12 +29,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEmitter;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -40,6 +48,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
+import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
+
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
 
 @SideOnly(Side.CLIENT)
 public class RotatingParticleManager
@@ -48,9 +64,9 @@ public class RotatingParticleManager
     /** Reference to the World object. */
     protected World world;
     /**
-     * Second dimension: 0 = GlStateManager.depthMask true aka transparent textures, 1 = false
+     * Second dimension: 0 = GlStateManager.depthMask false aka transparent textures, 1 = true
      */
-    public final List<ArrayDeque<Particle>[][]> fxLayers = new ArrayList<>();
+    public final HashMap<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> fxLayers = new HashMap<>();
     private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
     private final TextureManager renderer;
     private final Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
@@ -65,18 +81,41 @@ public class RotatingParticleManager
 
     public static int debugParticleRenderCount;
 
+    public static int lastAmountToRender;
+
+    public static boolean useShaders;
+
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
         this.world = worldIn;
         this.renderer = rendererIn;
 
+
+
+        /*shaderTest = new Renderer();
+        try {
+            shaderTest.init();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }*/
+
+
+        //this.registerVanillaParticles();
+    }
+
+    public void initNewArrayData(TextureAtlasSprite sprite) {
+        List<ArrayDeque<Particle>[][]> list = new ArrayList<>();
+
         //main default layer
-        fxLayers.add(0, new ArrayDeque[4][]);
+        list.add(0, new ArrayDeque[4][]);
 
         //layer for tornado funnel
-        fxLayers.add(1, new ArrayDeque[4][]);
+        list.add(1, new ArrayDeque[4][]);
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
+        //close up stuff like precipitation
+        list.add(2, new ArrayDeque[4][]);
+
+        for (ArrayDeque<Particle>[][] entry : list) {
             for (int i = 0; i < 4; ++i)
             {
                 entry[i] = new ArrayDeque[2];
@@ -88,8 +127,7 @@ public class RotatingParticleManager
             }
         }
 
-
-        //this.registerVanillaParticles();
+        fxLayers.put(sprite, list);
     }
 
     public void registerParticle(int id, IParticleFactory particleFactory)
@@ -166,7 +204,11 @@ public class RotatingParticleManager
                     renderOrder = ((EntityRotFX) particle).renderOrder;
                 }
 
-                ArrayDeque<Particle>[][] entry = fxLayers.get(renderOrder);
+                if (!fxLayers.containsKey(particle.particleTexture)) {
+                    initNewArrayData(particle.particleTexture);
+                }
+
+                ArrayDeque<Particle>[][] entry = fxLayers.get(particle.particleTexture).get(renderOrder);
 
                 if (entry[j][k].size() >= 16384) {
                     entry[j][k].removeFirst();
@@ -187,11 +229,14 @@ public class RotatingParticleManager
 
         for (int i = 0; i < 2; ++i)
         {
-            //this.world.theProfiler.startSection(i + "");
-            for (ArrayDeque<Particle>[][] entry : fxLayers) {
-                this.tickParticleList(entry[layer][i]);
+            //this.worldObj.theProfiler.startSection(i + "");
+            for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+                for (ArrayDeque<Particle>[][] entry2 : entry1.getValue()) {
+                    this.tickParticleList(entry2[layer][i]);
+                }
             }
-            //this.world.theProfiler.endSection();
+
+            //this.worldObj.theProfiler.endSection();
         }
 
         //this.world.theProfiler.endSection();
@@ -205,7 +250,7 @@ public class RotatingParticleManager
 
             while (iterator.hasNext())
             {
-                Particle particle = (Particle)iterator.next();
+                Particle particle = iterator.next();
                 this.tickParticle(particle);
 
                 if (!particle.isAlive())
@@ -250,6 +295,11 @@ public class RotatingParticleManager
      */
     public void renderParticles(Entity entityIn, float partialTicks)
     {
+
+
+        //if (true) return;
+
+
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();
         float f2 = ActiveRenderInfo.getRotationYZ();
@@ -261,10 +311,12 @@ public class RotatingParticleManager
         Particle.cameraViewDir = entityIn.getLook(partialTicks);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
         GlStateManager.alphaFunc(516, 0.003921569F);
+        //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
         
-        GlStateManager.disableCull();
+
 
         int mip_min = 0;
         int mip_mag = 0;
@@ -276,6 +328,8 @@ public class RotatingParticleManager
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         }
+
+
         
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
@@ -337,62 +391,250 @@ public class RotatingParticleManager
 
         debugParticleRenderCount = 0;
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i_nf = 0; i_nf < 3; ++i_nf) {
-                final int i = i_nf;
+        //GlStateManager.depthMask(false);
 
-                for (int j = 0; j < 2; ++j) {
-                    if (!entry[i][j].isEmpty()) {
-                        switch (j) {
-                            case 0:
-                                GlStateManager.depthMask(false);
-                                break;
-                            case 1:
-                                GlStateManager.depthMask(true);
-                        }
+        //testing no blending (so far notice no fps change)
+        /*GL11.glDepthMask(true);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_BLEND);*/
 
-                        switch (i) {
-                            case 0:
-                            default:
-                                this.renderer.bindTexture(PARTICLE_TEXTURES);
-                                break;
-                            case 1:
-                                this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                        }
 
-                        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                        Tessellator tessellator = Tessellator.getInstance();
-                        BufferBuilder vertexbuffer = tessellator.getBuffer();
-                        vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+        //screen door transparency
+        //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
-                        for (final Particle particle : entry[i][j]) {
-                            //try {
-                                particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
-                                debugParticleRenderCount++;
-                            /*} catch (Throwable throwable) {
-                                CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
-                                CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
-                                crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
-                                    public String call() throws Exception {
-                                        return particle.toString();
-                                    }
-                                });
-                                crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>() {
-                                    public String call() throws Exception {
-                                        return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
-                                    }
-                                });
-                                throw new ReportedException(crashreport);
-                            }*/
-                        }
+        if (Main.gameEngine == null) {
+            Main.initUnthreaded();
 
-                        tessellator.draw();
-                    }
-                }
+
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
+            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
+            /*ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+
+            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);*/
+
+            //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
+            try {
+                //EventHandler.shaderTest.init();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
+        GlStateManager.disableCull();
+        //Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
 
-        //System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
+        //if (true) return;
+
+        Transformation transformation = null;
+        Matrix4fe viewMatrix = null;
+
+        useShaders = ShaderManager.canUseShadersInstancedRendering();
+
+        if (world.getTotalWorldTime() % 20 < 10) {
+            //useShaders = false;
+        }
+
+        //useShaders = false;
+
+        //useShaders = !useShaders;
+
+        //
+
+
+
+        int glCalls = 0;
+        int trueRenderCount = 0;
+        int bufferSize = 0;
+        int particles = 0;
+
+        if (useShaders) {
+            ShaderProgram shaderProgram = Main.gameLogic.renderer.shaderProgram;
+            transformation = Main.gameLogic.renderer.transformation;
+            shaderProgram.bind();
+            Matrix4fe mat = new Matrix4fe();
+            FloatBuffer buf = BufferUtils.createFloatBuffer(16);
+            GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+            buf.rewind();
+            Matrix4fe.get(mat, 0, buf);
+
+            //modify far distance, 4x as far
+            boolean distantRendering = true;
+            if (distantRendering) {
+                float zNear = 0.05F;
+                float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
+                mat.m22 = ((zFar + zNear) / (zNear - zFar));
+                mat.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+            }
+
+            shaderProgram.setUniform("projectionMatrix", mat);
+
+            boolean alternateCameraCapture = true;
+            if (alternateCameraCapture) {
+                viewMatrix = new Matrix4fe();
+                FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
+                GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
+                buf2.rewind();
+                Matrix4fe.get(viewMatrix, 0, buf2);
+            }
+
+            shaderProgram.setUniform("texture_sampler", 0);
+
+            CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+        }
+
+        //do sprite/mesh list
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+
+            InstancedMesh mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+
+            //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.rain_white_trans) continue;
+
+            //TODO: register if missing, maybe relocate this
+            if (mesh == null) {
+                ParticleMeshBufferManager.setupMeshForParticle(entry1.getKey());
+                mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+            }
+
+            if (mesh != null) {
+                //do cloud layer, then funnel layer
+                for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                    //do each texture mode, 0 and 1 are the only ones used now
+                    for (int i_nf = 0; i_nf < 3; ++i_nf) {
+                        final int i = i_nf;
+
+                        //do non depth mask (for transparent ones), then depth mask
+                        for (int j = 0; j < 2; ++j) {
+                            if (!entry[i][j].isEmpty()) {
+                                switch (j) {
+
+                                    /**
+                                     * TODO: make sure alpha test toggling doesnt interfere with anything else
+                                     * with it on, it speeds up rendering of non transparent particles, does it also allow for full transparent particle pixels?
+                                     */
+
+                                    case 0:
+                                        GlStateManager.depthMask(false);
+                                        //GL11.glDisable(GL11.GL_DEPTH_TEST);
+                                        //GL11.glEnable(GL11.GL_DEPTH_TEST);
+                                        /*GL11.glEnable(GL11.GL_ALPHA_TEST);
+                                        GL11.glEnable(GL11.GL_BLEND);*/
+                                        break;
+                                    case 1:
+                                        GlStateManager.depthMask(true);
+                                        //GL11.glEnable(GL11.GL_DEPTH_TEST);
+                                        /*GL11.glDisable(GL11.GL_ALPHA_TEST);
+                                        GL11.glDisable(GL11.GL_BLEND);*/
+                                }
+
+                                switch (i) {
+                                    case 0:
+                                    default:
+                                        this.renderer.bindTexture(PARTICLE_TEXTURES);
+                                        break;
+                                    case 1:
+                                        this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                                }
+
+                                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+                                if (useShaders) {
+
+                                    mesh.initRender();
+
+                                    mesh.instanceDataBuffer.clear();
+                                    mesh.curBufferPos = 0;
+                                    particles = entry[i][j].size();
+
+                                    if (true) {
+                                        for (final Particle particle : entry[i][j]) {
+                                            if (particle instanceof EntityRotFX) {
+                                                EntityRotFX part = (EntityRotFX) particle;
+
+                                                part.updateQuaternion(entityIn);
+
+                                                //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
+                                                part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+
+                                            }
+                                        }
+                                    }
+
+                                    mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+
+                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+                                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+                                    ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
+
+                                    glCalls++;
+                                    trueRenderCount += mesh.curBufferPos;
+                                    //bufferSize = mesh.instanceDataBuffer.capacity();
+
+                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                                    mesh.endRender();
+                                } else {
+                                    Tessellator tessellator = Tessellator.getInstance();
+                                    BufferBuilder vertexbuffer = tessellator.getBuffer();
+                                    vertexbuffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+
+                                    for (final Particle particle : entry[i][j]) {
+                                        //try {
+
+                                        if (particle instanceof EntityRotFX) {
+                                            EntityRotFX part = (EntityRotFX) particle;
+                                            //part.rotationPitch = 0;
+                                            //part.rotationYaw = 45;
+                                            //part.rotationPitch = 90;
+                                            //part.rotationYaw = 0;
+                                        }
+                                        particle.renderParticle(vertexbuffer, entityIn, partialTicks, f, f4, f1, f2, f3);
+                                        debugParticleRenderCount++;
+                                /*} catch (Throwable throwable) {
+                                    CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
+                                    CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
+                                    crashreportcategory.setDetail("Particle", new ICrashReportDetail<String>() {
+                                        public String call() throws Exception {
+                                            return particle.toString();
+                                        }
+                                    });
+                                    crashreportcategory.setDetail("Particle Type", new ICrashReportDetail<String>() {
+                                        public String call() throws Exception {
+                                            return i == 0 ? "MISC_TEXTURE" : (i == 1 ? "TERRAIN_TEXTURE" : (i == 3 ? "ENTITY_PARTICLE_TEXTURE" : "Unknown - " + i));
+                                        }
+                                    });
+                                    throw new ReportedException(crashreport);
+                                }*/
+                                    }
+
+                                    tessellator.draw();
+                                }
+
+
+
+
+                            }
+                        }
+                    }
+                }
+            } else {
+                //didnt register all atlas sprites, ok for now
+                //System.out.println("MESH NULL, SHOULDNT HAPPEN!");
+            }
+
+
+        }
+
+        if (useShaders) {
+            Main.gameLogic.renderer.shaderProgram.unbind();
+        }
+
+        if (world.getTotalWorldTime() % 60 == 0) {
+            System.out.println("particles: " + particles);
+            System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
+            System.out.println("trueRenderCount: " + trueRenderCount);
+            System.out.println("glCalls: " + glCalls);
+        }
         
         if (fog) {
         	GlStateManager.disableFog();
@@ -420,18 +662,19 @@ public class RotatingParticleManager
         float f4 = f1 * MathHelper.sin(entityIn.rotationPitch * 0.017453292F);
         float f5 = MathHelper.cos(entityIn.rotationPitch * 0.017453292F);
 
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i = 0; i < 2; ++i) {
-                Queue<Particle> queue = entry[3][i];
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < 2; ++i) {
+                    Queue<Particle> queue = entry[3][i];
+                    if (!queue.isEmpty()) {
+                        Tessellator tessellator = Tessellator.getInstance();
+                        BufferBuilder vertexbuffer = tessellator.getBuffer();
 
-                if (!queue.isEmpty()) {
-                    Tessellator tessellator = Tessellator.getInstance();
-                    BufferBuilder vertexbuffer = tessellator.getBuffer();
-
-                    for (Particle particle : queue) {
-                        particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);
+                        for (Particle particle : queue) {
+                            particle.renderParticle(vertexbuffer, entityIn, partialTick, f1, f5, f2, f3, f4);
+                        }
+                        }
                     }
-                }
             }
         }
     }
@@ -440,12 +683,14 @@ public class RotatingParticleManager
     {
         this.world = worldIn;
 
-        //pre shader branch way
-        for (ArrayDeque<Particle>[][] entry : fxLayers) {
-            for (int i = 0; i < entry.length; i++) {
-                for (int j = 0; j < entry[i].length; j++) {
-                    if (entry[i][j] != null) {
-                        entry[i][j].clear();
+        //shader way
+        for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (int i = 0; i < entry.length; i++) {
+                    for (int j = 0; j < entry[i].length; j++) {
+                        if (entry[i][j] != null) {
+                            entry[i][j].clear();
+                        }
                     }
                 }
 

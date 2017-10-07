@@ -3,8 +3,15 @@ package extendedrenderer.particle.entity;
 import java.util.List;
 
 import CoroUtil.api.weather.IWindHandler;
+import CoroUtil.util.CoroUtilBlockLightCache;
+import CoroUtil.util.CoroUtilMath;
+import CoroUtil.util.CoroUtilParticle;
 import CoroUtil.util.Vec3;
+import extendedrenderer.shadertest.gametest.InstancedMesh;
+import extendedrenderer.shadertest.gametest.Matrix4fe;
+import extendedrenderer.shadertest.gametest.Transformation;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -14,11 +21,16 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
+import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
+
+import javax.vecmath.Vector3f;
 
 @SideOnly(Side.CLIENT)
 public class EntityRotFX extends Particle implements IWindHandler
@@ -57,6 +69,9 @@ public class EntityRotFX extends Particle implements IWindHandler
     public boolean killOnCollide = false;
 	
 	public boolean facePlayer = false;
+
+	//facePlayer will override this
+    public boolean facePlayerYaw = false;
 	
 	public boolean vanillaMotionDampen = true;
 
@@ -79,13 +94,29 @@ public class EntityRotFX extends Particle implements IWindHandler
 
     private boolean killWhenUnderTopmostBlock = false;
 
+    public int killWhenUnderCameraAtLeast = 0;
+
     private float ticksFadeOutMaxOnDeath = -1;
     private float ticksFadeOutCurOnDeath = 0;
     protected boolean fadingOut = false;
 
     public float avoidTerrainAngle = 0;
 
+    //halp
+    public float rotationAroundCenter = 0;
+    public float rotationSpeedAroundCenter = 0;
+
     private boolean slantParticleToWind = false;
+
+    public Quaternion rotation;
+
+    public boolean fastLight = false;
+
+    public float brightnessCache = 0.5F;
+
+    public boolean rotateOrderXY = false;
+
+    public float extraYRotation = 0;
 
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
@@ -95,6 +126,10 @@ public class EntityRotFX extends Particle implements IWindHandler
         //this.setMaxAge(100);
         
         this.entityID = par1World.rand.nextInt(100000);
+
+        rotation = new Quaternion();
+
+        brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)posX, (float)posY, (float)posZ);
     }
 
     public boolean isSlantParticleToWind() {
@@ -168,6 +203,8 @@ public class EntityRotFX extends Particle implements IWindHandler
     @Override
     public void onUpdate() {
     	super.onUpdate();
+
+        //if (this.entityID % 400 == 0) System.out.println("onUpdate time: " + this.worldObj.getTotalWorldTime());
     	
     	if (!isVanillaMotionDampen()) {
     		//cancel motion dampening (which is basically air resistance)
@@ -191,6 +228,14 @@ public class EntityRotFX extends Particle implements IWindHandler
                     startDeath();
                 }
             }
+
+            //case: when on high pillar and rain is falling far below you, start killing it / fading it out
+            if (killWhenUnderCameraAtLeast != 0) {
+                Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+                if (this.posY < ent.posY - killWhenUnderCameraAtLeast) {
+                    startDeath();
+                }
+            }
         }
 
     	if (!collisionSpeedDampen) {
@@ -209,7 +254,7 @@ public class EntityRotFX extends Particle implements IWindHandler
         if (!fadingOut) {
             if (ticksFadeInMax > 0 && this.getAge() < ticksFadeInMax) {
                 //System.out.println("particle.getAge(): " + particle.getAge());
-                this.setAlphaF(this.getAge() / ticksFadeInMax);
+                this.setAlphaF((float)this.getAge() / ticksFadeInMax);
                 //particle.setAlphaF(1);
             } else if (ticksFadeOutMax > 0 && this.getAge() > this.getMaxAge() - ticksFadeOutMax) {
                 float count = this.getAge() - (this.getMaxAge() - ticksFadeOutMax);
@@ -231,7 +276,19 @@ public class EntityRotFX extends Particle implements IWindHandler
             this.setAlphaF(val);
         }
 
+        if (world.getTotalWorldTime() % 5 == 0) {
+            brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)posX, (float)posY, (float)posZ);
+        }
 
+        rotationAroundCenter += rotationSpeedAroundCenter;
+        if (rotationAroundCenter >= 360) {
+            rotationAroundCenter -= 360;
+        }
+
+        if (slantParticleToWind) {
+            double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
+            rotationPitch = (float)Math.atan2(motionY, motionXZ);
+        }
     }
 
     public void startDeath() {
@@ -426,6 +483,46 @@ public class EntityRotFX extends Particle implements IWindHandler
 				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
 
+	public void renderParticleForShader(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+                                        float partialTicks, float rotationX, float rotationZ,
+                                        float rotationYZ, float rotationXY, float rotationXZ) {
+
+        if (mesh.curBufferPos >= mesh.numInstances) return;
+
+        //camera relative positions, for world position, remove the interpPos values
+        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - this.interpPosX);
+        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - this.interpPosY);
+        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - this.interpPosZ);
+        //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
+        Vector3f pos = new Vector3f(posX, posY, posZ);
+
+        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+
+        //adjust to perspective and camera
+        Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+        //upload to buffer
+        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
+
+        //brightness
+        float brightness;
+        //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
+        brightness = brightnessCache;
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
+
+        int rgbaIndex = 0;
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
+
+        mesh.curBufferPos++;
+        
+    }
+
 	@Override
 	public float getWindWeight() {
 		return windWeight;
@@ -519,4 +616,49 @@ public class EntityRotFX extends Particle implements IWindHandler
     public int getBrightnessForRender(float p_189214_1_) {
         return super.getBrightnessForRender(p_189214_1_);//(int)((float)super.getBrightnessForRender(p_189214_1_))/* * this.world.getSunBrightness(1F))*/;
     }
+
+    public void updateQuaternion(Entity camera) {
+
+        if (this.facePlayer) {
+            this.rotationYaw = camera.rotationYaw;
+            this.rotationPitch = camera.rotationPitch;
+        } else if (facePlayerYaw) {
+            this.rotationYaw = camera.rotationYaw;
+        }
+
+        Quaternion qY = new Quaternion();
+        Quaternion qX = new Quaternion();
+        qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-this.rotationYaw - 180F)));
+        qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-this.rotationPitch)));
+        if (this.rotateOrderXY) {
+            Quaternion.mul(qX, qY, this.rotation);
+        } else {
+            Quaternion.mul(qY, qX, this.rotation);
+        }
+    }
+
+    /**
+     * Costly method, use cached value
+     *
+     * @param pos
+     * @param partialTicks
+     * @return
+     */
+    /*public float getBrightnessNonLightmap(BlockPos pos, float partialTicks) {
+        //TODO: performance test light getting methods
+        //BlockPos posB = new BlockPos(pos.x, pos.y, pos.z);
+        float brightnessSky = worldObj.getSunBrightness(partialTicks);
+        float brightnessBlock = worldObj.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, pos) / 15F;
+
+        float brightness = brightnessSky;
+        if (brightnessBlock > brightnessSky) {
+            brightness = brightnessBlock;
+        }
+        return brightness;
+
+    }
+
+    public float getBrightnessCached() {
+        return brightnessCache;
+    }*/
 }

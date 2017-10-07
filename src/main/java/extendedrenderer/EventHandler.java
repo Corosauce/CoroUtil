@@ -3,6 +3,8 @@ package extendedrenderer;
 import java.nio.FloatBuffer;
 
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.shadertest.gametest.Main;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -29,12 +31,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
 import CoroUtil.forge.CoroUtil;
+import extendedrenderer.shadertest.Renderer;
 
 public class EventHandler {
 
 	
 	//public long lastWorldTime;
     public World lastWorld;
+    //public static Renderer shaderTest;
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void tickRenderScreen(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            tickShaderTest();
+        }
+    }
+
+    public static void tickShaderTest() {
+
+    }
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
@@ -46,10 +62,12 @@ public class EventHandler {
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
 
-
+                    if (mc.world.getTotalWorldTime() % 60 == 0) {
+                        CoroUtilBlockLightCache.clear();
+                    }
                 }
                 //if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
-                //lastWorldTime = mc.theWorld.getTotalWorldTime();
+                    //lastWorldTime = mc.theWorld.getTotalWorldTime();
 
 
                 //}
@@ -61,7 +79,10 @@ public class EventHandler {
 	@SideOnly(Side.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
-		Minecraft mc = Minecraft.getMinecraft();
+
+
+        Minecraft mc = Minecraft.getMinecraft();
+
 
         //update world reference and clear old effects on world change or on no world
         if (lastWorld != mc.world) {
@@ -69,17 +90,6 @@ public class EventHandler {
             ExtendedRenderer.rotEffRenderer.clearEffects(mc.world);
             lastWorld = mc.world;
         }
-
-		/*if (mc.theWorld != null) {
-
-            if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
-                lastWorldTime = mc.theWorld.getTotalWorldTime();
-
-                if (!isPaused()) {
-                    ExtendedRenderer.rotEffRenderer.updateEffects();
-                }
-            }
-        }*/
 
         if (ConfigCoroAI.disableParticleRenderer) return;
 
