@@ -34,6 +34,11 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean disableParticleRenderer = false;
 	public static boolean disableMipmapFix = false;
 
+	public static boolean forceShadersOff = false;
+
+	//maybe temp
+	public static boolean optimizedCloudRendering = false;
+
 	@Override
 	public String getName() {
 		return "CoroUtil";

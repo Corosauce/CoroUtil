@@ -106,8 +106,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
 		} else {
 			if (this.isSlantParticleToWind()) {
-				//rotationXZ = (float) -this.motionZ;
-				//rotationXY = (float) -this.motionX;
+				rotationXZ = (float) -this.motionZ;
+				rotationXY = (float) -this.motionX;
 			}
 			//rotationXZ = 6.28F;
 			//rotationXY = 1;

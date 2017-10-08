@@ -1,6 +1,8 @@
 package extendedrenderer.shadertest;
 
 
+import CoroUtil.forge.CoroUtil;
+import CoroUtil.util.CoroUtilFile;
 import CoroUtil.util.CoroUtilMath;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -9,6 +11,7 @@ import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -47,27 +50,10 @@ public class Renderer {
     public void init() throws Exception {
         shaderProgram = new ShaderProgram();
 
-        String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
-        String vertex = Files.toString(new File(folderShaders + "/" + "vertex.vs"), Charsets.UTF_8);
-        String fragment = Files.toString(new File(folderShaders + "/" + "fragment.fs"), Charsets.UTF_8);
+        //String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
+        String vertex = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/vertex.vs"));
+        String fragment = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/fragment.fs"));
 
-        /*String vertex = "#version 120\n" +
-                "\n" +
-                "in vec3 position;\n" +
-                "uniform mat4 projectionMatrix;\n" +
-                "\n" +
-                "void main()\n" +
-                "{\n" +
-                "\tgl_Position = vec4(position, 1.0);\n" +
-                "}";
-        String fragment = "#version 120\n" +
-                "\n" +
-                "varying out vec4 fragColor;\n" +
-                "\n" +
-                "void main()\n" +
-                "{\n" +
-                "\tfragColor = vec4(0.0, 0.5, 0.5, 1.0);\n" +
-                "}";*/
         shaderProgram.createVertexShader(vertex);
         shaderProgram.createFragmentShader(fragment);
         shaderProgram.link();

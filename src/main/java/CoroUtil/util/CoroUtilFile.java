@@ -3,10 +3,16 @@ package CoroUtil.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 
+import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -14,6 +20,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.io.IOUtils;
 
 public class CoroUtilFile {
 	public static String lastWorldFolder = "";
@@ -107,4 +114,17 @@ public class CoroUtilFile {
     		return null;
     	}
     }
+
+    @SideOnly(Side.CLIENT)
+    public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
+		try {
+			IResourceManager resourceManager = Minecraft.getMinecraft().entityRenderer.resourceManager;
+			IResource iresource = resourceManager.getResource(resourceLocation);
+			String contents = IOUtils.toString(iresource.getInputStream(), StandardCharsets.UTF_8);
+			return contents;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return "";
+	}
 }

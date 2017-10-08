@@ -58,10 +58,16 @@ public class ShaderManager {
                     useARBInstancedArrays = true;
                 }
             } else {
+                System.out.println("WARNING: Unable to use instanced rendering shaders for ExtendedRenderer, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
+                        "GL_ARB_draw_instanced: " + contextcapabilities.GL_ARB_draw_instanced + ", " +
+                        "GL_ARB_instanced_arrays: " + contextcapabilities.GL_ARB_instanced_arrays + ")");
                 canUseShadersInstancedRendering = false;
             }
         } else {
-            canUseShaders = false;
+            System.out.println("WARNING: Unable to use shaders for ExtendedRenderer, OpenGL21: " + contextcapabilities.OpenGL21 + ", (" +
+                    "GL_ARB_vertex_shader: " + contextcapabilities.GL_ARB_vertex_shader + ", " +
+                    "GL_ARB_fragment_shader: " + contextcapabilities.GL_ARB_fragment_shader + ", " +
+                    "GL_ARB_shader_objects: " + contextcapabilities.GL_ARB_shader_objects + ")");
             canUseShadersInstancedRendering = false;
         }
     }

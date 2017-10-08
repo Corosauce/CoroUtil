@@ -440,6 +440,10 @@ public class RotatingParticleManager
 
         //
 
+        if (ConfigCoroAI.forceShadersOff) {
+            useShaders = false;
+        }
+
 
 
         int glCalls = 0;
