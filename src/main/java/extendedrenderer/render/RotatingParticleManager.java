@@ -402,7 +402,13 @@ public class RotatingParticleManager
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
-        if (Main.gameEngine == null) {
+        useShaders = ShaderManager.canUseShadersInstancedRendering();
+
+        if (ConfigCoroAI.forceShadersOff) {
+            useShaders = false;
+        }
+
+        if (useShaders && Main.gameEngine == null) {
             Main.initUnthreaded();
 
 
@@ -428,8 +434,6 @@ public class RotatingParticleManager
         Transformation transformation = null;
         Matrix4fe viewMatrix = null;
 
-        useShaders = ShaderManager.canUseShadersInstancedRendering();
-
         if (world.getTotalWorldTime() % 20 < 10) {
             //useShaders = false;
         }
@@ -439,10 +443,6 @@ public class RotatingParticleManager
         //useShaders = !useShaders;
 
         //
-
-        if (ConfigCoroAI.forceShadersOff) {
-            useShaders = false;
-        }
 
 
 
