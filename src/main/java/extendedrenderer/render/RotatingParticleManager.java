@@ -211,6 +211,8 @@ public class RotatingParticleManager
                 ArrayDeque<Particle>[][] entry = fxLayers.get(particle.particleTexture).get(renderOrder);
 
                 if (entry[j][k].size() >= 16384) {
+                    //fix bug of particles not being cleaned up from other lists
+                    entry[j][k].getFirst().setExpired();
                     entry[j][k].removeFirst();
                 }
 
