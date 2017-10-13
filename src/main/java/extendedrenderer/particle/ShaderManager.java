@@ -5,6 +5,8 @@ import org.lwjgl.opengl.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import static org.lwjgl.opengl.GL20.GL_SHADING_LANGUAGE_VERSION;
+
 /**
  * Created by corosus on 25/05/17.
  *
@@ -33,8 +35,15 @@ public class ShaderManager {
         return canUseShadersInstancedRendering;
     }
 
+    public static void disableShaders() {
+        canUseShaders = false;
+        canUseShadersInstancedRendering = false;
+    }
+
     public static void queryGLCaps() {
         ContextCapabilities contextcapabilities = GLContext.getCapabilities();
+
+        System.out.println("Extended Renderer: detected GLSL version: " + GL11.glGetString(GL_SHADING_LANGUAGE_VERSION));
 
         useARBVBO = !contextcapabilities.OpenGL15 && contextcapabilities.GL_ARB_vertex_buffer_object;
 
@@ -58,13 +67,13 @@ public class ShaderManager {
                     useARBInstancedArrays = true;
                 }
             } else {
-                System.out.println("WARNING: Unable to use instanced rendering shaders for ExtendedRenderer, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
+                System.out.println("Extended Renderer WARNING: Unable to use instanced rendering shaders, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
                         "GL_ARB_draw_instanced: " + contextcapabilities.GL_ARB_draw_instanced + ", " +
                         "GL_ARB_instanced_arrays: " + contextcapabilities.GL_ARB_instanced_arrays + ")");
                 canUseShadersInstancedRendering = false;
             }
         } else {
-            System.out.println("WARNING: Unable to use shaders for ExtendedRenderer, OpenGL21: " + contextcapabilities.OpenGL21 + ", (" +
+            System.out.println("Extended Renderer WARNING: Unable to use shaders, OpenGL21: " + contextcapabilities.OpenGL21 + ", (" +
                     "GL_ARB_vertex_shader: " + contextcapabilities.GL_ARB_vertex_shader + ", " +
                     "GL_ARB_fragment_shader: " + contextcapabilities.GL_ARB_fragment_shader + ", " +
                     "GL_ARB_shader_objects: " + contextcapabilities.GL_ARB_shader_objects + ")");

@@ -62,14 +62,15 @@ public class Main {
 
     }
 
-    public static void initUnthreaded() {
+    public static boolean initUnthreaded() {
         try {
             init();
             gameEngine.init();
+            return true;
         } catch (Exception excp) {
             excp.printStackTrace();
-            System.exit(-1);
+            //System.exit(-1);
         }
-
+        return false;
     }
 }

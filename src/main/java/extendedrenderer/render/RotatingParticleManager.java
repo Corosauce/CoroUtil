@@ -411,9 +411,16 @@ public class RotatingParticleManager
         }
 
         if (useShaders && Main.gameEngine == null) {
-            Main.initUnthreaded();
+            //currently for if shader compiling fails, which is an ongoing issue for some machines...
+            if (!Main.initUnthreaded()) {
+                ShaderManager.disableShaders();
+                useShaders = false;
+            } else {
+                System.out.println("Extended Renderer: Initialized instanced rendering shaders");
+            }
+        }
 
-
+        if (useShaders) {
             ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
             ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
             //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);

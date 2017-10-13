@@ -1,16 +1,16 @@
 #version 120
 
-in vec3 position;
-in vec2 texCoord;
-in vec3 vertexNormal;
-in mat4 modelViewMatrix;
-in float brightness;
-in vec4 rgba;
+attribute vec3 position;
+attribute vec2 texCoord;
+attribute vec3 vertexNormal;
+attribute mat4 modelViewMatrix;
+attribute float brightness;
+attribute vec4 rgba;
 //in vec2 texOffset;
 
-varying out vec2 outTexCoord;
-varying out float outBrightness;
-varying out vec4 outRGBA;
+varying vec2 outTexCoord;
+varying float outBrightness;
+varying vec4 outRGBA;
 
 //uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
