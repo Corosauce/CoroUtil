@@ -57,6 +57,18 @@ public class ShaderProgram {
         OpenGlHelper.glUniformMatrix4(uniforms.get(uniformName), false, fb);
     }
 
+    public void setUniformEfficient(String uniformName, Matrix4fe value, FloatBuffer buffer) {
+        /*try (MemoryStack stack = MemoryStack.stackPush()) {
+            // Dump the matrix into a float buffer
+            FloatBuffer fb = stack.mallocFloat(16);
+            value.get(fb);
+            glUniformMatrix4fv(uniforms.get(uniformName), false, fb);
+        }*/
+        //FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+        value.get(buffer);
+        OpenGlHelper.glUniformMatrix4(uniforms.get(uniformName), false, buffer);
+    }
+
     public void setUniform(String uniformName, int value) {
         OpenGlHelper.glUniform1i(uniforms.get(uniformName), value);
     }

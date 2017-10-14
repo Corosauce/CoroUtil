@@ -94,7 +94,7 @@ public class ParticleMeshBufferManager {
         if (!lookupParticleToMesh.containsKey(sprite)) {
             lookupParticleToMesh.put(sprite, mesh);
         } else {
-            //System.out.println("WARNING: duplicate entry attempt for particle sprite: " + sprite);
+            System.out.println("WARNING: duplicate entry attempt for particle sprite: " + sprite);
         }
     }
 

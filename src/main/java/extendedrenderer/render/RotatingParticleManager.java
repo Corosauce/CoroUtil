@@ -1,12 +1,9 @@
 package extendedrenderer.render;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.*;
 
 import javax.annotation.Nullable;
-import javax.vecmath.Vector3f;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
@@ -14,13 +11,10 @@ import extendedrenderer.particle.ParticleMeshBufferManager;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;
-import extendedrenderer.particle.entity.ParticleTexExtraRender;
-import extendedrenderer.shadertest.Renderer;
 import extendedrenderer.shadertest.ShaderProgram;
 import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -48,14 +42,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import org.lwjgl.util.vector.Quaternion;
-import org.lwjgl.util.vector.Vector4f;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
 
 @SideOnly(Side.CLIENT)
 public class RotatingParticleManager
@@ -84,6 +75,8 @@ public class RotatingParticleManager
     public static int lastAmountToRender;
 
     public static boolean useShaders;
+
+    public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
@@ -421,8 +414,13 @@ public class RotatingParticleManager
         }
 
         if (useShaders) {
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
+            //temp priority fix
+            if (ParticleMeshBufferManager.getMesh(ParticleRegistry.cloud256_test) == null) {
+                ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
+            }
+            if (ParticleMeshBufferManager.getMesh(ParticleRegistry.rain_white_trans) == null) {
+                ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
+            }
             //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
             /*ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
 
@@ -479,7 +477,8 @@ public class RotatingParticleManager
                 mat.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
             }
 
-            shaderProgram.setUniform("projectionMatrix", mat);
+            //shaderProgram.setUniform("projectionMatrix", mat);
+            shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
 
             boolean alternateCameraCapture = true;
             if (alternateCameraCapture) {
