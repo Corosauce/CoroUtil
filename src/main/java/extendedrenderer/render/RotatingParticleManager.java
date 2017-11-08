@@ -57,7 +57,7 @@ public class RotatingParticleManager
     /**
      * Second dimension: 0 = GlStateManager.depthMask false aka transparent textures, 1 = true
      */
-    public final HashMap<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> fxLayers = new HashMap<>();
+    public final LinkedHashMap<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> fxLayers = new LinkedHashMap<>();
     private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
     private final TextureManager renderer;
     private final Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
@@ -414,17 +414,23 @@ public class RotatingParticleManager
         }
 
         if (useShaders) {
-            //temp priority fix
-            if (ParticleMeshBufferManager.getMesh(ParticleRegistry.cloud256_test) == null) {
-                ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256_test);
-            }
-            if (ParticleMeshBufferManager.getMesh(ParticleRegistry.rain_white_trans) == null) {
-                ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white_trans);
-            }
-            //ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.cloud256);
-            /*ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.rain_white);
+            //temp render ordering setup, last to first
+            //background stuff
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
+            //foreground stuff
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.downfall3);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_6); //ground splash
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.rain_white);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.snow);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.leaf);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_1);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_2);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_3);
+            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.tumbleweed);
 
-            ParticleMeshBufferManager.setupMeshForParticle(ParticleRegistry.leaf);*/
 
             //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
             try {
@@ -641,7 +647,7 @@ public class RotatingParticleManager
             Main.gameLogic.renderer.shaderProgram.unbind();
         }
 
-        if (world.getTotalWorldTime() % 60 == 0) {
+        if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
             System.out.println("particles: " + particles);
             System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
             System.out.println("trueRenderCount: " + trueRenderCount);

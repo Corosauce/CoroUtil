@@ -108,4 +108,10 @@ public class ParticleMeshBufferManager {
     public static InstancedMesh getMesh(TextureAtlasSprite sprite) {
         return lookupParticleToMesh.get(sprite);
     }
+
+    public static void setupMeshForParticleIfMissing(TextureAtlasSprite sprite) {
+        if (!lookupParticleToMesh.containsKey(sprite)) {
+            setupMeshForParticle(sprite);
+        }
+    }
 }

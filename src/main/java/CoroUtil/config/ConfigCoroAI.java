@@ -37,7 +37,10 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean forceShadersOff = false;
 
 	//maybe temp
+	@ConfigComment("WIP, more strict transparent cloud usage, better on fps")
 	public static boolean optimizedCloudRendering = false;
+
+	public static boolean debugShaders = false;
 
 	@Override
 	public String getName() {
