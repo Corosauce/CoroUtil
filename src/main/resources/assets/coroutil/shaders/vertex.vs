@@ -5,7 +5,7 @@ attribute vec2 texCoord;
 attribute vec3 vertexNormal;
 attribute mat4 modelViewMatrix;
 attribute float brightness;
-attribute vec4 rgba;
+//attribute vec4 rgba;
 attribute vec4 rgbaTest;
 //in vec2 texOffset;
 

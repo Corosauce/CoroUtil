@@ -27,10 +27,9 @@ public class InstancedMesh extends Mesh {
 
     public static final int MATRIX_SIZE_BYTES = MATRIX_SIZE_FLOATS * FLOAT_SIZE_BYTES;
 
-    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 5/* * 2 + FLOAT_SIZE_BYTES * 2*/;
+    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 1/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
-    //extra + 4 for test
-    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1 + 4;// * 2 + 2;
+    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1;// * 2 + 2;
 
     public static final int INSTANCE_SIZE_FLOATS_TEST = 4;
 
@@ -91,10 +90,10 @@ public class InstancedMesh extends Mesh {
          */
 
         //rgba
-        glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        /*glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
-        strideStart += VECTOR4F_SIZE_BYTES;
+        strideStart += VECTOR4F_SIZE_BYTES;*/
 
         // Light view matrix
         /*for (int i = 0; i < 4; i++) {
