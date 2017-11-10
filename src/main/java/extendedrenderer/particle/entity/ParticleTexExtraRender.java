@@ -314,7 +314,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
 			//rgba to buffer
-			/*int rgbaIndex = 0;
+			int rgbaIndex = 0;
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
 					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
@@ -322,7 +322,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
 					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());*/
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
 			mesh.curBufferPos++;
 		}
@@ -332,19 +332,55 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	@Override
 	public void renderParticleForShaderTest(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
 
-		if (mesh.curBufferPos >= mesh.numInstances) return;
 
-		int rgbaIndex = 0;
-		mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-				+ (rgbaIndex++), this.getRedColorF());
-		mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-				+ (rgbaIndex++), this.getGreenColorF());
-		mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-				+ (rgbaIndex++), this.getBlueColorF());
-		mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-				+ (rgbaIndex++), this.getAlphaF());
+		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks);
+		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks);
+		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks);
 
-		mesh.curBufferPos++;
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
+
+		for (int iii = 0; iii < renderAmount; iii++) {
+
+			if (mesh.curBufferPos >= mesh.numInstances) return;
+
+			Vector3f pos;
+
+			if (iii != 0) {
+				pos = new Vector3f(posX + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+						posY + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+						posZ + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+			} else {
+				pos = new Vector3f(posX, posY, posZ);
+			}
+
+			if (this.isDontRenderUnderTopmostBlock()) {
+				int height = this.world.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
+				if (pos.y <= height) continue;
+			}
+
+			//adjust to relative to camera positions finally
+			pos.x -= interpPosX;
+			pos.y -= interpPosY;
+			pos.z -= interpPosZ;
+
+			int rgbaIndex = 0;
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getRedColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getGreenColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getBlueColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getAlphaF());
+
+			mesh.curBufferPos++;
+
+		}
 
 	}
 
