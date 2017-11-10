@@ -575,12 +575,28 @@ public class RotatingParticleManager
 
                                             }
                                         }
+
+                                        mesh.curBufferPos = 0;
+
+                                        //test
+                                        for (final Particle particle : entry[i][j]) {
+                                            if (particle instanceof EntityRotFX) {
+                                                EntityRotFX part = (EntityRotFX) particle;
+
+                                                part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+
+                                            }
+                                        }
                                     }
 
                                     mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 
                                     OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
                                     ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+                                    //this is supposed to be used only when needed for proper implementation
+                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
+                                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
 
                                     ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
 

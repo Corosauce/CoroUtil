@@ -6,6 +6,7 @@ attribute vec3 vertexNormal;
 attribute mat4 modelViewMatrix;
 attribute float brightness;
 attribute vec4 rgba;
+attribute vec4 rgbaTest;
 //in vec2 texOffset;
 
 varying vec2 outTexCoord;
@@ -35,5 +36,5 @@ void main()
 	//rgba.z = 1;
 	//rgba.w = 1;
 
-	outRGBA = rgba;
+	outRGBA = rgbaTest;
 }

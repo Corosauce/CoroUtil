@@ -25,6 +25,7 @@ public class ShaderProgram {
     private int vertexShaderAttributeModelViewMatrix = InstancedMesh.vboSizeMesh;//5;
     private int vertexShaderAttributeBrightness = InstancedMesh.vboSizeMesh + 4;//9;
     private int vertexShaderAttributeRGBA = InstancedMesh.vboSizeMesh + 5;//10;
+    private int vertexShaderAttributeRGBATest = InstancedMesh.vboSizeMesh + 6;//10;
     //private int vertexShaderAttributeTexOffset = 13;
 
     private Map<String, Integer> uniforms;
@@ -104,6 +105,7 @@ public class ShaderProgram {
             ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeModelViewMatrix, "modelViewMatrix");
             ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeBrightness, "brightness");
             ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
+            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBATest, "rgbaTest");
         }
 
         return shaderId;

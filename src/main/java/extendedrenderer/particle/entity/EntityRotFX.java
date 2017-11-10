@@ -509,7 +509,7 @@ public class EntityRotFX extends Particle implements IWindHandler
         brightness = brightnessCache;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
-        int rgbaIndex = 0;
+        /*int rgbaIndex = 0;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
@@ -517,10 +517,29 @@ public class EntityRotFX extends Particle implements IWindHandler
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());*/
 
         mesh.curBufferPos++;
         
+    }
+
+    public void renderParticleForShaderTest(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+                                        float partialTicks, float rotationX, float rotationZ,
+                                        float rotationYZ, float rotationXY, float rotationXZ) {
+
+        if (mesh.curBufferPos >= mesh.numInstances) return;
+
+        int rgbaIndex = 0;
+        mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + (rgbaIndex++), this.getRedColorF());
+        mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + (rgbaIndex++), this.getGreenColorF());
+        mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + (rgbaIndex++), this.getBlueColorF());
+        mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+                + (rgbaIndex++), this.getAlphaF());
+
+        mesh.curBufferPos++;
     }
 
 	@Override

@@ -4,6 +4,9 @@ import CoroUtil.util.CoroUtilParticle;
 import extendedrenderer.particle.ShaderManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 
 import javax.vecmath.Vector3f;
 import java.nio.FloatBuffer;
@@ -26,13 +29,18 @@ public class InstancedMesh extends Mesh {
 
     public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 5/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
+    //extra + 4 for test
     public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1 + 4;// * 2 + 2;
+
+    //public static final int INSTANCE_SIZE_FLOATS_TEST = 4;
 
     public final int numInstances;
 
     public final int instanceDataVBO;
+    public final int instanceDataVBOTest;
 
     public FloatBuffer instanceDataBuffer;
+    public FloatBuffer instanceDataBufferTest;
 
     public int curBufferPos = 0;
 
@@ -98,6 +106,24 @@ public class InstancedMesh extends Mesh {
         /*glVertexAttribPointer(start, 2, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         glVertexAttribDivisor(start, 1);*/
 
+        //test color to its own vbo
+        instanceDataBufferTest = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);
+
+        FloatBuffer colorBuffer = null;
+        instanceDataVBOTest = OpenGlHelper.glGenBuffers();
+        vboIdList.add(instanceDataVBOTest);
+        colorBuffer = BufferUtils.createFloatBuffer(4);
+        float[] floats = new float[4];
+        floats[0] = 1F;
+        floats[1] = 1F;
+        floats[2] = 1F;
+        floats[3] = 1F;
+
+        colorBuffer.put(floats).flip();
+        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBOTest);
+        ShaderManager.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_DYNAMIC_DRAW);
+        GL20.glVertexAttribPointer(start++, 4, GL11.GL_FLOAT, false, 0, 0);
+
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
         ShaderManager.glBindVertexArray(0);
     }
@@ -108,6 +134,11 @@ public class InstancedMesh extends Mesh {
         if (this.instanceDataBuffer != null) {
             //MemoryUtil.memFree(this.instanceDataBuffer);
             this.instanceDataBuffer = null;
+        }
+
+        if (this.instanceDataBufferTest != null) {
+            //MemoryUtil.memFree(this.instanceDataBuffer);
+            this.instanceDataBufferTest = null;
         }
     }
 
