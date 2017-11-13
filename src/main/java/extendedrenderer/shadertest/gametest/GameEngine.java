@@ -75,7 +75,7 @@ public class GameEngine implements Runnable {
         System.out.println("wat");
     }
 
-    protected void cleanup() {
+    public void cleanup() {
         gameLogic.cleanup();                
     }
     

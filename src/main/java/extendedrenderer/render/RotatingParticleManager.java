@@ -78,6 +78,8 @@ public class RotatingParticleManager
 
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
+    public static boolean forceShaderReset = false;
+
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
         this.world = worldIn;
@@ -401,6 +403,12 @@ public class RotatingParticleManager
 
         if (ConfigCoroAI.forceShadersOff) {
             useShaders = false;
+        }
+
+        if (forceShaderReset) {
+            forceShaderReset = false;
+            Main.gameEngine.cleanup();
+            Main.gameEngine = null;
         }
 
         if (useShaders && Main.gameEngine == null) {
