@@ -1,7 +1,5 @@
 package extendedrenderer.shader;
 
-import extendedrenderer.shader.Renderer;
-
 public class ShaderEngine {
 
     public static Renderer renderer;

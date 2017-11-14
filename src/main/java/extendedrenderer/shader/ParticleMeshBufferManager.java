@@ -1,5 +1,6 @@
-package extendedrenderer.particle;
+package extendedrenderer.shader;
 
+import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.shader.InstancedMesh;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
-import extendedrenderer.particle.ParticleMeshBufferManager;
+import extendedrenderer.shader.ParticleMeshBufferManager;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;

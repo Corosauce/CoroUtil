@@ -1,5 +1,6 @@
 package extendedrenderer.particle;
 
+import extendedrenderer.shader.ParticleMeshBufferManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;

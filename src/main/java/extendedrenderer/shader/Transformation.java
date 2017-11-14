@@ -8,25 +8,13 @@ import javax.vecmath.Vector3f;
 
 public class Transformation {
 
-    private Matrix4fe projectionMatrix;
-
     private Matrix4fe modelViewMatrix;
-
-    private Matrix4fe viewMatrix;
 
     public Matrix4fe modelMatrix;
     
     public Transformation() {
         modelViewMatrix = new Matrix4fe();
-        projectionMatrix = new Matrix4fe();
-        viewMatrix = new Matrix4fe();
         modelMatrix = new Matrix4fe();
-    }
-
-    public final Matrix4fe getProjectionMatrix(float fov, float aspectRatio, float zNear, float zFar) {
-        projectionMatrix.identity(projectionMatrix);
-        projectionMatrix.setPerspective(fov, aspectRatio, zNear, zFar);
-        return projectionMatrix;
     }
 
     public Matrix4fe buildModelViewMatrix(Matrix4fe modelMatrix, Matrix4fe viewMatrix) {
