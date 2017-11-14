@@ -15,14 +15,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-
-/*import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;*/
-
 /**
  * Created by corosus on 08/05/17.
  */

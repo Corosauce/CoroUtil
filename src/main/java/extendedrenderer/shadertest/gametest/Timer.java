@@ -1,5 +1,8 @@
 package extendedrenderer.shadertest.gametest;
 
+/**
+ * Keep for now, might prove handy for not depending on glitchy totalworldtime
+ */
 public class Timer {
 
     private double lastLoopTime;

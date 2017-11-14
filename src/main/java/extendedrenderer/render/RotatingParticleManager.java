@@ -413,7 +413,7 @@ public class RotatingParticleManager
 
         if (useShaders && ShaderEngine.renderer == null) {
             //currently for if shader compiling fails, which is an ongoing issue for some machines...
-            if (!ShaderEngine.initUnthreaded()) {
+            if (!ShaderEngine.init()) {
                 ShaderManager.disableShaders();
                 useShaders = false;
             } else {
