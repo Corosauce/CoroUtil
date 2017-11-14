@@ -13,21 +13,18 @@ public class DummyGame implements IGameLogic {
 
     private float color = 0.0f;
 
-    public final Renderer renderer;
-
     public final Camera camera;
 
     public List<GameItem> gameItems;
 
     public DummyGame() {
-        renderer = new Renderer();
         camera = new Camera();
         gameItems = new ArrayList<>();
     }
     
     @Override
     public void init() throws Exception {
-        renderer.init();
+        //renderer.init();
 
         float[] positions = new float[]{
                 -0.5f,  0.5f,  0.0f,
@@ -93,12 +90,12 @@ public class DummyGame implements IGameLogic {
     @Override
     public void render(Window window) {
         if (window != null) window.setClearColor(color, color, color, 0.0f);
-        renderer.render(window, camera, gameItems);
+        //renderer.render(window, camera, gameItems);
     }
 
     @Override
     public void cleanup() {
-        renderer.cleanup();
+        //renderer.cleanup();
     }
 
 }

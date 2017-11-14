@@ -407,13 +407,13 @@ public class RotatingParticleManager
 
         if (forceShaderReset) {
             forceShaderReset = false;
-            Main.gameEngine.cleanup();
-            Main.gameEngine = null;
+            ShaderEngine.cleanup();
+            ShaderEngine.renderer = null;
         }
 
-        if (useShaders && Main.gameEngine == null) {
+        if (useShaders && ShaderEngine.renderer == null) {
             //currently for if shader compiling fails, which is an ongoing issue for some machines...
-            if (!Main.initUnthreaded()) {
+            if (!ShaderEngine.initUnthreaded()) {
                 ShaderManager.disableShaders();
                 useShaders = false;
             } else {
@@ -473,8 +473,8 @@ public class RotatingParticleManager
         int particles = 0;
 
         if (useShaders) {
-            ShaderProgram shaderProgram = Main.gameLogic.renderer.shaderProgram;
-            transformation = Main.gameLogic.renderer.transformation;
+            ShaderProgram shaderProgram = ShaderEngine.renderer.shaderProgram;
+            transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
             Matrix4fe mat = new Matrix4fe();
             FloatBuffer buf = BufferUtils.createFloatBuffer(16);
@@ -668,7 +668,7 @@ public class RotatingParticleManager
         }
 
         if (useShaders) {
-            Main.gameLogic.renderer.shaderProgram.unbind();
+            ShaderEngine.renderer.shaderProgram.unbind();
         }
 
         if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
