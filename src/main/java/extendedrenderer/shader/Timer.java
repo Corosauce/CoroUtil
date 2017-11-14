@@ -1,4 +1,4 @@
-package extendedrenderer.shadertest.gametest;
+package extendedrenderer.shader;
 
 /**
  * Keep for now, might prove handy for not depending on glitchy totalworldtime

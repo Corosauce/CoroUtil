@@ -1,6 +1,6 @@
-package extendedrenderer.shadertest.gametest;
+package extendedrenderer.shader;
 
-import extendedrenderer.shadertest.Renderer;
+import extendedrenderer.shader.Renderer;
 
 public class ShaderEngine {
 

@@ -1,4 +1,4 @@
-package extendedrenderer.shadertest.gametest;
+package extendedrenderer.shader;
 
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;

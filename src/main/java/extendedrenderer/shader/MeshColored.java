@@ -1,4 +1,4 @@
-package extendedrenderer.shadertest.gametest;
+package extendedrenderer.shader;
 
 import org.lwjgl.BufferUtils;
 

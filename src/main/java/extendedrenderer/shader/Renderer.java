@@ -1,9 +1,8 @@
-package extendedrenderer.shadertest;
+package extendedrenderer.shader;
 
 
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.CoroUtilFile;
-import extendedrenderer.shadertest.gametest.*;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 

@@ -1,8 +1,6 @@
 package extendedrenderer.particle;
 
-import extendedrenderer.shadertest.gametest.InstancedMesh;
-import extendedrenderer.shadertest.gametest.Mesh;
-import net.minecraft.client.particle.Particle;
+import extendedrenderer.shader.InstancedMesh;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import java.util.HashMap;

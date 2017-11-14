@@ -1,8 +1,6 @@
-package extendedrenderer.shadertest;
+package extendedrenderer.shader;
 
 import extendedrenderer.particle.ShaderManager;
-import extendedrenderer.shadertest.gametest.InstancedMesh;
-import extendedrenderer.shadertest.gametest.Matrix4fe;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL20;

@@ -1,4 +1,4 @@
-package extendedrenderer.shadertest.gametest;
+package extendedrenderer.shader;
 
 import extendedrenderer.particle.ShaderManager;
 import net.minecraft.client.renderer.OpenGlHelper;

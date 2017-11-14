@@ -1,29 +1,22 @@
 package extendedrenderer.particle.entity;
 
 import CoroUtil.util.CoroUtilBlockLightCache;
-import CoroUtil.util.Vec3;
-import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.render.RotatingParticleManager;
-import extendedrenderer.shadertest.gametest.InstancedMesh;
-import extendedrenderer.shadertest.gametest.Matrix4fe;
-import extendedrenderer.shadertest.gametest.Mesh;
-import extendedrenderer.shadertest.gametest.Transformation;
-import net.minecraft.client.renderer.ActiveRenderInfo;
+import extendedrenderer.shader.InstancedMesh;
+import extendedrenderer.shader.Matrix4fe;
+import extendedrenderer.shader.Transformation;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
-import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
-import java.util.Random;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 

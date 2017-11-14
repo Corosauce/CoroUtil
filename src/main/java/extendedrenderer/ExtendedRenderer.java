@@ -54,42 +54,6 @@ public class ExtendedRenderer {
     public ExtendedRenderer() {
     	
     }
-    
-    public static String lastWorldFolder = "";
-    
-    public static String getWorldFolderName() {
-		World world = DimensionManager.getWorld(0);
-		
-		if (world != null) {
-			lastWorldFolder = ((WorldServer)world).getChunkSaveLocation().getName();
-			return lastWorldFolder + File.separator;
-		}
-		
-		return lastWorldFolder + File.separator;
-	}
-	
-	public static String getSaveFolderPath() {
-    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
-    		return getClientSidePath() + File.separator;
-    	} else {
-    		return new File(".").getAbsolutePath() + File.separator;
-    	}
-    	
-    }
-	
-	public static String getWorldSaveFolderPath() {
-    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
-    		return getClientSidePath() + File.separator + "saves" + File.separator;
-    	} else {
-    		return new File(".").getAbsolutePath() + File.separator;
-    	}
-    	
-    }
-    
-    @SideOnly(Side.CLIENT)
-	public static String getClientSidePath() {
-		return FMLClientHandler.instance().getClient().mcDataDir.getPath();
-	}
 	
 	public static void dbg(Object obj) {
 		if (true) System.out.println(obj);
