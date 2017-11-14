@@ -23,32 +23,19 @@ public class Transformation {
         return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
     }
 
-    public Matrix4fe buildModelMatrix(EntityRotFX gameItem, Vector3f posCustom) {
-        Quaternion q = gameItem.rotation;
+    public Matrix4fe buildModelMatrix(IShaderRenderedEntity gameItem, Vector3f posCustom) {
+        Quaternion q = gameItem.getQuaternion();
 
         float scaleAdj = gameItem.getScale();
 
+        //???
         scaleAdj *= 0.2F;
 
-        Vector3f vecPos = posCustom != null ? posCustom : new Vector3f((float)gameItem.posX, (float)gameItem.posY, (float)gameItem.posZ);
+        Vector3f vecPos = posCustom != null ? posCustom : gameItem.getPosition();
 
-        //moved - its eyeheight
-        //vecPos.y -= 1.62F;
-
-        boolean quat = true;
-
-        if (quat) {
-            return modelMatrix.translationRotateScale(
-                    vecPos.x, vecPos.y, vecPos.z,
-                    q.x, q.y, q.z, q.w,
-                    scaleAdj, scaleAdj, scaleAdj);
-        } else {
-            return modelMatrix.identity()
-                    .translate(vecPos)
-                    .rotateY((float)Math.toRadians(-gameItem.rotationYaw))
-                    .rotateX((float)Math.toRadians(-gameItem.rotationPitch))
-                    /*.rotateZ((float)Math.toRadians(0))*/
-                    .scale(scaleAdj);
-        }
+        return modelMatrix.translationRotateScale(
+                vecPos.x, vecPos.y, vecPos.z,
+                q.x, q.y, q.z, q.w,
+                scaleAdj, scaleAdj, scaleAdj);
     }
 }

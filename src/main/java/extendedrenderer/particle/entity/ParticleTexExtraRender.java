@@ -2,7 +2,7 @@ package extendedrenderer.particle.entity;
 
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.render.RotatingParticleManager;
-import extendedrenderer.shader.InstancedMesh;
+import extendedrenderer.shader.InstancedMeshParticle;
 import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -250,7 +250,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
         
 	}
 
-	public void renderParticleForShader(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
 										float partialTicks, float rotationX, float rotationZ,
 										float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -323,7 +323,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	}
 
 	@Override
-	public void renderParticleForShaderTest(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+	public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
 
 
 		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks);

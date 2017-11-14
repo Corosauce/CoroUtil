@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
-import extendedrenderer.shader.ParticleMeshBufferManager;
+import extendedrenderer.shader.MeshBufferManagerParticle;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -78,6 +78,13 @@ public class RotatingParticleManager
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public static boolean forceShaderReset = false;
+
+    //mostly failed idea, particle system needs rework if this is going to have a proper benefit
+    private static boolean forceVBO2Update = false;
+
+    public static void markDirtyVBO2() {
+        forceVBO2Update = true;
+    }
 
     public RotatingParticleManager(World worldIn, TextureManager rendererIn)
     {
@@ -188,6 +195,8 @@ public class RotatingParticleManager
 
         if (!this.queueEntityFX.isEmpty())
         {
+
+            RotatingParticleManager.markDirtyVBO2();
             for (Particle particle = (Particle)this.queueEntityFX.poll(); particle != null; particle = (Particle)this.queueEntityFX.poll())
             {
                 int j = particle.getFXLayer();
@@ -252,6 +261,8 @@ public class RotatingParticleManager
                 if (!particle.isAlive())
                 {
                     iterator.remove();
+
+                    RotatingParticleManager.markDirtyVBO2();
                 }
             }
         }
@@ -423,20 +434,20 @@ public class RotatingParticleManager
         if (useShaders) {
             //temp render ordering setup, last to first
             //background stuff
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
             //foreground stuff
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.downfall3);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_6); //ground splash
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.rain_white);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.snow);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.leaf);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_1);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_2);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.debris_3);
-            ParticleMeshBufferManager.setupMeshForParticleIfMissing(ParticleRegistry.tumbleweed);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall3);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_6); //ground splash
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.snow);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.leaf);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.debris_1);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.debris_2);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.debris_3);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.tumbleweed);
 
 
             //EventHandler.shaderTest = new extendedrenderer.shadertest.Renderer();
@@ -472,7 +483,7 @@ public class RotatingParticleManager
         int particles = 0;
 
         if (useShaders) {
-            ShaderProgram shaderProgram = ShaderEngine.renderer.shaderProgram;
+            ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("particle");
             transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
             Matrix4fe mat = new Matrix4fe();
@@ -510,14 +521,14 @@ public class RotatingParticleManager
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
 
-            InstancedMesh mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+            InstancedMeshParticle mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
 
             //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.rain_white_trans) continue;
 
             //TODO: register if missing, maybe relocate this
             if (mesh == null) {
-                ParticleMeshBufferManager.setupMeshForParticle(entry1.getKey());
-                mesh = ParticleMeshBufferManager.getMesh(entry1.getKey());
+                MeshBufferManagerParticle.setupMeshForParticle(entry1.getKey());
+                mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
             }
 
             if (mesh != null) {
@@ -564,7 +575,10 @@ public class RotatingParticleManager
 
                                 if (useShaders) {
 
+                                    //all VBO VertexAttribArrays must be enabled for so glDrawElementsInstanced can use them, so might as well enable all at same time
                                     mesh.initRender();
+                                    mesh.initRenderVBO1();
+                                    mesh.initRenderVBO2();
 
                                     mesh.instanceDataBuffer.clear();
                                     mesh.curBufferPos = 0;
@@ -583,27 +597,39 @@ public class RotatingParticleManager
                                             }
                                         }
 
-                                        mesh.curBufferPos = 0;
-
+                                        mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
                                         //test
-                                        for (final Particle particle : entry[i][j]) {
-                                            if (particle instanceof EntityRotFX) {
-                                                EntityRotFX part = (EntityRotFX) particle;
+                                        //mesh.instanceDataBuffer.limit(ParticleMeshBufferManager.numInstances * mesh.INSTANCE_SIZE_FLOATS);
 
-                                                part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
 
+                                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+                                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+                                        //not working right yet, something not flagging it correctly, only like 10% fps gain atm anyways
+                                        //actually, the dynamic render amounts used in TexExtraRender completely breaks the sync
+                                        if (true || forceVBO2Update) {
+                                            mesh.curBufferPos = 0;
+
+                                            //test
+                                            for (final Particle particle : entry[i][j]) {
+                                                if (particle instanceof EntityRotFX) {
+                                                    EntityRotFX part = (EntityRotFX) particle;
+
+                                                    part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+
+                                                }
                                             }
+                                        } else {
+                                            //System.out.println("skipped render");
                                         }
+
+
+                                        //this is supposed to be used only when needed for proper implementation
+                                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
+                                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
+
+
                                     }
-
-                                    mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
-
-                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-                                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
-
-                                    //this is supposed to be used only when needed for proper implementation
-                                    OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
-                                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
 
                                     ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
 
@@ -613,6 +639,8 @@ public class RotatingParticleManager
 
                                     OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+                                    mesh.endRenderVBO1();
+                                    mesh.endRenderVBO2();
                                     mesh.endRender();
                                 } else {
                                     Tessellator tessellator = Tessellator.getInstance();
@@ -666,8 +694,11 @@ public class RotatingParticleManager
 
         }
 
+
+        forceVBO2Update = false;
+
         if (useShaders) {
-            ShaderEngine.renderer.shaderProgram.unbind();
+            ShaderEngine.renderer.getShaderProgram("particle").unbind();
         }
 
         if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {

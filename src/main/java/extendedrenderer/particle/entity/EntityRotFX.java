@@ -5,7 +5,9 @@ import java.util.List;
 import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.Vec3;
-import extendedrenderer.shader.InstancedMesh;
+import extendedrenderer.render.RotatingParticleManager;
+import extendedrenderer.shader.IShaderRenderedEntity;
+import extendedrenderer.shader.InstancedMeshParticle;
 import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
@@ -27,7 +29,7 @@ import org.lwjgl.util.vector.Vector4f;
 import javax.vecmath.Vector3f;
 
 @SideOnly(Side.CLIENT)
-public class EntityRotFX extends Particle implements IWindHandler
+public class EntityRotFX extends Particle implements IWindHandler, IShaderRenderedEntity
 {
     public boolean weatherEffect = false;
 
@@ -341,11 +343,22 @@ public class EntityRotFX extends Particle implements IWindHandler
     public float maxRenderRange() {
     	return renderRange;
     }
-    
+
     public void setScale(float parScale) {
     	particleScale = parScale;
     }
-    
+
+    @Override
+    public Vector3f getPosition() {
+        return new Vector3f((float)posX, (float)posY, (float)posZ);
+    }
+
+    @Override
+    public Quaternion getQuaternion() {
+        return this.rotation;
+    }
+
+    @Override
     public float getScale() {
     	return particleScale;
     }
@@ -477,7 +490,7 @@ public class EntityRotFX extends Particle implements IWindHandler
 				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
 
-	public void renderParticleForShader(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                         float partialTicks, float rotationX, float rotationZ,
                                         float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -517,9 +530,9 @@ public class EntityRotFX extends Particle implements IWindHandler
         
     }
 
-    public void renderParticleForShaderTest(InstancedMesh mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
-                                        float partialTicks, float rotationX, float rotationZ,
-                                        float rotationYZ, float rotationXY, float rotationXZ) {
+    public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+                                            float partialTicks, float rotationX, float rotationZ,
+                                            float rotationYZ, float rotationXY, float rotationXZ) {
 
         if (mesh.curBufferPos >= mesh.numInstances) return;
 
@@ -674,4 +687,16 @@ public class EntityRotFX extends Particle implements IWindHandler
     public float getBrightnessCached() {
         return brightnessCache;
     }*/
+
+    @Override
+    public void setRBGColorF(float particleRedIn, float particleGreenIn, float particleBlueIn) {
+        super.setRBGColorF(particleRedIn, particleGreenIn, particleBlueIn);
+        RotatingParticleManager.markDirtyVBO2();
+    }
+
+    @Override
+    public void setAlphaF(float alpha) {
+        super.setAlphaF(alpha);
+        RotatingParticleManager.markDirtyVBO2();
+    }
 }

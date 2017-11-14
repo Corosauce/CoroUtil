@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
 
-public class InstancedMesh extends Mesh {
+public class InstancedMeshParticle extends Mesh {
 
     public static final int FLOAT_SIZE_BYTES = 4;
 
@@ -46,7 +46,7 @@ public class InstancedMesh extends Mesh {
      */
     public static int vboSizeMesh = 2;
 
-    public InstancedMesh(float[] positions, float[] textCoords, int[] indices, int numInstances) {
+    public InstancedMeshParticle(float[] positions, float[] textCoords, int[] indices, int numInstances) {
         super(positions, textCoords, indices);
 
         this.numInstances = numInstances;
@@ -140,22 +140,50 @@ public class InstancedMesh extends Mesh {
     @Override
     public void initRender() {
         super.initRender();
+    }
 
+    @Override
+    public void endRender() {
+
+        super.endRender();
+    }
+
+    public void initRenderVBO1() {
         int start = vboSizeMesh;
-        int numElements = 4 * 2 + 1;
+        //model matrix + brightness
+        int numElements = 5;
         for (int i = 0; i < numElements; i++) {
             GL20.glEnableVertexAttribArray(start + i);
         }
     }
 
-    @Override
-    public void endRender() {
+    public void endRenderVBO1() {
+
         int start = vboSizeMesh;
-        int numElements = 4 * 2 + 1;
+        //model matrix + brightness
+        int numElements = 5;
         for (int i = 0; i < numElements; i++) {
             GL20.glDisableVertexAttribArray(start + i);
         }
+    }
 
-        super.endRender();
+    public void initRenderVBO2() {
+        int start = vboSizeMesh;
+        //model matrix + brightness
+        int numElementsVBO1 = 5;
+        int numElementsVBO2 = 1;
+        for (int i = 0; i < numElementsVBO2; i++) {
+            GL20.glEnableVertexAttribArray(start + numElementsVBO1 + i);
+        }
+    }
+
+    public void endRenderVBO2() {
+        int start = vboSizeMesh;
+        //model matrix + brightness
+        int numElementsVBO1 = 5;
+        int numElementsVBO2 = 1;
+        for (int i = 0; i < numElementsVBO2; i++) {
+            GL20.glDisableVertexAttribArray(start + numElementsVBO1 + i);
+        }
     }
 }

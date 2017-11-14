@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class ShaderProgram {
 
+    private String name;
+
     private final int programId;
 
     private int vertexShaderId;
@@ -20,15 +22,16 @@ public class ShaderProgram {
     private int vertexShaderAttributeIndexPosition = 0;
     private int vertexShaderAttributeTexCoord = 1;
     //private int vertexShaderAttributeVertexNormal = 2;
-    private int vertexShaderAttributeModelViewMatrix = InstancedMesh.vboSizeMesh;//5;
-    private int vertexShaderAttributeBrightness = InstancedMesh.vboSizeMesh + 4;//9;
+    private int vertexShaderAttributeModelViewMatrix = InstancedMeshParticle.vboSizeMesh;//5;
+    private int vertexShaderAttributeBrightness = InstancedMeshParticle.vboSizeMesh + 4;//9;
     //private int vertexShaderAttributeRGBA = InstancedMesh.vboSizeMesh + 5;//10;
-    private int vertexShaderAttributeRGBATest = InstancedMesh.vboSizeMesh + 5;//10;
+    private int vertexShaderAttributeRGBATest = InstancedMeshParticle.vboSizeMesh + 5;//10;
     //private int vertexShaderAttributeTexOffset = 13;
 
     private Map<String, Integer> uniforms;
 
-    public ShaderProgram() throws Exception {
+    public ShaderProgram(String name) throws Exception {
+        this.name = name;
         programId = OpenGlHelper.glCreateProgram();
         if (programId == 0) {
             throw new Exception("Could not create Shader");
@@ -143,5 +146,9 @@ public class ShaderProgram {
         if (programId != 0) {
             OpenGlHelper.glDeleteProgram(programId);
         }
+    }
+
+    public String getName() {
+        return this.name;
     }
 }

@@ -6,9 +6,12 @@ import CoroUtil.util.CoroUtilFile;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
+import java.util.HashMap;
+
 public class Renderer {
 
-    public ShaderProgram shaderProgram;
+    //public ShaderProgram shaderProgram;
+    private HashMap<String, ShaderProgram> lookupNameToProgram = new HashMap<>();
 
     //might be worth relocating
     public Transformation transformation;
@@ -18,7 +21,7 @@ public class Renderer {
     }
 
     public void init() throws Exception {
-        shaderProgram = new ShaderProgram();
+        ShaderProgram shaderProgram = new ShaderProgram("particle");
 
         //String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
         String vertex = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/particle.vs"));
@@ -31,6 +34,8 @@ public class Renderer {
         shaderProgram.createUniform("projectionMatrix");
         //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
+
+        lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }
 
     public void clear() {
@@ -38,8 +43,13 @@ public class Renderer {
     }
 
     public void cleanup() {
-        if (shaderProgram != null) {
+        for (ShaderProgram shaderProgram : lookupNameToProgram.values()) {
             shaderProgram.cleanup();
         }
+        lookupNameToProgram.clear();
+    }
+
+    public ShaderProgram getShaderProgram(String name) {
+        return lookupNameToProgram.get(name);
     }
 }
