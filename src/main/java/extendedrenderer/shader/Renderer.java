@@ -52,6 +52,7 @@ public class Renderer {
         shaderProgram.createUniform("modelViewMatrixCamera");
         //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
+        shaderProgram.createUniform("time");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }

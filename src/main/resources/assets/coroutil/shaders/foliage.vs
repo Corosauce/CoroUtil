@@ -20,14 +20,35 @@ varying float outBrightness;
 varying vec4 outRGBA;
 
 uniform mat4 modelViewMatrixCamera;
+
+uniform int time;
 //uniform mat4 projectionMatrix;
 
 //uniform int numCols;
 //uniform int numRows;
 
+mat4 rotationMatrix(vec3 axis, float angle) {
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
 void main()
 {
-	gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+
+    int timeMod = int(mod(time * 4, 360));
+    float rot = sin(timeMod * 0.0174533) * 0.25;
+    float rot2 = cos(timeMod * 0.0174533) * 0.25;
+    mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
+    mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
+
+	gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position, 1.0);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);

@@ -80,21 +80,21 @@ public class FoliageRenderer {
             Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
             Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
 
-            /*GlStateManager.enableBlend();
+            GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.alphaFunc(516, 0.003921569F);*/
+            GlStateManager.alphaFunc(516, 0.003921569F);
 
             GlStateManager.disableCull();
 
-            //GlStateManager.depthMask(false);
+            GlStateManager.depthMask(true);
 
             renderJustShaders(entityIn, partialTicks);
 
             GlStateManager.enableCull();
 
-            /*GlStateManager.depthMask(true);
+            GlStateManager.depthMask(true);
             GlStateManager.disableBlend();
-            GlStateManager.alphaFunc(516, 0.1F);*/
+            GlStateManager.alphaFunc(516, 0.1F);
         }
     }
 
@@ -144,9 +144,10 @@ public class FoliageRenderer {
         //transformation = ShaderEngine.renderer.transformation;
         shaderProgram.bind();
 
-        float interpX = (float)(entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * (double) partialTicks);
-        float interpY = (float)(entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * (double) partialTicks);
-        float interpZ = (float)(entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * (double) partialTicks);
+        //fix for camera model matrix being 0 0 0 on positions, readjusts to world positions for static rendering instanced meshes
+        float interpX = (float)(entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks);
+        float interpY = (float)(entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks);
+        float interpZ = (float)(entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks);
         Matrix4fe matrixFix = new Matrix4fe();
         matrixFix = matrixFix.translationRotateScale(
                 -interpX, -interpY, -interpZ,
@@ -158,6 +159,8 @@ public class FoliageRenderer {
 
         shaderProgram.setUniform("texture_sampler", 0);
 
+        shaderProgram.setUniform("time", (int)world.getTotalWorldTime());
+
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
         InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
 
@@ -166,9 +169,14 @@ public class FoliageRenderer {
         mesh.initRenderVBO2();
 
         //also resets position
-        mesh.instanceDataBuffer.clear();
-        mesh.instanceDataBufferSeldom.clear();
-        mesh.curBufferPos = 0;
+
+        boolean skipUpdate = true;
+
+        if (!skipUpdate) {
+            mesh.instanceDataBuffer.clear();
+            mesh.instanceDataBufferSeldom.clear();
+            mesh.curBufferPos = 0;
+        }
 
         BlockPos pos = entityIn.getPosition();
 
@@ -176,11 +184,9 @@ public class FoliageRenderer {
 
         Random rand = new Random();
         rand.setSeed(5);
-        int range = 50;
+        int range = 150;
 
-        boolean skipUpdate = true;
-
-        int amount = 5000;
+        int amount = 35000;
 
         //make obj
         if (!skipUpdate) {
@@ -197,7 +203,7 @@ public class FoliageRenderer {
                 foliage.posZ += rand.nextFloat();
                 foliage.prevPosZ = foliage.posZ;
                 foliage.rotationYaw = rand.nextInt(360);
-                foliage.rotationPitch = rand.nextInt(90) - 45;
+                //foliage.rotationPitch = rand.nextInt(90) - 45;
                 foliage.particleScale /= 0.2;
                 listFoliage.add(foliage);
             }
@@ -209,7 +215,7 @@ public class FoliageRenderer {
                 foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
             }
 
-            //mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+            mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
@@ -223,7 +229,7 @@ public class FoliageRenderer {
             }
 
             //wasnt used in particle renderer and even crashes it :o
-            //mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+            mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
