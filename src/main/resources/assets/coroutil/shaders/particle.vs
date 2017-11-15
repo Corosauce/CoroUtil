@@ -3,7 +3,7 @@
 attribute vec3 position;
 attribute vec2 texCoord;
 attribute vec3 vertexNormal;
-attribute mat4 modelViewMatrix;
+attribute mat4 modelMatrix;
 attribute float brightness;
 //attribute vec4 rgba;
 attribute vec4 rgbaTest;
@@ -13,7 +13,7 @@ varying vec2 outTexCoord;
 varying float outBrightness;
 varying vec4 outRGBA;
 
-//uniform mat4 modelViewMatrix;
+uniform mat4 modelViewMatrixCamera;
 uniform mat4 projectionMatrix;
 
 //uniform int numCols;
@@ -21,7 +21,7 @@ uniform mat4 projectionMatrix;
 
 void main()
 {
-	gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+	gl_Position = projectionMatrix * modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);

@@ -506,9 +506,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
 
         //adjust to perspective and camera
-        Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+        //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
         //upload to buffer
-        modelViewMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
+        modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
 
         //brightness
         float brightness;

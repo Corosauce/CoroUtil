@@ -32,6 +32,7 @@ public class Renderer {
         shaderProgram.link();
 
         shaderProgram.createUniform("projectionMatrix");
+        shaderProgram.createUniform("modelViewMatrixCamera");
         //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
 

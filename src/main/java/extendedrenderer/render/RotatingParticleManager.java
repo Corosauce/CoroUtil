@@ -76,6 +76,7 @@ public class RotatingParticleManager
     public static boolean useShaders;
 
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
+    public static FloatBuffer viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
     public static boolean forceShaderReset = false;
 
@@ -512,6 +513,8 @@ public class RotatingParticleManager
                 buf2.rewind();
                 Matrix4fe.get(viewMatrix, 0, buf2);
             }
+
+            shaderProgram.setUniformEfficient("modelViewMatrixCamera", viewMatrix, viewMatrixBuffer);
 
             shaderProgram.setUniform("texture_sampler", 0);
 

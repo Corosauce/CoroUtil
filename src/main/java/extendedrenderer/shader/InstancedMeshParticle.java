@@ -53,7 +53,7 @@ public class InstancedMeshParticle extends Mesh {
 
         ShaderManager.glBindVertexArray(vaoId);
 
-        // Model View Matrix
+        // Model Matrix
         instanceDataVBO = GL15.glGenBuffers();
         vboIdList.add(instanceDataVBO);
         instanceDataBuffer = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
