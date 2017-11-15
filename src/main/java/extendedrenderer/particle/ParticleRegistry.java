@@ -1,5 +1,6 @@
 package extendedrenderer.particle;
 
+import extendedrenderer.shader.MeshBufferManagerFoliage;
 import extendedrenderer.shader.MeshBufferManagerParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -51,6 +52,7 @@ public class ParticleRegistry {
 		//optifine breaks (removes) forge added method setTextureEntry, dont use it
 
 		MeshBufferManagerParticle.cleanup();
+		MeshBufferManagerFoliage.cleanup();
 
 		squareGrey = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
 		smoke = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));

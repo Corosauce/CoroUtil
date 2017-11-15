@@ -18,5 +18,7 @@ public class ShaderEngine {
 
     public static void cleanup() {
         renderer.cleanup();
+        MeshBufferManagerParticle.cleanup();
+        MeshBufferManagerFoliage.cleanup();
     }
 }

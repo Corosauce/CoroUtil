@@ -7,10 +7,10 @@ public class ShaderProgramFoliage extends ShaderProgram {
     private int vertexShaderAttributeIndexPosition = 0;
     private int vertexShaderAttributeTexCoord = 1;
     //private int vertexShaderAttributeVertexNormal = 2;
-    private int vertexShaderAttributeAlpha = InstancedMeshParticle.vboSizeMesh;
-    private int vertexShaderAttributeBrightness = InstancedMeshParticle.vboSizeMesh + 1;
-    private int vertexShaderAttributeModelMatrix = InstancedMeshParticle.vboSizeMesh + 2;
-    private int vertexShaderAttributeRGBATest = InstancedMeshParticle.vboSizeMesh + 6;
+    private int vertexShaderAttributeAlpha = InstancedMeshFoliage.vboSizeMesh;
+    private int vertexShaderAttributeBrightness = InstancedMeshFoliage.vboSizeMesh + 1;
+    private int vertexShaderAttributeModelMatrix = InstancedMeshFoliage.vboSizeMesh + 2;
+    private int vertexShaderAttributeRGBATest = InstancedMeshFoliage.vboSizeMesh + 6;
 
     public ShaderProgramFoliage(String name) throws Exception {
         super(name);

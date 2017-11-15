@@ -42,5 +42,5 @@ void main()
 	//rgba.z = 1;
 	//rgba.w = 1;
 
-	outRGBA = rgba;
+	outRGBA = new vec4(rgba.x, rgba.y, rgba.z, alpha);
 }

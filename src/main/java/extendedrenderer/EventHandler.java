@@ -96,15 +96,20 @@ public class EventHandler {
             //GlStateManager.loadIdentity();
             //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
             //GlStateManager.matrixMode(5888);
+
+
+
             ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
+
+            ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
 
             er.disableLightmap();
         }
 
-        er.enableLightmap();
+        /*er.enableLightmap();
         RenderHelper.disableStandardItemLighting();
-        ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
-        er.disableLightmap();
+
+        er.disableLightmap();*/
 
         
         //old code call

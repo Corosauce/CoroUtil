@@ -21,6 +21,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -44,6 +47,29 @@ public class FoliageRenderer {
 
     public void render(Entity entityIn, float partialTicks)
     {
+
+        RotatingParticleManager.useShaders = ShaderManager.canUseShadersInstancedRendering();
+
+        if (ConfigCoroAI.forceShadersOff) {
+            RotatingParticleManager.useShaders = false;
+        }
+
+        if (RotatingParticleManager.forceShaderReset) {
+            RotatingParticleManager.forceShaderReset = false;
+            ShaderEngine.cleanup();
+            ShaderEngine.renderer = null;
+        }
+
+        if (RotatingParticleManager.useShaders && ShaderEngine.renderer == null) {
+            //currently for if shader compiling fails, which is an ongoing issue for some machines...
+            if (!ShaderEngine.init()) {
+                ShaderManager.disableShaders();
+                RotatingParticleManager.useShaders = false;
+            } else {
+                System.out.println("Extended Renderer: Initialized instanced rendering shaders");
+            }
+        }
+
         if (RotatingParticleManager.useShaders) {
 
             Minecraft mc = Minecraft.getMinecraft();
@@ -54,112 +80,268 @@ public class FoliageRenderer {
             Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
             Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
 
-            GlStateManager.enableBlend();
+            /*GlStateManager.enableBlend();
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.alphaFunc(516, 0.003921569F);
+            GlStateManager.alphaFunc(516, 0.003921569F);*/
 
             GlStateManager.disableCull();
 
-            //Transformation transformation = null;
-            Matrix4fe viewMatrix = null;
+            //GlStateManager.depthMask(false);
 
-            ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
-            //transformation = ShaderEngine.renderer.transformation;
-            shaderProgram.bind();
-            Matrix4fe projectionMatrix = new Matrix4fe();
-            FloatBuffer buf = BufferUtils.createFloatBuffer(16);
-            GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
-            buf.rewind();
-            Matrix4fe.get(projectionMatrix, 0, buf);
+            renderJustShaders(entityIn, partialTicks);
 
-            //modify far distance, 4x as far
-            boolean distantRendering = true;
-            if (distantRendering) {
-                float zNear = 0.05F;
-                float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
-                projectionMatrix.m22 = ((zFar + zNear) / (zNear - zFar));
-                projectionMatrix.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+            GlStateManager.enableCull();
+
+            /*GlStateManager.depthMask(true);
+            GlStateManager.disableBlend();
+            GlStateManager.alphaFunc(516, 0.1F);*/
+        }
+    }
+
+    public void renderJustShaders(Entity entityIn, float partialTicks)
+    {
+
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityRenderer er = mc.entityRenderer;
+        World world = mc.world;
+
+        Matrix4fe projectionMatrix = new Matrix4fe();
+        FloatBuffer buf = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+        buf.rewind();
+        Matrix4fe.get(projectionMatrix, 0, buf);
+
+        //modify far distance, 4x as far
+        boolean distantRendering = true;
+        if (distantRendering) {
+            float zNear = 0.05F;
+            float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
+            projectionMatrix.m22 = ((zFar + zNear) / (zNear - zFar));
+            projectionMatrix.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+        }
+
+        //testing determined i can save frames by baking projectionMatrix into modelViewMatrixCamera, might have to revert for more complex shaders
+        //further testing its just barely faster, if at all...
+        //shaderProgram.setUniform("projectionMatrix", mat);
+        //shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
+
+        Matrix4fe viewMatrix = new Matrix4fe();
+        FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
+        buf2.rewind();
+        Matrix4fe.get(viewMatrix, 0, buf2);
+
+        Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
+
+        ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
+        //transformation = ShaderEngine.renderer.transformation;
+        shaderProgram.bind();
+
+        shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
+
+        shaderProgram.setUniform("texture_sampler", 0);
+
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
+        InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
+
+        mesh.initRender();
+        mesh.initRenderVBO1();
+        mesh.initRenderVBO2();
+
+        //also resets position
+        mesh.instanceDataBuffer.clear();
+        mesh.instanceDataBufferSeldom.clear();
+        mesh.curBufferPos = 0;
+
+        BlockPos pos = entityIn.getPosition();
+
+        List<Foliage> listFoliage = new ArrayList<>();
+
+        Random rand = new Random();
+        rand.setSeed(5);
+        int range = 50;
+
+        boolean skipUpdate = true;
+
+        int amount = 5000;
+
+        //make obj
+        if (!skipUpdate) {
+            for (int i = 0; i < amount; i++) {
+                Foliage foliage = new Foliage();
+                int randX = rand.nextInt(range) - range / 2;
+                int randY = 0;//rand.nextInt(range) - range / 2;
+                int randZ = rand.nextInt(range) - range / 2;
+                foliage.setPosition(new BlockPos(pos).up(0).add(randX, randY, randZ));
+                foliage.posY += 0.5F;
+                foliage.prevPosY = foliage.posY;
+                foliage.posX += rand.nextFloat();
+                foliage.prevPosX = foliage.posX;
+                foliage.posZ += rand.nextFloat();
+                foliage.prevPosZ = foliage.posZ;
+                foliage.rotationYaw = rand.nextInt(360);
+                foliage.rotationPitch = rand.nextInt(90) - 45;
+                foliage.particleScale /= 0.2;
+                listFoliage.add(foliage);
             }
 
-            //testing determined i can save frames by baking projectionMatrix into modelViewMatrixCamera, might have to revert for more complex shaders
-            //further testing its just barely faster, if at all...
-            //shaderProgram.setUniform("projectionMatrix", mat);
-            //shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
+            for (Foliage foliage : listFoliage) {
+                foliage.updateQuaternion(entityIn);
 
-            boolean alternateCameraCapture = true;
-            if (alternateCameraCapture) {
-                viewMatrix = new Matrix4fe();
-                FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
-                GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
-                buf2.rewind();
-                Matrix4fe.get(viewMatrix, 0, buf2);
+                //update vbo1
+                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
             }
 
-            //return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
-            Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
-            //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(viewMatrix, projectionMatrix);
-
-            shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
-
-            shaderProgram.setUniform("texture_sampler", 0);
-
-            CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
-
-
-            MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
-            InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
-
-            this.renderer.bindTexture(PARTICLE_TEXTURES);
-
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-            mesh.initRender();
-            mesh.initRenderVBO1();
-            mesh.initRenderVBO2();
-
-            mesh.instanceDataBuffer.clear();
-            mesh.curBufferPos = 0;
-
-            BlockPos pos = entityIn.getPosition();
-
-            //make obj
-            Foliage foliage = new Foliage();
-            foliage.setPosition(pos.up(4));
-            foliage.updateQuaternion(entityIn);
-
-            //update vbo1
-            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
-
-            mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+            //mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
 
             mesh.curBufferPos = 0;
 
-            //update vbo2
-            foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+            for (Foliage foliage : listFoliage) {
+
+                //update vbo2
+                foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+            }
+
+            //wasnt used in particle renderer and even crashes it :o
+            //mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
-
-            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
-
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            mesh.endRenderVBO1();
-            mesh.endRenderVBO2();
-            mesh.endRender();
-
-            ShaderEngine.renderer.getShaderProgram("foliage").unbind();
-
-
-            GlStateManager.enableCull();
-
-            GlStateManager.depthMask(true);
-            GlStateManager.disableBlend();
-            GlStateManager.alphaFunc(516, 0.1F);
         }
+
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, amount);
+
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        mesh.endRenderVBO1();
+        mesh.endRenderVBO2();
+        mesh.endRender();
+
+        ShaderEngine.renderer.getShaderProgram("foliage").unbind();
+
+        /*//Transformation transformation = null;
+        Matrix4fe viewMatrix = null;
+
+        ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
+        //transformation = ShaderEngine.renderer.transformation;
+        shaderProgram.bind();
+        Matrix4fe projectionMatrix = new Matrix4fe();
+        FloatBuffer buf = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+        buf.rewind();
+        Matrix4fe.get(projectionMatrix, 0, buf);
+
+        //modify far distance, 4x as far
+        boolean distantRendering = true;
+        if (distantRendering) {
+            float zNear = 0.05F;
+            float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
+            projectionMatrix.m22 = ((zFar + zNear) / (zNear - zFar));
+            projectionMatrix.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+        }
+
+        //testing determined i can save frames by baking projectionMatrix into modelViewMatrixCamera, might have to revert for more complex shaders
+        //further testing its just barely faster, if at all...
+        //shaderProgram.setUniform("projectionMatrix", mat);
+        //shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
+
+        boolean alternateCameraCapture = true;
+        if (alternateCameraCapture) {
+            viewMatrix = new Matrix4fe();
+            FloatBuffer buf2 = BufferUtils.createFloatBuffer(16);
+            GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, buf2);
+            buf2.rewind();
+            Matrix4fe.get(viewMatrix, 0, buf2);
+        }
+
+        //return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
+        Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
+        //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(viewMatrix, projectionMatrix);
+
+        shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
+
+        shaderProgram.setUniform("texture_sampler", 0);
+
+        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+
+
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
+        InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
+
+        //test
+        //GlStateManager.depthMask(false);
+
+        this.renderer.bindTexture(PARTICLE_TEXTURES);
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        mesh.initRender();
+        mesh.initRenderVBO1();
+        mesh.initRenderVBO2();
+
+        //also resets position
+        mesh.instanceDataBuffer.clear();
+        mesh.instanceDataBufferSeldom.clear();
+        mesh.curBufferPos = 0;
+
+        BlockPos pos = entityIn.getPosition();
+
+        List<Foliage> listFoliage = new ArrayList<>();
+
+        Random rand = new Random();
+        int range = 10;
+
+        //make obj
+        for (int i = 0; i < 100; i++) {
+            Foliage foliage = new Foliage();
+            int randX = rand.nextInt(range) - range/2;
+            int randY = rand.nextInt(range) - range/2;
+            int randZ = rand.nextInt(range) - range/2;
+            foliage.setPosition(new BlockPos(pos).add(randX, randY, randZ));
+            foliage.rotationYaw = 1;
+            foliage.rotationPitch = 1;
+            foliage.particleScale = 100;
+            listFoliage.add(foliage);
+        }
+
+        for (Foliage foliage : listFoliage) {
+            foliage.updateQuaternion(entityIn);
+
+            //update vbo1
+            foliage.renderForShaderVBO1(mesh, transformation, modelViewMatrix, entityIn, partialTicks);
+        }
+
+        //mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+        mesh.curBufferPos = 0;
+
+        for (Foliage foliage : listFoliage) {
+
+            //update vbo2
+            foliage.renderForShaderVBO2(mesh, transformation, modelViewMatrix, entityIn, partialTicks);
+        }
+
+        //wasnt used in particle renderer and even crashes it :o
+        //mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
+        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
+
+        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        mesh.endRenderVBO1();
+        mesh.endRenderVBO2();
+        mesh.endRender();
+
+        ShaderEngine.renderer.getShaderProgram("foliage").unbind();*/
     }
 
 }

@@ -69,6 +69,10 @@ public class InstancedMeshFoliage extends Mesh {
 
         /** VBO 2 START **/
 
+        //test
+        //start = vboSizeMesh;
+        strideStart = 0;
+
         instanceDataVBOSeldom = OpenGlHelper.glGenBuffers();
         vboIdList.add(instanceDataVBOSeldom);
         instanceDataBufferSeldom = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_SELDOM);
@@ -137,8 +141,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public void initRenderVBO2() {
         int start = vboSizeMesh;
+        //model matrix + brightness
         int numElementsVBO1 = 2;
-        //model matrix + rgba
+
         int numElementsVBO2 = 5;
         for (int i = 0; i < numElementsVBO2; i++) {
             GL20.glEnableVertexAttribArray(start + numElementsVBO1 + i);

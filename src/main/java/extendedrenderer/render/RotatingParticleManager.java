@@ -7,6 +7,8 @@ import javax.annotation.Nullable;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.ExtendedRenderer;
+import extendedrenderer.foliage.Foliage;
 import extendedrenderer.shader.MeshBufferManagerParticle;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
@@ -14,6 +16,7 @@ import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.shader.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.math.BlockPos;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -432,6 +435,8 @@ public class RotatingParticleManager
             }
         }
 
+        //useShaders = false;
+
         if (useShaders) {
             //temp render ordering setup, last to first
             //background stuff
@@ -483,7 +488,7 @@ public class RotatingParticleManager
         int bufferSize = 0;
         int particles = 0;
 
-        if (useShaders) {
+        //if (useShaders) {
             ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("particle");
             transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
@@ -525,7 +530,7 @@ public class RotatingParticleManager
             shaderProgram.setUniform("texture_sampler", 0);
 
             CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
-        }
+        //}
 
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
@@ -589,6 +594,7 @@ public class RotatingParticleManager
                                     mesh.initRenderVBO1();
                                     mesh.initRenderVBO2();
 
+                                    //also resets position
                                     mesh.instanceDataBuffer.clear();
                                     mesh.curBufferPos = 0;
                                     particles = entry[i][j].size();
@@ -632,6 +638,8 @@ public class RotatingParticleManager
                                             //System.out.println("skipped render");
                                         }
 
+                                        //TODO: added, unverified
+                                        //mesh.instanceDataBufferTest.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_TEST);
 
                                         //this is supposed to be used only when needed for proper implementation
                                         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
@@ -708,6 +716,87 @@ public class RotatingParticleManager
 
         if (useShaders) {
             ShaderEngine.renderer.getShaderProgram("particle").unbind();
+        }
+
+        //ExtendedRenderer.foliageRenderer.renderJustShaders(entityIn, partialTicks);
+
+        boolean test = false;
+        if (test) {
+            shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
+            //transformation = ShaderEngine.renderer.transformation;
+            shaderProgram.bind();
+
+            shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
+
+            shaderProgram.setUniform("texture_sampler", 0);
+
+            MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
+            InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
+
+            mesh.initRender();
+            mesh.initRenderVBO1();
+            mesh.initRenderVBO2();
+
+            //also resets position
+            mesh.instanceDataBuffer.clear();
+            mesh.instanceDataBufferSeldom.clear();
+            mesh.curBufferPos = 0;
+
+            BlockPos pos = entityIn.getPosition();
+
+            List<Foliage> listFoliage = new ArrayList<>();
+
+            Random rand = new Random();
+            int range = 10;
+
+            //make obj
+            for (int i = 0; i < 100; i++) {
+                Foliage foliage = new Foliage();
+                int randX = rand.nextInt(range) - range / 2;
+                int randY = rand.nextInt(range) - range / 2;
+                int randZ = rand.nextInt(range) - range / 2;
+                foliage.setPosition(new BlockPos(pos).up(4).add(randX, randY, randZ));
+                foliage.rotationYaw = 1;
+                foliage.rotationPitch = 1;
+                foliage.particleScale = 100;
+                listFoliage.add(foliage);
+            }
+
+            for (Foliage foliage : listFoliage) {
+                foliage.updateQuaternion(entityIn);
+
+                //update vbo1
+                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+            }
+
+            //mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+
+            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+            mesh.curBufferPos = 0;
+
+            for (Foliage foliage : listFoliage) {
+
+                //update vbo2
+                foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+            }
+
+            //wasnt used in particle renderer and even crashes it :o
+            //mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+
+            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
+            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+
+            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
+
+            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            mesh.endRenderVBO1();
+            mesh.endRenderVBO2();
+            mesh.endRender();
+
+            ShaderEngine.renderer.getShaderProgram("foliage").unbind();
         }
 
         if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
