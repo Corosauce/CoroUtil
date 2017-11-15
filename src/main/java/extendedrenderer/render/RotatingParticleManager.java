@@ -502,6 +502,8 @@ public class RotatingParticleManager
                 projectionMatrix.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
             }
 
+            //testing determined i can save frames by baking projectionMatrix into modelViewMatrixCamera, might have to revert for more complex shaders
+            //further testing its just barely faster, if at all...
             //shaderProgram.setUniform("projectionMatrix", mat);
             //shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
 

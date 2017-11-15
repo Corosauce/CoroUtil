@@ -37,6 +37,23 @@ public class Renderer {
         shaderProgram.createUniform("texture_sampler");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
+
+        shaderProgram = new ShaderProgramParticle("foliage");
+
+        //String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
+        vertex = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/foliage.vs"));
+        fragment = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/foliage.fs"));
+
+        shaderProgram.createVertexShader(vertex);
+        shaderProgram.createFragmentShader(fragment);
+        shaderProgram.link();
+
+        //shaderProgram.createUniform("projectionMatrix");
+        shaderProgram.createUniform("modelViewMatrixCamera");
+        //shaderProgram.createUniform("modelViewMatrix");
+        shaderProgram.createUniform("texture_sampler");
+
+        lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }
 
     public void clear() {

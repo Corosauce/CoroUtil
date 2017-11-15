@@ -1,5 +1,6 @@
 package extendedrenderer;
 
+import extendedrenderer.render.FoliageRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -27,6 +28,7 @@ public class ClientProxy extends CommonProxy
     {
     	super.postInit();
     	ExtendedRenderer.rotEffRenderer = new RotatingParticleManager(mc.world, mc.renderEngine);
+        ExtendedRenderer.foliageRenderer = new FoliageRenderer(mc.renderEngine);
     }
 
     @Override

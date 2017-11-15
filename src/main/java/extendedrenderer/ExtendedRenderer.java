@@ -2,6 +2,7 @@ package extendedrenderer;
 
 import java.io.File;
 
+import extendedrenderer.render.FoliageRenderer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -32,6 +33,9 @@ public class ExtendedRenderer {
     
     @SideOnly(Side.CLIENT)
     public static RotatingParticleManager rotEffRenderer;
+
+    @SideOnly(Side.CLIENT)
+    public static FoliageRenderer foliageRenderer;
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)

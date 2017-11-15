@@ -77,27 +77,35 @@ public class EventHandler {
             lastWorld = mc.world;
         }
 
-        FoliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
+        EntityRenderer er = mc.entityRenderer;
 
-        if (ConfigCoroAI.disableParticleRenderer) return;
+        if (!ConfigCoroAI.disableParticleRenderer) {
 
-        //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
-		EntityRenderer er = mc.entityRenderer;
-		er.enableLightmap();
-        mc.mcProfiler.endStartSection("litParticles");
-        //particlemanager.renderLitParticles(entity, partialTicks);
-        ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+            //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
+
+            er.enableLightmap();
+            mc.mcProfiler.endStartSection("litParticles");
+            //particlemanager.renderLitParticles(entity, partialTicks);
+            ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity) mc.getRenderViewEntity(), (float) event.getPartialTicks());
+            RenderHelper.disableStandardItemLighting();
+            //private method, cant use.... for now
+            //er.setupFog(0, event.getPartialTicks());
+            mc.mcProfiler.endStartSection("particles");
+            //particlemanager.renderParticles(entity, partialTicks);
+            //GlStateManager.matrixMode(5889);
+            //GlStateManager.loadIdentity();
+            //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
+            //GlStateManager.matrixMode(5888);
+            ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
+
+            er.disableLightmap();
+        }
+
+        er.enableLightmap();
         RenderHelper.disableStandardItemLighting();
-        //private method, cant use.... for now
-        //er.setupFog(0, event.getPartialTicks());
-        mc.mcProfiler.endStartSection("particles");
-        //particlemanager.renderParticles(entity, partialTicks);
-        //GlStateManager.matrixMode(5889);
-        //GlStateManager.loadIdentity();
-        //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
-        //GlStateManager.matrixMode(5888);
-        ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
+        ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
         er.disableLightmap();
+
         
         //old code call
         //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());

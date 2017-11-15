@@ -13,7 +13,7 @@ public class MeshBufferManagerFoliage {
     //for prebuffering allowed max
     public static int numInstances = 100000;
 
-    private static HashMap<TextureAtlasSprite, InstancedMeshParticle> lookupParticleToMesh = new HashMap<>();
+    private static HashMap<TextureAtlasSprite, InstancedMeshFoliage> lookupParticleToMesh = new HashMap<>();
 
     public static void setupMeshForParticle(TextureAtlasSprite sprite) {
 
@@ -41,7 +41,7 @@ public class MeshBufferManagerFoliage {
                 0, 1, 3, 3, 1, 2
         };
 
-        InstancedMeshParticle mesh = new InstancedMeshParticle(positions, texCoords, indices, numInstances);
+        InstancedMeshFoliage mesh = new InstancedMeshFoliage(positions, texCoords, indices, numInstances);
 
         if (!lookupParticleToMesh.containsKey(sprite)) {
             lookupParticleToMesh.put(sprite, mesh);
@@ -51,17 +51,17 @@ public class MeshBufferManagerFoliage {
     }
 
     public static void cleanup() {
-        for (Map.Entry<TextureAtlasSprite, InstancedMeshParticle> entry : lookupParticleToMesh.entrySet()) {
+        for (Map.Entry<TextureAtlasSprite, InstancedMeshFoliage> entry : lookupParticleToMesh.entrySet()) {
             entry.getValue().cleanup();
         }
         lookupParticleToMesh.clear();
     }
 
-    public static InstancedMeshParticle getMesh(TextureAtlasSprite sprite) {
+    public static InstancedMeshFoliage getMesh(TextureAtlasSprite sprite) {
         return lookupParticleToMesh.get(sprite);
     }
 
-    public static void setupMeshForParticleIfMissing(TextureAtlasSprite sprite) {
+    public static void setupMeshIfMissing(TextureAtlasSprite sprite) {
         if (!lookupParticleToMesh.containsKey(sprite)) {
             setupMeshForParticle(sprite);
         }

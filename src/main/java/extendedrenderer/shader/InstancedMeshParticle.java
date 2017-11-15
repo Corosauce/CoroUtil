@@ -23,9 +23,9 @@ public class InstancedMeshParticle extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1;// * 2 + 2;
 
-    public static final int INSTANCE_SIZE_FLOATS_TEST = 4;
-
     public static final int INSTANCE_SIZE_BYTES_TEST = FLOAT_SIZE_BYTES * 4/* * 2 + FLOAT_SIZE_BYTES * 2*/;
+
+    public static final int INSTANCE_SIZE_FLOATS_TEST = 4;
 
     public final int numInstances;
 
