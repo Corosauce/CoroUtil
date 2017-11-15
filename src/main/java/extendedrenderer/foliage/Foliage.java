@@ -40,7 +40,7 @@ public class Foliage implements IShaderRenderedEntity {
     public float rotationYaw;
     public float rotationPitch;
 
-    public Quaternion rotation;
+    public Quaternion rotation = new Quaternion();
 
     public boolean rotateOrderXY = false;
 

@@ -35,8 +35,11 @@ public class FoliageRenderer {
 
     public static FloatBuffer viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
+    public Transformation transformation;
+
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
+        transformation = new Transformation();
     }
 
     public void render(Entity entityIn, float partialTicks)
@@ -57,11 +60,11 @@ public class FoliageRenderer {
 
             GlStateManager.disableCull();
 
-            Transformation transformation = null;
+            //Transformation transformation = null;
             Matrix4fe viewMatrix = null;
 
             ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
-            transformation = ShaderEngine.renderer.transformation;
+            //transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
             Matrix4fe projectionMatrix = new Matrix4fe();
             FloatBuffer buf = BufferUtils.createFloatBuffer(16);
@@ -121,11 +124,11 @@ public class FoliageRenderer {
 
             //make obj
             Foliage foliage = new Foliage();
-            foliage.setPosition(pos);
+            foliage.setPosition(pos.up(4));
             foliage.updateQuaternion(entityIn);
-            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
-            //update vbo1
 
+            //update vbo1
+            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
 
             mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
 

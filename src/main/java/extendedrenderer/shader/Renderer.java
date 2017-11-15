@@ -38,7 +38,7 @@ public class Renderer {
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
 
-        shaderProgram = new ShaderProgramParticle("foliage");
+        shaderProgram = new ShaderProgramFoliage("foliage");
 
         //String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
         vertex = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/foliage.vs"));

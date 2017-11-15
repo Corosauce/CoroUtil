@@ -42,5 +42,5 @@ void main()
 	//rgba.z = 1;
 	//rgba.w = 1;
 
-	outRGBA = rgbaTest;
+	outRGBA = rgba;
 }
