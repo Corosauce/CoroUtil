@@ -131,13 +131,30 @@ public class FoliageRenderer {
         buf2.rewind();
         Matrix4fe.get(viewMatrix, 0, buf2);
 
+        //m03, m13, m23 ?
+        //30 31 32
+        //bad context to do in i think...
+        /*viewMatrix.m30 = (float) entityIn.posX;
+        viewMatrix.m31 = (float) entityIn.posY;
+        viewMatrix.m32 = (float) entityIn.posZ;*/
+
         Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
 
         ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
         //transformation = ShaderEngine.renderer.transformation;
         shaderProgram.bind();
 
-        shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
+        float interpX = (float)(entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * (double) partialTicks);
+        float interpY = (float)(entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * (double) partialTicks);
+        float interpZ = (float)(entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * (double) partialTicks);
+        Matrix4fe matrixFix = new Matrix4fe();
+        matrixFix = matrixFix.translationRotateScale(
+                -interpX, -interpY, -interpZ,
+                0, 0, 0, 1,
+                1, 1, 1);
+        matrixFix = modelViewMatrix.mul(matrixFix);
+
+        shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
 
         shaderProgram.setUniform("texture_sampler", 0);
 
