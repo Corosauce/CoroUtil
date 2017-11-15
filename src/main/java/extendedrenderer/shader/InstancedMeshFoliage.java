@@ -23,27 +23,20 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1;// * 2 + 2;
 
-    public static final int INSTANCE_SIZE_FLOATS_TEST = 4;
+    public static final int INSTANCE_SIZE_FLOATS_SELDOM = 4;
 
-    public static final int INSTANCE_SIZE_BYTES_TEST = FLOAT_SIZE_BYTES * 4/* * 2 + FLOAT_SIZE_BYTES * 2*/;
+    public static final int INSTANCE_SIZE_BYTES_SELDOM = FLOAT_SIZE_BYTES * 4/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
     public final int numInstances;
 
     public final int instanceDataVBO;
-    public final int instanceDataVBOTest;
+    public final int instanceDataVBOSeldom;
 
     public FloatBuffer instanceDataBuffer;
-    public FloatBuffer instanceDataBufferTest;
+    public FloatBuffer instanceDataBufferSeldom;
 
     public int curBufferPos = 0;
 
-    /**
-     * TODO: despite the mesh only being a size of 2 vbos instead of 5, lowering this to 2 breaks something somehow (no rendering)
-     * need to figure out where to fix so i can optimize memory usage
-     * not even sure if the memory is unoptimized, theres just gaps in the memory used probably
-     *
-     * fixed, didnt account for attrib location values in shader program
-     */
     public static int vboSizeMesh = 2;
 
     public InstancedMeshFoliage(float[] positions, float[] textCoords, int[] indices, int numInstances) {
@@ -100,11 +93,11 @@ public class InstancedMeshFoliage extends Mesh {
         glVertexAttribDivisor(start, 1);*/
 
         //test color to its own vbo
-        instanceDataBufferTest = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_TEST);
+        instanceDataBufferSeldom = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_SELDOM);
 
         FloatBuffer colorBuffer = null;
-        instanceDataVBOTest = OpenGlHelper.glGenBuffers();
-        vboIdList.add(instanceDataVBOTest);
+        instanceDataVBOSeldom = OpenGlHelper.glGenBuffers();
+        vboIdList.add(instanceDataVBOSeldom);
         colorBuffer = BufferUtils.createFloatBuffer(4);
         float[] floats = new float[4];
         floats[0] = 1F;
@@ -113,9 +106,9 @@ public class InstancedMeshFoliage extends Mesh {
         floats[3] = 1F;
 
         colorBuffer.put(floats).flip();
-        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBOTest);
+        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBOSeldom);
         ShaderManager.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_DYNAMIC_DRAW);
-        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_TEST, 0);
+        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, 0);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
 
@@ -131,9 +124,9 @@ public class InstancedMeshFoliage extends Mesh {
             this.instanceDataBuffer = null;
         }
 
-        if (this.instanceDataBufferTest != null) {
+        if (this.instanceDataBufferSeldom != null) {
             //MemoryUtil.memFree(this.instanceDataBuffer);
-            this.instanceDataBufferTest = null;
+            this.instanceDataBufferSeldom = null;
         }
     }
 

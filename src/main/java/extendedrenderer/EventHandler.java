@@ -2,6 +2,7 @@ package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.render.FoliageRenderer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -76,6 +77,8 @@ public class EventHandler {
             lastWorld = mc.world;
         }
 
+        FoliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
+
         if (ConfigCoroAI.disableParticleRenderer) return;
 
         //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
@@ -93,7 +96,7 @@ public class EventHandler {
         //GlStateManager.loadIdentity();
         //Project.gluPerspective(90F/*er.getFOVModifier((float)event.getPartialTicks(), true)*/, (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, (float)(mc.gameSettings.renderDistanceChunks * 16) * MathHelper.SQRT_2 * 5);
         //GlStateManager.matrixMode(5888);
-        ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
         er.disableLightmap();
         
         //old code call

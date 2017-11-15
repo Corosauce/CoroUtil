@@ -9,7 +9,7 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShaderProgram {
+public abstract class ShaderProgram {
 
     private String name;
 
@@ -18,15 +18,6 @@ public class ShaderProgram {
     private int vertexShaderId;
 
     private int fragmentShaderId;
-
-    private int vertexShaderAttributeIndexPosition = 0;
-    private int vertexShaderAttributeTexCoord = 1;
-    //private int vertexShaderAttributeVertexNormal = 2;
-    private int vertexShaderAttributeModelViewMatrix = InstancedMeshParticle.vboSizeMesh;//5;
-    private int vertexShaderAttributeBrightness = InstancedMeshParticle.vboSizeMesh + 4;//9;
-    //private int vertexShaderAttributeRGBA = InstancedMesh.vboSizeMesh + 5;//10;
-    private int vertexShaderAttributeRGBATest = InstancedMeshParticle.vboSizeMesh + 5;//10;
-    //private int vertexShaderAttributeTexOffset = 13;
 
     private Map<String, Integer> uniforms;
 
@@ -100,17 +91,13 @@ public class ShaderProgram {
 
         //replaces use of "layout (location =0) " type indexing in shader, since that isnt supported for GLSL 120
         if (shaderType == GL20.GL_VERTEX_SHADER) {
-            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeIndexPosition, "position");
-            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeTexCoord, "texCoord");
-            //ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeVertexNormal, "vertexNormal");
-            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeModelViewMatrix, "modelViewMatrix");
-            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeBrightness, "brightness");
-            //ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
-            ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBATest, "rgbaTest");
+            setupAttribLocations();
         }
 
         return shaderId;
     }
+
+    public abstract void setupAttribLocations();
 
     public void link() throws Exception {
         OpenGlHelper.glLinkProgram(programId);
@@ -150,5 +137,9 @@ public class ShaderProgram {
 
     public String getName() {
         return this.name;
+    }
+
+    public int getProgramId() {
+        return programId;
     }
 }

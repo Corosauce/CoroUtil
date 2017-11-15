@@ -21,7 +21,7 @@ public class Renderer {
     }
 
     public void init() throws Exception {
-        ShaderProgram shaderProgram = new ShaderProgram("particle");
+        ShaderProgram shaderProgram = new ShaderProgramParticle("particle");
 
         //String folderShaders = "/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/shaders/";
         String vertex = CoroUtilFile.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, "shaders/particle.vs"));
