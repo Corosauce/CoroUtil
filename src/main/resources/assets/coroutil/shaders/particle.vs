@@ -14,14 +14,14 @@ varying float outBrightness;
 varying vec4 outRGBA;
 
 uniform mat4 modelViewMatrixCamera;
-uniform mat4 projectionMatrix;
+//uniform mat4 projectionMatrix;
 
 //uniform int numCols;
 //uniform int numRows;
 
 void main()
 {
-	gl_Position = projectionMatrix * modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+	gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);

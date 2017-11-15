@@ -487,23 +487,23 @@ public class RotatingParticleManager
             ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("particle");
             transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
-            Matrix4fe mat = new Matrix4fe();
+            Matrix4fe projectionMatrix = new Matrix4fe();
             FloatBuffer buf = BufferUtils.createFloatBuffer(16);
             GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
             buf.rewind();
-            Matrix4fe.get(mat, 0, buf);
+            Matrix4fe.get(projectionMatrix, 0, buf);
 
             //modify far distance, 4x as far
             boolean distantRendering = true;
             if (distantRendering) {
                 float zNear = 0.05F;
                 float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;
-                mat.m22 = ((zFar + zNear) / (zNear - zFar));
-                mat.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
+                projectionMatrix.m22 = ((zFar + zNear) / (zNear - zFar));
+                projectionMatrix.m32 = ((zFar + zFar) * zNear / (zNear - zFar));
             }
 
             //shaderProgram.setUniform("projectionMatrix", mat);
-            shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
+            //shaderProgram.setUniformEfficient("projectionMatrix", mat, projectionMatrixBuffer);
 
             boolean alternateCameraCapture = true;
             if (alternateCameraCapture) {
@@ -514,7 +514,11 @@ public class RotatingParticleManager
                 Matrix4fe.get(viewMatrix, 0, buf2);
             }
 
-            shaderProgram.setUniformEfficient("modelViewMatrixCamera", viewMatrix, viewMatrixBuffer);
+            //return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
+            Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
+            //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(viewMatrix, projectionMatrix);
+
+            shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
 
             shaderProgram.setUniform("texture_sampler", 0);
 
