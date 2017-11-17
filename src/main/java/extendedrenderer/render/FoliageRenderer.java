@@ -43,6 +43,8 @@ public class FoliageRenderer {
 
     public boolean needsUpdate = true;
 
+    public List<Foliage> listFoliage = new ArrayList<>();
+
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
         transformation = new Transformation();
@@ -91,7 +93,7 @@ public class FoliageRenderer {
 
             GlStateManager.disableCull();
 
-            GlStateManager.depthMask(true);
+            GlStateManager.depthMask(false);
 
             renderJustShaders(entityIn, partialTicks);
 
@@ -176,6 +178,9 @@ public class FoliageRenderer {
         //also resets position
 
         boolean skipUpdate = false;
+        boolean updateFoliageObjects = false;
+        boolean updateVBO1 = true;
+        boolean updateVBO2 = false;
 
         if (!skipUpdate || needsUpdate) {
             mesh.instanceDataBuffer.clear();
@@ -185,83 +190,99 @@ public class FoliageRenderer {
 
         BlockPos pos = entityIn.getPosition();
 
-        List<Foliage> listFoliage = new ArrayList<>();
+
 
         Random rand = new Random();
         rand.setSeed(5);
-        int range = 150;
+        int range = 50;
 
         int amount = 35000;
         int adjAmount = amount;
 
-        boolean subTest = true;
+        boolean subTest = false;
 
         if (subTest) {
-            adjAmount = 50;
+            adjAmount = amount;
+            //adjAmount = 50;
         }
 
         //make obj
         if (!skipUpdate || needsUpdate) {
-            for (int i = 0; i < adjAmount; i++) {
-                Foliage foliage = new Foliage();
-                int randX = rand.nextInt(range) - range / 2;
-                int randY = 0;//rand.nextInt(range) - range / 2;
-                int randZ = rand.nextInt(range) - range / 2;
-                foliage.setPosition(new BlockPos(pos).up(0).add(randX, randY, randZ));
-                foliage.posY += 0.5F;
-                foliage.prevPosY = foliage.posY;
-                foliage.posX += rand.nextFloat();
-                foliage.prevPosX = foliage.posX;
-                foliage.posZ += rand.nextFloat();
-                foliage.prevPosZ = foliage.posZ;
-                foliage.rotationYaw = rand.nextInt(360);
-                //foliage.rotationPitch = rand.nextInt(90) - 45;
-                foliage.particleScale /= 0.2;
-                listFoliage.add(foliage);
+            if (updateFoliageObjects) {
+                listFoliage.clear();
+                for (int i = 0; i < adjAmount; i++) {
+                    Foliage foliage = new Foliage();
+                    int randX = rand.nextInt(range) - range / 2;
+                    int randY = 0;//rand.nextInt(range) - range / 2;
+                    int randZ = rand.nextInt(range) - range / 2;
+                    foliage.setPosition(new BlockPos(pos).up(0).add(randX, randY, randZ));
+                    foliage.posY += 0.5F;
+                    foliage.prevPosY = foliage.posY;
+                    foliage.posX += rand.nextFloat();
+                    foliage.prevPosX = foliage.posX;
+                    foliage.posZ += rand.nextFloat();
+                    foliage.prevPosZ = foliage.posZ;
+                    foliage.rotationYaw = rand.nextInt(360);
+                    //foliage.rotationPitch = rand.nextInt(90) - 45;
+                    foliage.particleScale /= 0.2;
+                    listFoliage.add(foliage);
+                }
             }
 
-            for (Foliage foliage : listFoliage) {
-                foliage.updateQuaternion(entityIn);
+            if (updateVBO1) {
+                for (Foliage foliage : listFoliage) {
 
-                //update vbo1
-                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
-            }
+                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                    if (dist < 10) {
+                        foliage.particleAlpha = (float)dist / 10F;
+                    } else {
+                        foliage.particleAlpha = 1F;
+                    }
 
-            if (!subTest) {
-                mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
-            } else {
-                mesh.instanceDataBuffer.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
-            }
+                    //update vbo1
+                    foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                }
 
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+                if (!subTest) {
+                    mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+                } else {
+                    mesh.instanceDataBuffer.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
+                }
 
-            if (!subTest) {
-                ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
-            } else {
-                GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
+                OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+
+                if (!subTest) {
+                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+                } else {
+                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
+                    //GL15.glMapBuffer()
+                }
             }
 
             mesh.curBufferPos = 0;
 
-            for (Foliage foliage : listFoliage) {
+            if (updateVBO2) {
+                for (Foliage foliage : listFoliage) {
+                    foliage.updateQuaternion(entityIn);
 
-                //update vbo2
-                foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
-            }
+                    //update vbo2
+                    foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                }
 
-            //wasnt used in particle renderer and even crashes it :o
-            if (!subTest) {
-                mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-            } else {
-                mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-            }
+                //wasnt used in particle renderer and even crashes it :o
+                if (!subTest) {
+                    mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+                } else {
+                    mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+                }
 
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
+                OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
 
-            if (!subTest) {
-                ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
-            } else {
-                GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
+                if (!subTest) {
+                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+                } else {
+                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
+                }
             }
         }
 
