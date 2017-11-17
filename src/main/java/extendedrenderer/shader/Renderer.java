@@ -53,6 +53,7 @@ public class Renderer {
         //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
         shaderProgram.createUniform("time");
+        shaderProgram.createUniform("partialTick");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }

@@ -7,6 +7,8 @@ import extendedrenderer.foliage.ParticleTallGrassTemp;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.shader.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -165,6 +167,8 @@ public class FoliageRenderer {
             //ignore optimization in testing
         }
 
+        shaderProgram.setUniform("partialTick", partialTicks);
+
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
         InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
 
@@ -191,9 +195,9 @@ public class FoliageRenderer {
 
         Random rand = new Random();
         rand.setSeed(5);
-        int range = 50;
+        int range = 150;
 
-        int amount = 35000;
+        int amount = 70000;
         int adjAmount = amount;
 
         boolean subTest = false;
@@ -203,10 +207,13 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
+        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+
         if (!skipUpdate || needsUpdate) {
             if (updateFoliageObjects || needsUpdate) {
                 //make obj
                 listFoliage.clear();
+                int foliageAdded = 0;
                 for (int i = 0; i < adjAmount; i++) {
                     Foliage foliage = new Foliage();
                     int randX = rand.nextInt(range) - range / 2;
@@ -223,9 +230,21 @@ public class FoliageRenderer {
                     //foliage.rotationPitch = rand.nextInt(90) - 45;
                     foliage.particleScale /= 0.2;
 
-                    foliage.particleScale *= 3;
+                    //foliage.particleScale *= 3;
 
-                    listFoliage.add(foliage);
+                    BlockPos folipos = new BlockPos(foliage.posX, foliage.posY, foliage.posZ);
+
+                    IBlockState state = entityIn.world.getBlockState(folipos.down());
+                    if (state.getMaterial() == Material.GRASS) {
+                        int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, folipos, 0);
+                        foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+                        foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+                        foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+
+                        listFoliage.add(foliage);
+                    }
                 }
             }
 
@@ -233,11 +252,13 @@ public class FoliageRenderer {
                 for (Foliage foliage : listFoliage) {
 
                     double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                    if (dist < 10) {
+                    if (false && dist < 10) {
                         foliage.particleAlpha = (float)dist / 10F;
                     } else {
                         foliage.particleAlpha = 1F;
                     }
+
+                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.2F;
 
                     //update vbo1
                     foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
@@ -288,7 +309,7 @@ public class FoliageRenderer {
 
         needsUpdate = false;
 
-        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, amount);
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, listFoliage.size());
 
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 

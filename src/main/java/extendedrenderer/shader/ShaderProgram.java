@@ -67,6 +67,11 @@ public abstract class ShaderProgram {
         OpenGlHelper.glUniform1i(uniforms.get(uniformName), value);
     }
 
+    public void setUniform(String uniformName, float value) {
+        GL20.glUniform1f(uniforms.get(uniformName), value);
+        //OpenGlHelper.glUniform(uniforms.get(uniformName), value);
+    }
+
     public void createVertexShader(String shaderCode) throws Exception {
         vertexShaderId = createShader(shaderCode, GL20.GL_VERTEX_SHADER);
     }
