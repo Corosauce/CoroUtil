@@ -126,9 +126,9 @@ public class EventHandler {
                 }
             }
 
-            //ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
-
             ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
+
+            ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
 
             er.disableLightmap();
         }

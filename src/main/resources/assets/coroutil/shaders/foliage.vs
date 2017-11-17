@@ -49,9 +49,10 @@ void main()
 {
 
     float timeSmooth = (time-1) + partialTick;
-    int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 8, 360));
-    float rot = sin(timeMod * 0.0174533) * 0.25;
-    float rot2 = cos(timeMod * 0.0174533) * 0.25;
+    //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
+    int timeMod = int(mod((timeSmooth) * 2, 360));
+    float rot = sin(timeMod * 0.0174533) * 0.45;
+    float rot2 = cos(timeMod * 0.0174533) * 0.45;
     mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
     mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
 
@@ -67,6 +68,7 @@ void main()
         0, 0, 1, 0,
         0, 0, 0, 1);
 
+    //top parts
     if (gl_VertexID == 0 || gl_VertexID == 3) {
         gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x, position.y + 0, position.z, 1.0);
     } else {

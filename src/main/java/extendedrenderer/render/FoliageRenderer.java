@@ -24,9 +24,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -47,6 +45,7 @@ public class FoliageRenderer {
     public boolean needsUpdate = true;
 
     public List<Foliage> listFoliage = new ArrayList<>();
+    public HashMap<BlockPos, Foliage> lookupPosToFoliage = new HashMap<>();
 
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
@@ -181,6 +180,12 @@ public class FoliageRenderer {
         boolean updateFoliageObjects = false;
         boolean updateVBO1 = true;
         boolean updateVBO2 = false;
+        boolean add = true;
+        boolean trim = true;
+
+        /**
+         * TODO: lazy foliage management done, now to make it play nicer with VBO and not break ordering
+         */
 
         if (!skipUpdate || needsUpdate) {
             //also resets position
@@ -209,8 +214,78 @@ public class FoliageRenderer {
 
         CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
 
+        int radialRange = 50;
+
+        int xzRange = radialRange;
+        int yRange = 10;
+
+        boolean dirtyVBO2 = false;
+
+        //scan and add foliage around player
+        //TODO: firstly, dont do this per render tick geeze, secondly, thread it just like weather leaf block scan
+        //time here is a hack for now
+        if (add && world.getTotalWorldTime() % 5 == 0) {
+            for (int x = -xzRange; x <= xzRange; x++) {
+                for (int z = -xzRange; z <= xzRange; z++) {
+                    for (int y = -yRange; y <= yRange; y++) {
+                        BlockPos posScan = pos.add(x, y, z);
+                        IBlockState state = entityIn.world.getBlockState(posScan.down());
+                        if (!lookupPosToFoliage.containsKey(posScan)) {
+                            if (state.getMaterial() == Material.GRASS) {
+                                if (entityIn.getDistanceSq(posScan) <= radialRange * radialRange) {
+                                    Foliage foliage = new Foliage();
+                                    foliage.setPosition(posScan);
+                                    foliage.posY += 0.5F;
+                                    foliage.prevPosY = foliage.posY;
+                                    foliage.posX += 0.5F;
+                                    foliage.prevPosX = foliage.posX;
+                                    foliage.posZ += 0.5F;
+                                    foliage.prevPosZ = foliage.posZ;
+                                    foliage.rotationYaw = rand.nextInt(360);
+                                    //foliage.rotationPitch = rand.nextInt(90) - 45;
+                                    foliage.particleScale /= 0.2;
+
+                                    int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, posScan.down(), 0);
+                                    foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+                                    foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+                                    foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+                                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+
+                                    lookupPosToFoliage.put(posScan, foliage);
+
+                                    dirtyVBO2 = true;
+                                }
+                            }
+                        } else {
+
+                        }
+                    }
+                }
+            }
+        }
+
+        //cleanup list
+        if (trim) {
+            Iterator<Map.Entry<BlockPos, Foliage>> it = lookupPosToFoliage.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<BlockPos, Foliage> entry = it.next();
+                IBlockState state = entityIn.world.getBlockState(entry.getKey().down());
+                if (state.getMaterial() != Material.GRASS) {
+                    it.remove();
+                    dirtyVBO2 = true;
+                } else if (entityIn.getDistanceSq(entry.getKey()) > radialRange * radialRange) {
+                    it.remove();
+                    dirtyVBO2 = true;
+                }
+            }
+        }
+
         if (!skipUpdate || needsUpdate) {
-            if (updateFoliageObjects || needsUpdate) {
+
+
+
+            if (updateFoliageObjects/* || needsUpdate*/) {
                 //make obj
                 listFoliage.clear();
                 int foliageAdded = 0;
@@ -249,16 +324,17 @@ public class FoliageRenderer {
             }
 
             if (updateVBO1 || needsUpdate) {
-                for (Foliage foliage : listFoliage) {
+                for (Foliage foliage : lookupPosToFoliage.values()) {
 
+                    float distMax = 3F;
                     double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                    if (false && dist < 10) {
-                        foliage.particleAlpha = (float)dist / 10F;
+                    if (dist < distMax) {
+                        foliage.particleAlpha = (float)(dist) / distMax;
                     } else {
                         foliage.particleAlpha = 1F;
                     }
 
-                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.2F;
+                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
 
                     //update vbo1
                     foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
@@ -282,8 +358,8 @@ public class FoliageRenderer {
 
             mesh.curBufferPos = 0;
 
-            if (updateVBO2 || needsUpdate) {
-                for (Foliage foliage : listFoliage) {
+            if (updateVBO2 || needsUpdate || dirtyVBO2) {
+                for (Foliage foliage : lookupPosToFoliage.values()) {
                     foliage.updateQuaternion(entityIn);
 
                     //update vbo2
@@ -309,7 +385,7 @@ public class FoliageRenderer {
 
         needsUpdate = false;
 
-        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, listFoliage.size());
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, lookupPosToFoliage.size());
 
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 

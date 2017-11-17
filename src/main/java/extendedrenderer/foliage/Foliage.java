@@ -59,6 +59,10 @@ public class Foliage implements IShaderRenderedEntity {
         prevPosZ = posZ;
     }
 
+    public BlockPos getBlockPosition() {
+        return new BlockPos(posX, posY, posZ);
+    }
+
     @Override
     public Vector3f getPosition() {
         return new Vector3f((float)posX, (float)posY, (float)posZ);
