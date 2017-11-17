@@ -146,4 +146,8 @@ public class ShaderManager {
         }
     }
 
+    public static void resetCheck() {
+        check = true;
+    }
+
 }

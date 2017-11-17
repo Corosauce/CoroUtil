@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class FoliageRenderer {
 
     public Transformation transformation;
 
+    public boolean needsUpdate = true;
+
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
         transformation = new Transformation();
@@ -58,6 +61,8 @@ public class FoliageRenderer {
             RotatingParticleManager.forceShaderReset = false;
             ShaderEngine.cleanup();
             ShaderEngine.renderer = null;
+            needsUpdate = true;
+            ShaderManager.resetCheck();
         }
 
         if (RotatingParticleManager.useShaders && ShaderEngine.renderer == null) {
@@ -170,9 +175,9 @@ public class FoliageRenderer {
 
         //also resets position
 
-        boolean skipUpdate = true;
+        boolean skipUpdate = false;
 
-        if (!skipUpdate) {
+        if (!skipUpdate || needsUpdate) {
             mesh.instanceDataBuffer.clear();
             mesh.instanceDataBufferSeldom.clear();
             mesh.curBufferPos = 0;
@@ -187,10 +192,17 @@ public class FoliageRenderer {
         int range = 150;
 
         int amount = 35000;
+        int adjAmount = amount;
+
+        boolean subTest = true;
+
+        if (subTest) {
+            adjAmount = 50;
+        }
 
         //make obj
-        if (!skipUpdate) {
-            for (int i = 0; i < amount; i++) {
+        if (!skipUpdate || needsUpdate) {
+            for (int i = 0; i < adjAmount; i++) {
                 Foliage foliage = new Foliage();
                 int randX = rand.nextInt(range) - range / 2;
                 int randY = 0;//rand.nextInt(range) - range / 2;
@@ -215,10 +227,19 @@ public class FoliageRenderer {
                 foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
             }
 
-            mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+            if (!subTest) {
+                mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+            } else {
+                mesh.instanceDataBuffer.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
+            }
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+            if (!subTest) {
+                ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+            } else {
+                GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
+            }
 
             mesh.curBufferPos = 0;
 
@@ -229,11 +250,22 @@ public class FoliageRenderer {
             }
 
             //wasnt used in particle renderer and even crashes it :o
-            mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+            if (!subTest) {
+                mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+            } else {
+                mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+            }
 
             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
-            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+
+            if (!subTest) {
+                ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+            } else {
+                GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
+            }
         }
+
+        needsUpdate = false;
 
         ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, amount);
 

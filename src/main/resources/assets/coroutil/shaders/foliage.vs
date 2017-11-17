@@ -48,7 +48,19 @@ void main()
     mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
     mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
 
-	gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position, 1.0);
+    mat4 test1 = mat4(
+        1, 0, 0, 0,
+        0, 1, 0, 7,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+
+    mat4 test2 = mat4(
+        1, 0, 0, 0,
+        0, 1, 0, -7,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
+
+        gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position, 1.0);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);
