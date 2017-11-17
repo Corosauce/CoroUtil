@@ -1,4 +1,5 @@
 #version 120
+#pragma optimize(off)
 
 //seldom changing or 1 time use data - non instanced:
 attribute vec3 position; //mesh pos
@@ -19,10 +20,12 @@ varying vec2 outTexCoord;
 varying float outBrightness;
 varying vec4 outRGBA;
 
+//uniform mat4 projectionMatrix;
+
 uniform mat4 modelViewMatrixCamera;
 
 uniform int time;
-//uniform mat4 projectionMatrix;
+
 
 //uniform int numCols;
 //uniform int numRows;
@@ -60,7 +63,7 @@ void main()
         0, 0, 1, 0,
         0, 0, 0, 1);
 
-        gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position, 1.0);
+    gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position, 1.0);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);

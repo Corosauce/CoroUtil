@@ -413,7 +413,7 @@ public class RotatingParticleManager
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
-        useShaders = ShaderManager.canUseShadersInstancedRendering();
+        /*useShaders = ShaderManager.canUseShadersInstancedRendering();
 
         if (ConfigCoroAI.forceShadersOff) {
             useShaders = false;
@@ -433,7 +433,7 @@ public class RotatingParticleManager
             } else {
                 System.out.println("Extended Renderer: Initialized instanced rendering shaders");
             }
-        }
+        }*/
 
         //useShaders = false;
 
@@ -498,8 +498,11 @@ public class RotatingParticleManager
             buf.rewind();
             Matrix4fe.get(projectionMatrix, 0, buf);
 
+            //TODO: this interferes with drawing order more and more as you move away from things
+            //1 solution might be to make vanilla also use this change, but without changing mc.gameSettings.renderDistanceChunks itself
+            //have to be carefull about a way to fix without hurting vanilla performance
             //modify far distance, 4x as far
-            boolean distantRendering = true;
+            boolean distantRendering = false;
             if (distantRendering) {
                 float zNear = 0.05F;
                 float zFar = (float) (mc.gameSettings.renderDistanceChunks * 16) * 4F;

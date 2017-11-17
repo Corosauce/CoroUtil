@@ -33,7 +33,8 @@ public abstract class ShaderProgram {
     public void createUniform(String uniformName) throws Exception {
         int uniformLocation = OpenGlHelper.glGetUniformLocation(programId, uniformName);
         if (uniformLocation < 0) {
-            throw new Exception("Could not find uniform:" + uniformName);
+            System.out.println("!!!!!!!! GLSL OPTIMIZATION WARNING MAYBE: " + "Could not find uniform:" + uniformName);
+            //throw new Exception("Could not find uniform:" + uniformName);
         }
         uniforms.put(uniformName, uniformLocation);
     }

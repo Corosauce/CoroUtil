@@ -2,7 +2,10 @@ package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.FoliageRenderer;
+import extendedrenderer.render.RotatingParticleManager;
+import extendedrenderer.shader.ShaderEngine;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -98,6 +101,30 @@ public class EventHandler {
             //GlStateManager.matrixMode(5888);
 
 
+
+            RotatingParticleManager.useShaders = ShaderManager.canUseShadersInstancedRendering();
+
+            if (ConfigCoroAI.forceShadersOff) {
+                RotatingParticleManager.useShaders = false;
+            }
+
+            if (RotatingParticleManager.forceShaderReset) {
+                RotatingParticleManager.forceShaderReset = false;
+                ShaderEngine.cleanup();
+                ShaderEngine.renderer = null;
+                ExtendedRenderer.foliageRenderer.needsUpdate = true;
+                ShaderManager.resetCheck();
+            }
+
+            if (RotatingParticleManager.useShaders && ShaderEngine.renderer == null) {
+                //currently for if shader compiling fails, which is an ongoing issue for some machines...
+                if (!ShaderEngine.init()) {
+                    ShaderManager.disableShaders();
+                    RotatingParticleManager.useShaders = false;
+                } else {
+                    System.out.println("Extended Renderer: Initialized instanced rendering shaders");
+                }
+            }
 
             //ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
 
