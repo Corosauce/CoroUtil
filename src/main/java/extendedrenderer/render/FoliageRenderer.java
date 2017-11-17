@@ -208,7 +208,7 @@ public class FoliageRenderer {
 
         //make obj
         if (!skipUpdate || needsUpdate) {
-            if (updateFoliageObjects) {
+            if (updateFoliageObjects || needsUpdate) {
                 listFoliage.clear();
                 for (int i = 0; i < adjAmount; i++) {
                     Foliage foliage = new Foliage();
@@ -229,7 +229,7 @@ public class FoliageRenderer {
                 }
             }
 
-            if (updateVBO1) {
+            if (updateVBO1 || needsUpdate) {
                 for (Foliage foliage : listFoliage) {
 
                     double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
@@ -261,7 +261,7 @@ public class FoliageRenderer {
 
             mesh.curBufferPos = 0;
 
-            if (updateVBO2) {
+            if (updateVBO2 || needsUpdate) {
                 for (Foliage foliage : listFoliage) {
                     foliage.updateQuaternion(entityIn);
 
