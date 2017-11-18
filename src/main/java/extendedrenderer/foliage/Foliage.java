@@ -140,8 +140,9 @@ public class Foliage implements IShaderRenderedEntity {
                 + (rgbaIndex++), this.particleGreen);
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleBlue);
+        //using yaw here instead, alpha in other VBO
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
-                + (rgbaIndex++), this.particleAlpha);
+                + (rgbaIndex++), this.rotationYaw);
 
         mesh.curBufferPos++;
     }

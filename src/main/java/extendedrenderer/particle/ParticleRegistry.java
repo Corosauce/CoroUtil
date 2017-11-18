@@ -46,6 +46,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite test_texture;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
 	public static TextureAtlasSprite tallgrass;
+	public static TextureAtlasSprite tallgrass_hd;
 	
 	public static void init(TextureStitchEvent.Pre event) {
 		
@@ -89,6 +90,7 @@ public class ParticleRegistry {
 			listFish.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/fish_" + i)));
 		}
 		tallgrass = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass"));
+		tallgrass_hd = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass_hd"));
 
 
 		//ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);

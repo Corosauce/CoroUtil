@@ -54,6 +54,8 @@ public class Renderer {
         shaderProgram.createUniform("texture_sampler");
         shaderProgram.createUniform("time");
         shaderProgram.createUniform("partialTick");
+        shaderProgram.createUniform("windDir");
+        shaderProgram.createUniform("windSpeed");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }

@@ -128,7 +128,7 @@ public class EventHandler {
 
             ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
 
-            ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
+            //ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
 
             er.disableLightmap();
         }

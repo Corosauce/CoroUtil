@@ -3,6 +3,7 @@ package extendedrenderer.render;
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.foliage.Foliage;
+import extendedrenderer.foliage.FoliageClutter;
 import extendedrenderer.foliage.ParticleTallGrassTemp;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
@@ -45,7 +46,10 @@ public class FoliageRenderer {
     public boolean needsUpdate = true;
 
     public List<Foliage> listFoliage = new ArrayList<>();
-    public HashMap<BlockPos, Foliage> lookupPosToFoliage = new HashMap<>();
+    public HashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new HashMap<>();
+
+    public float windDir = 0;
+    public float windSpeed = 0;
 
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
@@ -69,15 +73,31 @@ public class FoliageRenderer {
             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             GlStateManager.alphaFunc(516, 0.003921569F);
 
-            GlStateManager.disableCull();
+            int mip_min = 0;
+            int mip_mag = 0;
+
+            if (!ConfigCoroAI.disableMipmapFix) {
+                mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
+                mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
+                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+            }
 
             GlStateManager.depthMask(true);
+
+            GlStateManager.disableCull();
 
             renderJustShaders(entityIn, partialTicks);
 
             GlStateManager.enableCull();
 
             GlStateManager.depthMask(true);
+
+            if (!ConfigCoroAI.disableMipmapFix) {
+                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
+                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
+            }
+
             GlStateManager.disableBlend();
             GlStateManager.alphaFunc(516, 0.1F);
         }
@@ -167,8 +187,11 @@ public class FoliageRenderer {
         }
 
         shaderProgram.setUniform("partialTick", partialTicks);
+        shaderProgram.setUniform("windDir", windDir);
+        shaderProgram.setUniform("windSpeed", windSpeed);
 
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass_hd);
         InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
 
         mesh.initRender();
@@ -180,8 +203,8 @@ public class FoliageRenderer {
         boolean updateFoliageObjects = false;
         boolean updateVBO1 = true;
         boolean updateVBO2 = false;
-        boolean add = true;
-        boolean trim = true;
+        boolean add = false;
+        boolean trim = false;
 
         /**
          * TODO: lazy foliage management done, now to make it play nicer with VBO and not break ordering
@@ -214,7 +237,7 @@ public class FoliageRenderer {
 
         CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
 
-        int radialRange = 50;
+        int radialRange = 150;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -233,26 +256,33 @@ public class FoliageRenderer {
                         if (!lookupPosToFoliage.containsKey(posScan)) {
                             if (state.getMaterial() == Material.GRASS) {
                                 if (entityIn.getDistanceSq(posScan) <= radialRange * radialRange) {
-                                    Foliage foliage = new Foliage();
-                                    foliage.setPosition(posScan);
-                                    foliage.posY += 0.5F;
-                                    foliage.prevPosY = foliage.posY;
-                                    foliage.posX += 0.5F;
-                                    foliage.prevPosX = foliage.posX;
-                                    foliage.posZ += 0.5F;
-                                    foliage.prevPosZ = foliage.posZ;
-                                    foliage.rotationYaw = rand.nextInt(360);
-                                    //foliage.rotationPitch = rand.nextInt(90) - 45;
-                                    foliage.particleScale /= 0.2;
+                                    List<Foliage> listClutter = new ArrayList<>();
+                                    for (int i = 0; i < FoliageClutter.clutterSize; i++) {
+                                        Foliage foliage = new Foliage();
+                                        foliage.setPosition(posScan);
+                                        foliage.posY += 0.5F;
+                                        foliage.prevPosY = foliage.posY;
+                                        foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosX = foliage.posX;
+                                        foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosZ = foliage.posZ;
+                                        foliage.rotationYaw = 0;
+                                        //foliage.rotationYaw = 90;
+                                        foliage.rotationYaw = rand.nextInt(360);
+                                        //foliage.rotationPitch = rand.nextInt(90) - 45;
+                                        foliage.particleScale /= 0.2;
 
-                                    int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, posScan.down(), 0);
-                                    foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
-                                    foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
-                                    foliage.particleBlue = (float) (color & 255) / 255.0F;
+                                        int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, posScan.down(), 0);
+                                        foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+                                        foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+                                        foliage.particleBlue = (float) (color & 255) / 255.0F;
 
-                                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+                                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
 
-                                    lookupPosToFoliage.put(posScan, foliage);
+                                        listClutter.add(foliage);
+                                    }
+
+                                    lookupPosToFoliage.put(posScan, listClutter);
 
                                     dirtyVBO2 = true;
                                 }
@@ -267,9 +297,9 @@ public class FoliageRenderer {
 
         //cleanup list
         if (trim) {
-            Iterator<Map.Entry<BlockPos, Foliage>> it = lookupPosToFoliage.entrySet().iterator();
+            Iterator<Map.Entry<BlockPos, List<Foliage>>> it = lookupPosToFoliage.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<BlockPos, Foliage> entry = it.next();
+                Map.Entry<BlockPos, List<Foliage>> entry = it.next();
                 IBlockState state = entityIn.world.getBlockState(entry.getKey().down());
                 if (state.getMaterial() != Material.GRASS) {
                     it.remove();
@@ -283,61 +313,22 @@ public class FoliageRenderer {
 
         if (!skipUpdate || needsUpdate) {
 
-
-
-            if (updateFoliageObjects/* || needsUpdate*/) {
-                //make obj
-                listFoliage.clear();
-                int foliageAdded = 0;
-                for (int i = 0; i < adjAmount; i++) {
-                    Foliage foliage = new Foliage();
-                    int randX = rand.nextInt(range) - range / 2;
-                    int randY = 0;//rand.nextInt(range) - range / 2;
-                    int randZ = rand.nextInt(range) - range / 2;
-                    foliage.setPosition(new BlockPos(pos).up(0).add(randX, randY, randZ));
-                    foliage.posY += 0.5F;
-                    foliage.prevPosY = foliage.posY;
-                    foliage.posX += rand.nextFloat();
-                    foliage.prevPosX = foliage.posX;
-                    foliage.posZ += rand.nextFloat();
-                    foliage.prevPosZ = foliage.posZ;
-                    foliage.rotationYaw = rand.nextInt(360);
-                    //foliage.rotationPitch = rand.nextInt(90) - 45;
-                    foliage.particleScale /= 0.2;
-
-                    //foliage.particleScale *= 3;
-
-                    BlockPos folipos = new BlockPos(foliage.posX, foliage.posY, foliage.posZ);
-
-                    IBlockState state = entityIn.world.getBlockState(folipos.down());
-                    if (state.getMaterial() == Material.GRASS) {
-                        int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, folipos, 0);
-                        foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
-                        foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
-                        foliage.particleBlue = (float) (color & 255) / 255.0F;
-
-                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
-
-                        listFoliage.add(foliage);
-                    }
-                }
-            }
-
             if (updateVBO1 || needsUpdate) {
-                for (Foliage foliage : lookupPosToFoliage.values()) {
+                for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
+                    for (Foliage foliage : listFoliage) {
+                        float distMax = 3F;
+                        double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                        if (dist < distMax) {
+                            foliage.particleAlpha = (float) (dist) / distMax;
+                        } else {
+                            foliage.particleAlpha = 1F;
+                        }
 
-                    float distMax = 3F;
-                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                    if (dist < distMax) {
-                        foliage.particleAlpha = (float)(dist) / distMax;
-                    } else {
-                        foliage.particleAlpha = 1F;
+                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+
+                        //update vbo1
+                        foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                     }
-
-                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
-
-                    //update vbo1
-                    foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                 }
 
                 if (!subTest) {
@@ -359,11 +350,13 @@ public class FoliageRenderer {
             mesh.curBufferPos = 0;
 
             if (updateVBO2 || needsUpdate || dirtyVBO2) {
-                for (Foliage foliage : lookupPosToFoliage.values()) {
-                    foliage.updateQuaternion(entityIn);
+                for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
+                    for (Foliage foliage : listFoliage) {
+                        foliage.updateQuaternion(entityIn);
 
-                    //update vbo2
-                    foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                        //update vbo2
+                        foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                    }
                 }
 
                 //wasnt used in particle renderer and even crashes it :o
@@ -385,7 +378,7 @@ public class FoliageRenderer {
 
         needsUpdate = false;
 
-        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, lookupPosToFoliage.size());
+        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);
 
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
