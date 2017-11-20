@@ -10,7 +10,10 @@ void main()
 {
 
     // Exp fog
-    float fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
+    //float fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
+
+    // Linear fog
+    float fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
 
     vec4 fragColor = texture2D(texture_sampler, outTexCoord);
 	fragColor.x *= outRGBA.x * outBrightness;
@@ -29,5 +32,5 @@ void main()
 
     //gl_FragColor.w = 0.1;
 
-    gl_FragColor = fragColor;
+    //gl_FragColor = fragColor;
 }

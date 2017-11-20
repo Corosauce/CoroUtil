@@ -476,25 +476,29 @@ public class RotatingParticleManager
                                     particles = entry[i][j].size();
 
                                     if (true) {
-                                        for (final Particle particle : entry[i][j]) {
-                                            if (particle instanceof EntityRotFX) {
-                                                EntityRotFX part = (EntityRotFX) particle;
+                                        if (true) {
+                                            for (final Particle particle : entry[i][j]) {
+                                                if (particle instanceof EntityRotFX) {
+                                                    EntityRotFX part = (EntityRotFX) particle;
 
-                                                part.updateQuaternion(entityIn);
+                                                    part.updateQuaternion(entityIn);
 
-                                                //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
-                                                part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+                                                    //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
+                                                    part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
 
+                                                }
                                             }
+
+                                            mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+                                            //test
+                                            //mesh.instanceDataBuffer.limit(ParticleMeshBufferManager.numInstances * mesh.INSTANCE_SIZE_FLOATS);
+
+
+                                            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
+                                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
                                         }
 
-                                        mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
-                                        //test
-                                        //mesh.instanceDataBuffer.limit(ParticleMeshBufferManager.numInstances * mesh.INSTANCE_SIZE_FLOATS);
 
-
-                                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-                                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
 
                                         //not working right yet, something not flagging it correctly, only like 10% fps gain atm anyways
                                         //actually, the dynamic render amounts used in TexExtraRender completely breaks the sync
@@ -510,16 +514,18 @@ public class RotatingParticleManager
 
                                                 }
                                             }
+
+                                            //TODO: added, unverified
+                                            //mesh.instanceDataBufferTest.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_TEST);
+
+                                            //this is supposed to be used only when needed for proper implementation
+                                            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
+                                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
                                         } else {
                                             //System.out.println("skipped render");
                                         }
 
-                                        //TODO: added, unverified
-                                        //mesh.instanceDataBufferTest.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_TEST);
 
-                                        //this is supposed to be used only when needed for proper implementation
-                                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
-                                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
 
 
                                     }

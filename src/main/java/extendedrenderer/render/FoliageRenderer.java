@@ -43,6 +43,7 @@ public class FoliageRenderer {
 
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
     public static FloatBuffer viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
+    public static FloatBuffer viewMatrixClassicBuffer = BufferUtils.createFloatBuffer(16);
 
     public Transformation transformation;
 
@@ -225,6 +226,7 @@ public class FoliageRenderer {
         }
 
         shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
+        shaderProgram.setUniformEfficient("modelViewMatrixClassic", viewMatrix, viewMatrixClassicBuffer);
 
         shaderProgram.setUniform("texture_sampler", 0);
 
@@ -238,7 +240,7 @@ public class FoliageRenderer {
         shaderProgram.setUniform("windDir", windDir);
 
         //temp
-        windSpeed = 0.0F;
+        windSpeed = 0.5F;
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
@@ -297,7 +299,7 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
-        int radialRange = 30;
+        int radialRange = 60;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -317,9 +319,9 @@ public class FoliageRenderer {
                         float distMax = 3F;
                         double distFadeRange = 10;
                         double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                        if (dist < distMax) {
+                        /*if (dist < distMax) {
                             foliage.particleAlpha = (float) (dist) / distMax;
-                        } else if (dist > radialRange - distFadeRange) {
+                        } else */if (dist > radialRange - distFadeRange) {
 
                             double diff = dist - ((double)radialRange - distFadeRange);
                             foliage.particleAlpha = (float)(1F - (diff / distFadeRange));

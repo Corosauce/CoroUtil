@@ -25,6 +25,7 @@ varying vec4 outRGBA;
 //uniform mat4 projectionMatrix;
 
 uniform mat4 modelViewMatrixCamera;
+uniform mat4 modelViewMatrixClassic;
 
 uniform int time;
 uniform float partialTick;
@@ -52,10 +53,10 @@ void main()
 
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
-    int timeMod = int(mod((timeSmooth + index * 3) * 2, 360));
+    int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
     //int timeMod = int(mod(((timeSmooth) * 6), 360));
 
-    float variance = 0.25;
+    float variance = windSpeed * 0.25;
 
     float rot = sin(timeMod * 0.0174533) * variance;
     float rot2 = cos(timeMod * 0.0174533) * variance;
@@ -68,8 +69,10 @@ void main()
 
     float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
 
-    float xAdj = -sin(adjDir * 0.0174533) * windSpeed;
-    float zAdj = cos(adjDir * 0.0174533) * windSpeed;
+    float ampWind = 0.6;
+
+    float xAdj = -sin(adjDir * 0.0174533) * windSpeed * ampWind;
+    float zAdj = cos(adjDir * 0.0174533) * windSpeed * ampWind;
     //rot = 0;
     //rot2 = 0;
     mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
@@ -94,8 +97,23 @@ void main()
         gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
     }
 
-    vec4 eyePos = gl_ModelViewMatrix * gl_Position;
-    gl_FogFragCoord = abs(eyePos.z/eyePos.w);
+    //vec4
+    //gl_Position
+
+    //from example:
+    //vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
+    //gl_FogFragCoord = abs(eyePos.z/eyePos.w);
+
+    //vec4 eyePos = gl_ModelViewMatrix * vec4(position, 1.0);
+    //vec4 eyePos = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+    //gl_FogFragCoord = abs(eyePos.z/eyePos.w);
+
+    //this is for distance to camera
+    //gl_FogFragCoord = alpha;
+
+    //my math is bad and i should feel bad... but this works
+    gl_FogFragCoord = abs(gl_Position.z);
+    //gl_FogFragCoord = 6;
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);

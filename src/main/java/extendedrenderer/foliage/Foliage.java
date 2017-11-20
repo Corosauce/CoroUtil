@@ -1,6 +1,7 @@
 package extendedrenderer.foliage;
 
 import extendedrenderer.shader.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -104,6 +105,9 @@ public class Foliage implements IShaderRenderedEntity {
         if (mesh.curBufferPos >= mesh.numInstances) return;
 
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), particleAlpha);
+
+        //TEMP
+        //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getMinecraft().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
 
         float brightness;
         //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
