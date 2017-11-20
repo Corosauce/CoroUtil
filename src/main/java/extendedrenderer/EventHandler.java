@@ -26,7 +26,7 @@ public class EventHandler {
 
 	
 	//public long lastWorldTime;
-    public World lastWorld;
+    public static World lastWorld;
     //public static Renderer shaderTest;
 
     @SubscribeEvent
@@ -72,6 +72,22 @@ public class EventHandler {
 
         Minecraft mc = Minecraft.getMinecraft();
 
+        EventHandler.hookRenderShaders(event.getPartialTicks());
+
+        /*er.enableLightmap();
+        RenderHelper.disableStandardItemLighting();
+
+        er.disableLightmap();*/
+
+        
+        //old code call
+        //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+    }
+
+    public static void hookRenderShaders(float partialTicks) {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (mc.world == null || mc.player == null) return;
 
         //update world reference and clear old effects on world change or on no world
         if (lastWorld != mc.world) {
@@ -89,7 +105,7 @@ public class EventHandler {
             er.enableLightmap();
             mc.mcProfiler.endStartSection("litParticles");
             //particlemanager.renderLitParticles(entity, partialTicks);
-            ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity) mc.getRenderViewEntity(), (float) event.getPartialTicks());
+            ExtendedRenderer.rotEffRenderer.renderLitParticles((Entity) mc.getRenderViewEntity(), (float) partialTicks);
             RenderHelper.disableStandardItemLighting();
             //private method, cant use.... for now
             //er.setupFog(0, event.getPartialTicks());
@@ -126,21 +142,14 @@ public class EventHandler {
                 }
             }
 
-            ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), event.getPartialTicks());
+            ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
 
-            //ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), event.getPartialTicks());
+            ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), partialTicks);
+
+
 
             er.disableLightmap();
         }
-
-        /*er.enableLightmap();
-        RenderHelper.disableStandardItemLighting();
-
-        er.disableLightmap();*/
-
-        
-        //old code call
-        //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
     }
 	
 	@SideOnly(Side.CLIENT)

@@ -378,7 +378,7 @@ public class RotatingParticleManager
 	        	float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
 	        	float fogColorGreen = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175082_R");
 	        	float fogColorBlue = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175081_S");
-	        	GlStateManager.glFog(2918, this.setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
+	        	GlStateManager.glFog(GL11.GL_FOG_COLOR, this.setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
 	            GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
 	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	            
@@ -488,7 +488,7 @@ public class RotatingParticleManager
         int bufferSize = 0;
         int particles = 0;
 
-        //if (useShaders) {
+        if (useShaders) {
             ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("particle");
             transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
@@ -533,7 +533,7 @@ public class RotatingParticleManager
             shaderProgram.setUniform("texture_sampler", 0);
 
             CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
-        //}
+        }
 
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
@@ -722,85 +722,6 @@ public class RotatingParticleManager
         }
 
         //ExtendedRenderer.foliageRenderer.renderJustShaders(entityIn, partialTicks);
-
-        boolean test = false;
-        if (test) {
-            shaderProgram = ShaderEngine.renderer.getShaderProgram("foliage");
-            //transformation = ShaderEngine.renderer.transformation;
-            shaderProgram.bind();
-
-            shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
-
-            shaderProgram.setUniform("texture_sampler", 0);
-
-            MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
-            InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
-
-            mesh.initRender();
-            mesh.initRenderVBO1();
-            mesh.initRenderVBO2();
-
-            //also resets position
-            mesh.instanceDataBuffer.clear();
-            mesh.instanceDataBufferSeldom.clear();
-            mesh.curBufferPos = 0;
-
-            BlockPos pos = entityIn.getPosition();
-
-            List<Foliage> listFoliage = new ArrayList<>();
-
-            Random rand = new Random();
-            int range = 10;
-
-            //make obj
-            for (int i = 0; i < 100; i++) {
-                Foliage foliage = new Foliage();
-                int randX = rand.nextInt(range) - range / 2;
-                int randY = rand.nextInt(range) - range / 2;
-                int randZ = rand.nextInt(range) - range / 2;
-                foliage.setPosition(new BlockPos(pos).up(4).add(randX, randY, randZ));
-                foliage.rotationYaw = 1;
-                foliage.rotationPitch = 1;
-                foliage.particleScale = 100;
-                listFoliage.add(foliage);
-            }
-
-            for (Foliage foliage : listFoliage) {
-                foliage.updateQuaternion(entityIn);
-
-                //update vbo1
-                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
-            }
-
-            //mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
-
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
-
-            mesh.curBufferPos = 0;
-
-            for (Foliage foliage : listFoliage) {
-
-                //update vbo2
-                foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
-            }
-
-            //wasnt used in particle renderer and even crashes it :o
-            //mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
-            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
-
-            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, mesh.curBufferPos);
-
-            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-            mesh.endRenderVBO1();
-            mesh.endRenderVBO2();
-            mesh.endRender();
-
-            ShaderEngine.renderer.getShaderProgram("foliage").unbind();
-        }
 
         if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
             System.out.println("particles: " + particles);

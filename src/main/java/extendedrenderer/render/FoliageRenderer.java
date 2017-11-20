@@ -203,8 +203,8 @@ public class FoliageRenderer {
         boolean updateFoliageObjects = false;
         boolean updateVBO1 = true;
         boolean updateVBO2 = false;
-        boolean add = false;
-        boolean trim = false;
+        boolean add = true;
+        boolean trim = true;
 
         /**
          * TODO: lazy foliage management done, now to make it play nicer with VBO and not break ordering
@@ -237,7 +237,7 @@ public class FoliageRenderer {
 
         CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
 
-        int radialRange = 150;
+        int radialRange = 15;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -268,7 +268,7 @@ public class FoliageRenderer {
                                         foliage.prevPosZ = foliage.posZ;
                                         foliage.rotationYaw = 0;
                                         //foliage.rotationYaw = 90;
-                                        foliage.rotationYaw = rand.nextInt(360);
+                                        foliage.rotationYaw = world.rand.nextInt(360);
                                         //foliage.rotationPitch = rand.nextInt(90) - 45;
                                         foliage.particleScale /= 0.2;
 

@@ -1,5 +1,4 @@
 #version 120
-#pragma optimize(off)
 
 in int gl_VertexID;
 in int gl_InstanceID;
@@ -89,6 +88,9 @@ void main()
     } else {
         gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
     }
+
+    vec4 eyePos = gl_ModelViewMatrix * gl_Position;
+    gl_FogFragCoord = abs(eyePos.z/eyePos.w);
 
 	// Support for texture atlas, update texture coordinates
     //float x = (texCoord.x / numCols + texOffset.x);
