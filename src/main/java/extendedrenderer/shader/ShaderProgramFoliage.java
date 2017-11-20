@@ -11,6 +11,7 @@ public class ShaderProgramFoliage extends ShaderProgram {
     private int vertexShaderAttributeBrightness = InstancedMeshFoliage.vboSizeMesh + 1;
     private int vertexShaderAttributeModelMatrix = InstancedMeshFoliage.vboSizeMesh + 2;
     private int vertexShaderAttributeRGBATest = InstancedMeshFoliage.vboSizeMesh + 6;
+    private int vertexShaderAttributeIndex = InstancedMeshFoliage.vboSizeMesh + 7;
 
     public ShaderProgramFoliage(String name) throws Exception {
         super(name);
@@ -26,5 +27,6 @@ public class ShaderProgramFoliage extends ShaderProgram {
         //ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeAlpha, "alpha");
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeBrightness, "brightness");
+        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeIndex, "index");
     }
 }

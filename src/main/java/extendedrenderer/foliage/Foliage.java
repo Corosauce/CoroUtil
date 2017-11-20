@@ -144,6 +144,10 @@ public class Foliage implements IShaderRenderedEntity {
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.rotationYaw);
 
+        //index, aka buffer pos?
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+                + (rgbaIndex++), mesh.curBufferPos);
+
         mesh.curBufferPos++;
     }
 }

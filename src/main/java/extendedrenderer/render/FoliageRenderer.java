@@ -2,6 +2,7 @@ package extendedrenderer.render;
 
 import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.foliage.Foliage;
 import extendedrenderer.foliage.FoliageClutter;
 import extendedrenderer.foliage.ParticleTallGrassTemp;
@@ -27,6 +28,7 @@ import org.lwjgl.opengl.GL15;
 
 import java.nio.FloatBuffer;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -46,8 +48,12 @@ public class FoliageRenderer {
 
     public boolean needsUpdate = true;
 
-    public List<Foliage> listFoliage = new ArrayList<>();
-    public HashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new HashMap<>();
+    public static boolean dirtyVBO2Flag = false;
+    public static List<BlockPos> foliageQueueAdd = new ArrayList();
+    public static List<BlockPos> foliageQueueRemove = new ArrayList();
+
+    //public List<Foliage> listFoliage = new ArrayList<>();
+    public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
 
     public float windDir = 0;
     public float windSpeed = 0;
@@ -80,8 +86,69 @@ public class FoliageRenderer {
         }
     }
 
-    public boolean validFoliageSpot(World world, BlockPos pos) {
-        return world.getBlockState(pos).getMaterial() == Material.GRASS && world.isAirBlock(pos.up());
+    public synchronized boolean getFlag() {
+        return dirtyVBO2Flag;
+    }
+
+    public synchronized void processQueue() {
+        World world = Minecraft.getMinecraft().world;
+
+        try {
+
+            for (int ii = 0; ii < foliageQueueAdd.size(); ii++) {
+                BlockPos pos = foliageQueueAdd.get(ii);
+            //for (BlockPos pos : foliageQueueAdd) {
+                IBlockState state = world.getBlockState(pos.down());
+                List<Foliage> listClutter = new ArrayList<>();
+                for (int i = 0; i < FoliageClutter.clutterSize; i++) {
+                    Foliage foliage = new Foliage();
+                    foliage.setPosition(pos);
+                    foliage.posY += 0.5F;
+                    foliage.prevPosY = foliage.posY;
+                                            /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                            foliage.prevPosX = foliage.posX;
+                                            foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                            foliage.prevPosZ = foliage.posZ;*/
+                    foliage.posX += 0.5F;
+                    foliage.prevPosX = foliage.posX;
+                    foliage.posZ += 0.5F;
+                    foliage.prevPosZ = foliage.posZ;
+                    foliage.rotationYaw = 0;
+                    //foliage.rotationYaw = 90;
+                    foliage.rotationYaw = world.rand.nextInt(360);
+
+                    //cross sectionize based on initial random from first part, remove if using more than 2 per clutter
+                    if (i == 1) {
+                        foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
+                    }
+
+                    //foliage.rotationPitch = rand.nextInt(90) - 45;
+                    foliage.particleScale /= 0.2;
+
+                    int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
+                    foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+                    foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+                    foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+
+                    listClutter.add(foliage);
+                    lookupPosToFoliage.put(pos, listClutter);
+                }
+            }
+
+            //for (BlockPos pos : foliageQueueRemove) {
+            for (int i = 0; i < foliageQueueRemove.size(); i++) {
+                BlockPos pos = foliageQueueRemove.get(i);
+                lookupPosToFoliage.remove(pos);
+            }
+        } catch (Exception ex) {
+            System.out.println("foliage queue CME");
+            //ex.printStackTrace();
+        }
+
+        foliageQueueAdd.clear();
+        foliageQueueRemove.clear();
     }
 
     public void renderJustShaders(Entity entityIn, float partialTicks)
@@ -171,7 +238,7 @@ public class FoliageRenderer {
         shaderProgram.setUniform("windDir", windDir);
 
         //temp
-        windSpeed = 0.2F;
+        windSpeed = 0.0F;
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
@@ -188,7 +255,7 @@ public class FoliageRenderer {
         boolean updateFoliageObjects = false;
         boolean updateVBO1 = true;
         boolean updateVBO2 = false;
-        boolean add = true;
+        boolean add = false;
         boolean trim = true;
 
         /**
@@ -210,7 +277,17 @@ public class FoliageRenderer {
         rand.setSeed(5);
         int range = 150;
 
-        int amount = 70000;
+        /**
+         *
+         * For staticly sized foliage, 6000 is decent for tallgrass, with 30 range
+         * - with this we can try to add and remove entries without changing entire index order
+         * - how do we blank out an entry so it doesnt render?
+         *
+         * ehhh, for now lets just force a full refresh and feed our own index in
+         *
+         */
+
+        int amount = 6000;
         int adjAmount = amount;
 
         boolean subTest = false;
@@ -220,89 +297,14 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
-        int radialRange = 15;
+        int radialRange = 30;
 
         int xzRange = radialRange;
         int yRange = 10;
 
-        boolean dirtyVBO2 = false;
-
-        //scan and add foliage around player
-        //TODO: firstly, dont do this per render tick geeze, secondly, thread it just like weather leaf block scan
-        //time here is a hack for now
-        if (add && world.getTotalWorldTime() % 5 == 0) {
-            for (int x = -xzRange; x <= xzRange; x++) {
-                for (int z = -xzRange; z <= xzRange; z++) {
-                    for (int y = -yRange; y <= yRange; y++) {
-                        BlockPos posScan = pos.add(x, y, z);
-                        IBlockState state = entityIn.world.getBlockState(posScan.down());
-                        if (!lookupPosToFoliage.containsKey(posScan)) {
-                            if (validFoliageSpot(entityIn.world, posScan.down())) {
-                            //if () {
-                                if (entityIn.getDistanceSq(posScan) <= radialRange * radialRange) {
-                                    List<Foliage> listClutter = new ArrayList<>();
-                                    for (int i = 0; i < FoliageClutter.clutterSize; i++) {
-                                        Foliage foliage = new Foliage();
-                                        foliage.setPosition(posScan);
-                                        foliage.posY += 0.5F;
-                                        foliage.prevPosY = foliage.posY;
-                                        /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
-                                        foliage.prevPosX = foliage.posX;
-                                        foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
-                                        foliage.prevPosZ = foliage.posZ;*/
-                                        foliage.posX += 0.5F;
-                                        foliage.prevPosX = foliage.posX;
-                                        foliage.posZ += 0.5F;
-                                        foliage.prevPosZ = foliage.posZ;
-                                        foliage.rotationYaw = 0;
-                                        //foliage.rotationYaw = 90;
-                                        foliage.rotationYaw = world.rand.nextInt(360);
-
-                                        //cross sectionize based on initial random from first part, remove if using more than 2 per clutter
-                                        if (i == 1) {
-                                            foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
-                                        }
-
-                                        //foliage.rotationPitch = rand.nextInt(90) - 45;
-                                        foliage.particleScale /= 0.2;
-
-                                        int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, entityIn.world, posScan.down(), 0);
-                                        foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
-                                        foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
-                                        foliage.particleBlue = (float) (color & 255) / 255.0F;
-
-                                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
-
-                                        listClutter.add(foliage);
-                                    }
-
-                                    lookupPosToFoliage.put(posScan, listClutter);
-
-                                    dirtyVBO2 = true;
-                                }
-                            }
-                        } else {
-
-                        }
-                    }
-                }
-            }
-        }
-
-        //cleanup list
-        if (trim) {
-            Iterator<Map.Entry<BlockPos, List<Foliage>>> it = lookupPosToFoliage.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<BlockPos, List<Foliage>> entry = it.next();
-                if (!validFoliageSpot(world, entry.getKey().down())) {
-                //if (state.getMaterial() != Material.GRASS) {
-                    it.remove();
-                    dirtyVBO2 = true;
-                } else if (entityIn.getDistanceSq(entry.getKey()) > radialRange * radialRange) {
-                    it.remove();
-                    dirtyVBO2 = true;
-                }
-            }
+        boolean dirtyVBO2 = getFlag();
+        if (dirtyVBO2) {
+            processQueue();
         }
 
         if (!skipUpdate || needsUpdate) {
@@ -310,13 +312,22 @@ public class FoliageRenderer {
             if (updateVBO1 || needsUpdate) {
                 for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
                     for (Foliage foliage : listFoliage) {
+
+                        //close fade
                         float distMax = 3F;
+                        double distFadeRange = 10;
                         double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
                         if (dist < distMax) {
                             foliage.particleAlpha = (float) (dist) / distMax;
+                        } else if (dist > radialRange - distFadeRange) {
+
+                            double diff = dist - ((double)radialRange - distFadeRange);
+                            foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
+
                         } else {
                             foliage.particleAlpha = 1F;
                         }
+
 
                         foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
 
@@ -333,7 +344,7 @@ public class FoliageRenderer {
 
                 OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
 
-                if (!subTest) {
+                if (true || !subTest) {
                     ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
                 } else {
                     GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
@@ -362,7 +373,7 @@ public class FoliageRenderer {
 
                 OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
 
-                if (!subTest) {
+                if (true || !subTest) {
                     ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
                 } else {
                     GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
@@ -372,7 +383,15 @@ public class FoliageRenderer {
 
         needsUpdate = false;
 
-        ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);
+        if (!subTest) {
+            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                    0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);
+        } else {
+            //if (lookupPosToFoliage.size() > 5) {
+                ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                        0, adjAmount);
+            //}
+        }
 
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 

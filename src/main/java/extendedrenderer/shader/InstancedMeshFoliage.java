@@ -23,9 +23,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = 2;
 
-    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 4;
+    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 5;
 
-    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 4;
+    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 5;
 
     public final int numInstances;
 
@@ -91,6 +91,12 @@ public class InstancedMeshFoliage extends Mesh {
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
 
+        //instance index
+        //brightness
+        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribDivisor(start, 1);
+        start++;
+
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         ShaderManager.glBindVertexArray(0);
     }
@@ -144,7 +150,7 @@ public class InstancedMeshFoliage extends Mesh {
         //model matrix + brightness
         int numElementsVBO1 = 2;
 
-        int numElementsVBO2 = 5;
+        int numElementsVBO2 = 6;
         for (int i = 0; i < numElementsVBO2; i++) {
             GL20.glEnableVertexAttribArray(start + numElementsVBO1 + i);
         }
