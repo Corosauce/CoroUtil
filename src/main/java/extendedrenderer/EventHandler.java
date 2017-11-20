@@ -6,13 +6,15 @@ import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.FoliageRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.ShaderEngine;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.*;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -21,6 +23,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
 import CoroUtil.forge.CoroUtil;
+import org.lwjgl.opengl.GL11;
+
+import java.nio.FloatBuffer;
 
 public class EventHandler {
 
@@ -28,6 +33,15 @@ public class EventHandler {
 	//public long lastWorldTime;
     public static World lastWorld;
     //public static Renderer shaderTest;
+
+    public static int mip_min = 0;
+    public static int mip_mag = 0;
+
+    private static final FloatBuffer fogColorBuffer = GLAllocation.createDirectFloatBuffer(16);
+
+
+    //a hack to enable fog for particles when weather2 sandstorm is active
+    public static float sandstormFogAmount = 0F;
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
@@ -72,7 +86,7 @@ public class EventHandler {
 
         Minecraft mc = Minecraft.getMinecraft();
 
-        EventHandler.hookRenderShaders(event.getPartialTicks());
+        //EventHandler.hookRenderShaders(event.getPartialTicks());
 
         /*er.enableLightmap();
         RenderHelper.disableStandardItemLighting();
@@ -142,14 +156,126 @@ public class EventHandler {
                 }
             }
 
+            preShaderRender(mc.getRenderViewEntity(), partialTicks);
+
             ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
 
             ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), partialTicks);
 
 
 
+            postShaderRender(mc.getRenderViewEntity(), partialTicks);
+
             er.disableLightmap();
         }
+    }
+
+    public static void preShaderRender(Entity entityIn, float partialTicks) {
+
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityRenderer er = mc.entityRenderer;
+
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
+        GlStateManager.alphaFunc(516, 0.003921569F);
+        //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
+        //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
+
+        //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
+        if (!ConfigCoroAI.disableMipmapFix) {
+            mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
+            mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        }
+
+        //TODO: requires AT for EntityRenderer
+        boolean testGLUOverride = false;
+        if (testGLUOverride) {
+	        /*GlStateManager.matrixMode(5889);
+	        GlStateManager.loadIdentity();
+	        Project.gluPerspective(er.getFOVModifier(partialTicks, true), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, er.farPlaneDistance * 4.0F);
+	        GlStateManager.matrixMode(5888);*/
+        }
+
+        boolean fog = true;
+        if (fog) {
+            boolean ATmode = true;
+
+            //TODO: make match other fog states
+
+            if (ATmode) {
+                //TODO: add AT if this will be used
+
+                er.setupFog(0, partialTicks);
+
+                float fogScaleInvert = 1F - sandstormFogAmount;
+
+                //customized
+                //GlStateManager.setFogDensity(0F);
+                GlStateManager.setFogStart(0F);
+                GlStateManager.setFogEnd(Math.max(40F, 1000F * fogScaleInvert));
+                //GlStateManager.setFogEnd(30F);
+                /**/
+            } else {
+                //incomplete copy
+                float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
+                float fogColorGreen = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175082_R");
+                float fogColorBlue = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175081_S");
+                GlStateManager.glFog(GL11.GL_FOG_COLOR, setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
+                GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+                Entity entity = mc.getRenderViewEntity();
+                IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.world, entity, partialTicks);
+	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
+	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
+
+                GlStateManager.setFogDensity(1F);
+
+                GlStateManager.enableColorMaterial();
+                GlStateManager.enableFog();
+                GlStateManager.colorMaterial(1028, 4608);
+            }
+
+            /*GlStateManager.setFogStart(0);
+            GlStateManager.setFogEnd(100);*/
+        }
+
+        GlStateManager.disableCull();
+
+        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(mc.world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    public static void postShaderRender(Entity entityIn, float partialTicks) {
+
+        GlStateManager.enableCull();
+
+        boolean fog = true;
+        if (fog) {
+            GlStateManager.disableFog();
+        }
+
+        //restore original mipmap state
+        if (!ConfigCoroAI.disableMipmapFix) {
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
+        }
+
+        GlStateManager.depthMask(true);
+        GlStateManager.disableBlend();
+        GlStateManager.alphaFunc(516, 0.1F);
+    }
+
+    private static FloatBuffer setFogColorBuffer(float red, float green, float blue, float alpha)
+    {
+        fogColorBuffer.clear();
+        fogColorBuffer.put(red).put(green).put(blue).put(alpha);
+        fogColorBuffer.flip();
+        return fogColorBuffer;
     }
 	
 	@SideOnly(Side.CLIENT)

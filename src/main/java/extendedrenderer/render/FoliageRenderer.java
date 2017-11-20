@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -69,38 +70,18 @@ public class FoliageRenderer {
             Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
             Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
 
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.alphaFunc(516, 0.003921569F);
-
-            int mip_min = 0;
-            int mip_mag = 0;
-
-            if (!ConfigCoroAI.disableMipmapFix) {
-                mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
-                mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
-                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-            }
-
             GlStateManager.depthMask(true);
 
-            GlStateManager.disableCull();
+            mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
             renderJustShaders(entityIn, partialTicks);
 
-            GlStateManager.enableCull();
-
-            GlStateManager.depthMask(true);
-
-            if (!ConfigCoroAI.disableMipmapFix) {
-                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
-                GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
-            }
-
-            GlStateManager.disableBlend();
-            GlStateManager.alphaFunc(516, 0.1F);
+            //GlStateManager.depthMask(true);
         }
+    }
+
+    public boolean validFoliageSpot(World world, BlockPos pos) {
+        return world.getBlockState(pos).getMaterial() == Material.GRASS && world.isAirBlock(pos.up());
     }
 
     public void renderJustShaders(Entity entityIn, float partialTicks)
@@ -188,6 +169,10 @@ public class FoliageRenderer {
 
         shaderProgram.setUniform("partialTick", partialTicks);
         shaderProgram.setUniform("windDir", windDir);
+
+        //temp
+        windSpeed = 0.2F;
+
         shaderProgram.setUniform("windSpeed", windSpeed);
 
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
@@ -235,8 +220,6 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
-        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
-
         int radialRange = 15;
 
         int xzRange = radialRange;
@@ -254,7 +237,8 @@ public class FoliageRenderer {
                         BlockPos posScan = pos.add(x, y, z);
                         IBlockState state = entityIn.world.getBlockState(posScan.down());
                         if (!lookupPosToFoliage.containsKey(posScan)) {
-                            if (state.getMaterial() == Material.GRASS) {
+                            if (validFoliageSpot(entityIn.world, posScan.down())) {
+                            //if () {
                                 if (entityIn.getDistanceSq(posScan) <= radialRange * radialRange) {
                                     List<Foliage> listClutter = new ArrayList<>();
                                     for (int i = 0; i < FoliageClutter.clutterSize; i++) {
@@ -262,13 +246,23 @@ public class FoliageRenderer {
                                         foliage.setPosition(posScan);
                                         foliage.posY += 0.5F;
                                         foliage.prevPosY = foliage.posY;
-                                        foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
                                         foliage.prevPosX = foliage.posX;
                                         foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosZ = foliage.posZ;*/
+                                        foliage.posX += 0.5F;
+                                        foliage.prevPosX = foliage.posX;
+                                        foliage.posZ += 0.5F;
                                         foliage.prevPosZ = foliage.posZ;
                                         foliage.rotationYaw = 0;
                                         //foliage.rotationYaw = 90;
                                         foliage.rotationYaw = world.rand.nextInt(360);
+
+                                        //cross sectionize based on initial random from first part, remove if using more than 2 per clutter
+                                        if (i == 1) {
+                                            foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
+                                        }
+
                                         //foliage.rotationPitch = rand.nextInt(90) - 45;
                                         foliage.particleScale /= 0.2;
 
@@ -300,8 +294,8 @@ public class FoliageRenderer {
             Iterator<Map.Entry<BlockPos, List<Foliage>>> it = lookupPosToFoliage.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<BlockPos, List<Foliage>> entry = it.next();
-                IBlockState state = entityIn.world.getBlockState(entry.getKey().down());
-                if (state.getMaterial() != Material.GRASS) {
+                if (!validFoliageSpot(world, entry.getKey().down())) {
+                //if (state.getMaterial() != Material.GRASS) {
                     it.remove();
                     dirtyVBO2 = true;
                 } else if (entityIn.getDistanceSq(entry.getKey()) > radialRange * radialRange) {

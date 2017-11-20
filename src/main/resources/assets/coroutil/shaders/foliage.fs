@@ -22,10 +22,10 @@ void main()
         fogFactor = clamp(fogFactor, 0.0, 1.0);
         gl_FragColor = mix(gl_Fog.color, fragColor, fogFactor);
         gl_FragColor.w = fragColor.w;
-        //gl_FragColor = fragColor;
+        gl_FragColor = fragColor;
     } else {
         gl_FragColor = fragColor;
     }
 
-    gl_FragColor = fragColor;
+    //gl_FragColor = fragColor;
 }

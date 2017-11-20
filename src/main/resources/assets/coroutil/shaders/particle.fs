@@ -29,5 +29,5 @@ void main()
 
     //gl_FragColor.w = 0.1;
 
-    //gl_FragColor = fragColor;
+    gl_FragColor = fragColor;
 }

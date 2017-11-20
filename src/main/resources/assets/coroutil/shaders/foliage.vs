@@ -50,10 +50,13 @@ void main()
 {
 
     float timeSmooth = (time-1) + partialTick;
-    //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
-    int timeMod = int(mod(((timeSmooth) * 6), 360));
-    float rot = sin(timeMod * 0.0174533) * 0.45;
-    float rot2 = cos(timeMod * 0.0174533) * 0.45;
+    int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
+    //int timeMod = int(mod(((timeSmooth) * 6), 360));
+
+    float variance = 0.25;
+
+    float rot = sin(timeMod * 0.0174533) * variance;
+    float rot2 = cos(timeMod * 0.0174533) * variance;
 
     //baseyaw=atan2(R(2,1),R(1,1));
     float baseYaw=atan(modelMatrix[1][1],modelMatrix[2][1]);
@@ -63,8 +66,8 @@ void main()
 
     float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
 
-    float xAdj = -sin(adjDir * 0.0174533) * 1;
-    float zAdj = cos(adjDir * 0.0174533) * 1;
+    float xAdj = -sin(adjDir * 0.0174533) * windSpeed;
+    float zAdj = cos(adjDir * 0.0174533) * windSpeed;
     //rot = 0;
     //rot2 = 0;
     mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
@@ -84,7 +87,7 @@ void main()
 
     //top parts
     if (gl_VertexID == 0 || gl_VertexID == 3) {
-        gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + 0, position.z + zAdj, 1.0);
+        gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y - 0.0, position.z + zAdj, 1.0);
     } else {
         gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
     }

@@ -66,11 +66,6 @@ public class RotatingParticleManager
     private final Queue<Particle> queueEntityFX = Queues.<Particle>newArrayDeque();
     
     //ExtendedRenderer Additions
-    
-    private final FloatBuffer fogColorBuffer = GLAllocation.createDirectFloatBuffer(16);
-
-    //a hack to enable fog for particles when weather2 sandstorm is active
-    public static float sandstormFogAmount = 0F;
 
     public static int debugParticleRenderCount;
 
@@ -306,11 +301,6 @@ public class RotatingParticleManager
      */
     public void renderParticles(Entity entityIn, float partialTicks)
     {
-
-
-        //if (true) return;
-
-
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();
         float f2 = ActiveRenderInfo.getRotationYZ();
@@ -320,89 +310,10 @@ public class RotatingParticleManager
         Particle.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
         Particle.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
         Particle.cameraViewDir = entityIn.getLook(partialTicks);
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
-        GlStateManager.alphaFunc(516, 0.003921569F);
-        //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
-        //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
-        
 
-
-        int mip_min = 0;
-        int mip_mag = 0;
-
-        //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
-        if (!ConfigCoroAI.disableMipmapFix) {
-            mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
-            mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        }
-
-
-        
         Minecraft mc = Minecraft.getMinecraft();
-        EntityRenderer er = mc.entityRenderer;
-        
-        //TODO: requires AT for EntityRenderer
-        boolean testGLUOverride = false;
-        if (testGLUOverride) {
-	        /*GlStateManager.matrixMode(5889);
-	        GlStateManager.loadIdentity();
-	        Project.gluPerspective(er.getFOVModifier(partialTicks, true), (float)mc.displayWidth / (float)mc.displayHeight, 0.05F, er.farPlaneDistance * 4.0F);
-	        GlStateManager.matrixMode(5888);*/
-        }
-        
-        boolean fog = true;
-        if (fog) {
-        	boolean ATmode = true;
-        	
-        	//TODO: make match other fog states
-        	
-        	if (ATmode) {
-        		//TODO: add AT if this will be used
-
-                er.setupFog(0, partialTicks);
-
-                float fogScaleInvert = 1F - sandstormFogAmount;
-
-                //customized
-                //GlStateManager.setFogDensity(0F);
-                GlStateManager.setFogStart(0F);
-                GlStateManager.setFogEnd(Math.max(40F, 1000F * fogScaleInvert));
-                //GlStateManager.setFogEnd(30F);
-                /**/
-        	} else {
-        		//incomplete copy
-	        	float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
-	        	float fogColorGreen = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175082_R");
-	        	float fogColorBlue = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175081_S");
-	        	GlStateManager.glFog(GL11.GL_FOG_COLOR, this.setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
-	            GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
-	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-	            
-	            Entity entity = mc.getRenderViewEntity();
-	            IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.world, entity, partialTicks);
-	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
-	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
-	            
-	            GlStateManager.setFogDensity(1F);
-	            
-	            GlStateManager.enableColorMaterial();
-	            GlStateManager.enableFog();
-	            GlStateManager.colorMaterial(1028, 4608);
-        	}
-            
-            /*GlStateManager.setFogStart(0);
-            GlStateManager.setFogEnd(100);*/
-        }
-
-        //ArrayDeque<Particle>[][] entry = fxLayers.get(1);
 
         debugParticleRenderCount = 0;
-
-        //GlStateManager.depthMask(false);
 
         //testing no blending (so far notice no fps change)
         /*GL11.glDepthMask(true);
@@ -412,30 +323,6 @@ public class RotatingParticleManager
 
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
-
-        /*useShaders = ShaderManager.canUseShadersInstancedRendering();
-
-        if (ConfigCoroAI.forceShadersOff) {
-            useShaders = false;
-        }
-
-        if (forceShaderReset) {
-            forceShaderReset = false;
-            ShaderEngine.cleanup();
-            ShaderEngine.renderer = null;
-        }
-
-        if (useShaders && ShaderEngine.renderer == null) {
-            //currently for if shader compiling fails, which is an ongoing issue for some machines...
-            if (!ShaderEngine.init()) {
-                ShaderManager.disableShaders();
-                useShaders = false;
-            } else {
-                System.out.println("Extended Renderer: Initialized instanced rendering shaders");
-            }
-        }*/
-
-        //useShaders = false;
 
         if (useShaders) {
             //temp render ordering setup, last to first
@@ -463,10 +350,6 @@ public class RotatingParticleManager
                 ex.printStackTrace();
             }
         }
-        GlStateManager.disableCull();
-        //Main.gameLogic.renderer.render(null, Main.gameLogic.camera, Main.gameLogic.gameItems);
-
-        //if (true) return;
 
         Transformation transformation = null;
         Matrix4fe viewMatrix = null;
@@ -474,14 +357,6 @@ public class RotatingParticleManager
         if (world.getTotalWorldTime() % 20 < 10) {
             //useShaders = false;
         }
-
-        //useShaders = false;
-
-        //useShaders = !useShaders;
-
-        //
-
-
 
         int glCalls = 0;
         int trueRenderCount = 0;
@@ -532,7 +407,7 @@ public class RotatingParticleManager
 
             shaderProgram.setUniform("texture_sampler", 0);
 
-            CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+
         }
 
         //do sprite/mesh list
@@ -587,8 +462,6 @@ public class RotatingParticleManager
                                     case 1:
                                         this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                                 }
-
-                                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
                                 if (useShaders) {
 
@@ -721,30 +594,12 @@ public class RotatingParticleManager
             ShaderEngine.renderer.getShaderProgram("particle").unbind();
         }
 
-        //ExtendedRenderer.foliageRenderer.renderJustShaders(entityIn, partialTicks);
-
         if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
             System.out.println("particles: " + particles);
             System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
             System.out.println("trueRenderCount: " + trueRenderCount);
             System.out.println("glCalls: " + glCalls);
         }
-        
-        if (fog) {
-        	GlStateManager.disableFog();
-        }
-        
-        //restore original mipmap state
-        if (!ConfigCoroAI.disableMipmapFix) {
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
-        }
-        
-        GlStateManager.enableCull();
-
-        GlStateManager.depthMask(true);
-        GlStateManager.disableBlend();
-        GlStateManager.alphaFunc(516, 0.1F);
     }
 
     public void renderLitParticles(Entity entityIn, float partialTick)
@@ -791,7 +646,6 @@ public class RotatingParticleManager
             }
         }
 
-        //shader way
         /*for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
             for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
                 for (int i = 0; i < entry.length; i++) {
@@ -816,13 +670,5 @@ public class RotatingParticleManager
     	}*/
     	//item sheet seems only one used now
         return "" + count;
-    }
-    
-    private FloatBuffer setFogColorBuffer(float red, float green, float blue, float alpha)
-    {
-        this.fogColorBuffer.clear();
-        this.fogColorBuffer.put(red).put(green).put(blue).put(alpha);
-        this.fogColorBuffer.flip();
-        return this.fogColorBuffer;
     }
 }
