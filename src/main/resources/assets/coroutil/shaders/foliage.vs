@@ -11,8 +11,9 @@ attribute mat4 modelMatrix; //used to be modelViewMatrix, separate from view mat
 attribute vec4 rgba; //4th entry, alpha not used here, might as well leave vec4 unless more efficient to separate things to per float/attrib entries
 attribute float index;
 //often changed data - instanced
-attribute float alpha;
-attribute float brightness;
+attribute vec2 alphaBrightness;
+//attribute float alpha;
+//attribute float brightness;
 //alpha?
 //
 //attribute vec4 rgbaTest;
@@ -120,7 +121,7 @@ void main()
     //float y = (texCoord.y / numRows + texOffset.y);
 
 	outTexCoord = texCoord;
-	outBrightness = brightness;
+	outBrightness = alphaBrightness.y;
 
 	//temp
 	//rgba.x = 1;
@@ -128,5 +129,5 @@ void main()
 	//rgba.z = 1;
 	//rgba.w = 1;
 
-	outRGBA = new vec4(rgba.x, rgba.y, rgba.z, alpha);
+	outRGBA = new vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
 }

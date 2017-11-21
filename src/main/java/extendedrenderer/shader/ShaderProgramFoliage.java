@@ -7,11 +7,12 @@ public class ShaderProgramFoliage extends ShaderProgram {
     private int vertexShaderAttributeIndexPosition = 0;
     private int vertexShaderAttributeTexCoord = 1;
     //private int vertexShaderAttributeVertexNormal = 2;
-    private int vertexShaderAttributeAlpha = InstancedMeshFoliage.vboSizeMesh;
-    private int vertexShaderAttributeBrightness = InstancedMeshFoliage.vboSizeMesh + 1;
-    private int vertexShaderAttributeModelMatrix = InstancedMeshFoliage.vboSizeMesh + 2;
-    private int vertexShaderAttributeRGBATest = InstancedMeshFoliage.vboSizeMesh + 6;
-    private int vertexShaderAttributeIndex = InstancedMeshFoliage.vboSizeMesh + 7;
+    private int vertexShaderAttributeAlphaBrightness = InstancedMeshFoliage.vboSizeMesh;
+    //private int vertexShaderAttributeAlpha = InstancedMeshFoliage.vboSizeMesh;
+    //private int vertexShaderAttributeBrightness = InstancedMeshFoliage.vboSizeMesh + 1;
+    private int vertexShaderAttributeModelMatrix = InstancedMeshFoliage.vboSizeMesh + 1;
+    private int vertexShaderAttributeRGBATest = InstancedMeshFoliage.vboSizeMesh + 5;
+    private int vertexShaderAttributeIndex = InstancedMeshFoliage.vboSizeMesh + 6;
 
     public ShaderProgramFoliage(String name) throws Exception {
         super(name);
@@ -25,8 +26,9 @@ public class ShaderProgramFoliage extends ShaderProgram {
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeModelMatrix, "modelMatrix");
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeRGBATest, "rgba");
         //ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
-        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeAlpha, "alpha");
-        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeBrightness, "brightness");
+        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeAlphaBrightness, "alphaBrightness");
+        //ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeAlpha, "alpha");
+        //ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeBrightness, "brightness");
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeIndex, "index");
     }
 }

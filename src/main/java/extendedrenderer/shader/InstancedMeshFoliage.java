@@ -55,17 +55,17 @@ public class InstancedMeshFoliage extends Mesh {
         int start = vboSizeMesh;
         int strideStart = 0;
 
-        //alpha
-        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        //alpha, brightness
+        GL20.glVertexAttribPointer(start, 2, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += FLOAT_SIZE_BYTES;
 
         //brightness
-        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        /*GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
-        strideStart += FLOAT_SIZE_BYTES;
+        strideStart += FLOAT_SIZE_BYTES;*/
 
         /** VBO 2 START **/
 
@@ -86,16 +86,28 @@ public class InstancedMeshFoliage extends Mesh {
             strideStart += VECTOR4F_SIZE_BYTES;
         }
 
-        //rgba unused alpha
+        //red, green, blue, rotation
         GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
 
+        //instance index, animation ID, height index
+        //todo....
+
         //instance index
-        //brightness
         GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
+/*
+        //animation ID
+        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribDivisor(start, 1);
+        start++;
+
+        //height from base piece
+        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribDivisor(start, 1);
+        start++;*/
 
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         ShaderManager.glBindVertexArray(0);
@@ -128,9 +140,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public void initRenderVBO1() {
         int start = vboSizeMesh;
-        //alpha, brightness
-        int numElements = 2;
-        for (int i = 0; i < numElements; i++) {
+        //alphaBrightness
+        int numElementsVBO1 = 1;
+        for (int i = 0; i < numElementsVBO1; i++) {
             GL20.glEnableVertexAttribArray(start + i);
         }
     }
@@ -138,18 +150,19 @@ public class InstancedMeshFoliage extends Mesh {
     public void endRenderVBO1() {
 
         int start = vboSizeMesh;
-        //alpha, brightness
-        int numElements = 2;
-        for (int i = 0; i < numElements; i++) {
+        //alphaBrightness
+        int numElementsVBO1 = 1;
+        for (int i = 0; i < numElementsVBO1; i++) {
             GL20.glDisableVertexAttribArray(start + i);
         }
     }
 
     public void initRenderVBO2() {
         int start = vboSizeMesh;
-        //model matrix + brightness
-        int numElementsVBO1 = 2;
+        //alphaBrightness
+        int numElementsVBO1 = 1;
 
+        //model matrix + rgbrot
         int numElementsVBO2 = 6;
         for (int i = 0; i < numElementsVBO2; i++) {
             GL20.glEnableVertexAttribArray(start + numElementsVBO1 + i);
@@ -158,8 +171,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public void endRenderVBO2() {
         int start = vboSizeMesh;
-        int numElementsVBO1 = 2;
-        //model matrix + rgba
+        //alphaBrightness
+        int numElementsVBO1 = 1;
+        //model matrix + rgbrot
         int numElementsVBO2 = 5;
         for (int i = 0; i < numElementsVBO2; i++) {
             GL20.glDisableVertexAttribArray(start + numElementsVBO1 + i);
