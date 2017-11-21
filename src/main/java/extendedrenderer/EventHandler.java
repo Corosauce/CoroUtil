@@ -8,6 +8,7 @@ import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.ShaderEngine;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -182,14 +183,6 @@ public class EventHandler {
         //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
         //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
 
-        //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
-        if (!ConfigCoroAI.disableMipmapFix) {
-            mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
-            mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
-        }
-
         //TODO: requires AT for EntityRenderer
         boolean testGLUOverride = false;
         if (testGLUOverride) {
@@ -248,21 +241,38 @@ public class EventHandler {
         CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(mc.world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        mip_min = 0;
+        mip_mag = 0;
+
+        //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
+        if (!ConfigCoroAI.disableMipmapFix) {
+            mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            //                                  3553                10241
+            mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
+            //                                                      10240
+            mip_mag = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER);
+            //System.out.println(mip_min + " - " + mip_mag);
+            //                                                                                  9728
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        }
     }
 
     public static void postShaderRender(Entity entityIn, float partialTicks) {
+
+        //restore original mipmap state
+        if (!ConfigCoroAI.disableMipmapFix) {
+            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
+            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
+        }
 
         GlStateManager.enableCull();
 
         boolean fog = true;
         if (fog) {
             GlStateManager.disableFog();
-        }
-
-        //restore original mipmap state
-        if (!ConfigCoroAI.disableMipmapFix) {
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
-            GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
         }
 
         GlStateManager.depthMask(true);
