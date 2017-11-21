@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glGetInteger;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 
@@ -229,6 +230,16 @@ public class FoliageRenderer {
         shaderProgram.setUniformEfficient("modelViewMatrixClassic", viewMatrix, viewMatrixClassicBuffer);
 
         shaderProgram.setUniform("texture_sampler", 0);
+        int glFogMode = GL11.glGetInteger(GL11.GL_FOG_MODE);
+        int modeIndex = 0;
+        if (glFogMode == GL11.GL_LINEAR) {
+            modeIndex = 0;
+        } else if (glFogMode == GL11.GL_EXP) {
+            modeIndex = 1;
+        } else if (glFogMode == GL11.GL_EXP2) {
+            modeIndex = 2;
+        }
+        shaderProgram.setUniform("fogmode", modeIndex);
 
         try {
             shaderProgram.setUniform("time", (int) world.getTotalWorldTime());

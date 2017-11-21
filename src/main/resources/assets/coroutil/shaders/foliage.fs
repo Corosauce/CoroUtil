@@ -1,6 +1,7 @@
 #version 120
 
 uniform sampler2D texture_sampler;
+uniform int fogmode;
 
 varying vec2 outTexCoord;
 varying float outBrightness;
@@ -15,14 +16,16 @@ void main()
     // Linear fog
     //float fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
     //float fogFactor = gl_Fog.scale;
-    float fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
-
-    //gl_Fog.end is not what we think it is, according to my java code it should be 7
+    float fogFactor = 0;
+    if (fogmode == 0) {
+        // Linear fog
+        fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
+    } else if (fogmode == 1) {
+        // Exp fog
+        fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
+    }
 
     //float fogFactor = (7.0 - gl_FogFragCoord);// / gl_Fog.scale;
-    if (fogFactor > 0) {
-        //fogFactor = fogFactor / 7.0;
-    }
 
     //fogFactor = 0.1;
 

@@ -35,6 +35,8 @@ public class Renderer {
         shaderProgram.createUniform("modelViewMatrixCamera");
         //shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
+        //0 = linear, 1 = exp, 2 = exp2
+        shaderProgram.createUniform("fogmode");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
 
@@ -57,6 +59,7 @@ public class Renderer {
         shaderProgram.createUniform("partialTick");
         shaderProgram.createUniform("windDir");
         shaderProgram.createUniform("windSpeed");
+        shaderProgram.createUniform("fogmode");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }

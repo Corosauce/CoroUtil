@@ -45,8 +45,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 
@@ -406,6 +405,16 @@ public class RotatingParticleManager
             shaderProgram.setUniformEfficient("modelViewMatrixCamera", modelViewMatrix, viewMatrixBuffer);
 
             shaderProgram.setUniform("texture_sampler", 0);
+            int glFogMode = GL11.glGetInteger(GL11.GL_FOG_MODE);
+            int modeIndex = 0;
+            if (glFogMode == GL11.GL_LINEAR) {
+                modeIndex = 0;
+            } else if (glFogMode == GL11.GL_EXP) {
+                modeIndex = 1;
+            } else if (glFogMode == GL11.GL_EXP2) {
+                modeIndex = 2;
+            }
+            shaderProgram.setUniform("fogmode", modeIndex);
 
 
         }

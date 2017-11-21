@@ -1,6 +1,7 @@
 #version 120
 
 uniform sampler2D texture_sampler;
+uniform int fogmode;
 
 varying vec2 outTexCoord;
 varying float outBrightness;
@@ -9,11 +10,18 @@ varying vec4 outRGBA;
 void main()
 {
 
-    // Exp fog
-    //float fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
+    float fogFactor = 0;
 
-    // Linear fog
-    float fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
+
+    if (fogmode == 0) {
+        // Linear fog
+        fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
+    } else if (fogmode == 1) {
+        // Exp fog
+        fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
+    }
+
+    //float
 
     vec4 fragColor = texture2D(texture_sampler, outTexCoord);
 	fragColor.x *= outRGBA.x * outBrightness;
