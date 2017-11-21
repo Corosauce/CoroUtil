@@ -124,9 +124,9 @@ public class Foliage implements IShaderRenderedEntity {
         if (mesh.curBufferPos >= mesh.numInstances) return;
 
         //camera relative positions, for world position, remove the interpPos values
-        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks/* - this.interpPosX*/);
-        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks/* - this.interpPosY*/);
-        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks/* - this.interpPosZ*/);
+        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - this.interpPosX);
+        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - this.interpPosY);
+        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - this.interpPosZ);
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
         Vector3f pos = new Vector3f(posX, posY, posZ);
 

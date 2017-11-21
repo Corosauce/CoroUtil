@@ -74,10 +74,6 @@ public class FoliageRenderer {
             EntityRenderer er = mc.entityRenderer;
             World world = mc.world;
 
-            Foliage.interpPosX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
-            Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
-            Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-
             GlStateManager.depthMask(true);
 
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
@@ -192,9 +188,29 @@ public class FoliageRenderer {
         //Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
 
         //fix for camera model matrix being 0 0 0 on positions, readjusts to world positions for static rendering instanced meshes
-        float interpX = (float)(entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks);
-        float interpY = (float)(entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks);
-        float interpZ = (float)(entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks);
+        /**
+         * new problem, accuracy diminishes the more you are from 0 0 0 causing vertex flicker
+         * idea:
+         * - set a new point of reference each time you have to do a full vbo update
+         * -- if it works, it maintains speed and precision
+         * procedure:
+         * - on vbo refresh, set new "0 0 0" point
+         * - offset interp values by it
+         * - matrixFix = -(interp - VBOUpdateCamPos)
+         * - foliagepos = interp - VBOUpdateCamPos
+         */
+        boolean dirtyVBO2 = getFlag();
+        if (dirtyVBO2) {
+            processQueue();
+
+            //set new static camera point for max precision and speed
+            Foliage.interpPosX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
+            Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
+            Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
+        }
+        float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
+        float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
+        float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
         Matrix4fe matrixFix = new Matrix4fe();
         matrixFix = matrixFix.translationRotateScale(
                 -interpX, -interpY, -interpZ,
@@ -314,11 +330,6 @@ public class FoliageRenderer {
 
         int xzRange = radialRange;
         int yRange = 10;
-
-        boolean dirtyVBO2 = getFlag();
-        if (dirtyVBO2) {
-            processQueue();
-        }
 
         if (!skipUpdate || needsUpdate) {
 
