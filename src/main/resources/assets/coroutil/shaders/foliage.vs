@@ -9,7 +9,7 @@ attribute vec3 vertexNormal; //unused
 //seldom - instanced
 attribute mat4 modelMatrix; //used to be modelViewMatrix, separate from view matrix
 attribute vec4 rgba; //4th entry, alpha not used here, might as well leave vec4 unless more efficient to separate things to per float/attrib entries
-attribute float index;
+attribute vec3 indexAnimationIDHeightIndex;
 //often changed data - instanced
 attribute vec2 alphaBrightness;
 //attribute float alpha;
@@ -52,6 +52,9 @@ mat4 rotationMatrix(vec3 axis, float angle) {
 void main()
 {
 
+    float index = indexAnimationIDHeightIndex.x;
+    float animationID = indexAnimationIDHeightIndex.y;
+    float heightIndex = indexAnimationIDHeightIndex.z;
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
     int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));

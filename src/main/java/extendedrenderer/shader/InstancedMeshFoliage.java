@@ -23,9 +23,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = 2;
 
-    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 5;
+    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 7;
 
-    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 5;
+    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 7;
 
     public final int numInstances;
 
@@ -93,11 +93,14 @@ public class InstancedMeshFoliage extends Mesh {
 
         //instance index, animation ID, height index
         //todo....
-
-        //instance index
-        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        GL20.glVertexAttribPointer(start, 3, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
+
+        //instance index
+        /*GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribDivisor(start, 1);
+        start++;*/
 /*
         //animation ID
         GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
@@ -138,45 +141,41 @@ public class InstancedMeshFoliage extends Mesh {
         super.endRender();
     }
 
+    public int getAttribSizeVBO1() {
+        //alphaBrightness
+        return 1;
+    }
+
+    public int getAttribSizeVBO2() {
+        //model matrix + rgbrot + index,animationID,heightIndex
+        return 6;
+    }
+
     public void initRenderVBO1() {
         int start = vboSizeMesh;
-        //alphaBrightness
-        int numElementsVBO1 = 1;
-        for (int i = 0; i < numElementsVBO1; i++) {
+        for (int i = 0; i < getAttribSizeVBO1(); i++) {
             GL20.glEnableVertexAttribArray(start + i);
         }
     }
 
     public void endRenderVBO1() {
-
         int start = vboSizeMesh;
-        //alphaBrightness
-        int numElementsVBO1 = 1;
-        for (int i = 0; i < numElementsVBO1; i++) {
+        for (int i = 0; i < getAttribSizeVBO1(); i++) {
             GL20.glDisableVertexAttribArray(start + i);
         }
     }
 
     public void initRenderVBO2() {
         int start = vboSizeMesh;
-        //alphaBrightness
-        int numElementsVBO1 = 1;
-
-        //model matrix + rgbrot
-        int numElementsVBO2 = 6;
-        for (int i = 0; i < numElementsVBO2; i++) {
-            GL20.glEnableVertexAttribArray(start + numElementsVBO1 + i);
+        for (int i = 0; i < getAttribSizeVBO2(); i++) {
+            GL20.glEnableVertexAttribArray(start + getAttribSizeVBO1() + i);
         }
     }
 
     public void endRenderVBO2() {
         int start = vboSizeMesh;
-        //alphaBrightness
-        int numElementsVBO1 = 1;
-        //model matrix + rgbrot
-        int numElementsVBO2 = 5;
-        for (int i = 0; i < numElementsVBO2; i++) {
-            GL20.glDisableVertexAttribArray(start + numElementsVBO1 + i);
+        for (int i = 0; i < getAttribSizeVBO2(); i++) {
+            GL20.glDisableVertexAttribArray(start + getAttribSizeVBO1() + i);
         }
     }
 }
