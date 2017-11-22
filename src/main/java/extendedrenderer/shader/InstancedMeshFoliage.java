@@ -90,12 +90,13 @@ public class InstancedMeshFoliage extends Mesh {
         GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
+        strideStart += VECTOR4F_SIZE_BYTES;
 
         //instance index, animation ID, height index
-        //todo....
         GL20.glVertexAttribPointer(start, 3, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
+        strideStart += VECTOR4F_SIZE_BYTES;
 
         //instance index
         /*GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);

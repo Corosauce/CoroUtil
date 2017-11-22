@@ -17,6 +17,6 @@ public class ShaderProgramFoliage extends ShaderProgram {
         ShaderManager.glBindAttribLocation(getProgramId(), index, "modelMatrix");
         index+=4;
         ShaderManager.glBindAttribLocation(getProgramId(), index++, "rgba");
-        ShaderManager.glBindAttribLocation(getProgramId(), index++, "indexAnimationIDHeightIndex");
+        ShaderManager.glBindAttribLocation(getProgramId(), index++, "meta");
     }
 }

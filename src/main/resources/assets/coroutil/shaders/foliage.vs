@@ -9,7 +9,7 @@ attribute vec3 vertexNormal; //unused
 //seldom - instanced
 attribute mat4 modelMatrix; //used to be modelViewMatrix, separate from view matrix
 attribute vec4 rgba; //4th entry, alpha not used here, might as well leave vec4 unless more efficient to separate things to per float/attrib entries
-attribute vec3 indexAnimationIDHeightIndex;
+attribute vec3 meta;
 //often changed data - instanced
 attribute vec2 alphaBrightness;
 //attribute float alpha;
@@ -26,7 +26,7 @@ varying vec4 outRGBA;
 //uniform mat4 projectionMatrix;
 
 uniform mat4 modelViewMatrixCamera;
-uniform mat4 modelViewMatrixClassic;
+//uniform mat4 modelViewMatrixClassic;
 
 uniform int time;
 uniform float partialTick;
@@ -52,13 +52,13 @@ mat4 rotationMatrix(vec3 axis, float angle) {
 void main()
 {
 
-    float index = indexAnimationIDHeightIndex.x;
-    float animationID = indexAnimationIDHeightIndex.y;
-    float heightIndex = indexAnimationIDHeightIndex.z;
+    float index = meta.x;
+    float animationID = meta.y;
+    float heightIndex = meta.z;
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
-    int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    //int timeMod = int(mod(((timeSmooth) * 6), 360));
+    //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
+    int timeMod = int(mod(((timeSmooth) * 10), 360));
 
     float variance = windSpeed * 0.25;
 
@@ -75,10 +75,16 @@ void main()
 
     float ampWind = 0.6;
 
-    float xAdj = -sin(adjDir * 0.0174533) * windSpeed * ampWind;
-    float zAdj = cos(adjDir * 0.0174533) * windSpeed * ampWind;
-    //rot = 0;
-    //rot2 = 0;
+    float ampIndex = 1F;
+    if (heightIndex == 1) {
+        ampIndex = 1F;
+    }
+
+    float xAdj = (-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+    float yAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+    float zAdj = (cos(adjDir * 0.0174533) + rot2) * windSpeed * ampWind * ampIndex;
+    rot = 0;
+    rot2 = 0;
     mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
     mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
 
@@ -95,10 +101,27 @@ void main()
         0, 0, 0, 1);
 
     //top parts
-    if (gl_VertexID == 0 || gl_VertexID == 3) {
-        gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y - 0.0, position.z + zAdj, 1.0);
-    } else {
-        gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+    if (heightIndex == 0) {
+        if (gl_VertexID == 0 || gl_VertexID == 3) {
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+        } else {
+            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+            //gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+        }
+    } else if (heightIndex == 1) {
+        if (gl_VertexID == 0 || gl_VertexID == 3) {
+            ampIndex = 2.0;
+            rot = sin(timeMod * 0.0174533) * variance * ampIndex;
+            rot2 = cos(timeMod * 0.0174533) * variance * ampIndex;
+            xAdj = (-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+            yAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+            zAdj = (cos(adjDir * 0.0174533) + rot2) * windSpeed * ampWind * ampIndex;
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+        } else {
+            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+        }
     }
 
     //vec4

@@ -47,6 +47,9 @@ public class Foliage implements IShaderRenderedEntity {
 
     public float brightnessCache = 0.5F;
 
+    public int animationID = 0;
+    public int heightIndex = 0;
+
     public Foliage() {
 
     }
@@ -152,11 +155,9 @@ public class Foliage implements IShaderRenderedEntity {
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), mesh.curBufferPos);
 
-        float animationID = 0;
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), animationID);
 
-        float heightIndex = 0;
         mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), heightIndex);
 
