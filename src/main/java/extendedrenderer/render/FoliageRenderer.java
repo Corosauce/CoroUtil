@@ -103,16 +103,13 @@ public class FoliageRenderer {
                     int heightIndex = 0;
 
                     for (int i = 0; i < FoliageClutter.clutterSize; i++) {
-                        if (i >= 2) {
+                        /*if (i >= 2) {
                             heightIndex = 1;
-                        }
+                        }*/
+                        heightIndex = i / 2;
                         Foliage foliage = new Foliage();
-                        foliage.setPosition(pos);
+                        foliage.setPosition(pos.add(0, heightIndex, 0));
                         foliage.posY += 0.5F;
-                        if (heightIndex == 1) {
-                            foliage.setPosition(pos.up());
-                            foliage.posY += 0.5F;
-                        }
                         foliage.prevPosY = foliage.posY;
                         foliage.heightIndex = heightIndex;
                                             /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
@@ -128,9 +125,9 @@ public class FoliageRenderer {
                         foliage.rotationYaw = world.rand.nextInt(360);
 
                         //cross sectionize for each second one
-                        if ((i+1) % 2 == 0) {
+                        /*if ((i+1) % 2 == 0) {
                             foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
-                        }
+                        }*/
 
                         //temp
                         foliage.rotationYaw = 45;

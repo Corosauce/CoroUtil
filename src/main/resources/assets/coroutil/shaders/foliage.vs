@@ -52,41 +52,52 @@ mat4 rotationMatrix(vec3 axis, float angle) {
 void main()
 {
 
+    float radian = 0.0174533;
+    int swayLag = 7;
     float index = meta.x;
     float animationID = meta.y;
     float heightIndex = meta.z;
+    float rotation = rgba.w;
+
+    if (heightIndex >= 0 && (gl_VertexID == 0 || gl_VertexID == 3)) {
+        heightIndex += 1;
+    }
+
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    int timeMod = int(mod(((timeSmooth) * 10), 360));
+    int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 4) + rotation, 360));
 
-    float variance = windSpeed * 0.25;
+    float variance = 1;//windSpeed * 0.5;
 
-    float rot = sin(timeMod * 0.0174533) * variance;
-    float rot2 = cos(timeMod * 0.0174533) * variance;
+    float rot = sin(timeMod * radian) * variance;
+    float rot2 = cos(timeMod * radian) * variance;
 
     //baseyaw=atan2(R(2,1),R(1,1));
     float baseYaw=atan(modelMatrix[1][1],modelMatrix[2][1]);
-    baseYaw = rgba.w;
+    baseYaw = rotation;
     //rot = -sin(baseYaw * 0.0174533);
     //rot2 = cos(baseYaw * 0.0174533);
 
-    float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
+    //float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
+    float adjDir = 0;//-baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
 
     float ampWind = 0.6;
 
-    float ampIndex = 1F;
-    if (heightIndex == 1 && (gl_VertexID == 0 || gl_VertexID == 3)) {
-        ampIndex = 2F;
+    float ampIndex = heightIndex + 1;
+    if (heightIndex >= 1 && !(gl_VertexID == 0 || gl_VertexID == 3)) {
+        //ampIndex -= 1F;
     }
 
-    float xAdj = (-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-    float yAdj = 0;//rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-    float zAdj = (cos(adjDir * 0.0174533) + rot2) * windSpeed * ampWind * ampIndex;
+    float xAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * ampWind * ampIndex;
+    float yAdj = 1;//rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+    float zAdj = rot2;//(cos(adjDir * 0.0174533) + rot2) * ampWind * ampIndex;
     //xAdj = 0;
     //yAdj = 0;
     //zAdj = 0;
+    //vec3 sway = normalize(vec3(xAdj, yAdj, zAdj));
     vec3 sway = vec3(xAdj, yAdj, zAdj);
+    sway = vec3(sway.x, 0, sway.z);
 
     //use or dont use, in pairs
     //sway = normalize(sway);
@@ -99,24 +110,28 @@ void main()
     //vec3 posSway = vec3(position.x + sway.x, position.y + sway.y, position.z + sway.z);
     //rot = 0;
     //rot2 = 0;
-    //mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
+    mat4 swayrotate = rotationMatrix(vec3(0, 1, 0), 0);//15 * index * radian);
+    vec4 conv = vec4(1, 1, 1, 1);
     //mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
+
+    //calc order needed?: cam, model, mesh with sway, 90 y axis ???
 
     //top parts
     if (heightIndex == 0) {
         if (gl_VertexID == 0 || gl_VertexID == 3) {
-            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
+            //gl_Position = vec4(posSway.x, posSway.y, posSway.z, 1.0) * swayrotate * modelViewMatrixCamera * modelMatrix;
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
         } else {
-            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(position, 1.0);
             //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
         }
-    } else if (heightIndex == 1) {
+    } else {
         if (gl_VertexID == 0 || gl_VertexID == 3) {
-            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
             //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
         } else {
             //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
         }
     }
 
