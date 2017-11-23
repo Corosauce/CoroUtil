@@ -76,51 +76,47 @@ void main()
     float ampWind = 0.6;
 
     float ampIndex = 1F;
-    if (heightIndex == 1) {
-        ampIndex = 1F;
+    if (heightIndex == 1 && (gl_VertexID == 0 || gl_VertexID == 3)) {
+        ampIndex = 2F;
     }
 
     float xAdj = (-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-    float yAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
+    float yAdj = 0;//rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
     float zAdj = (cos(adjDir * 0.0174533) + rot2) * windSpeed * ampWind * ampIndex;
-    rot = 0;
-    rot2 = 0;
-    mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
-    mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
+    //xAdj = 0;
+    //yAdj = 0;
+    //zAdj = 0;
+    vec3 sway = vec3(xAdj, yAdj, zAdj);
 
-    mat4 test1 = mat4(
-        1, 0, 0, 0,
-        0, 1, 0, 7,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
+    //use or dont use, in pairs
+    //sway = normalize(sway);
+    //sway = sway * ampIndex;
 
-    mat4 test2 = mat4(
-        1, 0, 0, 0,
-        0, 1, 0, -7,
-        0, 0, 1, 0,
-        0, 0, 0, 1);
+    //float length = sqrt(sway.x * sway.x + sway.y * sway.y + sway.z * sway.z);
+    //sway = vec3(sway.x / length, sway.y / length, sway.z / length);
+    vec3 posSway = position + sway;
+    //posSway = normalize(posSway);
+    //vec3 posSway = vec3(position.x + sway.x, position.y + sway.y, position.z + sway.z);
+    //rot = 0;
+    //rot2 = 0;
+    //mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
+    //mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
 
     //top parts
     if (heightIndex == 0) {
         if (gl_VertexID == 0 || gl_VertexID == 3) {
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
         } else {
             gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-            //gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
         }
     } else if (heightIndex == 1) {
         if (gl_VertexID == 0 || gl_VertexID == 3) {
-            ampIndex = 2.0;
-            rot = sin(timeMod * 0.0174533) * variance * ampIndex;
-            rot2 = cos(timeMod * 0.0174533) * variance * ampIndex;
-            xAdj = (-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-            yAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-            zAdj = (cos(adjDir * 0.0174533) + rot2) * windSpeed * ampWind * ampIndex;
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
             //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
         } else {
             //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * swayrotate2 * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
+            gl_Position = modelViewMatrixCamera * modelMatrix * vec4(posSway.x, posSway.y, posSway.z, 1.0);
         }
     }
 
@@ -155,5 +151,5 @@ void main()
 	//rgba.z = 1;
 	//rgba.w = 1;
 
-	outRGBA = new vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
+	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
 }
