@@ -49,6 +49,15 @@ mat4 rotationMatrix(vec3 axis, float angle) {
                 0.0,                                0.0,                                0.0,                                1.0);
 }
 
+vec3 computeCorner(vec3 sway, vec3 angle, vec3 center) {
+    vec3 cp = cross(sway, angle);
+    cp = normalize(cp);
+    cp = cp * 0.5;
+    vec3 pos = center.xyz;
+    pos += cp;
+    return pos;
+}
+
 void main()
 {
 
@@ -59,6 +68,8 @@ void main()
     float heightIndex = meta.z;
     float rotation = rgba.w;
 
+    vec3 bottom = vec3(0.5, 0, 0.5);
+
     if (heightIndex >= 0 && (gl_VertexID == 0 || gl_VertexID == 3)) {
         heightIndex += 1;
     }
@@ -68,72 +79,65 @@ void main()
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
     int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 4) + rotation, 360));
 
-    float variance = 0.5;//windSpeed * 0.5;
+    float variance = 0.2;//windSpeed * 0.5;
 
-    float rot = sin(timeMod * radian) * variance;
-    float rot2 = cos(timeMod * radian) * variance;
+    vec3 sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+    //temp
+    //sway = vec3(0, 1, 0);
 
-    //baseyaw=atan2(R(2,1),R(1,1));
-    float baseYaw=atan(modelMatrix[1][1],modelMatrix[2][1]);
-    baseYaw = rotation;
-    //rot = -sin(baseYaw * 0.0174533);
-    //rot2 = cos(baseYaw * 0.0174533);
+    sway = normalize(sway);
+    vec3 noSway = vec3(0, 1, 0);
 
-    //float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
-    float adjDir = 0;//-baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
+    vec3 top = bottom + sway;
 
-    float ampWind = 0.6;
+    //for now assume bottom and top will be the correct values for their height, fix that after
+    //verified that mesh vert order = gl_VertexID order
 
-    float ampIndex = heightIndex + 1;
-    if (heightIndex >= 1 && !(gl_VertexID == 0 || gl_VertexID == 3)) {
-        //ampIndex -= 1F;
+    //drawn in order of a U shape starting top left
+    vec3 pos = vec3(0, 0, 0);
+    if (gl_VertexID == 0) {
+        vec3 angle = vec3(1, 0, 1);
+        pos = computeCorner(sway, angle, top);
+        //TODO: verify correct order converted from java vec.crossProduct(vec2)
+        /*vec3 cp = cross(sway, angle);
+        cp = normalize(cp);
+        cp = cp * 0.5;
+        pos = top.xyz;
+        pos += cp;*/
+        //pos = vec3(-0.5, 0.5, 0);
+        //pos = normalize(pos);
+    } else if (gl_VertexID == 1) {
+        vec3 angle = vec3(1, 0, 1);
+        vec3 cp = cross(noSway, angle);
+        cp = normalize(cp);
+        cp = cp * 0.5;
+        pos = bottom.xyz;
+        pos += cp;
+        //pos = vec3(-0.5, -0.5, 0);
+        //pos = normalize(pos);
+    } else if (gl_VertexID == 2) {
+        vec3 angle = vec3(-1, 0, -1);
+        vec3 cp = cross(noSway, angle);
+        cp = normalize(cp);
+        cp = cp * 0.5;
+        pos = bottom.xyz;
+        pos += cp;
+        //pos = vec3(0.5, -0.5, 0);
+        //pos = normalize(pos);
+    } else if (gl_VertexID == 3) {
+        vec3 angle = vec3(-1, 0, -1);
+        vec3 cp = cross(sway, angle);
+        cp = normalize(cp);
+        cp = cp * 0.5;
+        pos = top.xyz;
+        pos += cp;
+
+        //temp
+        //pos = vec3(0.5, 0.5, 0);
+        //pos = normalize(pos);
     }
 
-    float xAdj = rot;//(-sin(adjDir * 0.0174533) + rot) * ampWind * ampIndex;
-    float yAdj = 1;//rot;//(-sin(adjDir * 0.0174533) + rot) * windSpeed * ampWind * ampIndex;
-    float zAdj = rot2;//(cos(adjDir * 0.0174533) + rot2) * ampWind * ampIndex;
-    //xAdj = 0;
-    //yAdj = 0;
-    //zAdj = 0;
-    //vec3 sway = normalize(vec3(xAdj, yAdj, zAdj));
-    vec3 sway = vec3(xAdj, yAdj, zAdj);
-    sway = vec3(sway.x, 0, sway.z);
-
-    //use or dont use, in pairs
-    //sway = normalize(sway);
-    //sway = sway * ampIndex;
-
-    //float length = sqrt(sway.x * sway.x + sway.y * sway.y + sway.z * sway.z);
-    //sway = vec3(sway.x / length, sway.y / length, sway.z / length);
-    vec3 posSway = position + sway;
-    //posSway = normalize(posSway);
-    //vec3 posSway = vec3(position.x + sway.x, position.y + sway.y, position.z + sway.z);
-    //rot = 0;
-    //rot2 = 0;
-    mat4 swayrotate = rotationMatrix(vec3(0, 1, 0), 0);//15 * index * radian);
-    vec4 conv = vec4(1, 1, 1, 1);
-    //mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
-
-    //calc order needed?: cam, model, mesh with sway, 90 y axis ???
-
-    //top parts
-    if (heightIndex == 0) {
-        if (gl_VertexID == 0 || gl_VertexID == 3) {
-            //gl_Position = vec4(posSway.x, posSway.y, posSway.z, 1.0) * swayrotate * modelViewMatrixCamera * modelMatrix;
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
-        } else {
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(position, 1.0);
-            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x + xAdj, position.y + yAdj, position.z + zAdj, 1.0);
-        }
-    } else {
-        if (gl_VertexID == 0 || gl_VertexID == 3) {
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
-            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-        } else {
-            //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-            gl_Position = modelViewMatrixCamera * modelMatrix * swayrotate * vec4(posSway.x, posSway.y, posSway.z, 1.0);
-        }
-    }
+    gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
 
     //vec4
     //gl_Position

@@ -129,11 +129,14 @@ public class FoliageRenderer {
                             foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
                         }*/
 
-                        //temp
+                        //temp?
                         foliage.rotationYaw = 45;
                         if ((i+1) % 2 == 0) {
                             foliage.rotationYaw += 90;
                         }
+
+                        //temp
+                        foliage.rotationYaw = 0;
 
                         //foliage.rotationPitch = rand.nextInt(90) - 45;
                         foliage.particleScale /= 0.2;

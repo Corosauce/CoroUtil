@@ -161,7 +161,7 @@ public class EventHandler {
 
             ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
 
-            ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), partialTicks);
+            //ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), partialTicks);
 
 
 
