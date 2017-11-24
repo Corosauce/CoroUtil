@@ -100,69 +100,89 @@ public class FoliageRenderer {
                 List<Foliage> listClutter = new ArrayList<>();
                 //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
 
-                    int heightIndex = 0;
+                int heightIndex = 0;
 
-                    for (int i = 0; i < FoliageClutter.clutterSize; i++) {
-                        /*if (i >= 2) {
-                            heightIndex = 1;
-                        }*/
-                        heightIndex = i / 2;
-                        Foliage foliage = new Foliage();
-                        foliage.setPosition(pos.add(0, heightIndex, 0));
-                        foliage.posY += 0.5F;
-                        foliage.prevPosY = foliage.posY;
-                        foliage.heightIndex = heightIndex;
-                                            /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
-                                            foliage.prevPosX = foliage.posX;
-                                            foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
-                                            foliage.prevPosZ = foliage.posZ;*/
-                        foliage.posX += 0.5F;
-                        foliage.prevPosX = foliage.posX;
-                        foliage.posZ += 0.5F;
-                        foliage.prevPosZ = foliage.posZ;
-                        foliage.rotationYaw = 0;
-                        //foliage.rotationYaw = 90;
-                        foliage.rotationYaw = world.rand.nextInt(360);
+                //TEMP!
+                FoliageClutter.clutterSize = 6;
 
-                        //cross sectionize for each second one
-                        /*if ((i+1) % 2 == 0) {
-                            foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
-                        }*/
+                for (int i = 0; i < FoliageClutter.clutterSize; i++) {
+                    /*if (i >= 2) {
+                        heightIndex = 1;
+                    }*/
+                    heightIndex = i / 2;
+                    Foliage foliage = new Foliage();
+                    foliage.setPosition(pos.add(0, heightIndex, 0));
+                    foliage.posY += 0.0F;
+                    foliage.prevPosY = foliage.posY;
+                    foliage.heightIndex = heightIndex;
+                                        /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosX = foliage.posX;
+                                        foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosZ = foliage.posZ;*/
+                    foliage.posX += 0.5F;
+                    foliage.prevPosX = foliage.posX;
+                    foliage.posZ += 0.5F;
+                    foliage.prevPosZ = foliage.posZ;
+                    foliage.rotationYaw = 0;
+                    //foliage.rotationYaw = 90;
+                    foliage.rotationYaw = world.rand.nextInt(360);
 
-                        //temp?
-                        foliage.rotationYaw = 45;
-                        if ((i+1) % 2 == 0) {
-                            foliage.rotationYaw += 90;
-                        }
+                    //cross sectionize for each second one
+                    /*if ((i+1) % 2 == 0) {
+                        foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
+                    }*/
 
-                        //temp
-                        foliage.rotationYaw = 0;
+                    //temp?
+                    foliage.rotationYaw = 45;
+                    if ((i+1) % 2 == 0) {
+                        foliage.rotationYaw += 90;
+                    }
 
-                        //foliage.rotationPitch = rand.nextInt(90) - 45;
-                        foliage.particleScale /= 0.2;
+                    //for seaweed render
+                    foliage.rotationYaw = 0;
+                    if ((i+1) % 2 == 0) {
+                        //use as a marker for GLSL
+                        foliage.rotationYaw = 1;
+                    }
 
-                        int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
-                        foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
-                        foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
-                        foliage.particleBlue = (float) (color & 255) / 255.0F;
+                    //foliage.rotationPitch = rand.nextInt(90) - 45;
+                    foliage.particleScale /= 0.2;
+
+                    int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
+                    foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+                    foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+                    foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+                    foliage.particleRed = 0;
+                    foliage.particleGreen = 0;
+                    foliage.particleBlue = 0;
+
+                    //debug
+                    if (heightIndex == 0) {
+                        foliage.particleRed = 1F;
+                    } else if (heightIndex == 1) {
+                        foliage.particleGreen = 1F;
+                    } else if (heightIndex == 2) {
+                        foliage.particleBlue = 1F;
+                    }
 
                         foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
 
-                        //temp
-                        if ((i+1) % 2 == 0) {
-                            //foliage.particleGreen = 0;
-                        }
-
-                        listClutter.add(foliage);
-
+                    //temp
+                    if ((i+1) % 2 == 0) {
+                        //foliage.particleGreen = 0;
                     }
 
-                    lookupPosToFoliage.put(pos, listClutter);
-                    /*if (heightIndex == 0) {
+                    listClutter.add(foliage);
 
-                    } else if (heightIndex == 1) {
-                        lookupPosToFoliage.put(pos.up(), listClutter);
-                    }*/
+                }
+
+                lookupPosToFoliage.put(pos, listClutter);
+                /*if (heightIndex == 0) {
+
+                } else if (heightIndex == 1) {
+                    lookupPosToFoliage.put(pos.up(), listClutter);
+                }*/
 
                 //}
             }

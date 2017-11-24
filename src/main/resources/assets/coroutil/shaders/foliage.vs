@@ -68,10 +68,8 @@ void main()
     float heightIndex = meta.z;
     float rotation = rgba.w;
 
-    vec3 bottom = vec3(0.5, 0, 0.5);
-
     if (heightIndex >= 0 && (gl_VertexID == 0 || gl_VertexID == 3)) {
-        heightIndex += 1;
+        //heightIndex += 1;
     }
 
     float timeSmooth = (time-1) + partialTick;
@@ -88,7 +86,7 @@ void main()
     sway = normalize(sway);
     vec3 noSway = vec3(0, 1, 0);
 
-    vec3 top = bottom + sway;
+
 
     //for now assume bottom and top will be the correct values for their height, fix that after
     //verified that mesh vert order = gl_VertexID order
@@ -96,32 +94,28 @@ void main()
     //drawn in order of a U shape starting top left
     vec3 pos = vec3(0, 0, 0);
     vec3 angle = vec3(-1, 0, 1);
+    if (rotation == 1) {
+        angle = vec3(1, 0, 1);
+    }
+
+    vec3 bottom = vec3(0.0, 0, 0.0);
+    vec3 bottom2 = vec3(0.0, 0, 0.0);
+    vec3 top = vec3(0, 0, 0);
+    for (int i = 0; i < heightIndex; i++) {
+        top = bottom + sway;
+
+        //bottom = top;
+    }
     if (gl_VertexID == 0) {
         pos = computeCorner(sway, angle, top);
-        //TODO: verify correct order converted from java vec.crossProduct(vec2)
-        /*vec3 cp = cross(sway, angle);
-        cp = normalize(cp);
-        cp = cp * 0.5;
-        pos = top.xyz;
-        pos += cp;*/
-        //pos = vec3(-0.5, 0.5, 0);
-        //pos = normalize(pos);
     } else if (gl_VertexID == 1) {
         pos = computeCorner(noSway, angle, bottom);
-        //pos = vec3(-0.5, -0.5, 0);
-        //pos = normalize(pos);
     } else if (gl_VertexID == 2) {
         angle = angle * -1;
         pos = computeCorner(noSway, angle, bottom);
-        //pos = vec3(0.5, -0.5, 0);
-        //pos = normalize(pos);
     } else if (gl_VertexID == 3) {
         angle = angle * -1;
         pos = computeCorner(sway, angle, top);
-
-        //temp
-        //pos = vec3(0.5, 0.5, 0);
-        //pos = normalize(pos);
     }
 
     gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
