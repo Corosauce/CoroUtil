@@ -145,6 +145,11 @@ public class FoliageRenderer {
 
                         foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
 
+                        //temp
+                        if ((i+1) % 2 == 0) {
+                            //foliage.particleGreen = 0;
+                        }
+
                         listClutter.add(foliage);
 
                     }

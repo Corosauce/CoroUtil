@@ -68,7 +68,7 @@ void main()
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
     int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 4) + rotation, 360));
 
-    float variance = 1;//windSpeed * 0.5;
+    float variance = 0.5;//windSpeed * 0.5;
 
     float rot = sin(timeMod * radian) * variance;
     float rot2 = cos(timeMod * radian) * variance;
