@@ -77,11 +77,11 @@ void main()
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 4) + rotation, 360));
+    int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
 
-    float variance = 0.2;//windSpeed * 0.5;
+    float variance = 0.1;//windSpeed * 0.5;
 
-    vec3 sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+    vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
     //temp
     //sway = vec3(0, 1, 0);
 
@@ -95,8 +95,8 @@ void main()
 
     //drawn in order of a U shape starting top left
     vec3 pos = vec3(0, 0, 0);
+    vec3 angle = vec3(-1, 0, 1);
     if (gl_VertexID == 0) {
-        vec3 angle = vec3(1, 0, 1);
         pos = computeCorner(sway, angle, top);
         //TODO: verify correct order converted from java vec.crossProduct(vec2)
         /*vec3 cp = cross(sway, angle);
@@ -107,30 +107,17 @@ void main()
         //pos = vec3(-0.5, 0.5, 0);
         //pos = normalize(pos);
     } else if (gl_VertexID == 1) {
-        vec3 angle = vec3(1, 0, 1);
-        vec3 cp = cross(noSway, angle);
-        cp = normalize(cp);
-        cp = cp * 0.5;
-        pos = bottom.xyz;
-        pos += cp;
+        pos = computeCorner(noSway, angle, bottom);
         //pos = vec3(-0.5, -0.5, 0);
         //pos = normalize(pos);
     } else if (gl_VertexID == 2) {
-        vec3 angle = vec3(-1, 0, -1);
-        vec3 cp = cross(noSway, angle);
-        cp = normalize(cp);
-        cp = cp * 0.5;
-        pos = bottom.xyz;
-        pos += cp;
+        angle = angle * -1;
+        pos = computeCorner(noSway, angle, bottom);
         //pos = vec3(0.5, -0.5, 0);
         //pos = normalize(pos);
     } else if (gl_VertexID == 3) {
-        vec3 angle = vec3(-1, 0, -1);
-        vec3 cp = cross(sway, angle);
-        cp = normalize(cp);
-        cp = cp * 0.5;
-        pos = top.xyz;
-        pos += cp;
+        angle = angle * -1;
+        pos = computeCorner(sway, angle, top);
 
         //temp
         //pos = vec3(0.5, 0.5, 0);
