@@ -105,7 +105,7 @@ public class FoliageRenderer {
                 int heightIndex = 0;
 
                 //TEMP!
-                FoliageClutter.clutterSize = 18;
+                FoliageClutter.clutterSize = 16;
 
                 for (int i = 0; i < FoliageClutter.clutterSize; i++) {
                     /*if (i >= 2) {
@@ -370,7 +370,7 @@ public class FoliageRenderer {
          *
          */
 
-        int amount = 6000;
+        int amount = 60000;
         int adjAmount = amount;
 
         boolean subTest = false;
@@ -426,7 +426,6 @@ public class FoliageRenderer {
                     ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
                 } else {
                     GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
-                    //GL15.glMapBuffer()
                 }
             }
 

@@ -50,19 +50,14 @@ mat4 rotationMatrix(vec3 axis, float angle) {
 }
 
 vec3 computeCorner(vec3 sway, vec3 angle, vec3 center) {
-    vec3 cp = cross(sway, angle);
-    cp = normalize(cp);
-    cp = cp * 0.5;
-    vec3 pos = center.xyz;
-    pos += cp;
-    return pos;
+    return center + normalize(cross(sway, angle)) * 0.5;
 }
 
 void main()
 {
 
     float radian = 0.0174533;
-    int swayLag = 7;
+    int swayLag = 20;
     float index = meta.x;
     float animationID = meta.y;
     float heightIndex = meta.z;
@@ -75,9 +70,9 @@ void main()
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 2) + rotation, 360));
+    int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 0.2) + rotation, 360));
 
-    float variance = 0.3;//windSpeed * 0.5;
+    float variance = 1.3;//windSpeed * 0.5;
 
     vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
     //temp
@@ -117,7 +112,7 @@ void main()
     for (int i = 0; i <= heightIndex; i++) {
         prevSway = sway;
         timeMod = int(mod(((timeSmooth + ((/*heightIndex*/i + 1) * swayLag)) * 2) + rotation, 360));
-        sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
+        sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
         sway = normalize(sway);
 
         top = bottomNext + sway;
