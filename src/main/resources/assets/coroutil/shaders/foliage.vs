@@ -109,9 +109,42 @@ void main()
 
     //vec3 swayNext = sway;
 
-    for (int i = 0; i <= heightIndex; i++) {
+    /*timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2), 360));
+    sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+    sway = normalize(sway);
+
+    top = bottom + sway;
+
+    timeMod = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2), 360));
+    prevSway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+    prevSway = normalize(prevSway);
+
+    bottom = prevSway;
+*/
+
+    //need sway, prevSway, top, bottom
+
+    vec3 baseHeight = vec3(0, heightIndex-1, 0);
+
+    int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
+    vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
+    prevSway = swayBottom;
+    bottom = baseHeight + swayBottom;
+
+    int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
+    sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
+    top = bottom + sway;
+
+
+
+
+    if (heightIndex == 0) {
+        bottom = vec3(0, 0, 0);
+    }
+
+    /*for (int i = 0; i <= heightIndex; i++) {
         prevSway = sway;
-        timeMod = int(mod(((timeSmooth + ((/*heightIndex*/i + 1) * swayLag)) * 2) + rotation, 360));
+        timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
         sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
         sway = normalize(sway);
 
@@ -119,9 +152,7 @@ void main()
 
         bottom = bottomNext;
         bottomNext = top;
-
-        //prevSway = oldSway;
-    }
+    }*/
 
     if (gl_VertexID == 0) {
         pos = computeCorner(sway, angle, top);
