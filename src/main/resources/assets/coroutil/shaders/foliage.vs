@@ -72,7 +72,7 @@ void main()
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
     int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 0.2) + rotation, 360));
 
-    float variance = 1.3;//windSpeed * 0.5;
+    float variance = 0.2;//windSpeed * 0.5;
 
     vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
     //temp
@@ -124,7 +124,9 @@ void main()
 
     //need sway, prevSway, top, bottom
 
+    //more performant but less accurate algorithm, use unless crazy mesh warping needed
     vec3 baseHeight = vec3(0, heightIndex-1, 0);
+    vec3 baseHeight2 = vec3(0, heightIndex, 0);
 
     int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
     vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
@@ -133,15 +135,13 @@ void main()
 
     int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
     sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
-    top = bottom + sway;
-
-
-
-
+    top = baseHeight2 + sway;
     if (heightIndex == 0) {
         bottom = vec3(0, 0, 0);
+        prevSway = vec3(0, 1, 0);
     }
 
+    //more accurate but more expensive loop
     /*for (int i = 0; i <= heightIndex; i++) {
         prevSway = sway;
         timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));

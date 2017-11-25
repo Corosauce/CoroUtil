@@ -155,9 +155,9 @@ public class FoliageRenderer {
                     foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
                     foliage.particleBlue = (float) (color & 255) / 255.0F;
 
-                    foliage.particleRed = rand.nextFloat();
+                    /*foliage.particleRed = rand.nextFloat();
                     foliage.particleGreen = rand.nextFloat();
-                    foliage.particleBlue = rand.nextFloat();
+                    foliage.particleBlue = rand.nextFloat();*/
 
                     //debug
                     /*if (heightIndex == 0) {
