@@ -75,17 +75,17 @@ void main()
     float timeSmooth = (time-1) + partialTick;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
     //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    int timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
+    int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 2) + rotation, 360));
 
-    float variance = 0.1;//windSpeed * 0.5;
+    float variance = 0.3;//windSpeed * 0.5;
 
     vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
     //temp
     //sway = vec3(0, 1, 0);
 
     sway = normalize(sway);
-    vec3 noSway = vec3(0, 1, 0);
-
+    vec3 prevSway = vec3(0, 1, 0);
+    sway = prevSway;
 
 
     //for now assume bottom and top will be the correct values for their height, fix that after
@@ -98,21 +98,43 @@ void main()
         angle = vec3(1, 0, 1);
     }
 
-    vec3 bottom = vec3(0.0, 0, 0.0);
-    vec3 bottom2 = vec3(0.0, 0, 0.0);
-    vec3 top = vec3(0, 0, 0);
-    for (int i = 0; i < heightIndex; i++) {
-        top = bottom + sway;
+    /*if (heightIndex == 0) {
+        top = top0;
+        bottom = bottom0;
+    } else if (heightIndex == 1) {
+        top = top1;
+        bottom = bottom1;
+    } else {
 
-        //bottom = top;
+    }*/
+
+    vec3 top = vec3(0, 0, 0);
+    vec3 bottom = vec3(0, 0, 0);
+    vec3 bottomNext = bottom;
+
+    //vec3 swayNext = sway;
+
+    for (int i = 0; i <= heightIndex; i++) {
+        prevSway = sway;
+        timeMod = int(mod(((timeSmooth + ((/*heightIndex*/i + 1) * swayLag)) * 2) + rotation, 360));
+        sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
+        sway = normalize(sway);
+
+        top = bottomNext + sway;
+
+        bottom = bottomNext;
+        bottomNext = top;
+
+        //prevSway = oldSway;
     }
+
     if (gl_VertexID == 0) {
         pos = computeCorner(sway, angle, top);
     } else if (gl_VertexID == 1) {
-        pos = computeCorner(noSway, angle, bottom);
+        pos = computeCorner(prevSway, angle, bottom);
     } else if (gl_VertexID == 2) {
         angle = angle * -1;
-        pos = computeCorner(noSway, angle, bottom);
+        pos = computeCorner(prevSway, angle, bottom);
     } else if (gl_VertexID == 3) {
         angle = angle * -1;
         pos = computeCorner(sway, angle, top);

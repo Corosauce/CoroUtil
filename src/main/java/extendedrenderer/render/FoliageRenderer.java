@@ -91,6 +91,8 @@ public class FoliageRenderer {
     public synchronized void processQueue() {
         World world = Minecraft.getMinecraft().world;
 
+        Random rand = new Random(5);
+
         try {
 
             for (int ii = 0; ii < foliageQueueAdd.size(); ii++) {
@@ -103,7 +105,7 @@ public class FoliageRenderer {
                 int heightIndex = 0;
 
                 //TEMP!
-                FoliageClutter.clutterSize = 6;
+                FoliageClutter.clutterSize = 18;
 
                 for (int i = 0; i < FoliageClutter.clutterSize; i++) {
                     /*if (i >= 2) {
@@ -111,7 +113,7 @@ public class FoliageRenderer {
                     }*/
                     heightIndex = i / 2;
                     Foliage foliage = new Foliage();
-                    foliage.setPosition(pos.add(0, heightIndex, 0));
+                    foliage.setPosition(pos.add(0, 0, 0));
                     foliage.posY += 0.0F;
                     foliage.prevPosY = foliage.posY;
                     foliage.heightIndex = heightIndex;
@@ -153,20 +155,20 @@ public class FoliageRenderer {
                     foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
                     foliage.particleBlue = (float) (color & 255) / 255.0F;
 
-                    foliage.particleRed = 0;
-                    foliage.particleGreen = 0;
-                    foliage.particleBlue = 0;
+                    foliage.particleRed = rand.nextFloat();
+                    foliage.particleGreen = rand.nextFloat();
+                    foliage.particleBlue = rand.nextFloat();
 
                     //debug
-                    if (heightIndex == 0) {
+                    /*if (heightIndex == 0) {
                         foliage.particleRed = 1F;
                     } else if (heightIndex == 1) {
                         foliage.particleGreen = 1F;
                     } else if (heightIndex == 2) {
                         foliage.particleBlue = 1F;
-                    }
+                    }*/
 
-                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
 
                     //temp
                     if ((i+1) % 2 == 0) {
