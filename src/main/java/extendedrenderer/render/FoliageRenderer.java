@@ -61,6 +61,8 @@ public class FoliageRenderer {
 
     public Lock lockVBO2 = new ReentrantLock();
 
+    public static int radialRange = 60;
+
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
         transformation = new Transformation();
@@ -105,6 +107,10 @@ public class FoliageRenderer {
 
                 int heightIndex = 0;
 
+                float variance = 0.4F;
+                float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
+                float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
+
                 for (int i = 0; i < FoliageClutter.clutterSize; i++) {
                     /*if (i >= 2) {
                         heightIndex = 1;
@@ -119,9 +125,9 @@ public class FoliageRenderer {
                                         foliage.prevPosX = foliage.posX;
                                         foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
                                         foliage.prevPosZ = foliage.posZ;*/
-                    foliage.posX += 0.5F;
+                    foliage.posX += 0.5F + randX;
                     foliage.prevPosX = foliage.posX;
-                    foliage.posZ += 0.5F;
+                    foliage.posZ += 0.5F + randZ;
                     foliage.prevPosZ = foliage.posZ;
                     foliage.rotationYaw = 0;
                     //foliage.rotationYaw = 90;
@@ -347,7 +353,11 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
-        int radialRange = 40;
+        //radialRange = 30;
+
+        //temp override vars
+        FoliageRenderer.radialRange = 40;
+        FoliageClutter.clutterSize = 6;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -393,13 +403,14 @@ public class FoliageRenderer {
 
                                 //close fade
                                 float distMax = 3F;
-                                double distFadeRange = 15;
+                                double distFadeRange = 5;
+                                int rangeAdj = radialRange - 10;
                                 double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
                         /*if (dist < distMax) {
                             foliage.particleAlpha = (float) (dist) / distMax;
-                        } else */if (dist > radialRange - distFadeRange) {
+                        } else */if (dist > rangeAdj - distFadeRange) {
 
-                                    double diff = dist - ((double)radialRange - distFadeRange);
+                                    double diff = dist - ((double)rangeAdj - distFadeRange);
                                     foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
 
                                 } else {
