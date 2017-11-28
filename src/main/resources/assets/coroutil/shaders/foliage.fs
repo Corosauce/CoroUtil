@@ -9,13 +9,6 @@ varying vec4 outRGBA;
 
 void main()
 {
-
-    // Exp fog
-    //float fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
-
-    // Linear fog
-    //float fogFactor = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;
-    //float fogFactor = gl_Fog.scale;
     float fogFactor = 0;
     if (fogmode == 0) {
         // Linear fog
@@ -25,15 +18,8 @@ void main()
         fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
     }
 
-    //float fogFactor = (7.0 - gl_FogFragCoord);// / gl_Fog.scale;
-
-    //fogFactor = 0.1;
-
     //0 = full fog
     //1 = no fog
-
-    //gl_Fog.scale is a precomputed 1.0 / (gl_Fog.end - gl_Fog.start)
-    //our start should be 0, and end should be 7 at its closest
 
     vec4 fragColor = texture2D(texture_sampler, outTexCoord);
 	fragColor.x *= outRGBA.x * outBrightness;

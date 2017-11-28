@@ -12,42 +12,17 @@ attribute vec4 rgba; //4th entry, alpha not used here, might as well leave vec4 
 attribute vec3 meta;
 //often changed data - instanced
 attribute vec2 alphaBrightness;
-//attribute float alpha;
-//attribute float brightness;
-//alpha?
-//
-//attribute vec4 rgbaTest;
-//in vec2 texOffset;
 
 varying vec2 outTexCoord;
 varying float outBrightness;
 varying vec4 outRGBA;
 
-//uniform mat4 projectionMatrix;
-
 uniform mat4 modelViewMatrixCamera;
-//uniform mat4 modelViewMatrixClassic;
 
 uniform int time;
 uniform float partialTick;
 uniform float windDir;
 uniform float windSpeed;
-
-
-//uniform int numCols;
-//uniform int numRows;
-
-mat4 rotationMatrix(vec3 axis, float angle) {
-    axis = normalize(axis);
-    float s = sin(angle);
-    float c = cos(angle);
-    float oc = 1.0 - c;
-
-    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
-                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
-                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
-                0.0,                                0.0,                                0.0,                                1.0);
-}
 
 vec3 computeCorner(vec3 sway, vec3 angle, vec3 center) {
     return center + normalize(cross(sway, angle)) * 0.5;
@@ -63,67 +38,16 @@ void main()
     float heightIndex = meta.z;
     float rotation = rgba.w;
 
-    if (heightIndex >= 0 && (gl_VertexID == 0 || gl_VertexID == 3)) {
-        //heightIndex += 1;
-    }
-
     float timeSmooth = (time-1) + partialTick;
     timeSmooth += index;
-    //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
-    int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    //int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 0.2) + rotation, 360));
 
-    float variance = 0.6;//windSpeed * 0.5;
+    float variance = 0.6;
 
-    vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
-    //temp
-    //sway = vec3(0, 1, 0);
-
-    sway = normalize(sway);
-    vec3 prevSway = vec3(0, 1, 0);
-    sway = prevSway;
-
-
-    //for now assume bottom and top will be the correct values for their height, fix that after
-    //verified that mesh vert order = gl_VertexID order
-
-    //drawn in order of a U shape starting top left
     vec3 pos = vec3(0, 0, 0);
     vec3 angle = vec3(-1, 0, 1);
     if (rotation == 1) {
         angle = vec3(1, 0, 1);
     }
-
-    /*if (heightIndex == 0) {
-        top = top0;
-        bottom = bottom0;
-    } else if (heightIndex == 1) {
-        top = top1;
-        bottom = bottom1;
-    } else {
-
-    }*/
-
-    vec3 top = vec3(0, 0, 0);
-    vec3 bottom = vec3(0, 0, 0);
-    vec3 bottomNext = bottom;
-
-    //vec3 swayNext = sway;
-
-    /*timeMod = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2), 360));
-    sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
-    sway = normalize(sway);
-
-    top = bottom + sway;
-
-    timeMod = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2), 360));
-    prevSway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
-    prevSway = normalize(prevSway);
-
-    bottom = prevSway;
-*/
-
-    //need sway, prevSway, top, bottom
 
     //more performant but less accurate algorithm, use unless crazy mesh warping needed
     vec3 baseHeight = vec3(0, heightIndex-1, 0);
@@ -131,19 +55,27 @@ void main()
 
     int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
     vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
-    prevSway = swayBottom;
-    bottom = baseHeight + swayBottom;
+    vec3 prevSway = swayBottom;
+    vec3 bottom = baseHeight + swayBottom;
 
     int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
-    sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
-    top = baseHeight2 + sway;
+    vec3 sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
+    vec3 top = baseHeight2 + sway;
     if (heightIndex == 0) {
         bottom = vec3(0, 0, 0);
         prevSway = vec3(0, 1, 0);
     }
 
     //more accurate but more expensive loop
-    /*for (int i = 0; i <= heightIndex; i++) {
+    /*
+
+    vec3 top = vec3(0, 0, 0);
+    vec3 bottom = vec3(0, 0, 0);
+    vec3 bottomNext = bottom;
+    //verify
+    vec3 sway = vec3(0, 0, 0);
+
+    for (int i = 0; i <= heightIndex; i++) {
         prevSway = sway;
         timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
         sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
@@ -169,36 +101,11 @@ void main()
 
     gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
 
-    //vec4
-    //gl_Position
-
-    //from example:
-    //vec4 eyePos = gl_ModelViewMatrix * gl_Vertex;
-    //gl_FogFragCoord = abs(eyePos.z/eyePos.w);
-
-    //vec4 eyePos = gl_ModelViewMatrix * vec4(position, 1.0);
-    //vec4 eyePos = modelViewMatrixCamera * modelMatrix * vec4(position, 1.0);
-    //gl_FogFragCoord = abs(eyePos.z/eyePos.w);
-
-    //this is for distance to camera
-    //gl_FogFragCoord = alpha;
-
-    //my math is bad and i should feel bad... but this works
+    //lazy, cheap dist to camera
     gl_FogFragCoord = abs(gl_Position.z);
-    //gl_FogFragCoord = 6;
-
-	// Support for texture atlas, update texture coordinates
-    //float x = (texCoord.x / numCols + texOffset.x);
-    //float y = (texCoord.y / numRows + texOffset.y);
 
 	outTexCoord = texCoord;
 	outBrightness = alphaBrightness.y;
-
-	//temp
-	//rgba.x = 1;
-	//rgba.y = 1;
-	//rgba.z = 1;
-	//rgba.w = 1;
 
 	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
 }
