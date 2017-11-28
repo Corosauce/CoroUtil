@@ -68,11 +68,12 @@ void main()
     }
 
     float timeSmooth = (time-1) + partialTick;
+    timeSmooth += index;
     //int timeMod = int(mod((timeSmooth + gl_InstanceID * 3) * 2, 360));
-    //int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
-    int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 0.2) + rotation, 360));
+    int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
+    //int timeMod = int(mod(((timeSmooth + ((/*heightIndex*/0 + 1) * swayLag)) * 0.2) + rotation, 360));
 
-    float variance = 0.2;//windSpeed * 0.5;
+    float variance = 0.6;//windSpeed * 0.5;
 
     vec3 sway = vec3(sin(timeMod * radian) * variance, 1, sin(timeMod * radian) * variance);
     //temp

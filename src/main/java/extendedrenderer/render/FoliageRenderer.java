@@ -48,8 +48,8 @@ public class FoliageRenderer {
     public boolean needsUpdate = true;
 
     public static boolean dirtyVBO2Flag = false;
-    public static List<BlockPos> foliageQueueAdd = new ArrayList();
-    public static List<BlockPos> foliageQueueRemove = new ArrayList();
+    /*public static List<BlockPos> foliageQueueAdd = new ArrayList();
+    public static List<BlockPos> foliageQueueRemove = new ArrayList();*/
 
     //public List<Foliage> listFoliage = new ArrayList<>();
     public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
@@ -91,79 +91,79 @@ public class FoliageRenderer {
         return dirtyVBO2Flag;
     }
 
-    public void processQueue() {
+    public void addForPos(BlockPos pos) {
+
         World world = Minecraft.getMinecraft().world;
 
-        Random rand = new Random(5);
+        Random rand = new Random();
+        //for (BlockPos pos : foliageQueueAdd) {
+        IBlockState state = world.getBlockState(pos.down());
+        List<Foliage> listClutter = new ArrayList<>();
+        //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
 
-        try {
+        int heightIndex = 0;
 
-            for (int ii = 0; ii < foliageQueueAdd.size(); ii++) {
-                BlockPos pos = foliageQueueAdd.get(ii);
-            //for (BlockPos pos : foliageQueueAdd) {
-                IBlockState state = world.getBlockState(pos.down());
-                List<Foliage> listClutter = new ArrayList<>();
-                //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
+        float variance = 0.4F;
+        float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
+        float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
 
-                int heightIndex = 0;
-
-                float variance = 0.4F;
-                float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
-                float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
-
-                for (int i = 0; i < FoliageClutter.clutterSize; i++) {
+        for (int i = 0; i < FoliageClutter.clutterSize; i++) {
                     /*if (i >= 2) {
                         heightIndex = 1;
                     }*/
-                    heightIndex = i / 2;
-                    Foliage foliage = new Foliage();
-                    foliage.setPosition(pos.add(0, 0, 0));
-                    foliage.posY += 0.0F;
-                    foliage.prevPosY = foliage.posY;
-                    foliage.heightIndex = heightIndex;
+            heightIndex = i / 2;
+            Foliage foliage = new Foliage();
+            foliage.setPosition(pos.add(0, 0, 0));
+            foliage.posY += 0.0F;
+            foliage.prevPosY = foliage.posY;
+            foliage.heightIndex = heightIndex;
                                         /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
                                         foliage.prevPosX = foliage.posX;
                                         foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
                                         foliage.prevPosZ = foliage.posZ;*/
-                    foliage.posX += 0.5F + randX;
-                    foliage.prevPosX = foliage.posX;
-                    foliage.posZ += 0.5F + randZ;
-                    foliage.prevPosZ = foliage.posZ;
-                    foliage.rotationYaw = 0;
-                    //foliage.rotationYaw = 90;
-                    foliage.rotationYaw = world.rand.nextInt(360);
+            foliage.posX += 0.5F + randX;
+            foliage.prevPosX = foliage.posX;
+            foliage.posZ += 0.5F + randZ;
+            foliage.prevPosZ = foliage.posZ;
+            foliage.rotationYaw = 0;
+            //foliage.rotationYaw = 90;
+            foliage.rotationYaw = world.rand.nextInt(360);
 
-                    //cross sectionize for each second one
+            //cross sectionize for each second one
                     /*if ((i+1) % 2 == 0) {
                         foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
                     }*/
 
-                    //temp?
-                    foliage.rotationYaw = 45;
-                    if ((i+1) % 2 == 0) {
-                        foliage.rotationYaw += 90;
-                    }
+            //temp?
+            foliage.rotationYaw = 45;
+            if ((i+1) % 2 == 0) {
+                foliage.rotationYaw += 90;
+            }
 
-                    //for seaweed render
-                    foliage.rotationYaw = 0;
-                    if ((i+1) % 2 == 0) {
-                        //use as a marker for GLSL
-                        foliage.rotationYaw = 1;
-                    }
+            //for seaweed render
+            foliage.rotationYaw = 0;
+            if ((i+1) % 2 == 0) {
+                //use as a marker for GLSL
+                foliage.rotationYaw = 1;
+            }
 
-                    //foliage.rotationPitch = rand.nextInt(90) - 45;
-                    foliage.particleScale /= 0.2;
+            //foliage.rotationPitch = rand.nextInt(90) - 45;
+            foliage.particleScale /= 0.2;
 
-                    int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
-                    foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
-                    foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
-                    foliage.particleBlue = (float) (color & 255) / 255.0F;
+            int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
+            foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+            foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+            foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+            foliage.particleRed -= 0.2F;
+            foliage.particleGreen -= 0.2F;
+            foliage.particleBlue = 1F;
 
                     /*foliage.particleRed = rand.nextFloat();
                     foliage.particleGreen = rand.nextFloat();
                     foliage.particleBlue = rand.nextFloat();*/
 
-                    //debug
+            //debug
                     /*if (heightIndex == 0) {
                         foliage.particleRed = 1F;
                     } else if (heightIndex == 1) {
@@ -172,39 +172,18 @@ public class FoliageRenderer {
                         foliage.particleBlue = 1F;
                     }*/
 
-                    foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+            foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
 
-                    //temp
-                    if ((i+1) % 2 == 0) {
-                        //foliage.particleGreen = 0;
-                    }
-
-                    listClutter.add(foliage);
-
-                }
-
-                lookupPosToFoliage.put(pos, listClutter);
-                /*if (heightIndex == 0) {
-
-                } else if (heightIndex == 1) {
-                    lookupPosToFoliage.put(pos.up(), listClutter);
-                }*/
-
-                //}
+            //temp
+            if ((i+1) % 2 == 0) {
+                //foliage.particleGreen = 0;
             }
 
-            //for (BlockPos pos : foliageQueueRemove) {
-            for (int i = 0; i < foliageQueueRemove.size(); i++) {
-                BlockPos pos = foliageQueueRemove.get(i);
-                lookupPosToFoliage.remove(pos);
-            }
-        } catch (Exception ex) {
-            System.out.println("foliage queue CME");
-            //ex.printStackTrace();
+            listClutter.add(foliage);
+
         }
 
-        foliageQueueAdd.clear();
-        foliageQueueRemove.clear();
+        lookupPosToFoliage.put(pos, listClutter);
     }
 
     public void renderJustShaders(Entity entityIn, float partialTicks)
@@ -356,8 +335,8 @@ public class FoliageRenderer {
         //radialRange = 30;
 
         //temp override vars
-        FoliageRenderer.radialRange = 40;
-        FoliageClutter.clutterSize = 6;
+        FoliageRenderer.radialRange = 80;
+        FoliageClutter.clutterSize = 16;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -406,9 +385,7 @@ public class FoliageRenderer {
                                 double distFadeRange = 5;
                                 int rangeAdj = radialRange - 10;
                                 double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                        /*if (dist < distMax) {
-                            foliage.particleAlpha = (float) (dist) / distMax;
-                        } else */if (dist > rangeAdj - distFadeRange) {
+                                if (dist > rangeAdj - distFadeRange) {
 
                                     double diff = dist - ((double)rangeAdj - distFadeRange);
                                     foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
@@ -417,6 +394,9 @@ public class FoliageRenderer {
                                     foliage.particleAlpha = 1F;
                                 }
 
+                                //if (dist < distMax) {
+                                //foliage.particleAlpha = (float) (dist) / distMax;
+                                //} else
 
                                 foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
 
