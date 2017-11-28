@@ -1,6 +1,7 @@
 package extendedrenderer.render;
 
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.foliage.Foliage;
 import extendedrenderer.foliage.FoliageClutter;
 import extendedrenderer.particle.ParticleRegistry;
@@ -103,9 +104,6 @@ public class FoliageRenderer {
                 //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
 
                 int heightIndex = 0;
-
-                //TEMP!
-                FoliageClutter.clutterSize = 16;
 
                 for (int i = 0; i < FoliageClutter.clutterSize; i++) {
                     /*if (i >= 2) {
@@ -319,8 +317,6 @@ public class FoliageRenderer {
 
         if (!skipUpdate || needsUpdate) {
             //also resets position
-            mesh.instanceDataBufferVBO1.clear();
-            mesh.curBufferPos = 0;
         }
 
         BlockPos pos = entityIn.getPosition();
@@ -351,7 +347,7 @@ public class FoliageRenderer {
             //adjAmount = 50;
         }
 
-        int radialRange = 10;
+        int radialRange = 40;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -365,53 +361,68 @@ public class FoliageRenderer {
             if (lockVBO2.tryLock()) {
                 try {
 
-                    mesh.curBufferPosVBO2 = 0;
-
-                    if (updateVBO2/* || needsUpdate*//* || dirtyVBO2*/) {
-                        if (!threadedVBOUpdate) {
-                            for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
-                                for (Foliage foliage : listFoliage) {
-                                    foliage.updateQuaternion(entityIn);
-
-                                    //update vbo2
-                                    foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
-                                }
-                            }
-                        }
-
-                        int vboPos = mesh.curBufferPosVBO2;
-                        if (threadedVBOUpdate) {
-                            vboPos = vbo2BufferPos;
-                        }
-
-                        //wasnt used in particle renderer and even crashes it :o
-                        /*if (!subTest) {
-                            mesh.instanceDataBufferSeldom.limit(vboPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-                        } else {
-                            mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-                        }*/
-
-
-                    }
+                    /*mesh.instanceDataBufferVBO2.clear();
+                    mesh.curBufferPosVBO2 = 0;*/
 
                     if (getFlag()) {
-                        //System.out.println("render thread: lock & update needed, vbo2BufferPos: " + vbo2BufferPos);
-                        //mesh.instanceDataBufferSeldom.limit(vbo2BufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
 
                         Foliage.interpPosX = Foliage.interpPosXThread;
                         Foliage.interpPosY = Foliage.interpPosYThread;
                         Foliage.interpPosZ = Foliage.interpPosZThread;
 
+                        //System.out.println("main thread: mesh.curBufferPosVBO2: " + mesh.curBufferPosVBO2);
+                        //System.out.println("vbo 2 bind");
 
+                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO2);
+                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
 
-                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
-
-                        if (true || !subTest) {
-                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
-                        } else {
-                            GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferVBO2);
-                        }
                         dirtyVBO2Flag = false;
+
+                        FoliageRenderer.vbo2BufferPos = mesh.curBufferPosVBO2;
+                    }
+
+                    if (updateVBO1 || needsUpdate) {
+
+                        mesh.instanceDataBufferVBO1.clear();
+                        mesh.curBufferPosVBO1 = 0;
+
+                        //System.out.println("vbo 1 update");
+
+                        for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
+                            for (Foliage foliage : listFoliage) {
+
+                                //close fade
+                                float distMax = 3F;
+                                double distFadeRange = 15;
+                                double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                        /*if (dist < distMax) {
+                            foliage.particleAlpha = (float) (dist) / distMax;
+                        } else */if (dist > radialRange - distFadeRange) {
+
+                                    double diff = dist - ((double)radialRange - distFadeRange);
+                                    foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
+
+                                } else {
+                                    foliage.particleAlpha = 1F;
+                                }
+
+
+                                foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+
+                                //update vbo1
+                                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                            }
+                        }
+
+                        //System.out.println("main thread: mesh.curBufferPosVBO1: " + mesh.curBufferPosVBO1);
+
+                        //System.out.println("vbo 1 bind");
+
+                        mesh.instanceDataBufferVBO1.limit(mesh.curBufferPosVBO1 * mesh.INSTANCE_SIZE_FLOATS);
+
+                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO1);
+
+                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO1, GL_DYNAMIC_DRAW);
                     }
                 } finally {
                     lockVBO2.unlock();
@@ -419,47 +430,7 @@ public class FoliageRenderer {
 
             }
 
-            if (updateVBO1 || needsUpdate) {
-                for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
-                    for (Foliage foliage : listFoliage) {
 
-                        //close fade
-                        float distMax = 3F;
-                        double distFadeRange = 3;
-                        double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                        /*if (dist < distMax) {
-                            foliage.particleAlpha = (float) (dist) / distMax;
-                        } else */if (false && dist > radialRange - distFadeRange) {
-
-                            double diff = dist - ((double)radialRange - distFadeRange);
-                            foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
-
-                        } else {
-                            foliage.particleAlpha = 1F;
-                        }
-
-
-                        foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
-
-                        //update vbo1
-                        foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
-                    }
-                }
-
-                if (!subTest) {
-                    mesh.instanceDataBufferVBO1.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
-                } else {
-                    mesh.instanceDataBufferVBO1.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
-                }
-
-                OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
-
-                if (true || !subTest) {
-                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO1, GL_DYNAMIC_DRAW);
-                } else {
-                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferVBO1);
-                }
-            }
         }
 
         needsUpdate = false;
@@ -493,6 +464,7 @@ public class FoliageRenderer {
             /*ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
                     0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);*/
             if (vbo2BufferPos > 0) {
+                //System.out.println("draw");
                 ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
                         0, vbo2BufferPos);
             }

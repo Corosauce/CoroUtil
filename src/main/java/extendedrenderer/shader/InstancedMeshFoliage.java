@@ -29,14 +29,14 @@ public class InstancedMeshFoliage extends Mesh {
 
     public final int numInstances;
 
-    public final int instanceDataVBO;
-    public final int instanceDataVBOSeldom;
+    public final int instanceDataVBO1;
+    public final int instanceDataVBO2;
 
     public FloatBuffer instanceDataBufferVBO1;
     public FloatBuffer instanceDataBufferVBO2;
     public FloatBuffer instanceDataBufferSeldom2;
 
-    public int curBufferPos = 0;
+    public int curBufferPosVBO1 = 0;
     public int curBufferPosVBO2 = 0;
 
     public static int vboSizeMesh = 2;
@@ -50,10 +50,10 @@ public class InstancedMeshFoliage extends Mesh {
 
         /** VBO 1 START **/
 
-        instanceDataVBO = GL15.glGenBuffers();
-        vboIdList.add(instanceDataVBO);
+        instanceDataVBO1 = GL15.glGenBuffers();
+        vboIdList.add(instanceDataVBO1);
         instanceDataBufferVBO1 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
-        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO);
+        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO1);
         int start = vboSizeMesh;
         int strideStart = 0;
 
@@ -75,10 +75,10 @@ public class InstancedMeshFoliage extends Mesh {
         //start = vboSizeMesh;
         strideStart = 0;
 
-        instanceDataVBOSeldom = OpenGlHelper.glGenBuffers();
-        vboIdList.add(instanceDataVBOSeldom);
+        instanceDataVBO2 = OpenGlHelper.glGenBuffers();
+        vboIdList.add(instanceDataVBO2);
         instanceDataBufferVBO2 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_SELDOM);
-        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBOSeldom);
+        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO2);
 
         // Model Matrix
         for (int i = 0; i < 4; i++) {

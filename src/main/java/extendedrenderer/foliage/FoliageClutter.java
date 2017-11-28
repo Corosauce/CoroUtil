@@ -5,6 +5,6 @@ import java.util.List;
 
 public class FoliageClutter {
 
-    public static int clutterSize = 6;
+    public static int clutterSize = 16;
 
 }

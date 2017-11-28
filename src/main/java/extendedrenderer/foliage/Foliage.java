@@ -107,9 +107,9 @@ public class Foliage implements IShaderRenderedEntity {
     public void renderForShaderVBO1(InstancedMeshFoliage mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                         float partialTicks) {
 
-        if (mesh.curBufferPos >= mesh.numInstances) return;
+        if (mesh.curBufferPosVBO1 >= mesh.numInstances) return;
 
-        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), particleAlpha);
+        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPosVBO1), particleAlpha);
 
         //TEMP
         //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getMinecraft().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
@@ -117,9 +117,9 @@ public class Foliage implements IShaderRenderedEntity {
         float brightness;
         //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
         brightness = brightnessCache;
-        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + 1, brightness);
+        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPosVBO1) + 1, brightness);
 
-        mesh.curBufferPos++;
+        mesh.curBufferPosVBO1++;
 
     }
 
