@@ -34,8 +34,10 @@ public class InstancedMeshFoliage extends Mesh {
 
     public FloatBuffer instanceDataBuffer;
     public FloatBuffer instanceDataBufferSeldom;
+    public FloatBuffer instanceDataBufferSeldom2;
 
     public int curBufferPos = 0;
+    public int curBufferPosVBO2 = 0;
 
     public static int vboSizeMesh = 2;
 

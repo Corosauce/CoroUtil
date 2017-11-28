@@ -29,6 +29,8 @@ import org.lwjgl.opengl.GL15;
 import java.nio.FloatBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
@@ -38,13 +40,13 @@ import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 
 public class FoliageRenderer {
 
-    private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
+    //private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
 
     private final TextureManager renderer;
 
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
     public static FloatBuffer viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
-    public static FloatBuffer viewMatrixClassicBuffer = BufferUtils.createFloatBuffer(16);
+    //public static FloatBuffer viewMatrixClassicBuffer = BufferUtils.createFloatBuffer(16);
 
     public Transformation transformation;
 
@@ -59,6 +61,10 @@ public class FoliageRenderer {
 
     public float windDir = 0;
     public float windSpeed = 0;
+
+    public static int vbo2BufferPos = 0;
+
+    public Lock lockVBO2 = new ReentrantLock();
 
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
@@ -84,11 +90,11 @@ public class FoliageRenderer {
         }
     }
 
-    public synchronized boolean getFlag() {
+    public boolean getFlag() {
         return dirtyVBO2Flag;
     }
 
-    public synchronized void processQueue() {
+    public void processQueue() {
         World world = Minecraft.getMinecraft().world;
 
         Random rand = new Random(5);
@@ -253,23 +259,7 @@ public class FoliageRenderer {
          * - matrixFix = -(interp - VBOUpdateCamPos)
          * - foliagepos = interp - VBOUpdateCamPos
          */
-        boolean dirtyVBO2 = getFlag();
-        if (dirtyVBO2) {
-            processQueue();
-
-            //set new static camera point for max precision and speed
-            Foliage.interpPosX = entityIn.lastTickPosX + (entityIn.posX - entityIn.lastTickPosX) * (double)partialTicks;
-            Foliage.interpPosY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)partialTicks;
-            Foliage.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
-        }
-        float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
-        float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
-        float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
-        Matrix4fe matrixFix = new Matrix4fe();
-        matrixFix = matrixFix.translationRotateScale(
-                -interpX, -interpY, -interpZ,
-                0, 0, 0, 1,
-                1, 1, 1);
+        boolean threadedVBOUpdate = true;
 
         boolean test1 = false;
 
@@ -288,15 +278,7 @@ public class FoliageRenderer {
             }
         }
 
-
-        if (test1) {
-            matrixFix = viewMatrix.mul(matrixFix);
-        } else {
-            Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
-            matrixFix = modelViewMatrix.mul(matrixFix);
-        }
-
-        shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
+        //shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
         //shaderProgram.setUniformEfficient("modelViewMatrixClassic", viewMatrix, viewMatrixClassicBuffer);
 
         shaderProgram.setUniform("texture_sampler", 0);
@@ -341,14 +323,9 @@ public class FoliageRenderer {
         boolean add = false;
         boolean trim = true;
 
-        /**
-         * TODO: lazy foliage management done, now to make it play nicer with VBO and not break ordering
-         */
-
         if (!skipUpdate || needsUpdate) {
             //also resets position
             mesh.instanceDataBuffer.clear();
-            mesh.instanceDataBufferSeldom.clear();
             mesh.curBufferPos = 0;
         }
 
@@ -386,6 +363,67 @@ public class FoliageRenderer {
         int yRange = 10;
 
         if (!skipUpdate || needsUpdate) {
+
+
+
+
+
+            if (lockVBO2.tryLock()) {
+                try {
+
+                    mesh.curBufferPosVBO2 = 0;
+
+                    if (updateVBO2/* || needsUpdate*//* || dirtyVBO2*/) {
+                        if (!threadedVBOUpdate) {
+                            for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
+                                for (Foliage foliage : listFoliage) {
+                                    foliage.updateQuaternion(entityIn);
+
+                                    //update vbo2
+                                    foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                                }
+                            }
+                        }
+
+                        int vboPos = mesh.curBufferPosVBO2;
+                        if (threadedVBOUpdate) {
+                            vboPos = vbo2BufferPos;
+                        }
+
+                        //wasnt used in particle renderer and even crashes it :o
+                        /*if (!subTest) {
+                            mesh.instanceDataBufferSeldom.limit(vboPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+                        } else {
+                            mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+                        }*/
+
+
+                    }
+
+                    if (getFlag()) {
+                        System.out.println("render thread: lock & update needed, vbo2BufferPos: " + vbo2BufferPos);
+                        //mesh.instanceDataBufferSeldom.limit(vbo2BufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
+
+                        Foliage.interpPosX = Foliage.interpPosXThread;
+                        Foliage.interpPosY = Foliage.interpPosYThread;
+                        Foliage.interpPosZ = Foliage.interpPosZThread;
+
+
+
+                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
+
+                        if (true || !subTest) {
+                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+                        } else {
+                            GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
+                        }
+                        dirtyVBO2Flag = false;
+                    }
+                } finally {
+                    lockVBO2.unlock();
+                }
+
+            }
 
             if (updateVBO1 || needsUpdate) {
                 for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
@@ -428,41 +466,42 @@ public class FoliageRenderer {
                     GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
                 }
             }
-
-            mesh.curBufferPos = 0;
-
-            if (updateVBO2 || needsUpdate || dirtyVBO2) {
-                for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
-                    for (Foliage foliage : listFoliage) {
-                        foliage.updateQuaternion(entityIn);
-
-                        //update vbo2
-                        foliage.renderForShaderVBO2(mesh, transformation, viewMatrix, entityIn, partialTicks);
-                    }
-                }
-
-                //wasnt used in particle renderer and even crashes it :o
-                if (!subTest) {
-                    mesh.instanceDataBufferSeldom.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-                } else {
-                    mesh.instanceDataBufferSeldom.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
-                }
-
-                OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
-
-                if (true || !subTest) {
-                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
-                } else {
-                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
-                }
-            }
         }
 
         needsUpdate = false;
 
+
+        float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
+        float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
+        float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
+                        /*interpX = (float)(entityIn.posX - Foliage.interpPosX);
+                        interpY = (float)(entityIn.posY - Foliage.interpPosY);
+                        interpZ = (float)(entityIn.posZ - Foliage.interpPosZ);*/
+        Matrix4fe matrixFix = new Matrix4fe();
+        matrixFix = matrixFix.translationRotateScale(
+                -interpX, -interpY, -interpZ,
+                0, 0, 0, 1,
+                1, 1, 1);
+
+        projectionMatrix = new Matrix4fe();
+        buf = BufferUtils.createFloatBuffer(16);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+        buf.rewind();
+        Matrix4fe.get(projectionMatrix, 0, buf);
+
+
+        Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
+        matrixFix = modelViewMatrix.mul(matrixFix);
+
+        shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
+
         if (!subTest) {
-            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
-                    0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);
+            /*ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                    0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);*/
+            if (vbo2BufferPos > 0) {
+                ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                        0, vbo2BufferPos);
+            }
         } else {
             //if (lookupPosToFoliage.size() > 5) {
                 ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,

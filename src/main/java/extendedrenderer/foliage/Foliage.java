@@ -21,6 +21,9 @@ public class Foliage implements IShaderRenderedEntity {
     public static double interpPosX;
     public static double interpPosY;
     public static double interpPosZ;
+    public static double interpPosXThread;
+    public static double interpPosYThread;
+    public static double interpPosZThread;
 
     public float width = 1F;
     public float height = 1F;
@@ -124,12 +127,12 @@ public class Foliage implements IShaderRenderedEntity {
     public void renderForShaderVBO2(InstancedMeshFoliage mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                             float partialTicks) {
 
-        if (mesh.curBufferPos >= mesh.numInstances) return;
+        if (mesh.curBufferPosVBO2 >= mesh.numInstances) return;
 
         //camera relative positions, for world position, remove the interpPos values
-        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - this.interpPosX);
-        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - this.interpPosY);
-        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - this.interpPosZ);
+        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - this.interpPosXThread);
+        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - this.interpPosYThread);
+        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - this.interpPosZThread);
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
         Vector3f pos = new Vector3f(posX, posY, posZ);
 
@@ -138,29 +141,29 @@ public class Foliage implements IShaderRenderedEntity {
         //adjust to perspective and camera
         //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
         //upload to buffer
-        modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos), mesh.instanceDataBufferSeldom);
+        modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2), mesh.instanceDataBufferSeldom);
 
         int rgbaIndex = 0;
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleRed);
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleGreen);
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleBlue);
         //using yaw here instead, alpha in other VBO
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.rotationYaw);
 
         //index, aka buffer pos?
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
-                + (rgbaIndex++), mesh.curBufferPos);
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+                + (rgbaIndex++), mesh.curBufferPosVBO2);
 
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), animationID);
 
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), heightIndex);
 
-        mesh.curBufferPos++;
+        mesh.curBufferPosVBO2++;
     }
 }
