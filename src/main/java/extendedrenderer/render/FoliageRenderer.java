@@ -1,25 +1,19 @@
 package extendedrenderer.render;
 
-import CoroUtil.config.ConfigCoroAI;
 import CoroUtil.util.CoroUtilBlockLightCache;
-import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.foliage.Foliage;
 import extendedrenderer.foliage.FoliageClutter;
-import extendedrenderer.foliage.ParticleTallGrassTemp;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.shader.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.BufferUtils;
@@ -325,7 +319,7 @@ public class FoliageRenderer {
 
         if (!skipUpdate || needsUpdate) {
             //also resets position
-            mesh.instanceDataBuffer.clear();
+            mesh.instanceDataBufferVBO1.clear();
             mesh.curBufferPos = 0;
         }
 
@@ -401,7 +395,7 @@ public class FoliageRenderer {
                     }
 
                     if (getFlag()) {
-                        System.out.println("render thread: lock & update needed, vbo2BufferPos: " + vbo2BufferPos);
+                        //System.out.println("render thread: lock & update needed, vbo2BufferPos: " + vbo2BufferPos);
                         //mesh.instanceDataBufferSeldom.limit(vbo2BufferPos * mesh.INSTANCE_SIZE_FLOATS_SELDOM);
 
                         Foliage.interpPosX = Foliage.interpPosXThread;
@@ -413,9 +407,9 @@ public class FoliageRenderer {
                         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOSeldom);
 
                         if (true || !subTest) {
-                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferSeldom, GL_DYNAMIC_DRAW);
+                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
                         } else {
-                            GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferSeldom);
+                            GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferVBO2);
                         }
                         dirtyVBO2Flag = false;
                     }
@@ -453,17 +447,17 @@ public class FoliageRenderer {
                 }
 
                 if (!subTest) {
-                    mesh.instanceDataBuffer.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
+                    mesh.instanceDataBufferVBO1.limit(mesh.curBufferPos * mesh.INSTANCE_SIZE_FLOATS);
                 } else {
-                    mesh.instanceDataBuffer.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
+                    mesh.instanceDataBufferVBO1.limit(adjAmount * mesh.INSTANCE_SIZE_FLOATS);
                 }
 
                 OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
 
                 if (true || !subTest) {
-                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+                    ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO1, GL_DYNAMIC_DRAW);
                 } else {
-                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBuffer);
+                    GL15.glBufferSubData(GL_ARRAY_BUFFER, 0, mesh.instanceDataBufferVBO1);
                 }
             }
         }

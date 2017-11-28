@@ -1,7 +1,6 @@
 package extendedrenderer.foliage;
 
 import extendedrenderer.shader.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -110,7 +109,7 @@ public class Foliage implements IShaderRenderedEntity {
 
         if (mesh.curBufferPos >= mesh.numInstances) return;
 
-        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), particleAlpha);
+        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), particleAlpha);
 
         //TEMP
         //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getMinecraft().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
@@ -118,7 +117,7 @@ public class Foliage implements IShaderRenderedEntity {
         float brightness;
         //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
         brightness = brightnessCache;
-        mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + 1, brightness);
+        mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + 1, brightness);
 
         mesh.curBufferPos++;
 
@@ -141,27 +140,27 @@ public class Foliage implements IShaderRenderedEntity {
         //adjust to perspective and camera
         //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
         //upload to buffer
-        modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2), mesh.instanceDataBufferSeldom);
+        modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2), mesh.instanceDataBufferVBO2);
 
         int rgbaIndex = 0;
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleRed);
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleGreen);
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.particleBlue);
         //using yaw here instead, alpha in other VBO
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), this.rotationYaw);
 
         //index, aka buffer pos?
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), mesh.curBufferPosVBO2);
 
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), animationID);
 
-        mesh.instanceDataBufferSeldom.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+        mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), heightIndex);
 
         mesh.curBufferPosVBO2++;

@@ -32,8 +32,8 @@ public class InstancedMeshFoliage extends Mesh {
     public final int instanceDataVBO;
     public final int instanceDataVBOSeldom;
 
-    public FloatBuffer instanceDataBuffer;
-    public FloatBuffer instanceDataBufferSeldom;
+    public FloatBuffer instanceDataBufferVBO1;
+    public FloatBuffer instanceDataBufferVBO2;
     public FloatBuffer instanceDataBufferSeldom2;
 
     public int curBufferPos = 0;
@@ -52,7 +52,7 @@ public class InstancedMeshFoliage extends Mesh {
 
         instanceDataVBO = GL15.glGenBuffers();
         vboIdList.add(instanceDataVBO);
-        instanceDataBuffer = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
+        instanceDataBufferVBO1 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO);
         int start = vboSizeMesh;
         int strideStart = 0;
@@ -77,7 +77,7 @@ public class InstancedMeshFoliage extends Mesh {
 
         instanceDataVBOSeldom = OpenGlHelper.glGenBuffers();
         vboIdList.add(instanceDataVBOSeldom);
-        instanceDataBufferSeldom = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_SELDOM);
+        instanceDataBufferVBO2 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_SELDOM);
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBOSeldom);
 
         // Model Matrix
@@ -122,14 +122,14 @@ public class InstancedMeshFoliage extends Mesh {
     @Override
     public void cleanup() {
         super.cleanup();
-        if (this.instanceDataBuffer != null) {
+        if (this.instanceDataBufferVBO1 != null) {
             //MemoryUtil.memFree(this.instanceDataBuffer);
-            this.instanceDataBuffer = null;
+            this.instanceDataBufferVBO1 = null;
         }
 
-        if (this.instanceDataBufferSeldom != null) {
+        if (this.instanceDataBufferVBO2 != null) {
             //MemoryUtil.memFree(this.instanceDataBuffer);
-            this.instanceDataBufferSeldom = null;
+            this.instanceDataBufferVBO2 = null;
         }
     }
 
