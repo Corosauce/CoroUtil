@@ -21,15 +21,15 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glGetInteger;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 
@@ -81,7 +81,43 @@ public class FoliageRenderer {
 
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
+            Random rand = new Random(5);
+            byte[] stipple = new byte[128];
+            for (int i = 0; i < stipple.length; i++) {
+                stipple[i] = (byte)rand.nextInt(255);
+                //stipple[i] = (byte)(rand.nextBoolean() ? 0x00 : 0x05);
+            }
+
+            byte fly[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+                    (byte) 0x80, 0x01, (byte) 0xC0, 0x06, (byte) 0xC0, 0x03, 0x60,
+                    0x04, 0x60, 0x06, 0x20, 0x04, 0x30, 0x0C, 0x20, 0x04, 0x18, 0x18,
+                    0x20, 0x04, 0x0C, 0x30, 0x20, 0x04, 0x06, 0x60, 0x20, 0x44, 0x03,
+                    (byte) 0xC0, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
+                    (byte) 0x80, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
+                    (byte) 0x80, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
+                    (byte) 0x80, 0x22, 0x66, 0x01, (byte) 0x80, 0x66, 0x33, 0x01,
+                    (byte) 0x80, (byte) 0xCC, 0x19, (byte) 0x81, (byte) 0x81,
+                    (byte) 0x98, 0x0C, (byte) 0xC1, (byte) 0x83, 0x30, 0x07,
+                    (byte) 0xe1, (byte) 0x87, (byte) 0xe0, 0x03, 0x3f, (byte) 0xfc,
+                    (byte) 0xc0, 0x03, 0x31, (byte) 0x8c, (byte) 0xc0, 0x03, 0x33,
+                    (byte) 0xcc, (byte) 0xc0, 0x06, 0x64, 0x26, 0x60, 0x0c,
+                    (byte) 0xcc, 0x33, 0x30, 0x18, (byte) 0xcc, 0x33, 0x18, 0x10,
+                    (byte) 0xc4, 0x23, 0x08, 0x10, 0x63, (byte) 0xC6, 0x08, 0x10, 0x30,
+                    0x0c, 0x08, 0x10, 0x18, 0x18, 0x08, 0x10, 0x00, 0x00, 0x08 };
+            ByteBuffer flyBuffer = ByteBuffer.allocateDirect(128);
+            flyBuffer.put(stipple, 0, 128);
+
+            ByteBuffer off = ByteBuffer.allocateDirect(128);
+
+            //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
+            //flyBuffer.rewind();
+            //GL11.glPolygonStipple(flyBuffer);
+
             renderJustShaders(entityIn, partialTicks);
+
+            //GL11.glPolygonStipple(off);
+
+            //GL11.glDisable(GL11.GL_POLYGON_STIPPLE);
 
             //GlStateManager.depthMask(true);
         }
@@ -270,6 +306,25 @@ public class FoliageRenderer {
         }
         shaderProgram.setUniform("fogmode", modeIndex);
 
+        /*GLfloat v[10] = {...};
+        glUniform1fv(glGetUniformLocation(program, "v"), 10, v);*/
+
+        Random rand = new Random(5);
+        IntBuffer buffer = BufferUtils.createIntBuffer(64);
+        for (int i = 0; i < 64; i++) {
+            buffer.put(i, rand.nextInt(255));
+        }
+        buffer.flip();
+
+        /*byte[] stipple = new byte[128];
+        for (int i = 0; i < stipple.length; i++) {
+            stipple[i] = (byte)rand.nextInt(255);
+            //stipple[i] = (byte)(rand.nextBoolean() ? 0x00 : 0x05);
+        }*/
+
+        //TODO: validate correct use
+        OpenGlHelper.glUniform1(shaderProgram.uniforms.get("stipple"), buffer);
+
         try {
             shaderProgram.setUniform("time", (int) world.getTotalWorldTime());
         } catch (Exception ex) {
@@ -308,7 +363,7 @@ public class FoliageRenderer {
 
 
 
-        Random rand = new Random();
+        //Random rand = new Random();
         rand.setSeed(5);
         int range = 150;
 
@@ -335,7 +390,7 @@ public class FoliageRenderer {
         //radialRange = 30;
 
         //temp override vars
-        FoliageRenderer.radialRange = 80;
+        FoliageRenderer.radialRange = 40;
         FoliageClutter.clutterSize = 16;
 
         int xzRange = radialRange;
@@ -380,16 +435,22 @@ public class FoliageRenderer {
                         for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
                             for (Foliage foliage : listFoliage) {
 
-                                //close fade
-                                float distMax = 3F;
-                                double distFadeRange = 5;
-                                int rangeAdj = radialRange - 10;
-                                double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                                if (dist > rangeAdj - distFadeRange) {
+                                boolean doAlpha = false;
 
-                                    double diff = dist - ((double)rangeAdj - distFadeRange);
-                                    foliage.particleAlpha = (float)(1F - (diff / distFadeRange));
+                                if (doAlpha) {
+                                    //close fade
+                                    float distMax = 3F;
+                                    double distFadeRange = 5;
+                                    int rangeAdj = radialRange - 20;
+                                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                                    if (dist > rangeAdj - distFadeRange) {
 
+                                        double diff = dist - ((double) rangeAdj - distFadeRange);
+                                        foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
+
+                                    } else {
+                                        foliage.particleAlpha = 1F;
+                                    }
                                 } else {
                                     foliage.particleAlpha = 1F;
                                 }

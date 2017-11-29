@@ -2,6 +2,7 @@
 
 uniform sampler2D texture_sampler;
 uniform int fogmode;
+uniform int stipple[64];
 
 varying vec2 outTexCoord;
 varying float outBrightness;
@@ -26,6 +27,17 @@ void main()
 	fragColor.y *= outRGBA.y * outBrightness;
 	fragColor.z *= outRGBA.z * outBrightness;
 	fragColor.w *= outRGBA.w;
+
+	/*if (stipple[1] == 0) {
+	    fragColor.w = 1;
+	}*/
+
+    if (outRGBA.w < 1) {
+        ivec2 coord = ivec2(gl_FragCoord.xy - 0.5);
+
+        if (stipple[int(mod(coord.x, 8) + mod(coord.y, 8) * 8)] <= 127)
+           discard;
+    }
 
 	if (outRGBA.w > 0) {
         fogFactor = clamp(fogFactor, 0.0, 1.0);

@@ -143,7 +143,8 @@ public class EventHandler {
                 RotatingParticleManager.forceShaderReset = false;
                 ShaderEngine.cleanup();
                 ShaderEngine.renderer = null;
-                ExtendedRenderer.foliageRenderer.needsUpdate = true;
+                //ExtendedRenderer.foliageRenderer.needsUpdate = true;
+                ExtendedRenderer.foliageRenderer.vbo2BufferPos = 0;
                 ShaderManager.resetCheck();
             }
 
@@ -176,12 +177,9 @@ public class EventHandler {
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        //GlStateManager.blendFunc(GlStateManager.SourceFactor.DST_ALPHA, GlStateManager.DestFactor.ONE_MINUS_DST_ALPHA);
-        GlStateManager.alphaFunc(516, 0.003921569F);
-        //GlStateManager.alphaFunc(GL11.GL_LESS, 0.2F);
-        //GlStateManager.alphaFunc(GL11.GL_ALWAYS, 0.0F);
+        //GlStateManager.enableBlend();
+        //GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.alphaFunc(516, 0.003921569F);
 
         //TODO: requires AT for EntityRenderer
         boolean testGLUOverride = false;

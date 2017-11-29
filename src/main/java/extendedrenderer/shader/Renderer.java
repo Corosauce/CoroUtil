@@ -60,6 +60,7 @@ public class Renderer {
         shaderProgram.createUniform("windDir");
         shaderProgram.createUniform("windSpeed");
         shaderProgram.createUniform("fogmode");
+        shaderProgram.createUniform("stipple");
 
         lookupNameToProgram.put(shaderProgram.getName(), shaderProgram);
     }

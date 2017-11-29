@@ -5,10 +5,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
+import java.util.Random;
 
 public class Foliage implements IShaderRenderedEntity {
 
@@ -52,6 +54,11 @@ public class Foliage implements IShaderRenderedEntity {
 
     public int animationID = 0;
     public int heightIndex = 0;
+
+    private static final Random rand = new Random(439875L);
+
+    private static final NoiseGeneratorPerlin angleNoise = new NoiseGeneratorPerlin(rand, 1);
+    private static final NoiseGeneratorPerlin delayNoise = new NoiseGeneratorPerlin(rand, 3);
 
     public Foliage() {
 
@@ -157,8 +164,11 @@ public class Foliage implements IShaderRenderedEntity {
         //index, aka buffer pos?
         /*mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), mesh.curBufferPosVBO2);*/
+        /*mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
+                + (rgbaIndex++), (((MathHelper.floor(this.posX) * 15)+(MathHelper.floor(this.posX) * 15))));*/
         mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
-                + (rgbaIndex++), (((MathHelper.floor(this.posX) * 15)+(MathHelper.floor(this.posX) * 15))));
+                + (rgbaIndex++), (float)delayNoise.getValue(this.posX, this.posZ));
+
 
         mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), animationID);

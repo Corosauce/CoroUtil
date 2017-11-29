@@ -19,7 +19,7 @@ public abstract class ShaderProgram {
 
     private int fragmentShaderId;
 
-    private Map<String, Integer> uniforms;
+    public Map<String, Integer> uniforms;
 
     public ShaderProgram(String name) throws Exception {
         this.name = name;

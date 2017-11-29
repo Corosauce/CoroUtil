@@ -39,7 +39,7 @@ void main()
     float rotation = rgba.w;
 
     float timeSmooth = (time-1) + partialTick;
-    timeSmooth += index;
+    timeSmooth += index * 200;
 
     float variance = 0.6;
 
