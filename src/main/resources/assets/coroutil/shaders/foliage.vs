@@ -16,6 +16,7 @@ attribute vec2 alphaBrightness;
 varying vec2 outTexCoord;
 varying float outBrightness;
 varying vec4 outRGBA;
+varying float outAlphaInt;
 
 uniform mat4 modelViewMatrixCamera;
 
@@ -40,6 +41,8 @@ void main()
 
     float timeSmooth = (time-1) + partialTick;
     timeSmooth += index * 200;
+
+    //timeSmooth = 1;
 
     float variance = 0.6;
 
@@ -108,4 +111,5 @@ void main()
 	outBrightness = alphaBrightness.y;
 
 	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
+	outAlphaInt = 255 - int(outRGBA.w * 255);
 }

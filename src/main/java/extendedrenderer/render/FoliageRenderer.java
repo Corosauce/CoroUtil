@@ -309,20 +309,14 @@ public class FoliageRenderer {
         /*GLfloat v[10] = {...};
         glUniform1fv(glGetUniformLocation(program, "v"), 10, v);*/
 
+        //TODO: CACHE ME
         Random rand = new Random(5);
         IntBuffer buffer = BufferUtils.createIntBuffer(64);
         for (int i = 0; i < 64; i++) {
             buffer.put(i, rand.nextInt(255));
         }
-        buffer.flip();
+        //buffer.flip();
 
-        /*byte[] stipple = new byte[128];
-        for (int i = 0; i < stipple.length; i++) {
-            stipple[i] = (byte)rand.nextInt(255);
-            //stipple[i] = (byte)(rand.nextBoolean() ? 0x00 : 0x05);
-        }*/
-
-        //TODO: validate correct use
         OpenGlHelper.glUniform1(shaderProgram.uniforms.get("stipple"), buffer);
 
         try {
@@ -390,7 +384,7 @@ public class FoliageRenderer {
         //radialRange = 30;
 
         //temp override vars
-        FoliageRenderer.radialRange = 40;
+        FoliageRenderer.radialRange = 30;
         FoliageClutter.clutterSize = 16;
 
         int xzRange = radialRange;
@@ -435,18 +429,19 @@ public class FoliageRenderer {
                         for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
                             for (Foliage foliage : listFoliage) {
 
-                                boolean doAlpha = false;
+                                boolean doAlpha = true;
 
                                 if (doAlpha) {
                                     //close fade
                                     float distMax = 3F;
                                     double distFadeRange = 5;
-                                    int rangeAdj = radialRange - 20;
+                                    int rangeAdj = radialRange - (int)distFadeRange;
                                     double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
                                     if (dist > rangeAdj - distFadeRange) {
 
                                         double diff = dist - ((double) rangeAdj - distFadeRange);
                                         foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
+                                        if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
 
                                     } else {
                                         foliage.particleAlpha = 1F;
