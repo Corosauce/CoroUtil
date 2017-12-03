@@ -177,9 +177,9 @@ public class EventHandler {
         Minecraft mc = Minecraft.getMinecraft();
         EntityRenderer er = mc.entityRenderer;
 
-        //GlStateManager.enableBlend();
-        //GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        //GlStateManager.alphaFunc(516, 0.003921569F);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.alphaFunc(516, 0.003921569F);
 
         //TODO: requires AT for EntityRenderer
         boolean testGLUOverride = false;

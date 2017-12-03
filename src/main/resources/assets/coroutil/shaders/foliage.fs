@@ -7,23 +7,21 @@ uniform int stipple[64];
 varying vec2 outTexCoord;
 varying float outBrightness;
 varying vec4 outRGBA;
-varying float outAlphaInt;
+//varying float outAlphaInt;
 
 void main()
 {
 
     //considering range 0.9 to 1.0 is quite costly, and provides minimal visual difference, this is more efficient
     //scratch that, stipple is crazy expensive in many scenarios, damn
-    if (outRGBA.w < 0.9) {
-
-        //int alphaInt = 255 - int(outRGBA.w * 255);
+    /*if (outRGBA.w < 0.9) {
 
         ivec2 coord = ivec2(gl_FragCoord.xy - 0.5);
 
         if (stipple[int(mod(coord.x, 8) + mod(coord.y, 8) * 8)] < outAlphaInt - 1) {
             discard;
         }
-    }
+    }*/
 
     float fogFactor = 0;
     if (fogmode == 0) {

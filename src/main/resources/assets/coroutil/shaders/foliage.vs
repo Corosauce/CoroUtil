@@ -111,5 +111,5 @@ void main()
 	outBrightness = alphaBrightness.y;
 
 	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
-	outAlphaInt = 255 - int(outRGBA.w * 255);
+	//outAlphaInt = 255 - int(outRGBA.w * 255);
 }

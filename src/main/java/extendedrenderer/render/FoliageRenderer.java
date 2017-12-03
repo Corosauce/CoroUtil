@@ -191,9 +191,9 @@ public class FoliageRenderer {
             foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
             foliage.particleBlue = (float) (color & 255) / 255.0F;
 
-            foliage.particleRed -= 0.2F;
+            /*foliage.particleRed -= 0.2F;
             foliage.particleGreen -= 0.2F;
-            foliage.particleBlue = 1F;
+            foliage.particleBlue = 1F;*/
 
                     /*foliage.particleRed = rand.nextFloat();
                     foliage.particleGreen = rand.nextFloat();
@@ -384,8 +384,9 @@ public class FoliageRenderer {
         //radialRange = 30;
 
         //temp override vars
-        FoliageRenderer.radialRange = 30;
+        FoliageRenderer.radialRange = 50;
         FoliageClutter.clutterSize = 16;
+        FoliageClutter.clutterSize = 4;
 
         int xzRange = radialRange;
         int yRange = 10;
@@ -429,12 +430,12 @@ public class FoliageRenderer {
                         for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
                             for (Foliage foliage : listFoliage) {
 
-                                boolean doAlpha = true;
+                                boolean doAlpha = false;
 
                                 if (doAlpha) {
                                     //close fade
                                     float distMax = 3F;
-                                    double distFadeRange = 5;
+                                    double distFadeRange = 20;
                                     int rangeAdj = radialRange - (int)distFadeRange;
                                     double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
                                     if (dist > rangeAdj - distFadeRange) {
