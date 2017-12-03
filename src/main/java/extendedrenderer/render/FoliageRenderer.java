@@ -3,7 +3,6 @@ package extendedrenderer.render;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.foliage.Foliage;
-import extendedrenderer.foliage.FoliageClutter;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.shader.*;
@@ -52,6 +51,7 @@ public class FoliageRenderer {
     public static List<BlockPos> foliageQueueRemove = new ArrayList();*/
 
     //public List<Foliage> listFoliage = new ArrayList<>();
+    public List<Foliage> listFoliage = new ArrayList<>();
     public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
 
     public float windDir = 0;
@@ -81,45 +81,7 @@ public class FoliageRenderer {
 
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-            Random rand = new Random(5);
-            byte[] stipple = new byte[128];
-            for (int i = 0; i < stipple.length; i++) {
-                stipple[i] = (byte)rand.nextInt(255);
-                //stipple[i] = (byte)(rand.nextBoolean() ? 0x00 : 0x05);
-            }
-
-            byte fly[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
-                    (byte) 0x80, 0x01, (byte) 0xC0, 0x06, (byte) 0xC0, 0x03, 0x60,
-                    0x04, 0x60, 0x06, 0x20, 0x04, 0x30, 0x0C, 0x20, 0x04, 0x18, 0x18,
-                    0x20, 0x04, 0x0C, 0x30, 0x20, 0x04, 0x06, 0x60, 0x20, 0x44, 0x03,
-                    (byte) 0xC0, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
-                    (byte) 0x80, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
-                    (byte) 0x80, 0x22, 0x44, 0x01, (byte) 0x80, 0x22, 0x44, 0x01,
-                    (byte) 0x80, 0x22, 0x66, 0x01, (byte) 0x80, 0x66, 0x33, 0x01,
-                    (byte) 0x80, (byte) 0xCC, 0x19, (byte) 0x81, (byte) 0x81,
-                    (byte) 0x98, 0x0C, (byte) 0xC1, (byte) 0x83, 0x30, 0x07,
-                    (byte) 0xe1, (byte) 0x87, (byte) 0xe0, 0x03, 0x3f, (byte) 0xfc,
-                    (byte) 0xc0, 0x03, 0x31, (byte) 0x8c, (byte) 0xc0, 0x03, 0x33,
-                    (byte) 0xcc, (byte) 0xc0, 0x06, 0x64, 0x26, 0x60, 0x0c,
-                    (byte) 0xcc, 0x33, 0x30, 0x18, (byte) 0xcc, 0x33, 0x18, 0x10,
-                    (byte) 0xc4, 0x23, 0x08, 0x10, 0x63, (byte) 0xC6, 0x08, 0x10, 0x30,
-                    0x0c, 0x08, 0x10, 0x18, 0x18, 0x08, 0x10, 0x00, 0x00, 0x08 };
-            ByteBuffer flyBuffer = ByteBuffer.allocateDirect(128);
-            flyBuffer.put(stipple, 0, 128);
-
-            ByteBuffer off = ByteBuffer.allocateDirect(128);
-
-            //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
-            //flyBuffer.rewind();
-            //GL11.glPolygonStipple(flyBuffer);
-
             renderJustShaders(entityIn, partialTicks);
-
-            //GL11.glPolygonStipple(off);
-
-            //GL11.glDisable(GL11.GL_POLYGON_STIPPLE);
-
-            //GlStateManager.depthMask(true);
         }
     }
 
@@ -143,7 +105,9 @@ public class FoliageRenderer {
         float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
         float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
 
-        for (int i = 0; i < FoliageClutter.clutterSize; i++) {
+        int clutterSize = 4;
+
+        for (int i = 0; i < clutterSize; i++) {
                     /*if (i >= 2) {
                         heightIndex = 1;
                     }*/
@@ -216,10 +180,12 @@ public class FoliageRenderer {
             }
 
             listClutter.add(foliage);
+            listFoliage.add(foliage);
 
         }
 
         lookupPosToFoliage.put(pos, listClutter);
+
     }
 
     public void renderJustShaders(Entity entityIn, float partialTicks)
@@ -359,43 +325,11 @@ public class FoliageRenderer {
 
         //Random rand = new Random();
         rand.setSeed(5);
-        int range = 150;
-
-        /**
-         *
-         * For staticly sized foliage, 6000 is decent for tallgrass, with 30 range
-         * - with this we can try to add and remove entries without changing entire index order
-         * - how do we blank out an entry so it doesnt render?
-         *
-         * ehhh, for now lets just force a full refresh and feed our own index in
-         *
-         */
-
-        int amount = 60000;
-        int adjAmount = amount;
-
-        boolean subTest = false;
-
-        if (subTest) {
-            adjAmount = amount;
-            //adjAmount = 50;
-        }
-
-        //radialRange = 30;
 
         //temp override vars
         FoliageRenderer.radialRange = 50;
-        FoliageClutter.clutterSize = 16;
-        FoliageClutter.clutterSize = 4;
-
-        int xzRange = radialRange;
-        int yRange = 10;
 
         if (!skipUpdate || needsUpdate) {
-
-
-
-
 
             if (lockVBO2.tryLock()) {
                 try {
@@ -427,39 +361,32 @@ public class FoliageRenderer {
 
                         //System.out.println("vbo 1 update");
 
-                        for (List<Foliage> listFoliage : lookupPosToFoliage.values()) {
-                            for (Foliage foliage : listFoliage) {
+                        for (Foliage foliage : listFoliage) {
+                            boolean doAlpha = false;
 
-                                boolean doAlpha = false;
+                            if (doAlpha) {
+                                //close fade
+                                float distMax = 3F;
+                                double distFadeRange = 20;
+                                int rangeAdj = radialRange - (int)distFadeRange;
+                                double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                                if (dist > rangeAdj - distFadeRange) {
 
-                                if (doAlpha) {
-                                    //close fade
-                                    float distMax = 3F;
-                                    double distFadeRange = 20;
-                                    int rangeAdj = radialRange - (int)distFadeRange;
-                                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                                    if (dist > rangeAdj - distFadeRange) {
+                                    double diff = dist - ((double) rangeAdj - distFadeRange);
+                                    foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
+                                    if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
 
-                                        double diff = dist - ((double) rangeAdj - distFadeRange);
-                                        foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
-                                        if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
-
-                                    } else {
-                                        foliage.particleAlpha = 1F;
-                                    }
                                 } else {
                                     foliage.particleAlpha = 1F;
                                 }
-
-                                //if (dist < distMax) {
-                                //foliage.particleAlpha = (float) (dist) / distMax;
-                                //} else
-
-                                foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
-
-                                //update vbo1
-                                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                            } else {
+                                foliage.particleAlpha = 1F;
                             }
+
+                            foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+
+                            //update vbo1
+                            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                         }
 
                         //System.out.println("main thread: mesh.curBufferPosVBO1: " + mesh.curBufferPosVBO1);
@@ -483,13 +410,10 @@ public class FoliageRenderer {
 
         needsUpdate = false;
 
-
         float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
         float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
         float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
-                        /*interpX = (float)(entityIn.posX - Foliage.interpPosX);
-                        interpY = (float)(entityIn.posY - Foliage.interpPosY);
-                        interpZ = (float)(entityIn.posZ - Foliage.interpPosZ);*/
+
         Matrix4fe matrixFix = new Matrix4fe();
         matrixFix = matrixFix.translationRotateScale(
                 -interpX, -interpY, -interpZ,
@@ -508,19 +432,10 @@ public class FoliageRenderer {
 
         shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
 
-        if (!subTest) {
-            /*ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
-                    0, lookupPosToFoliage.size() * FoliageClutter.clutterSize);*/
-            if (vbo2BufferPos > 0) {
-                //System.out.println("draw");
-                ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
-                        0, vbo2BufferPos);
-            }
-        } else {
-            //if (lookupPosToFoliage.size() > 5) {
-                ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
-                        0, adjAmount);
-            //}
+        if (vbo2BufferPos > 0) {
+            //System.out.println("draw");
+            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                    0, vbo2BufferPos);
         }
 
         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
