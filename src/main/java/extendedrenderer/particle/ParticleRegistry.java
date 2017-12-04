@@ -45,6 +45,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite debris_3;
 	public static TextureAtlasSprite test_texture;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
+	public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
 	public static TextureAtlasSprite tallgrass;
 	public static TextureAtlasSprite tallgrass_hd;
 	
@@ -88,6 +89,9 @@ public class ParticleRegistry {
 		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
 		for (int i = 1; i <= 9; i++) {
 			listFish.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/fish_" + i)));
+		}
+		for (int i = 1; i <= 7; i++) {
+			listSeaweed.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/seaweed_section_" + i)));
 		}
 		tallgrass = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass"));
 		tallgrass_hd = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass_hd"));

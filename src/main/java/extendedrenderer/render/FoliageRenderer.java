@@ -207,6 +207,108 @@ public class FoliageRenderer {
 
     }
 
+    public void addForPosSeaweed(BlockPos pos) {
+
+        World world = Minecraft.getMinecraft().world;
+
+        Random rand = new Random();
+        //for (BlockPos pos : foliageQueueAdd) {
+        IBlockState state = world.getBlockState(pos.down());
+        List<Foliage> listClutter = new ArrayList<>();
+        //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
+
+        int heightIndex = 0;
+
+        float variance = 0.4F;
+        float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
+        float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
+
+        int clutterSize = 14;
+
+        clutterSize = rand.nextInt(7) * 2;
+
+        for (int i = 0; i < clutterSize; i++) {
+                    /*if (i >= 2) {
+                        heightIndex = 1;
+                    }*/
+            heightIndex = i / 2;
+            TextureAtlasSprite sprite = ParticleRegistry.listSeaweed.get(heightIndex);
+            Foliage foliage = new Foliage(sprite);
+            foliage.setPosition(pos.add(0, 0, 0));
+            foliage.posY += 0.0F;
+            foliage.prevPosY = foliage.posY;
+            foliage.heightIndex = heightIndex;
+                                        /*foliage.posX += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosX = foliage.posX;
+                                        foliage.posZ += 0.5F + (rand.nextFloat() - rand.nextFloat()) * 0.8F;
+                                        foliage.prevPosZ = foliage.posZ;*/
+            foliage.posX += 0.5F + randX;
+            foliage.prevPosX = foliage.posX;
+            foliage.posZ += 0.5F + randZ;
+            foliage.prevPosZ = foliage.posZ;
+            foliage.rotationYaw = 0;
+            //foliage.rotationYaw = 90;
+            foliage.rotationYaw = world.rand.nextInt(360);
+
+            //cross sectionize for each second one
+                    /*if ((i+1) % 2 == 0) {
+                        foliage.rotationYaw = (listClutter.get(0).rotationYaw + 90) % 360;
+                    }*/
+
+            //temp?
+            foliage.rotationYaw = 45;
+            if ((i+1) % 2 == 0) {
+                foliage.rotationYaw += 90;
+            }
+
+            //for seaweed render
+            foliage.rotationYaw = 0;
+            if ((i+1) % 2 == 0) {
+                //use as a marker for GLSL
+                foliage.rotationYaw = 1;
+            }
+
+            //foliage.rotationPitch = rand.nextInt(90) - 45;
+            foliage.particleScale /= 0.2;
+
+            int color = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, world, pos.down(), 0);
+            foliage.particleRed = (float) (color >> 16 & 255) / 255.0F;
+            foliage.particleGreen = (float) (color >> 8 & 255) / 255.0F;
+            foliage.particleBlue = (float) (color & 255) / 255.0F;
+
+            foliage.particleRed = 1F;
+            foliage.particleGreen = 1F;
+            foliage.particleBlue = 1F;
+
+                    /*foliage.particleRed = rand.nextFloat();
+                    foliage.particleGreen = rand.nextFloat();
+                    foliage.particleBlue = rand.nextFloat();*/
+
+            //debug
+                    /*if (heightIndex == 0) {
+                        foliage.particleRed = 1F;
+                    } else if (heightIndex == 1) {
+                        foliage.particleGreen = 1F;
+                    } else if (heightIndex == 2) {
+                        foliage.particleBlue = 1F;
+                    }*/
+
+            foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer;
+
+            //temp
+            if ((i+1) % 2 == 0) {
+                //foliage.particleGreen = 0;
+            }
+
+            listClutter.add(foliage);
+            getFoliageForSprite(sprite).add(foliage);
+
+        }
+
+        lookupPosToFoliage.put(pos, listClutter);
+
+    }
+
     public void renderJustShaders(Entity entityIn, float partialTicks)
     {
 
@@ -323,13 +425,16 @@ public class FoliageRenderer {
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
-        //temp allocations
+        //TODO: temp allocations
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass_hd);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.potato);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.chicken);
         for (int i = 0; i < ParticleRegistry.listFish.size(); i++) {
             MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.listFish.get(i));
+        }
+        for (int i = 0; i < ParticleRegistry.listSeaweed.size(); i++) {
+            MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.listSeaweed.get(i));
         }
 
         int meshCount = 0;
