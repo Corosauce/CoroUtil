@@ -61,7 +61,7 @@ public class FoliageRenderer {
      *
      */
 
-    public LinkedHashMap<TextureAtlasSprite, List<Foliage>> foliage = new LinkedHashMap<>();
+    public ConcurrentHashMap<TextureAtlasSprite, List<Foliage>> foliage = new ConcurrentHashMap<>();
 
     //for position tracking mainly, to be used for all foliage types maybe?
     public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
@@ -128,14 +128,14 @@ public class FoliageRenderer {
         float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
         float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
 
-        int clutterSize = 4;
+        int clutterSize = 16;
 
         for (int i = 0; i < clutterSize; i++) {
                     /*if (i >= 2) {
                         heightIndex = 1;
                     }*/
             heightIndex = i / 2;
-            Foliage foliage = new Foliage();
+            Foliage foliage = new Foliage(sprite);
             foliage.setPosition(pos.add(0, 0, 0));
             foliage.posY += 0.0F;
             foliage.prevPosY = foliage.posY;
@@ -327,137 +327,142 @@ public class FoliageRenderer {
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
+        //temp allocations
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass_hd);
-
-        for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
-
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.potato);
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.chicken);
+        for (int i = 0; i < ParticleRegistry.listFish.size(); i++) {
+            MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.listFish.get(i));
         }
 
-        InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
+        for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
+            InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(entry.getKey());
 
-        mesh.initRender();
-        mesh.initRenderVBO1();
-        mesh.initRenderVBO2();
+            if (mesh == null) {
+                System.out.println("NULL MESH FOR: " + entry.getKey().toString());
+            }
 
+            mesh.initRender();
+            mesh.initRenderVBO1();
+            mesh.initRenderVBO2();
 
-        boolean skipUpdate = false;
-        boolean updateVBO1 = true;
+            boolean skipUpdate = false;
+            boolean updateVBO1 = true;
 
-        if (!skipUpdate || needsUpdate) {
+            if (!skipUpdate || needsUpdate) {
 
-            if (lockVBO2.tryLock()) {
-                try {
+                if (lockVBO2.tryLock()) {
+                    try {
 
                     /*mesh.instanceDataBufferVBO2.clear();
                     mesh.curBufferPosVBO2 = 0;*/
 
-                    if (getFlag(mesh)) {
+                        if (getFlag(mesh)) {
 
-                        Foliage.interpPosX = Foliage.interpPosXThread;
-                        Foliage.interpPosY = Foliage.interpPosYThread;
-                        Foliage.interpPosZ = Foliage.interpPosZThread;
+                            Foliage.interpPosX = Foliage.interpPosXThread;
+                            Foliage.interpPosY = Foliage.interpPosYThread;
+                            Foliage.interpPosZ = Foliage.interpPosZThread;
 
-                        //System.out.println("main thread: mesh.curBufferPosVBO2: " + mesh.curBufferPosVBO2);
-                        //System.out.println("vbo 2 bind");
+                            //System.out.println("main thread: mesh.curBufferPosVBO2: " + mesh.curBufferPosVBO2);
+                            //System.out.println("vbo 2 bind");
 
-                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO2);
-                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
+                            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO2);
+                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
 
-                        mesh.dirtyVBO2Flag = false;
+                            mesh.dirtyVBO2Flag = false;
 
-                        mesh.curBufferPosVBO2Thread = mesh.curBufferPosVBO2;
-                    }
+                            mesh.curBufferPosVBO2Thread = mesh.curBufferPosVBO2;
+                        }
 
-                    if (updateVBO1 || needsUpdate) {
+                        if (updateVBO1 || needsUpdate) {
 
-                        mesh.instanceDataBufferVBO1.clear();
-                        mesh.curBufferPosVBO1 = 0;
+                            mesh.instanceDataBufferVBO1.clear();
+                            mesh.curBufferPosVBO1 = 0;
 
-                        //System.out.println("vbo 1 update");
+                            //System.out.println("vbo 1 update");
 
-                        for (Foliage foliage : listFoliage) {
-                            boolean doAlpha = false;
+                            for (Foliage foliage : entry.getValue()) {
+                                boolean doAlpha = false;
 
-                            if (doAlpha) {
-                                //close fade
-                                float distMax = 3F;
-                                double distFadeRange = 20;
-                                int rangeAdj = radialRange - (int)distFadeRange;
-                                double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                                if (dist > rangeAdj - distFadeRange) {
+                                if (doAlpha) {
+                                    //close fade
+                                    float distMax = 3F;
+                                    double distFadeRange = 20;
+                                    int rangeAdj = radialRange - (int)distFadeRange;
+                                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                                    if (dist > rangeAdj - distFadeRange) {
 
-                                    double diff = dist - ((double) rangeAdj - distFadeRange);
-                                    foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
-                                    if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
+                                        double diff = dist - ((double) rangeAdj - distFadeRange);
+                                        foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
+                                        if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
 
+                                    } else {
+                                        foliage.particleAlpha = 1F;
+                                    }
                                 } else {
                                     foliage.particleAlpha = 1F;
                                 }
-                            } else {
-                                foliage.particleAlpha = 1F;
+
+                                foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+
+                                //update vbo1
+                                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                             }
 
-                            foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+                            //System.out.println("main thread: mesh.curBufferPosVBO1: " + mesh.curBufferPosVBO1);
 
-                            //update vbo1
-                            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                            //System.out.println("vbo 1 bind");
+
+                            mesh.instanceDataBufferVBO1.limit(mesh.curBufferPosVBO1 * mesh.INSTANCE_SIZE_FLOATS);
+
+                            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO1);
+
+                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO1, GL_DYNAMIC_DRAW);
                         }
-
-                        //System.out.println("main thread: mesh.curBufferPosVBO1: " + mesh.curBufferPosVBO1);
-
-                        //System.out.println("vbo 1 bind");
-
-                        mesh.instanceDataBufferVBO1.limit(mesh.curBufferPosVBO1 * mesh.INSTANCE_SIZE_FLOATS);
-
-                        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO1);
-
-                        ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO1, GL_DYNAMIC_DRAW);
+                    } finally {
+                        lockVBO2.unlock();
                     }
-                } finally {
-                    lockVBO2.unlock();
+
                 }
 
             }
 
+            needsUpdate = false;
 
+            float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
+            float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
+            float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
+
+            Matrix4fe matrixFix = new Matrix4fe();
+            matrixFix = matrixFix.translationRotateScale(
+                    -interpX, -interpY, -interpZ,
+                    0, 0, 0, 1,
+                    1, 1, 1);
+
+            projectionMatrix = new Matrix4fe();
+            buf = BufferUtils.createFloatBuffer(16);
+            GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
+            buf.rewind();
+            Matrix4fe.get(projectionMatrix, 0, buf);
+
+            Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
+            matrixFix = modelViewMatrix.mul(matrixFix);
+
+            shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
+
+            if (mesh.curBufferPosVBO2Thread > 0) {
+                //System.out.println("draw");
+                ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
+                        0, mesh.curBufferPosVBO2Thread);
+            }
+
+            OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            mesh.endRenderVBO1();
+            mesh.endRenderVBO2();
+            mesh.endRender();
         }
-
-        needsUpdate = false;
-
-        float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
-        float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
-        float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
-
-        Matrix4fe matrixFix = new Matrix4fe();
-        matrixFix = matrixFix.translationRotateScale(
-                -interpX, -interpY, -interpZ,
-                0, 0, 0, 1,
-                1, 1, 1);
-
-        projectionMatrix = new Matrix4fe();
-        buf = BufferUtils.createFloatBuffer(16);
-        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, buf);
-        buf.rewind();
-        Matrix4fe.get(projectionMatrix, 0, buf);
-
-
-        Matrix4fe modelViewMatrix = projectionMatrix.mul(viewMatrix);
-        matrixFix = modelViewMatrix.mul(matrixFix);
-
-        shaderProgram.setUniformEfficient("modelViewMatrixCamera", matrixFix, viewMatrixBuffer);
-
-        if (vbo2BufferPos > 0) {
-            //System.out.println("draw");
-            ShaderManager.glDrawElementsInstanced(GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT,
-                    0, vbo2BufferPos);
-        }
-
-        OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-        mesh.endRenderVBO1();
-        mesh.endRenderVBO2();
-        mesh.endRender();
 
         ShaderEngine.renderer.getShaderProgram("foliage").unbind();
     }

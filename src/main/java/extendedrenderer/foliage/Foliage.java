@@ -60,8 +60,8 @@ public class Foliage implements IShaderRenderedEntity {
     private static final NoiseGeneratorPerlin angleNoise = new NoiseGeneratorPerlin(rand, 1);
     private static final NoiseGeneratorPerlin delayNoise = new NoiseGeneratorPerlin(rand, 3);
 
-    public Foliage() {
-
+    public Foliage(TextureAtlasSprite sprite) {
+        particleTexture = sprite;
     }
 
     public void setPosition(BlockPos pos) {
