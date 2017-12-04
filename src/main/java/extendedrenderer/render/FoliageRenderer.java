@@ -3,6 +3,8 @@ package extendedrenderer.render;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.foliage.Foliage;
+import extendedrenderer.foliage.FoliageLocationData;
+import extendedrenderer.foliage.FoliageReplacerBase;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.shader.*;
@@ -60,7 +62,7 @@ public class FoliageRenderer {
     public ConcurrentHashMap<TextureAtlasSprite, List<Foliage>> foliage = new ConcurrentHashMap<>();
 
     //for position tracking mainly, to be used for all foliage types maybe?
-    public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<BlockPos, FoliageLocationData> lookupPosToFoliage = new ConcurrentHashMap<>();
 
     public float windDir = 0;
     public float windSpeed = 0;
@@ -108,14 +110,15 @@ public class FoliageRenderer {
         return mesh.dirtyVBO2Flag;
     }
 
-    public void addForPos(TextureAtlasSprite sprite, BlockPos pos) {
+    public void addForPos(FoliageReplacerBase replacer, TextureAtlasSprite sprite, BlockPos pos) {
 
         World world = Minecraft.getMinecraft().world;
 
         Random rand = new Random();
         //for (BlockPos pos : foliageQueueAdd) {
         IBlockState state = world.getBlockState(pos.down());
-        List<Foliage> listClutter = new ArrayList<>();
+        //List<Foliage> listClutter = new ArrayList<>();
+        FoliageLocationData data = new FoliageLocationData(replacer);
         //for (int heightIndex = 0; heightIndex < 2; heightIndex++) {
 
         int heightIndex = 0;
@@ -124,7 +127,7 @@ public class FoliageRenderer {
         float randX = (rand.nextFloat() - rand.nextFloat()) * variance;
         float randZ = (rand.nextFloat() - rand.nextFloat()) * variance;
 
-        int clutterSize = 16;
+        int clutterSize = 2;
 
         for (int i = 0; i < clutterSize; i++) {
                     /*if (i >= 2) {
@@ -198,12 +201,12 @@ public class FoliageRenderer {
                 //foliage.particleGreen = 0;
             }
 
-            listClutter.add(foliage);
+            data.listFoliage.add(foliage);
             getFoliageForSprite(sprite).add(foliage);
 
         }
 
-        lookupPosToFoliage.put(pos, listClutter);
+        lookupPosToFoliage.put(pos, data);
 
     }
 
@@ -305,7 +308,7 @@ public class FoliageRenderer {
 
         }
 
-        lookupPosToFoliage.put(pos, listClutter);
+        //lookupPosToFoliage.put(pos, listClutter);
 
     }
 
