@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
@@ -45,19 +46,30 @@ public class FoliageRenderer {
     public Transformation transformation;
 
     public boolean needsUpdate = true;
-
-    public static boolean dirtyVBO2Flag = false;
     /*public static List<BlockPos> foliageQueueAdd = new ArrayList();
     public static List<BlockPos> foliageQueueRemove = new ArrayList();*/
 
     //public List<Foliage> listFoliage = new ArrayList<>();
-    public List<Foliage> listFoliage = new ArrayList<>();
+
+    /**
+     * ordered mesh list -> renderables should be enough for no translucency
+     *
+     * if in future i need translucency, keep above list and make a new one for translucency with:
+     *
+     * render order list to help lack of use of depth mask
+     * - TextureAtlasSprite to Foliage
+     *
+     */
+
+    public LinkedHashMap<TextureAtlasSprite, List<Foliage>> foliage = new LinkedHashMap<>();
+
+    //for position tracking mainly, to be used for all foliage types maybe?
     public ConcurrentHashMap<BlockPos, List<Foliage>> lookupPosToFoliage = new ConcurrentHashMap<>();
 
     public float windDir = 0;
     public float windSpeed = 0;
 
-    public static int vbo2BufferPos = 0;
+    //public static int vbo2BufferPos = 0;
 
     public Lock lockVBO2 = new ReentrantLock();
 
@@ -66,6 +78,17 @@ public class FoliageRenderer {
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
         transformation = new Transformation();
+
+
+    }
+
+    public List<Foliage> getFoliageForSprite(TextureAtlasSprite sprite) {
+        List<Foliage> list;
+        if (!foliage.containsKey(sprite)) {
+            list = new ArrayList<>();
+            foliage.put(sprite, list);
+        }
+        return foliage.get(sprite);
     }
 
     public void render(Entity entityIn, float partialTicks)
@@ -85,11 +108,11 @@ public class FoliageRenderer {
         }
     }
 
-    public boolean getFlag() {
-        return dirtyVBO2Flag;
+    public boolean getFlag(InstancedMeshFoliage mesh) {
+        return mesh.dirtyVBO2Flag;
     }
 
-    public void addForPos(BlockPos pos) {
+    public void addForPos(TextureAtlasSprite sprite, BlockPos pos) {
 
         World world = Minecraft.getMinecraft().world;
 
@@ -180,7 +203,7 @@ public class FoliageRenderer {
             }
 
             listClutter.add(foliage);
-            listFoliage.add(foliage);
+            getFoliageForSprite(sprite).add(foliage);
 
         }
 
@@ -275,15 +298,17 @@ public class FoliageRenderer {
         /*GLfloat v[10] = {...};
         glUniform1fv(glGetUniformLocation(program, "v"), 10, v);*/
 
-        //TODO: CACHE ME
         Random rand = new Random(5);
+
+        /*
+        //CACHE ME
         IntBuffer buffer = BufferUtils.createIntBuffer(64);
         for (int i = 0; i < 64; i++) {
             buffer.put(i, rand.nextInt(255));
-        }
+        }*/
         //buffer.flip();
 
-        OpenGlHelper.glUniform1(shaderProgram.uniforms.get("stipple"), buffer);
+        //OpenGlHelper.glUniform1(shaderProgram.uniforms.get("stipple"), buffer);
 
         try {
             shaderProgram.setUniform("time", (int) world.getTotalWorldTime());
@@ -297,10 +322,18 @@ public class FoliageRenderer {
         //temp
         windSpeed = 0.5F;
 
+        //temp override vars
+        FoliageRenderer.radialRange = 50;
+
         shaderProgram.setUniform("windSpeed", windSpeed);
 
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass_hd);
+
+        for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
+
+        }
+
         InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(ParticleRegistry.tallgrass);
 
         mesh.initRender();
@@ -309,25 +342,7 @@ public class FoliageRenderer {
 
 
         boolean skipUpdate = false;
-        boolean updateFoliageObjects = false;
         boolean updateVBO1 = true;
-        boolean updateVBO2 = false;
-        boolean add = false;
-        boolean trim = true;
-
-        if (!skipUpdate || needsUpdate) {
-            //also resets position
-        }
-
-        BlockPos pos = entityIn.getPosition();
-
-
-
-        //Random rand = new Random();
-        rand.setSeed(5);
-
-        //temp override vars
-        FoliageRenderer.radialRange = 50;
 
         if (!skipUpdate || needsUpdate) {
 
@@ -337,7 +352,7 @@ public class FoliageRenderer {
                     /*mesh.instanceDataBufferVBO2.clear();
                     mesh.curBufferPosVBO2 = 0;*/
 
-                    if (getFlag()) {
+                    if (getFlag(mesh)) {
 
                         Foliage.interpPosX = Foliage.interpPosXThread;
                         Foliage.interpPosY = Foliage.interpPosYThread;
@@ -349,9 +364,9 @@ public class FoliageRenderer {
                         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO2);
                         ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferVBO2, GL_DYNAMIC_DRAW);
 
-                        dirtyVBO2Flag = false;
+                        mesh.dirtyVBO2Flag = false;
 
-                        FoliageRenderer.vbo2BufferPos = mesh.curBufferPosVBO2;
+                        mesh.curBufferPosVBO2Thread = mesh.curBufferPosVBO2;
                     }
 
                     if (updateVBO1 || needsUpdate) {

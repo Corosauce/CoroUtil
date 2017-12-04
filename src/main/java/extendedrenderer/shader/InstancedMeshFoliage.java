@@ -39,6 +39,10 @@ public class InstancedMeshFoliage extends Mesh {
     public int curBufferPosVBO1 = 0;
     public int curBufferPosVBO2 = 0;
 
+    public int curBufferPosVBO2Thread = 0;
+
+    public boolean dirtyVBO2Flag = false;
+
     public static int vboSizeMesh = 2;
 
     public InstancedMeshFoliage(float[] positions, float[] textCoords, int[] indices, int numInstances) {

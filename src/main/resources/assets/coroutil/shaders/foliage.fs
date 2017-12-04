@@ -2,7 +2,7 @@
 
 uniform sampler2D texture_sampler;
 uniform int fogmode;
-uniform int stipple[64];
+//uniform int stipple[64];
 
 varying vec2 outTexCoord;
 varying float outBrightness;

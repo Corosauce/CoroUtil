@@ -144,7 +144,7 @@ public class EventHandler {
                 ShaderEngine.cleanup();
                 ShaderEngine.renderer = null;
                 //ExtendedRenderer.foliageRenderer.needsUpdate = true;
-                ExtendedRenderer.foliageRenderer.vbo2BufferPos = 0;
+                //ExtendedRenderer.foliageRenderer.vbo2BufferPos = 0;
                 ShaderManager.resetCheck();
             }
 
