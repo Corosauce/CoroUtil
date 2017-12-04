@@ -21,8 +21,17 @@ public class CoroUtilBlockLightCache {
      * triple hashmap lookups = 105 fps
      */
 
-    public static HashMap<Integer, Float> lookupPosToBrightness = new HashMap<>();
+    public static HashMap<Long, Float> lookupPosToBrightness = new HashMap<>();
     public static HashMap<Integer, HashMap<Integer, HashMap<Integer, Float>>> lookupPosToBrightness2 = new HashMap<>();
+
+    private static final int NUM_X_BITS = 1 + MathHelper.log2(MathHelper.smallestEncompassingPowerOfTwo(30000000));
+    private static final int NUM_Z_BITS = NUM_X_BITS;
+    private static final int NUM_Y_BITS = 64 - NUM_X_BITS - NUM_Z_BITS;
+    private static final int Y_SHIFT = 0 + NUM_Z_BITS;
+    private static final int X_SHIFT = Y_SHIFT + NUM_Y_BITS;
+    private static final long X_MASK = (1L << NUM_X_BITS) - 1L;
+    private static final long Y_MASK = (1L << NUM_Y_BITS) - 1L;
+    private static final long Z_MASK = (1L << NUM_Z_BITS) - 1L;
 
     public static float brightnessPlayer = 0F;
 
@@ -64,11 +73,13 @@ public class CoroUtilBlockLightCache {
             lookupPosToBrightness2.put(xx, xxx);
             return brightnesss;
         } else {
-            int hash;
+            long hash;
             //very slow
             //hash = PathPoint.makeHash(xx, yy, zz);
             //slightly less slow
-            hash = (xx + zz * 31) * 31 + yy;
+            //BlockPos.toLong, more accurate
+            hash = ((long)xx & X_MASK) << X_SHIFT | ((long)yy & Y_MASK) << Y_SHIFT | ((long)zz & Z_MASK) << 0;
+            //hash = (xx + zz * 31) * 31 + yy;
             //hmm, issues
             //hash = xx + (15 * yy) + (30 * zz);
             //inaccurate but fast?
