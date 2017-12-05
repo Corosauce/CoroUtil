@@ -424,12 +424,14 @@ public class FoliageRenderer {
         windSpeed = 0.5F;
 
         //temp override vars
-        FoliageRenderer.radialRange = 50;
+        FoliageRenderer.radialRange = 20;
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
         //TODO: temp allocations
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.double_plant_bottom);
+        MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.double_plant_top);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass_hd);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.potato);
         MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.chicken);
@@ -441,6 +443,8 @@ public class FoliageRenderer {
         }
 
         int meshCount = 0;
+
+        boolean updatedInterp = false;
 
         for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
             InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(entry.getKey());
@@ -463,9 +467,9 @@ public class FoliageRenderer {
 
                     if (getFlag(mesh)) {
 
-                        Foliage.interpPosX = Foliage.interpPosXThread;
-                        Foliage.interpPosY = Foliage.interpPosYThread;
-                        Foliage.interpPosZ = Foliage.interpPosZThread;
+                        mesh.interpPosX = mesh.interpPosXThread;
+                        mesh.interpPosY = mesh.interpPosYThread;
+                        mesh.interpPosZ = mesh.interpPosZThread;
 
                         //System.out.println("main thread: mesh.curBufferPosVBO2: " + mesh.curBufferPosVBO2);
                         //System.out.println("vbo 2 bind");
@@ -529,9 +533,9 @@ public class FoliageRenderer {
 
             }
 
-            float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - Foliage.interpPosX);
-            float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - Foliage.interpPosY);
-            float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - Foliage.interpPosZ);
+            float interpX = (float)((entityIn.prevPosX + (entityIn.posX - entityIn.prevPosX) * partialTicks) - mesh.interpPosX);
+            float interpY = (float)((entityIn.prevPosY + (entityIn.posY - entityIn.prevPosY) * partialTicks) - mesh.interpPosY);
+            float interpZ = (float)((entityIn.prevPosZ + (entityIn.posZ - entityIn.prevPosZ) * partialTicks) - mesh.interpPosZ);
 
             Matrix4fe matrixFix = new Matrix4fe();
             matrixFix = matrixFix.translationRotateScale(

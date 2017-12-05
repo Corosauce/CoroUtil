@@ -22,12 +22,6 @@ public class Foliage implements IShaderRenderedEntity {
     public double prevPosX;
     public double prevPosY;
     public double prevPosZ;
-    public static double interpPosX;
-    public static double interpPosY;
-    public static double interpPosZ;
-    public static double interpPosXThread;
-    public static double interpPosYThread;
-    public static double interpPosZThread;
 
     public float width = 1F;
     public float height = 1F;
@@ -139,9 +133,9 @@ public class Foliage implements IShaderRenderedEntity {
         if (mesh.curBufferPosVBO2 >= mesh.numInstances) return;
 
         //camera relative positions, for world position, remove the interpPos values
-        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - this.interpPosXThread);
-        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - this.interpPosYThread);
-        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - this.interpPosZThread);
+        float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - mesh.interpPosXThread);
+        float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - mesh.interpPosYThread);
+        float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - mesh.interpPosZThread);
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
         Vector3f pos = new Vector3f(posX, posY, posZ);
 

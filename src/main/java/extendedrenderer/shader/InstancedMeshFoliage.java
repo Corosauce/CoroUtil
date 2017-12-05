@@ -45,6 +45,13 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static int vboSizeMesh = 2;
 
+    public double interpPosX;
+    public double interpPosY;
+    public double interpPosZ;
+    public double interpPosXThread;
+    public double interpPosYThread;
+    public double interpPosZThread;
+
     public InstancedMeshFoliage(float[] positions, float[] textCoords, int[] indices, int numInstances) {
         super(positions, textCoords, indices);
 
