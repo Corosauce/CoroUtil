@@ -6,6 +6,7 @@ import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.FoliageRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.ShaderEngine;
+import extendedrenderer.shader.ShaderListenerRegistry;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -142,6 +143,7 @@ public class EventHandler {
             if (RotatingParticleManager.forceShaderReset) {
                 RotatingParticleManager.forceShaderReset = false;
                 ShaderEngine.cleanup();
+                ShaderListenerRegistry.postReset();
                 ShaderEngine.renderer = null;
                 //ExtendedRenderer.foliageRenderer.needsUpdate = true;
                 //ExtendedRenderer.foliageRenderer.vbo2BufferPos = 0;
@@ -155,6 +157,7 @@ public class EventHandler {
                     RotatingParticleManager.useShaders = false;
                 } else {
                     System.out.println("Extended Renderer: Initialized instanced rendering shaders");
+                    ShaderListenerRegistry.postInit();
                 }
             }
 
@@ -298,4 +301,10 @@ public class EventHandler {
 	public void registerIcons(TextureStitchEvent.Pre event) {
 		ParticleRegistry.init(event);
 	}
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void registerIconsPost(TextureStitchEvent.Post event) {
+        ParticleRegistry.initPost(event);
+    }
 }

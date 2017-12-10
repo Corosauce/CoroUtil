@@ -1,5 +1,6 @@
 package extendedrenderer.particle;
 
+import extendedrenderer.render.FoliageRenderer;
 import extendedrenderer.shader.MeshBufferManagerFoliage;
 import extendedrenderer.shader.MeshBufferManagerParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -46,10 +47,6 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite test_texture;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
 	public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
-	public static TextureAtlasSprite tallgrass;
-	public static TextureAtlasSprite tallgrass_hd;
-	public static TextureAtlasSprite double_plant_top;
-	public static TextureAtlasSprite double_plant_bottom;
 	
 	public static void init(TextureStitchEvent.Pre event) {
 		
@@ -95,15 +92,10 @@ public class ParticleRegistry {
 		for (int i = 1; i <= 7; i++) {
 			listSeaweed.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/seaweed_section_" + i)));
 		}
-		tallgrass = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass"));
-		tallgrass_hd = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tallgrass_hd"));
+	}
 
-		double_plant_top = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/double_plant_grass_top"));
-		double_plant_bottom = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/double_plant_grass_bottom"));
+	public static void initPost(TextureStitchEvent.Post event) {
 
-		//ParticleMeshBufferManager.setupMeshForParticle(cloud256_6);
-
-		//System.out.println("?");
 	}
 	
 	public static class TextureAtlasSpriteImpl extends TextureAtlasSprite {

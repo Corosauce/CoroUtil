@@ -103,6 +103,7 @@ void main()
     }
 
     gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
+    //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x, position.y, position.z, 1.0);
 
     //lazy, cheap dist to camera
     gl_FogFragCoord = abs(gl_Position.z);

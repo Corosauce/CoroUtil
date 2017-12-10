@@ -40,11 +40,6 @@ public class ClientProxy extends CommonProxy
         //rr.registerEntityRenderingHandler(EntityFallingRainFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntityWaterfallFX.class, new RenderNull());
         //rr.registerEntityRenderingHandler(EntitySnowFX.class, new RenderNull());
-        
-        //TODO: confirm not needed for 1.10.2 since we cant add to weathereffects anymore
-        /*RenderingRegistry.registerEntityRenderingHandler(EntityTexFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
-        RenderingRegistry.registerEntityRenderingHandler(EntityTexBiomeColorFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));
-        RenderingRegistry.registerEntityRenderingHandler(EntityRotFX.class, new RenderNull(Minecraft.getMinecraft().getRenderManager()));*/
     }
     
 }
