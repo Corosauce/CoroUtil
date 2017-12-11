@@ -29,11 +29,11 @@ public class Foliage implements IShaderRenderedEntity {
     public float particleScale = 1F;
 
     /** The red amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0. */
-    public float particleRed;
+    public float particleRed = 1F;
     /** The green amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0. */
     public float particleGreen = 1F;
     /** The blue amount of color. Used as a percentage, 1.0 = 255 and 0.0 = 0. */
-    public float particleBlue;
+    public float particleBlue = 1F;
 
     /** Particle alpha */
     public float particleAlpha = 1F;
@@ -111,7 +111,9 @@ public class Foliage implements IShaderRenderedEntity {
     public void renderForShaderVBO1(InstancedMeshFoliage mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                         float partialTicks) {
 
-        if (mesh.curBufferPosVBO1 >= mesh.numInstances) return;
+        if (mesh.curBufferPosVBO1 >= mesh.numInstances) {
+            return;
+        }
 
         mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPosVBO1), particleAlpha);
 
@@ -130,7 +132,10 @@ public class Foliage implements IShaderRenderedEntity {
     public void renderForShaderVBO2(InstancedMeshFoliage mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                             float partialTicks) {
 
-        if (mesh.curBufferPosVBO2 >= mesh.numInstances) return;
+        if (mesh.curBufferPosVBO2 >= mesh.numInstances) {
+            System.out.println("hitting max mesh count");
+            return;
+        }
 
         //camera relative positions, for world position, remove the interpPos values
         float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - mesh.interpPosXThread);

@@ -1,6 +1,7 @@
 package extendedrenderer.shader;
 
 import extendedrenderer.particle.ShaderManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -61,6 +62,7 @@ public class InstancedMeshFoliage extends Mesh {
 
         /** VBO 1 START **/
 
+        //Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
         instanceDataVBO1 = GL15.glGenBuffers();
         vboIdList.add(instanceDataVBO1);
         instanceDataBufferVBO1 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);

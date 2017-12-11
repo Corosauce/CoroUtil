@@ -51,6 +51,28 @@ public class FoliageRenderer {
      * render order list to help lack of use of depth mask
      * - TextureAtlasSprite to Foliage
      *
+     *
+     * possible solution to alpha sorting for translucency layer?
+     * "batch all physobj renders into a single BufferBuilder draw call, call sortVertexData before draw()
+     * remember vanilla is regularly sorting all translucent quads in the worldl
+     * and all FastTESR quads are sorted"
+     *
+     * vanilla model -> mesh:
+     *
+     * instead of doing different sway by singling out certain vertex ids, use:
+     * - sway amount = height index + vertex height
+     * - will make meshes work more generically for more complex models
+     *
+     * get the more complex model via:
+     * - ModelBakeEvent
+     * - instead of json editing models and losing their model
+     * -- leave json alone
+     * -- hook into event, steal model for my shader, override vanilla model/render with blank
+     * -- BufferBuilder.addVertexData eg
+     *
+     *
+     *
+     *
      */
 
     public ConcurrentHashMap<TextureAtlasSprite, List<Foliage>> foliage = new ConcurrentHashMap<>();
@@ -63,6 +85,7 @@ public class FoliageRenderer {
     public Lock lockVBO2 = new ReentrantLock();
 
     public static int radialRange = 60;
+    public static boolean testStaticLimit = false;
 
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
@@ -213,7 +236,7 @@ public class FoliageRenderer {
         windSpeed = 0.5F;
 
         //temp override vars
-        FoliageRenderer.radialRange = 130;
+        FoliageRenderer.radialRange = 20;
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 
@@ -233,10 +256,14 @@ public class FoliageRenderer {
 
         int meshCount = 0;
 
-        boolean updatedInterp = false;
+        /*TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
+        TextureAtlasSprite sprite = map.getAtlasSprite("minecraft:blocks/wheat_stage_7");*/
 
         for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
+        //for (int iii = 0; iii < 1; iii++) {
             InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(entry.getKey());
+
+            //InstancedMeshFoliage mesh = MeshBufferManagerFoliage.getMesh(sprite);
 
             if (mesh == null) {
                 System.out.println("NULL MESH FOR: " + entry.getKey().toString());
@@ -273,12 +300,14 @@ public class FoliageRenderer {
 
                     if (updateVBO1) {
 
+                        List<Foliage> listFoliage = entry.getValue();
+
                         mesh.instanceDataBufferVBO1.clear();
                         mesh.curBufferPosVBO1 = 0;
 
                         //System.out.println("vbo 1 update");
 
-                        for (Foliage foliage : entry.getValue()) {
+                        for (Foliage foliage : listFoliage) {
                             boolean doAlpha = false;
 
                             if (doAlpha) {
@@ -310,7 +339,12 @@ public class FoliageRenderer {
 
                         //System.out.println("vbo 1 bind");
 
-                        mesh.instanceDataBufferVBO1.limit(mesh.curBufferPosVBO1 * mesh.INSTANCE_SIZE_FLOATS);
+                        if (testStaticLimit) {
+                            mesh.instanceDataBufferVBO1.limit(30000 * mesh.INSTANCE_SIZE_FLOATS);
+                        } else {
+                            mesh.instanceDataBufferVBO1.limit(mesh.curBufferPosVBO1 * mesh.INSTANCE_SIZE_FLOATS);
+                        }
+
 
                         OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO1);
 
@@ -356,6 +390,11 @@ public class FoliageRenderer {
             mesh.endRenderVBO1();
             mesh.endRenderVBO2();
             mesh.endRender();
+        }
+
+        boolean debugMeshCount = false;
+        if (debugMeshCount) {
+            System.out.println("meshCount: " + meshCount);
         }
 
         ShaderEngine.renderer.getShaderProgram("foliage").unbind();

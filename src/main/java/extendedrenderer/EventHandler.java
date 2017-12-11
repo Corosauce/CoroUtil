@@ -7,11 +7,21 @@ import extendedrenderer.render.FoliageRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.ShaderEngine;
 import extendedrenderer.shader.ShaderListenerRegistry;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -21,6 +31,7 @@ import net.minecraft.entity.Entity;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
@@ -28,6 +39,9 @@ import CoroUtil.forge.CoroUtil;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class EventHandler {
 
@@ -306,5 +320,39 @@ public class EventHandler {
     @SideOnly(Side.CLIENT)
     public void registerIconsPost(TextureStitchEvent.Post event) {
         ParticleRegistry.initPost(event);
+    }
+
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
+    public void modelBake(ModelBakeEvent event) {
+
+        if (true) return;
+
+        /*Map<ModelResourceLocation, IModel> stateModels = ReflectionHelper.getPrivateValue(ModelLoader.class, event.getModelLoader(), "stateModels");
+        for (ModelResourceLocation mrl : event.getModelRegistry().getKeys()) {
+            IModel model = stateModels.get(mrl);
+        }*/
+
+        for (ModelResourceLocation res : event.getModelRegistry().getKeys()) {
+            IBakedModel model = event.getModelRegistry().getObject(res);
+
+            String domain = res.getResourceDomain();
+            String blockName = res.getResourcePath();
+            String variant = res.getVariant();
+
+            if (blockName.equals("wheat")) {
+                System.out.println(res.toString());
+
+                List<BakedQuad> quads = model.getQuads(Blocks.WHEAT.getDefaultState().withProperty(BlockCrops.AGE, 5), null, 0);
+            }
+
+            if (blockName.equals("tall_grass")) {
+                System.out.println(res.toString());
+
+                List<BakedQuad> quads = model.getQuads(Blocks.TALLGRASS.getDefaultState()/*.withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS)*/, null, 0);
+            }
+
+
+        }
     }
 }
