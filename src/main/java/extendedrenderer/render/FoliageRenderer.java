@@ -236,7 +236,7 @@ public class FoliageRenderer {
         windSpeed = 0.5F;
 
         //temp override vars
-        FoliageRenderer.radialRange = 90;
+        FoliageRenderer.radialRange = 20;
 
         shaderProgram.setUniform("windSpeed", windSpeed);
 

@@ -158,6 +158,7 @@ public class EventHandler {
                 RotatingParticleManager.forceShaderReset = false;
                 ShaderEngine.cleanup();
                 ShaderListenerRegistry.postReset();
+                ExtendedRenderer.foliageRenderer.foliage.clear();
                 ShaderEngine.renderer = null;
                 //ExtendedRenderer.foliageRenderer.needsUpdate = true;
                 //ExtendedRenderer.foliageRenderer.vbo2BufferPos = 0;
