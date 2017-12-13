@@ -42,64 +42,115 @@ void main()
     float timeSmooth = (time-1) + partialTick;
     timeSmooth += index * 200;
 
-    //timeSmooth = 1;
-
-    float variance = 0.6;
-
     vec3 pos = vec3(0, 0, 0);
-    vec3 angle = vec3(-1, 0, 1);
-    if (rotation == 1) {
-        angle = vec3(1, 0, 1);
-    }
 
-    //more performant but less accurate algorithm, use unless crazy mesh warping needed
-    vec3 baseHeight = vec3(0, heightIndex-1, 0);
-    vec3 baseHeight2 = vec3(0, heightIndex, 0);
+    //wind hit foliage, 1 high for now
+    if (animationID == 0) {
 
-    int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
-    vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
-    vec3 prevSway = swayBottom;
-    vec3 bottom = baseHeight + swayBottom;
+        int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
 
-    int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
-    vec3 sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
-    vec3 top = baseHeight2 + sway;
-    if (heightIndex == 0) {
-        bottom = vec3(0, 0, 0);
-        prevSway = vec3(0, 1, 0);
-    }
+        float variance = windSpeed * 0.25;
 
-    //more accurate but more expensive loop
-    /*
+        float rot = sin(timeMod * 0.0174533) * variance;
+        float rot2 = cos(timeMod * 0.0174533) * variance;
 
-    vec3 top = vec3(0, 0, 0);
-    vec3 bottom = vec3(0, 0, 0);
-    vec3 bottomNext = bottom;
-    //verify
-    vec3 sway = vec3(0, 0, 0);
+        float baseYaw = 45;
+        if (rotation == 1) {
+            baseYaw = baseYaw + 90;
+        }
+        //rot = -sin(baseYaw * 0.0174533);
+        //rot2 = cos(baseYaw * 0.0174533);
 
-    for (int i = 0; i <= heightIndex; i++) {
-        prevSway = sway;
-        timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
-        sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
-        sway = normalize(sway);
+        float adjDir = windDir - baseYaw;//(baseYaw / 0.0174533);// - (baseYaw + 180);
 
-        top = bottomNext + sway;
+        float ampWind = 0.6;
 
-        bottom = bottomNext;
-        bottomNext = top;
-    }*/
+        float xAdj = -sin(adjDir * 0.0174533) * windSpeed * ampWind;
+        float zAdj = cos(adjDir * 0.0174533) * windSpeed * ampWind;
+        //rot = 0;
+        //rot2 = 0;
+        //mat4 swayrotate = rotationMatrix(vec3(1, 0, 0), rot);
+        //mat4 swayrotate2 = rotationMatrix(vec3(0, 0, 1), rot2);
 
-    if (gl_VertexID == 0) {
-        pos = computeCorner(sway, angle, top);
-    } else if (gl_VertexID == 1) {
-        pos = computeCorner(prevSway, angle, bottom);
-    } else if (gl_VertexID == 2) {
-        angle = angle * -1;
-        pos = computeCorner(prevSway, angle, bottom);
-    } else if (gl_VertexID == 3) {
-        angle = angle * -1;
-        pos = computeCorner(sway, angle, top);
+        if (gl_VertexID == 0) {
+            //pos = computeCorner(sway, angle, top);
+            pos = vec3(position.x + xAdj + rot, position.y + 1, position.z + zAdj + rot2);
+            //pos = normalize(pos);
+        } else if (gl_VertexID == 1) {
+            //pos = computeCorner(prevSway, angle, bottom);
+            pos = position;
+        } else if (gl_VertexID == 2) {
+            /*angle = angle * -1;
+            pos = computeCorner(prevSway, angle, bottom);*/
+            pos = position;
+        } else if (gl_VertexID == 3) {
+            //angle = angle * -1;
+            //pos = computeCorner(sway, angle, top);
+            pos = vec3(position.x + xAdj + rot, position.y + 1, position.z + zAdj + rot2);
+            //pos = normalize(pos);
+        }
+
+    //seaweed
+    } else if (animationID == 1) {
+
+        //timeSmooth = 1;
+
+        float variance = 0.6;
+
+        vec3 angle = vec3(-1, 0, 1);
+        if (rotation == 1) {
+            angle = vec3(1, 0, 1);
+        }
+
+        //more performant but less accurate algorithm, use unless crazy mesh warping needed
+        vec3 baseHeight = vec3(0, heightIndex-1, 0);
+        vec3 baseHeight2 = vec3(0, heightIndex, 0);
+
+        int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
+        vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
+        vec3 prevSway = swayBottom;
+        vec3 bottom = baseHeight + swayBottom;
+
+        int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
+        vec3 sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
+        vec3 top = baseHeight2 + sway;
+        if (heightIndex == 0) {
+            bottom = vec3(0, 0, 0);
+            prevSway = vec3(0, 1, 0);
+        }
+
+        //more accurate but more expensive loop
+        /*
+
+        vec3 top = vec3(0, 0, 0);
+        vec3 bottom = vec3(0, 0, 0);
+        vec3 bottomNext = bottom;
+        //verify
+        vec3 sway = vec3(0, 0, 0);
+
+        for (int i = 0; i <= heightIndex; i++) {
+            prevSway = sway;
+            timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
+            sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+            sway = normalize(sway);
+
+            top = bottomNext + sway;
+
+            bottom = bottomNext;
+            bottomNext = top;
+        }*/
+
+        if (gl_VertexID == 0) {
+            pos = computeCorner(sway, angle, top);
+        } else if (gl_VertexID == 1) {
+            pos = computeCorner(prevSway, angle, bottom);
+        } else if (gl_VertexID == 2) {
+            angle = angle * -1;
+            pos = computeCorner(prevSway, angle, bottom);
+        } else if (gl_VertexID == 3) {
+            angle = angle * -1;
+            pos = computeCorner(sway, angle, top);
+        }
     }
 
     gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
