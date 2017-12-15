@@ -334,7 +334,12 @@ public class EventHandler {
             IModel model = stateModels.get(mrl);
         }*/
 
+        IBakedModel blank = event.getModelRegistry().getObject(new ModelResourceLocation("coroutil:blank", "normal"));
+
         for (ModelResourceLocation res : event.getModelRegistry().getKeys()) {
+
+            System.out.println(res.toString());
+
             IBakedModel model = event.getModelRegistry().getObject(res);
 
             String domain = res.getResourceDomain();
@@ -342,9 +347,24 @@ public class EventHandler {
             String variant = res.getVariant();
 
             if (blockName.equals("wheat")) {
-                System.out.println(res.toString());
 
-                List<BakedQuad> quads = model.getQuads(Blocks.WHEAT.getDefaultState().withProperty(BlockCrops.AGE, 5), null, 0);
+                if (!res.getVariant().equals("inventory")) {
+
+
+                    //List<BakedQuad> quads = model.getQuads(Blocks.WHEAT.getDefaultState().withProperty(BlockCrops.AGE, 5), null, 0);
+
+
+
+                    //System.out.println(quads);
+
+                    /*for (BakedQuad quad : quads) {
+                        ReflectionHelper.setPrivateValue(BakedQuad.class, quad, new int[1], "field_178215_a", "vertexData");
+                    }*/
+
+                    //System.out.println(quads);
+
+                    event.getModelRegistry().putObject(res, blank);
+                }
             }
 
             if (blockName.equals("tall_grass")) {

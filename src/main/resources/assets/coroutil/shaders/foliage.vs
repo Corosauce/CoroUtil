@@ -94,6 +94,7 @@ void main()
         //timeModBottom = int(windDir);
 
         vec3 swayBottom = vec3(-sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
+
         vec3 swayBottom2 = vec3(-sin(int(windDir) * radian) * variance, 1, cos(int(windDir) * radian) * variance);
         //swayBottom2 = vec3(0, 0, 0);
 

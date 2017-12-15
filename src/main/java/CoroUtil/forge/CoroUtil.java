@@ -37,7 +37,7 @@ public class CoroUtil {
 	
 	@Mod.Instance( value = "coroutil" )
 	public static CoroUtil instance;
-	public static String modID = "coroutil";
+	public static final String modID = "coroutil";
 
 
 	//public static final String version = "${version}";
