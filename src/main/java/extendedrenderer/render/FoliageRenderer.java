@@ -5,7 +5,6 @@ import extendedrenderer.foliage.Foliage;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.shader.*;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -14,7 +13,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -78,7 +76,7 @@ public class FoliageRenderer {
     public ConcurrentHashMap<TextureAtlasSprite, List<Foliage>> foliage = new ConcurrentHashMap<>();
 
     public float windDir = 0;
-    public float windSpeed = 0;
+    public float windSpeedSmooth = 0;
 
     //public static int vbo2BufferPos = 0;
 
@@ -233,13 +231,13 @@ public class FoliageRenderer {
         shaderProgram.setUniform("windDir", windDir);
 
         //temp
-        windSpeed = 0.001F;
+        //windSpeedSmooth = 0.1F;
         //System.out.println("wind: " + windSpeed);
 
         //temp override vars
         FoliageRenderer.radialRange = 20;
 
-        shaderProgram.setUniform("windSpeed", windSpeed);
+        shaderProgram.setUniform("windSpeed", windSpeedSmooth);
 
         //TODO: temp allocations
         /*MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);

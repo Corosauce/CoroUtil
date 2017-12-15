@@ -145,14 +145,8 @@ void main()
             pos = computeCorner(sway, angle, top) * heightIndexAmp;
         }
 
-        //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
-        timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 10), 360));
-        variance = 2.0;
-        //timeModTop = int(mod(90, 360));
-        vec3 windAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
-        if (rotation == 45.0) {
-            windAdj = vec3(-cos(timeModTop * radian) * variance, 0, -sin(timeModTop * radian) * variance);
-        }
+
+        //BETTER CODE START
 
 
         //try offsetting mesh so bottom is 0
@@ -161,7 +155,41 @@ void main()
 
         float heightFromBase = heightIndex + usePos.y;
 
-        windAdj = windAdj * 0.1 * heightFromBase;
+        angle = vec3(1, 0, 1);
+
+
+        float windSpeedAdj = windSpeed * 0.02 * (heightFromBase * heightFromBase * 0.2);
+        //disable for more variance per height
+        windSpeedAdj = windSpeed * 0.2;
+
+        float adjDir = windDir/* - rotation*/;
+
+        vec3 windAdj = vec3(-sin(adjDir * radian) * windSpeedAdj, 0, cos(adjDir * radian) * windSpeedAdj);
+
+        //semi hacky fix for rotation being done before we apply sway logic
+        if (rotation == 45.0) {
+            windAdj = vec3(-cos(adjDir * radian) * windSpeedAdj, 0, -sin(adjDir * radian) * windSpeedAdj);
+        }
+
+        //maybe correct, added gap between mesh connections though
+        //windAdj.y = cross(sway, windAdj).y;
+
+        //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
+        timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 10), 360));
+        //timeModTop = int(mod(90, 360));
+
+        variance = 0.002;
+        //enable for more variance per height
+        //variance = 0.06 * (heightFromBase * heightFromBase * 0.02);
+        vec3 chaosAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
+
+        //semi hacky fix for rotation being done before we apply sway logic
+        if (rotation == 45.0) {
+            chaosAdj = vec3(-cos(timeModTop * radian) * variance, 0, -sin(timeModTop * radian) * variance);
+        }
+
+        windAdj = windAdj * heightFromBase;
+        chaosAdj = chaosAdj * heightFromBase * 1;
 
         if (gl_VertexID == 0) {
             pos = usePos;
@@ -173,7 +201,7 @@ void main()
             pos = usePos;
         }
 
-        pos = pos + windAdj;
+        pos = pos + windAdj + chaosAdj;
         pos.y = pos.y + heightIndex;
 
     //seaweed
