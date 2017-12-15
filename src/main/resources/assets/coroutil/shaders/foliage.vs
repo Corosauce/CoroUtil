@@ -133,6 +133,31 @@ void main()
             pos = computeCorner(sway, angle, top) * heightIndexAmp;
         }
 
+        timeModTop = int(mod(((timeSmooth + ((1) * swayLag)) * 10) + rotation, 360));
+        //timeModTop = int(mod(90 * 10, 360));
+        vec3 windAdj = vec3(-sin(timeModTop * radian) * variance, -sin(timeModTop * radian) * variance, cos(timeModTop * radian) * variance);
+
+        //try offsetting mesh so bottom is 0
+        vec3 usePos = position;
+        usePos.y = usePos.y + 0.5;
+
+        float heightFromBase = heightIndex + usePos.y;
+
+        windAdj = windAdj * 0.1 * heightFromBase;
+
+        if (gl_VertexID == 0) {
+            pos = usePos;
+        } else if (gl_VertexID == 1) {
+            pos = usePos;
+        } else if (gl_VertexID == 2) {
+            pos = usePos;
+        } else if (gl_VertexID == 3) {
+            pos = usePos;
+        }
+
+        pos = pos + windAdj;
+        pos.y = pos.y + heightIndex;
+
     //seaweed
     } else if (animationID == 1) {
 
