@@ -29,6 +29,18 @@ vec3 computeCorner(vec3 sway, vec3 angle, vec3 center) {
     return center + normalize(cross(sway, angle)) * 0.5;
 }
 
+mat4 rotationMatrix(vec3 axis, float angle) {
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+
+    return mat4(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+                oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+                oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+                0.0,                                0.0,                                0.0,                                1.0);
+}
+
 void main()
 {
 
@@ -133,9 +145,15 @@ void main()
             pos = computeCorner(sway, angle, top) * heightIndexAmp;
         }
 
-        timeModTop = int(mod(((timeSmooth + ((1) * swayLag)) * 10) + rotation, 360));
-        //timeModTop = int(mod(90 * 10, 360));
-        vec3 windAdj = vec3(-sin(timeModTop * radian) * variance, -sin(timeModTop * radian) * variance, cos(timeModTop * radian) * variance);
+        //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
+        timeModTop = int(mod(((timeSmooth - (rotation + 45) + ((1) * swayLag)) * 1) + rotation, 360));
+        variance = 2.0;
+        //timeModTop = int(mod(90, 360));
+        vec3 windAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
+        if (rotation == 45.0) {
+            windAdj = vec3(-cos(timeModTop * radian) * variance, 0, -sin(timeModTop * radian) * variance);
+        }
+
 
         //try offsetting mesh so bottom is 0
         vec3 usePos = position;
@@ -221,7 +239,7 @@ void main()
         }
     }
 
-    gl_Position = modelViewMatrixCamera * modelMatrix * vec4(pos.x, pos.y, pos.z, 1.0);
+    gl_Position = modelViewMatrixCamera * modelMatrix/* * rotationMatrix(vec3(0, 1, 0), rotation * radian)*/ * vec4(pos.x, pos.y, pos.z, 1.0);
     //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x, position.y, position.z, 1.0);
 
     //lazy, cheap dist to camera
