@@ -146,7 +146,7 @@ void main()
         }
 
         //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
-        timeModTop = int(mod(((timeSmooth - (rotation + 45) + ((1) * swayLag)) * 1) + rotation, 360));
+        timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 10), 360));
         variance = 2.0;
         //timeModTop = int(mod(90, 360));
         vec3 windAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
