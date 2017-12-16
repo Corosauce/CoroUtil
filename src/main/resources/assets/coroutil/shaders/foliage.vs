@@ -9,7 +9,7 @@ attribute vec3 vertexNormal; //unused
 //seldom - instanced
 attribute mat4 modelMatrix; //used to be modelViewMatrix, separate from view matrix
 attribute vec4 rgba; //4th entry, alpha not used here, might as well leave vec4 unless more efficient to separate things to per float/attrib entries
-attribute vec3 meta;
+attribute vec4 meta;
 //often changed data - instanced
 attribute vec2 alphaBrightness;
 
@@ -49,6 +49,7 @@ void main()
     float index = meta.x;
     float animationID = meta.y;
     float heightIndex = meta.z;
+    float antiStiffness = meta.w;
     float rotation = rgba.w;
 
     float baseTimeChangeRate = 60.0 * windSpeed;
@@ -158,10 +159,13 @@ void main()
 
         angle = vec3(1, 0, 1);
 
-        swayLag = int(heightFromBase * -baseTimeChangeRate);
+        swayLag = int(heightFromBase * -baseTimeChangeRate * 0.2);
         //swayLag = int(heightFromBase * -1);
 
-        float windSpeedAdj = windSpeed * 0.02 * (heightFromBase * heightFromBase * 0.2);
+        float windSpeedAdj = windSpeed * 0.05 * (heightFromBase * heightFromBase * 0.1);
+
+        windSpeedAdj = windSpeedAdj * (antiStiffness * 2.0);
+
         //disable for more variance per height
         //windSpeedAdj = windSpeed * 0.2;
 
@@ -181,11 +185,14 @@ void main()
         //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0 * windSpeed), 360));
         //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0), 360));
         //timeModTop = int((((timeSmooth + ((0.001) * swayLag))) * 1.0));
-        timeModTop = int(mod((timeSmooth * 0.1) + swayLag, 360));
+        timeModTop = int(mod((timeSmooth * 0.2/* * antiStiffness*/) + swayLag, 360));
         //timeModTop = int(mod(int(timeSmooth * windSpeed * 10), 360));
         //timeModTop = int(mod(90, 360));
 
-        variance = 0.02 + (0.01 * windSpeed);
+        variance = 0.02 + (0.1 * windSpeed);
+
+        variance = variance * antiStiffness;
+
         //enable for more variance per height
         //variance = 0.06 * (heightFromBase * heightFromBase * 0.02);
         vec3 chaosAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
@@ -196,7 +203,7 @@ void main()
         }
 
         windAdj = windAdj * heightFromBase;
-        chaosAdj = chaosAdj * heightFromBase * 1;
+        chaosAdj = chaosAdj * heightFromBase * 1.0;
 
         if (gl_VertexID == 0) {
             pos = usePos;

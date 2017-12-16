@@ -24,9 +24,9 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS = 2;
 
-    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 7;
+    public static final int INSTANCE_SIZE_BYTES_SELDOM = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 8;
 
-    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 7;
+    public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 8;
 
     public final int numInstances;
 
@@ -108,7 +108,7 @@ public class InstancedMeshFoliage extends Mesh {
         strideStart += VECTOR4F_SIZE_BYTES;
 
         //instance index, animation ID, height index
-        GL20.glVertexAttribPointer(start, 3, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;
@@ -163,7 +163,7 @@ public class InstancedMeshFoliage extends Mesh {
     }
 
     public int getAttribSizeVBO2() {
-        //model matrix + rgbrot + index,animationID,heightIndex
+        //model matrix (4) + rgbrot (1) + index,animationID,heightIndex,stiffness (1)
         return 6;
     }
 
