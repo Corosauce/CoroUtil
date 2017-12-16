@@ -51,7 +51,8 @@ void main()
     float heightIndex = meta.z;
     float rotation = rgba.w;
 
-    float timeSmooth = (time-1) + partialTick;
+    float baseTimeChangeRate = 60.0 * windSpeed;
+    float timeSmooth = (time-baseTimeChangeRate) + (baseTimeChangeRate * partialTick);
     timeSmooth += index * 200;
 
     vec3 pos = vec3(0, 0, 0);
@@ -157,10 +158,12 @@ void main()
 
         angle = vec3(1, 0, 1);
 
+        swayLag = int(heightFromBase * -baseTimeChangeRate);
+        //swayLag = int(heightFromBase * -1);
 
         float windSpeedAdj = windSpeed * 0.02 * (heightFromBase * heightFromBase * 0.2);
         //disable for more variance per height
-        windSpeedAdj = windSpeed * 0.2;
+        //windSpeedAdj = windSpeed * 0.2;
 
         float adjDir = windDir/* - rotation*/;
 
@@ -175,10 +178,14 @@ void main()
         //windAdj.y = cross(sway, windAdj).y;
 
         //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
-        timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 10), 360));
+        //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0 * windSpeed), 360));
+        //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0), 360));
+        //timeModTop = int((((timeSmooth + ((0.001) * swayLag))) * 1.0));
+        timeModTop = int(mod((timeSmooth * 0.1) + swayLag, 360));
+        //timeModTop = int(mod(int(timeSmooth * windSpeed * 10), 360));
         //timeModTop = int(mod(90, 360));
 
-        variance = 0.002;
+        variance = 0.02 + (0.01 * windSpeed);
         //enable for more variance per height
         //variance = 0.06 * (heightFromBase * heightFromBase * 0.02);
         vec3 chaosAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);

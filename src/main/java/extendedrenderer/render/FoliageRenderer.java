@@ -85,6 +85,8 @@ public class FoliageRenderer {
     public static int radialRange = 60;
     public static boolean testStaticLimit = false;
 
+    public static long windTime = 0;
+
     public FoliageRenderer(TextureManager rendererIn) {
         this.renderer = rendererIn;
         transformation = new Transformation();
@@ -221,23 +223,28 @@ public class FoliageRenderer {
 
         //OpenGlHelper.glUniform1(shaderProgram.uniforms.get("stipple"), buffer);
 
-        try {
-            shaderProgram.setUniform("time", (int) world.getTotalWorldTime());
-        } catch (Exception ex) {
-            //ignore optimization in testing
-        }
-
-        shaderProgram.setUniform("partialTick", partialTicks);
-        shaderProgram.setUniform("windDir", windDir);
-
         //temp
-        //windSpeedSmooth = 0.1F;
+        //windSpeedSmooth = 0.01F;
+        //windSpeedSmooth = 0.2F;
+        //windSpeedSmooth = 0.9F;
         //System.out.println("wind: " + windSpeed);
+        //windDir = 180;
 
         //temp override vars
         FoliageRenderer.radialRange = 20;
 
+
+        shaderProgram.setUniform("partialTick", partialTicks);
+        shaderProgram.setUniform("windDir", windDir);
         shaderProgram.setUniform("windSpeed", windSpeedSmooth);
+
+        try {
+            //windTime += world.getTotalWorldTime() * windSpeedSmooth;
+            //shaderProgram.setUniform("time", (int) world.getTotalWorldTime());
+            shaderProgram.setUniform("time", (int) windTime);
+        } catch (Exception ex) {
+            //ignore optimization in testing
+        }
 
         //TODO: temp allocations
         /*MeshBufferManagerFoliage.setupMeshIfMissing(ParticleRegistry.tallgrass);
