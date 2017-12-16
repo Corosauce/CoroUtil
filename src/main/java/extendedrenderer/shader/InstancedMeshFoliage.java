@@ -28,7 +28,7 @@ public class InstancedMeshFoliage extends Mesh {
 
     public static final int INSTANCE_SIZE_FLOATS_SELDOM = MATRIX_SIZE_FLOATS + 8;
 
-    public final int numInstances;
+    public int numInstances;
 
     public final int instanceDataVBO1;
     public final int instanceDataVBO2;
@@ -52,6 +52,10 @@ public class InstancedMeshFoliage extends Mesh {
     public double interpPosXThread;
     public double interpPosYThread;
     public double interpPosZThread;
+
+    //alternative to growing floatbuffer
+    public int lastRemovalCount = 0;
+    public int lastAdditionCount = 0;
 
     public InstancedMeshFoliage(float[] positions, float[] textCoords, int[] indices, int numInstances) {
         super(positions, textCoords, indices);

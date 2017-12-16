@@ -8,10 +8,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
+import java.nio.FloatBuffer;
 import java.util.Random;
 
 public class Foliage implements IShaderRenderedEntity {
@@ -133,9 +135,38 @@ public class Foliage implements IShaderRenderedEntity {
     public void renderForShaderVBO2(InstancedMeshFoliage mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                             float partialTicks) {
 
+        boolean autoGrowBuffer = false;
         if (mesh.curBufferPosVBO2 >= mesh.numInstances) {
-            System.out.println("hitting max mesh count");
-            return;
+
+            //cant quite get this to work correctly without lots of missing renders ingame until next thread update, why?
+
+            if (autoGrowBuffer) {
+                mesh.numInstances *= 2;
+                System.out.println("hit max mesh count, doubling in size to " + mesh.numInstances);
+                //double vbo2 and copy data
+                FloatBuffer newBuffer = BufferUtils.createFloatBuffer(mesh.numInstances * InstancedMeshFoliage.INSTANCE_SIZE_FLOATS_SELDOM);
+                //newBuffer.clear();
+                //doesnt actually clear
+                mesh.instanceDataBufferVBO2.rewind();
+                newBuffer.put(mesh.instanceDataBufferVBO2);
+                mesh.instanceDataBufferVBO2.rewind();
+                newBuffer.flip();
+                mesh.instanceDataBufferVBO2 = newBuffer;
+                mesh.instanceDataBufferVBO2.position(mesh.curBufferPosVBO2 * InstancedMeshFoliage.INSTANCE_SIZE_FLOATS_SELDOM);
+
+                //double vbo1 and copy data
+
+                newBuffer = BufferUtils.createFloatBuffer(mesh.numInstances * InstancedMeshFoliage.INSTANCE_SIZE_FLOATS);
+                newBuffer.clear();
+                //doesnt actually clear
+                //mesh.instanceDataBufferVBO1.position(0);
+                //newBuffer.put(mesh.instanceDataBufferVBO1);
+                mesh.instanceDataBufferVBO1 = newBuffer;
+                //mesh.instanceDataBufferVBO1.position(mesh.curBufferPosVBO1 * InstancedMeshFoliage.INSTANCE_SIZE_FLOATS);
+            } else {
+                System.out.println("hitting max mesh count");
+                return;
+            }
         }
 
         //camera relative positions, for world position, remove the interpPos values

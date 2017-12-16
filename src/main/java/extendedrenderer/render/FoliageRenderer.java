@@ -231,7 +231,7 @@ public class FoliageRenderer {
         //windDir = 180;
 
         //temp override vars
-        FoliageRenderer.radialRange = 50;
+        FoliageRenderer.radialRange = 70;
 
 
         shaderProgram.setUniform("partialTick", partialTicks);
