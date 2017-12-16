@@ -82,7 +82,7 @@ public class FoliageRenderer {
 
     public Lock lockVBO2 = new ReentrantLock();
 
-    public static int radialRange = 60;
+    public static int radialRange = 40;
     public static boolean testStaticLimit = false;
 
     public static long windTime = 0;
@@ -231,7 +231,7 @@ public class FoliageRenderer {
         //windDir = 180;
 
         //temp override vars
-        FoliageRenderer.radialRange = 70;
+        //FoliageRenderer.radialRange = 70;
 
 
         shaderProgram.setUniform("partialTick", partialTicks);
