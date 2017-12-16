@@ -235,7 +235,8 @@ public class FoliageRenderer {
 
 
         shaderProgram.setUniform("partialTick", partialTicks);
-        shaderProgram.setUniform("windDir", windDir);
+        //-135 = hacky fix the side effect of compensating for rotation in model matrix before mesh deformation
+        shaderProgram.setUniform("windDir", windDir - 135);
         shaderProgram.setUniform("windSpeed", windSpeedSmooth);
 
         try {
