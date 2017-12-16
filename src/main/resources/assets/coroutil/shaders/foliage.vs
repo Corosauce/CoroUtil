@@ -166,6 +166,11 @@ void main()
 
         windSpeedAdj = windSpeedAdj * (antiStiffness * 2.0);
 
+        //a bit of hack to make all but reeds be influenced by wind more lower down
+        if (antiStiffness == 1.0) {
+            windSpeedAdj = windSpeed * 0.5;
+        }
+
         //disable for more variance per height
         //windSpeedAdj = windSpeed * 0.2;
 
@@ -173,13 +178,22 @@ void main()
 
         vec3 windAdj = vec3(-sin(adjDir * radian) * windSpeedAdj, 0, cos(adjDir * radian) * windSpeedAdj);
 
+        float yAdj = windAdj.y;
+        if (antiStiffness == 1.0) {
+            //yAdj = cross(windAdj, vec3(1, 0, 1)).y;
+        }
+
         //semi hacky fix for rotation being done before we apply sway logic
         if (rotation == 45.0) {
             windAdj = vec3(-cos(adjDir * radian) * windSpeedAdj, 0, -sin(adjDir * radian) * windSpeedAdj);
         }
 
         //maybe correct, added gap between mesh connections though
-        //windAdj.y = cross(sway, windAdj).y;
+        if (antiStiffness == 1.0) {
+            //windAdj.y = yAdj;
+        }
+
+        //windAdj.y = windAdj.y - 0.2;
 
         //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
         //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0 * windSpeed), 360));
@@ -189,7 +203,7 @@ void main()
         //timeModTop = int(mod(int(timeSmooth * windSpeed * 10), 360));
         //timeModTop = int(mod(90, 360));
 
-        variance = 0.02 + (0.1 * windSpeed);
+        variance = 0.02 + (0.05 * windSpeed);
 
         variance = variance * antiStiffness;
 
