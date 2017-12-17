@@ -53,8 +53,6 @@ public class EventHandler {
     public static int mip_min = 0;
     public static int mip_mag = 0;
 
-    private static final FloatBuffer fogColorBuffer = GLAllocation.createDirectFloatBuffer(16);
-
 
     //a hack to enable fog for particles when weather2 sandstorm is active
     public static float sandstormFogAmount = 0F;
@@ -98,22 +96,12 @@ public class EventHandler {
 	@SideOnly(Side.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
-
-
-        Minecraft mc = Minecraft.getMinecraft();
-
-        //EventHandler.hookRenderShaders(event.getPartialTicks());
-
-        /*er.enableLightmap();
-        RenderHelper.disableStandardItemLighting();
-
-        er.disableLightmap();*/
-
-        
-        //old code call
-        //ExtendedRenderer.rotEffRenderer.renderParticles((Entity)mc.getRenderViewEntity(), (float)event.getPartialTicks());
+        if (!ConfigCoroAI.useEntityRenderHookForShaders) {
+            EventHandler.hookRenderShaders(event.getPartialTicks());
+        }
     }
 
+    @SideOnly(Side.CLIENT)
     public static void hookRenderShaders(float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -190,6 +178,7 @@ public class EventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public static void preShaderRender(Entity entityIn, float partialTicks) {
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -227,25 +216,6 @@ public class EventHandler {
                 //GlStateManager.setFogEnd(Math.max(40F, 1000F * fogScaleInvert));
                 //GlStateManager.setFogEnd(30F);
                 /**/
-            } else {
-                //incomplete copy
-                float fogColorRed = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175080_Q");
-                float fogColorGreen = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175082_R");
-                float fogColorBlue = ObfuscationReflectionHelper.getPrivateValue(EntityRenderer.class, Minecraft.getMinecraft().entityRenderer, "field_175081_S");
-                GlStateManager.glFog(GL11.GL_FOG_COLOR, setFogColorBuffer(fogColorRed, fogColorGreen, fogColorBlue, 1.0F));
-                GlStateManager.glNormal3f(0.0F, -1.0F, 0.0F);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-                Entity entity = mc.getRenderViewEntity();
-                IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(mc.world, entity, partialTicks);
-	            /*float hook = net.minecraftforge.client.ForgeHooksClient.getFogDensity(er, entity, iblockstate, partialTicks, 0.1F);
-	            if (hook >= 0) GlStateManager.setFogDensity(hook);*/
-
-                GlStateManager.setFogDensity(1F);
-
-                GlStateManager.enableColorMaterial();
-                GlStateManager.enableFog();
-                GlStateManager.colorMaterial(1028, 4608);
             }
 
             /*GlStateManager.setFogStart(0);
@@ -277,6 +247,7 @@ public class EventHandler {
         }
     }
 
+    @SideOnly(Side.CLIENT)
     public static void postShaderRender(Entity entityIn, float partialTicks) {
 
         //restore original mipmap state
@@ -296,14 +267,6 @@ public class EventHandler {
         GlStateManager.depthMask(true);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(516, 0.1F);
-    }
-
-    private static FloatBuffer setFogColorBuffer(float red, float green, float blue, float alpha)
-    {
-        fogColorBuffer.clear();
-        fogColorBuffer.put(red).put(green).put(blue).put(alpha);
-        fogColorBuffer.flip();
-        return fogColorBuffer;
     }
 	
 	@SideOnly(Side.CLIENT)

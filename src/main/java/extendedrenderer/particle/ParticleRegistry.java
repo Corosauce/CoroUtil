@@ -1,6 +1,7 @@
 package extendedrenderer.particle;
 
 import extendedrenderer.render.FoliageRenderer;
+import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.MeshBufferManagerFoliage;
 import extendedrenderer.shader.MeshBufferManagerParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -95,7 +96,9 @@ public class ParticleRegistry {
 	}
 
 	public static void initPost(TextureStitchEvent.Post event) {
-
+		if (RotatingParticleManager.useShaders) {
+			RotatingParticleManager.forceShaderReset = true;
+		}
 	}
 	
 	public static class TextureAtlasSpriteImpl extends TextureAtlasSprite {

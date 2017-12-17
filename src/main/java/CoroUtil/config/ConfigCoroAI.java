@@ -36,6 +36,9 @@ public class ConfigCoroAI implements IConfigCategory {
 
 	public static boolean forceShadersOff = false;
 
+	@ConfigComment("Provides better context for shaders/particles to work nice with translucent blocks like glass and water")
+	public static boolean useEntityRenderHookForShaders = true;
+
 	//maybe temp
 	@ConfigComment("WIP, more strict transparent cloud usage, better on fps")
 	public static boolean optimizedCloudRendering = false;
