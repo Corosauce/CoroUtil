@@ -14,7 +14,7 @@ attribute vec4 meta;
 attribute vec2 alphaBrightness;
 
 varying vec2 outTexCoord;
-varying float outBrightness;
+flat varying float outBrightness;
 varying vec4 outRGBA;
 varying float outAlphaInt;
 
@@ -58,250 +58,167 @@ void main()
 
     vec3 pos = vec3(0, 0, 0);
 
-    //wind hit foliage, 1 high for now
-    if (animationID == 0) {
+    mat4 finalMat = modelViewMatrixCamera * modelMatrix;
+    vec3 posTestAdj = position;
+    posTestAdj.y = posTestAdj.y + heightIndex + 0.5;
+    vec4 posTest = finalMat * vec4(posTestAdj.x, posTestAdj.y, posTestAdj.z, 1.0);
 
-        /*int timeMod = int(mod((timeSmooth + index * 3) * 10, 360));
+    if (windSpeed > 0.00001 && posTest.w < 40) {
 
-        float variance = windSpeed * 0.25;
+        //wind hit foliage, 1 high for now
+        if (animationID == 0) {
 
-        float rot = sin(timeMod * 0.0174533) * variance;
-        float rot2 = cos(timeMod * 0.0174533) * variance;
+            //BETTER CODE START
 
-        float baseYaw = 45;
-        if (rotation == 1) {
-            baseYaw = baseYaw + 90;
-        }
+            float variance = 0.6;
 
-        float adjDir = windDir - baseYaw;
+            //try offsetting mesh so bottom is 0
+            vec3 usePos = position;
+            usePos.y = usePos.y + 0.5;
 
-        float ampWind = 0.6;
+            float heightFromBase = heightIndex + usePos.y;
 
-        float xAdj = -sin(adjDir * 0.0174533) * windSpeed * ampWind;
-        float zAdj = cos(adjDir * 0.0174533) * windSpeed * ampWind;
+            swayLag = int(heightFromBase * -baseTimeChangeRate * 0.2);
+            //swayLag = int(heightFromBase * -1);
 
-        if (gl_VertexID == 0) {
-            pos = vec3(position.x + xAdj + rot, position.y + 1, position.z + zAdj + rot2);
-        } else if (gl_VertexID == 1) {
-            pos = position;
-        } else if (gl_VertexID == 2) {
-            pos = position;
-        } else if (gl_VertexID == 3) {
-            pos = vec3(position.x + xAdj + rot, position.y + 1, position.z + zAdj + rot2);
-        }*/
+            float windSpeedAdj = windSpeed * 0.05 * (heightFromBase);
 
-        swayLag = -5;
+            windSpeedAdj = windSpeedAdj * (antiStiffness * 2.0);
 
-        float variance = 0.6;
+            //a bit of hack to make all but reeds be influenced by wind more lower down
+            if (antiStiffness == 1.0) {
+                windSpeedAdj = windSpeed * 0.5;
+            }
 
-        vec3 angle = vec3(-1, 0, 1);
-        if (rotation == 1) {
-            angle = vec3(1, 0, 1);
-        }
+            //disable for more variance per height
+            //windSpeedAdj = windSpeed * 0.2;
 
-        //more performant but less accurate algorithm, use unless crazy mesh warping needed
-        vec3 baseHeight = vec3(0, heightIndex-1, 0);
-        vec3 baseHeight2 = vec3(0, heightIndex, 0);
+            float adjDir = windDir/* - rotation*/;
 
-        int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 10) + rotation, 360));
+            vec3 windAdj = vec3(-sin(adjDir * radian) * windSpeedAdj, 0, cos(adjDir * radian) * windSpeedAdj);
 
-        //timeModBottom = int(windDir);
+            float yAdj = windAdj.y;
+            if (antiStiffness == 1.0) {
+                //yAdj = cross(windAdj, vec3(1, 0, 1)).y;
+            }
 
-        vec3 swayBottom = vec3(-sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
+            //semi hacky fix for rotation being done before we apply sway logic
+            if (rotation == 45.0) {
+                windAdj = vec3(-cos(adjDir * radian) * windSpeedAdj, 0, -sin(adjDir * radian) * windSpeedAdj);
+            }
 
-        vec3 swayBottom2 = vec3(-sin(int(windDir) * radian) * variance, 1, cos(int(windDir) * radian) * variance);
-        //swayBottom2 = vec3(0, 0, 0);
+            //maybe correct, added gap between mesh connections though
+            if (antiStiffness == 1.0) {
+                //windAdj.y = yAdj;
+            }
 
-        swayBottom = normalize((swayBottom2 * 5.0) + swayBottom);
+            //windAdj.y = windAdj.y - 0.2;
 
-        vec3 prevSway = swayBottom;
-        vec3 bottom = baseHeight + swayBottom;
+            //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
+            //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0 * windSpeed), 360));
+            //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0), 360));
+            //timeModTop = int((((timeSmooth + ((0.001) * swayLag))) * 1.0));
+            int timeModTop = int(mod((timeSmooth * 0.2/* * antiStiffness*/) + swayLag, 360));
+            //timeModTop = int(mod(int(timeSmooth * windSpeed * 10), 360));
+            //timeModTop = int(mod(90, 360));
 
-        int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 10) + rotation, 360));
+            variance = 0.02 + (0.05 * windSpeed);
 
-        //timeModTop = int(windDir);
+            variance = variance * antiStiffness;
 
-        vec3 sway = vec3(-sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
-        vec3 sway2 = vec3(-sin(int(windDir) * radian) * variance, 1, cos(int(windDir) * radian) * variance);
-        //sway2 = vec3(0, 0, 0);
+            //enable for more variance per height
+            //variance = 0.06 * (heightFromBase * heightFromBase * 0.02);
+            vec3 chaosAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
 
-        sway = normalize((sway2 * 5.0) + sway);
+            //semi hacky fix for rotation being done before we apply sway logic
+            if (rotation == 45.0) {
+                chaosAdj = vec3(-cos(timeModTop * radian) * variance, 0, -sin(timeModTop * radian) * variance);
+            }
 
-        vec3 top = baseHeight2 + sway;
-        if (heightIndex == 0) {
-            bottom = vec3(0, 0, 0);
-            prevSway = vec3(0, 1, 0);
-        }
+            windAdj = windAdj * heightFromBase;
+            chaosAdj = chaosAdj * heightFromBase * 1.0;
 
-        float heightIndexAmp = 1.0;//heightIndex + 1.0;
-
-        if (gl_VertexID == 0) {
-            pos = computeCorner(sway, angle, top) * heightIndexAmp;
-        } else if (gl_VertexID == 1) {
-            pos = computeCorner(prevSway, angle, bottom) * heightIndexAmp;
-        } else if (gl_VertexID == 2) {
-            angle = angle * -1;
-            pos = computeCorner(prevSway, angle, bottom) * heightIndexAmp;
-        } else if (gl_VertexID == 3) {
-            angle = angle * -1;
-            pos = computeCorner(sway, angle, top) * heightIndexAmp;
-        }
-
-
-        //BETTER CODE START
-
-
-        //try offsetting mesh so bottom is 0
-        vec3 usePos = position;
-        usePos.y = usePos.y + 0.5;
-
-        float heightFromBase = heightIndex + usePos.y;
-
-        angle = vec3(1, 0, 1);
-
-        swayLag = int(heightFromBase * -baseTimeChangeRate * 0.2);
-        //swayLag = int(heightFromBase * -1);
-
-        float windSpeedAdj = windSpeed * 0.05 * (heightFromBase * heightFromBase * 0.1);
-
-        windSpeedAdj = windSpeedAdj * (antiStiffness * 2.0);
-
-        //a bit of hack to make all but reeds be influenced by wind more lower down
-        if (antiStiffness == 1.0) {
-            windSpeedAdj = windSpeed * 0.5;
-        }
-
-        //disable for more variance per height
-        //windSpeedAdj = windSpeed * 0.2;
-
-        float adjDir = windDir/* - rotation*/;
-
-        vec3 windAdj = vec3(-sin(adjDir * radian) * windSpeedAdj, 0, cos(adjDir * radian) * windSpeedAdj);
-
-        float yAdj = windAdj.y;
-        if (antiStiffness == 1.0) {
-            //yAdj = cross(windAdj, vec3(1, 0, 1)).y;
-        }
-
-        //semi hacky fix for rotation being done before we apply sway logic
-        if (rotation == 45.0) {
-            windAdj = vec3(-cos(adjDir * radian) * windSpeedAdj, 0, -sin(adjDir * radian) * windSpeedAdj);
-        }
-
-        //maybe correct, added gap between mesh connections though
-        if (antiStiffness == 1.0) {
-            //windAdj.y = yAdj;
-        }
-
-        //windAdj.y = windAdj.y - 0.2;
-
-        //this.rotationYaw is quaternion is both required but messing with the sway math, rework when its quat rotated?
-        //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0 * windSpeed), 360));
-        //timeModTop = int(mod((((timeSmooth + ((1) * swayLag))) * 60.0), 360));
-        //timeModTop = int((((timeSmooth + ((0.001) * swayLag))) * 1.0));
-        timeModTop = int(mod((timeSmooth * 0.2/* * antiStiffness*/) + swayLag, 360));
-        //timeModTop = int(mod(int(timeSmooth * windSpeed * 10), 360));
-        //timeModTop = int(mod(90, 360));
-
-        variance = 0.02 + (0.05 * windSpeed);
-
-        variance = variance * antiStiffness;
-
-        //enable for more variance per height
-        //variance = 0.06 * (heightFromBase * heightFromBase * 0.02);
-        vec3 chaosAdj = vec3(-sin(timeModTop * radian) * variance, 0, cos(timeModTop * radian) * variance);
-
-        //semi hacky fix for rotation being done before we apply sway logic
-        if (rotation == 45.0) {
-            chaosAdj = vec3(-cos(timeModTop * radian) * variance, 0, -sin(timeModTop * radian) * variance);
-        }
-
-        windAdj = windAdj * heightFromBase;
-        chaosAdj = chaosAdj * heightFromBase * 1.0;
-
-        if (gl_VertexID == 0) {
             pos = usePos;
-        } else if (gl_VertexID == 1) {
-            pos = usePos;
-        } else if (gl_VertexID == 2) {
-            pos = usePos;
-        } else if (gl_VertexID == 3) {
-            pos = usePos;
+
+            pos = pos + windAdj + chaosAdj;
+            pos.y = pos.y + heightIndex;
+
+        //seaweed
+        } else if (false && animationID == 1) {
+
+            //timeSmooth = 1;
+
+            float variance = 0.6;
+
+            vec3 angle = vec3(-1, 0, 1);
+            if (rotation == 1) {
+                angle = vec3(1, 0, 1);
+            }
+
+            //more performant but less accurate algorithm, use unless crazy mesh warping needed
+            vec3 baseHeight = vec3(0, heightIndex-1, 0);
+            vec3 baseHeight2 = vec3(0, heightIndex, 0);
+
+            int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
+            vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
+            vec3 prevSway = swayBottom;
+            vec3 bottom = baseHeight + swayBottom;
+
+            int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
+            vec3 sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
+            vec3 top = baseHeight2 + sway;
+            if (heightIndex == 0) {
+                bottom = vec3(0, 0, 0);
+                prevSway = vec3(0, 1, 0);
+            }
+
+            //more accurate but more expensive loop
+            /*
+
+            vec3 top = vec3(0, 0, 0);
+            vec3 bottom = vec3(0, 0, 0);
+            vec3 bottomNext = bottom;
+            //verify
+            vec3 sway = vec3(0, 0, 0);
+
+            for (int i = 0; i <= heightIndex; i++) {
+                prevSway = sway;
+                timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
+                sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
+                sway = normalize(sway);
+
+                top = bottomNext + sway;
+
+                bottom = bottomNext;
+                bottomNext = top;
+            }*/
+
+            if (gl_VertexID == 0) {
+                pos = computeCorner(sway, angle, top);
+            } else if (gl_VertexID == 1) {
+                pos = computeCorner(prevSway, angle, bottom);
+            } else if (gl_VertexID == 2) {
+                angle = angle * -1;
+                pos = computeCorner(prevSway, angle, bottom);
+            } else if (gl_VertexID == 3) {
+                angle = angle * -1;
+                pos = computeCorner(sway, angle, top);
+            }
         }
 
-        pos = pos + windAdj + chaosAdj;
-        pos.y = pos.y + heightIndex;
-
-    //seaweed
-    } else if (animationID == 1) {
-
-        //timeSmooth = 1;
-
-        float variance = 0.6;
-
-        vec3 angle = vec3(-1, 0, 1);
-        if (rotation == 1) {
-            angle = vec3(1, 0, 1);
-        }
-
-        //more performant but less accurate algorithm, use unless crazy mesh warping needed
-        vec3 baseHeight = vec3(0, heightIndex-1, 0);
-        vec3 baseHeight2 = vec3(0, heightIndex, 0);
-
-        int timeModBottom = int(mod(((timeSmooth + ((heightIndex - 1 + 1) * swayLag)) * 2) + rotation, 360));
-        vec3 swayBottom = vec3(sin(timeModBottom * radian) * variance, 1, cos(timeModBottom * radian) * variance);
-        vec3 prevSway = swayBottom;
-        vec3 bottom = baseHeight + swayBottom;
-
-        int timeModTop = int(mod(((timeSmooth + ((heightIndex + 1) * swayLag)) * 2) + rotation, 360));
-        vec3 sway = vec3(sin(timeModTop * radian) * variance, 1, cos(timeModTop * radian) * variance);
-        vec3 top = baseHeight2 + sway;
-        if (heightIndex == 0) {
-            bottom = vec3(0, 0, 0);
-            prevSway = vec3(0, 1, 0);
-        }
-
-        //more accurate but more expensive loop
-        /*
-
-        vec3 top = vec3(0, 0, 0);
-        vec3 bottom = vec3(0, 0, 0);
-        vec3 bottomNext = bottom;
-        //verify
-        vec3 sway = vec3(0, 0, 0);
-
-        for (int i = 0; i <= heightIndex; i++) {
-            prevSway = sway;
-            timeMod = int(mod(((timeSmooth + ((i + 1) * swayLag)) * 2) + rotation, 360));
-            sway = vec3(sin(timeMod * radian) * variance, 1, cos(timeMod * radian) * variance);
-            sway = normalize(sway);
-
-            top = bottomNext + sway;
-
-            bottom = bottomNext;
-            bottomNext = top;
-        }*/
-
-        if (gl_VertexID == 0) {
-            pos = computeCorner(sway, angle, top);
-        } else if (gl_VertexID == 1) {
-            pos = computeCorner(prevSway, angle, bottom);
-        } else if (gl_VertexID == 2) {
-            angle = angle * -1;
-            pos = computeCorner(prevSway, angle, bottom);
-        } else if (gl_VertexID == 3) {
-            angle = angle * -1;
-            pos = computeCorner(sway, angle, top);
-        }
+        gl_Position = finalMat * vec4(pos.x, pos.y, pos.z, 1.0);
+    } else {
+        gl_Position = posTest;//finalMat * vec4(posTestAdj.x, posTestAdj.y, posTestAdj.z, 1.0);
     }
 
-    gl_Position = modelViewMatrixCamera * modelMatrix/* * rotationMatrix(vec3(0, 1, 0), rotation * radian)*/ * vec4(pos.x, pos.y, pos.z, 1.0);
-    //gl_Position = modelViewMatrixCamera * modelMatrix * vec4(position.x, position.y, position.z, 1.0);
+
+
 
     //lazy, cheap dist to camera
     gl_FogFragCoord = abs(gl_Position.z);
 
 	outTexCoord = texCoord;
+
 	outBrightness = alphaBrightness.y;
 
 	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);

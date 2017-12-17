@@ -254,7 +254,9 @@ public class EventHandler {
 
         GlStateManager.disableCull();
 
-        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessNonLightmap(mc.world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+        CoroUtilBlockLightCache.brightnessPlayer = CoroUtilBlockLightCache.getBrightnessFromLightmap(mc.world, (float)entityIn.posX, (float)entityIn.posY, (float)entityIn.posZ);
+
+
 
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
