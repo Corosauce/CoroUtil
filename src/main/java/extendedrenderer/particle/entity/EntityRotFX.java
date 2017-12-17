@@ -512,8 +512,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         //brightness
         float brightness;
-        //brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
-        brightness = brightnessCache;
+        brightness = CoroUtilBlockLightCache.getBrightnessCached(world, pos.x, pos.y, pos.z);
+        //brightness = brightnessCache;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
         /*int rgbaIndex = 0;

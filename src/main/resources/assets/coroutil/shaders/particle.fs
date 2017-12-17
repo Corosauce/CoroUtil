@@ -1,10 +1,11 @@
 #version 120
+#extension GL_EXT_gpu_shader4 : enable
 
 uniform sampler2D texture_sampler;
 uniform int fogmode;
 
 varying vec2 outTexCoord;
-varying float outBrightness;
+flat varying float outBrightness;
 varying vec4 outRGBA;
 
 void main()
@@ -21,12 +22,15 @@ void main()
         fogFactor = exp(-gl_Fog.density * gl_FogFragCoord);
     }
 
-    //float
+    int lightMap = int(outBrightness);
+    float r = float((lightMap >> 16) & 255) / 255.0;
+    float g = float((lightMap >> 8) & 255) / 255.0;
+    float b = float(lightMap & 255) / 255.0;
 
     vec4 fragColor = texture2D(texture_sampler, outTexCoord);
-	fragColor.x *= outRGBA.x * outBrightness;
-	fragColor.y *= outRGBA.y * outBrightness;
-	fragColor.z *= outRGBA.z * outBrightness;
+	fragColor.x *= outRGBA.x * r;
+	fragColor.y *= outRGBA.y * g;
+	fragColor.z *= outRGBA.z * b;
 	fragColor.w *= outRGBA.w;
 
     if (outRGBA.w > 0) {

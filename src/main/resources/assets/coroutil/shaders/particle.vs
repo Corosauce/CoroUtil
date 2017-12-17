@@ -11,7 +11,7 @@ attribute vec4 rgbaTest;
 //in vec2 texOffset;
 
 varying vec2 outTexCoord;
-varying float outBrightness;
+flat varying float outBrightness;
 varying vec4 outRGBA;
 
 uniform mat4 modelViewMatrixCamera;
