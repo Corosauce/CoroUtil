@@ -1,5 +1,4 @@
 #version 120
-#extension GL_EXT_gpu_shader4 : enable
 
 in int gl_VertexID;
 in int gl_InstanceID;
@@ -15,8 +14,7 @@ attribute vec4 meta;
 attribute vec2 alphaBrightness;
 
 varying vec2 outTexCoord;
-//flat varying float outBrightness;
-flat varying vec3 texMap;
+flat varying float outBrightness;
 varying vec4 outRGBA;
 varying float outAlphaInt;
 
@@ -221,10 +219,7 @@ void main()
 
 	outTexCoord = texCoord;
 
-	//outBrightness = alphaBrightness.y;
-
-	int lightMap = int(alphaBrightness.y);
-	texMap = vec3(float((lightMap >> 16) & 255) / 255.0, float((lightMap >> 8) & 255) / 255.0, float(lightMap & 255) / 255.0);
+	outBrightness = alphaBrightness.y;
 
 	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
 	//outAlphaInt = 255 - int(outRGBA.w * 255);
