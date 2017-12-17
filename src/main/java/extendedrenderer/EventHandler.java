@@ -81,7 +81,7 @@ public class EventHandler {
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
 
-                    if (mc.world.getTotalWorldTime() % 60 == 0) {
+                    if (mc.world.getTotalWorldTime() % 2 == 0) {
                         CoroUtilBlockLightCache.clear();
                     }
                 }

@@ -314,32 +314,39 @@ public class FoliageRenderer {
 
                         //System.out.println("vbo 1 update");
 
-                        for (Foliage foliage : listFoliage) {
-                            boolean doAlpha = false;
+                        //for (Foliage foliage : listFoliage) {
+                        //int size = listFoliage.size();
+                        try {
+                            for (int i = 0; i < listFoliage.size(); i++) {
+                                Foliage foliage = listFoliage.get(i);
+                                boolean doAlpha = false;
 
-                            if (doAlpha) {
-                                //close fade
-                                float distMax = 3F;
-                                double distFadeRange = 20;
-                                int rangeAdj = radialRange - (int)distFadeRange;
-                                double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
-                                if (dist > rangeAdj - distFadeRange) {
+                                if (doAlpha) {
+                                    //close fade
+                                    float distMax = 3F;
+                                    double distFadeRange = 20;
+                                    int rangeAdj = radialRange - (int) distFadeRange;
+                                    double dist = entityIn.getDistance(foliage.posX, foliage.posY, foliage.posZ);
+                                    if (dist > rangeAdj - distFadeRange) {
 
-                                    double diff = dist - ((double) rangeAdj - distFadeRange);
-                                    foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
-                                    if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
+                                        double diff = dist - ((double) rangeAdj - distFadeRange);
+                                        foliage.particleAlpha = (float) (1F - (diff / distFadeRange));
+                                        if (foliage.particleAlpha < 0F) foliage.particleAlpha = 0F;
 
+                                    } else {
+                                        foliage.particleAlpha = 1F;
+                                    }
                                 } else {
                                     foliage.particleAlpha = 1F;
                                 }
-                            } else {
-                                foliage.particleAlpha = 1F;
+
+                                foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
+
+                                //update vbo1
+                                foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                             }
-
-                            foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
-
-                            //update vbo1
-                            foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
 
                         //System.out.println("main thread: mesh.curBufferPosVBO1: " + mesh.curBufferPosVBO1);
