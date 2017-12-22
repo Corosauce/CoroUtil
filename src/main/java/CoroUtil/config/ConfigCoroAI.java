@@ -5,6 +5,10 @@ import java.util.Arrays;
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 import CoroUtil.util.DimensionChunkCacheNew;
+import net.minecraft.client.Minecraft;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConfigCoroAI implements IConfigCategory {
 
@@ -44,6 +48,9 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean optimizedCloudRendering = false;
 
 	public static boolean debugShaders = false;
+
+	public static boolean foliageShaders = true;
+	public static boolean particleShaders = true;
 
 	@Override
 	public String getName() {

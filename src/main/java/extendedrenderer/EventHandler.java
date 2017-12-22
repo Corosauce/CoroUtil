@@ -57,6 +57,8 @@ public class EventHandler {
     //a hack to enable fog for particles when weather2 sandstorm is active
     public static float sandstormFogAmount = 0F;
 
+    public boolean lastFoliageUse = ConfigCoroAI.foliageShaders;
+
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void tickRenderScreen(TickEvent.RenderTickEvent event) {
@@ -88,6 +90,11 @@ public class EventHandler {
 
 
                 //}
+            }
+
+            if (ConfigCoroAI.foliageShaders != lastFoliageUse) {
+                lastFoliageUse = ConfigCoroAI.foliageShaders;
+                Minecraft.getMinecraft().refreshResources();
             }
         }
     }
@@ -166,10 +173,12 @@ public class EventHandler {
 
             preShaderRender(mc.getRenderViewEntity(), partialTicks);
 
-            ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
+            if (ConfigCoroAI.foliageShaders) {
+                ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
+            }
+
 
             ExtendedRenderer.rotEffRenderer.renderParticles(mc.getRenderViewEntity(), partialTicks);
-
 
 
             postShaderRender(mc.getRenderViewEntity(), partialTicks);

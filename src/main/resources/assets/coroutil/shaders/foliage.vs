@@ -63,7 +63,7 @@ void main()
     posTestAdj.y = posTestAdj.y + heightIndex + 0.5;
     vec4 posTest = finalMat * vec4(posTestAdj.x, posTestAdj.y, posTestAdj.z, 1.0);
 
-    if (windSpeed > 0.00001 && posTest.w < 40) {
+    if (windSpeed > 0.00001 && posTest.w < 999) {
 
         //wind hit foliage, 1 high for now
         if (animationID == 0) {

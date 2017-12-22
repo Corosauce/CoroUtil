@@ -300,6 +300,9 @@ public class RotatingParticleManager
      */
     public void renderParticles(Entity entityIn, float partialTicks)
     {
+
+        boolean useParticleShaders = useShaders && ConfigCoroAI.particleShaders;
+
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();
         float f2 = ActiveRenderInfo.getRotationYZ();
@@ -323,7 +326,7 @@ public class RotatingParticleManager
         //screen door transparency
         //GL11.glEnable(GL11.GL_POLYGON_STIPPLE);
 
-        if (useShaders) {
+        if (useParticleShaders) {
             //temp render ordering setup, last to first
             //background stuff
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
@@ -362,7 +365,7 @@ public class RotatingParticleManager
         int bufferSize = 0;
         int particles = 0;
 
-        if (useShaders) {
+        if (useParticleShaders) {
             ShaderProgram shaderProgram = ShaderEngine.renderer.getShaderProgram("particle");
             transformation = ShaderEngine.renderer.transformation;
             shaderProgram.bind();
@@ -472,7 +475,7 @@ public class RotatingParticleManager
                                         this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
                                 }
 
-                                if (useShaders) {
+                                if (useParticleShaders) {
 
                                     //all VBO VertexAttribArrays must be enabled for so glDrawElementsInstanced can use them, so might as well enable all at same time
                                     mesh.initRender();
@@ -605,7 +608,7 @@ public class RotatingParticleManager
 
         forceVBO2Update = false;
 
-        if (useShaders) {
+        if (useParticleShaders) {
             ShaderEngine.renderer.getShaderProgram("particle").unbind();
         }
 
