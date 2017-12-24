@@ -19,17 +19,16 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.World;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -107,6 +106,16 @@ public class EventHandler {
             EventHandler.hookRenderShaders(event.getPartialTicks());
         }
     }
+
+    //for test added hook added in EntityRenderer.renderWorldPass, before "if (flag && this.mc.objectMouseOver"
+    /*@SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SideOnly(Side.CLIENT)
+    public void worldRender(RenderWorldBlockEvent event)
+    {
+        if (!ConfigCoroAI.useEntityRenderHookForShaders) {
+            EventHandler.hookRenderShaders(event.getPartialTicks());
+        }
+    }*/
 
     @SideOnly(Side.CLIENT)
     public static void hookRenderShaders(float partialTicks) {

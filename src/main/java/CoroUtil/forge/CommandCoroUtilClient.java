@@ -46,7 +46,8 @@ public class CommandCoroUtilClient extends CommandBase {
 	                    it.remove();
 	                }
 				} else if (var2[0].equalsIgnoreCase("reloadshaders") || var2[0].equalsIgnoreCase("rs")) {
-					RotatingParticleManager.forceShaderReset = true;
+					//RotatingParticleManager.forceShaderReset = true;
+					Minecraft.getMinecraft().refreshResources();
 				}
 				
 			}

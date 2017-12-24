@@ -124,7 +124,7 @@ public class Foliage implements IShaderRenderedEntity {
         //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getMinecraft().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
 
         float brightness;
-        brightness = CoroUtilBlockLightCache.getBrightnessCached(Minecraft.getMinecraft().world, (float)this.posX, (float)this.posY + 1, (float)this.posZ);
+        brightness = CoroUtilBlockLightCache.getBrightnessCached(Minecraft.getMinecraft().world, (float)this.posX, (float)this.posY, (float)this.posZ);
         //brightness = brightnessCache;
         //brightness = CoroUtilBlockLightCache.brightnessPlayer;
 
