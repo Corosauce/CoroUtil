@@ -48,6 +48,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite test_texture;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
 	public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
+	public static TextureAtlasSprite grass;
 	
 	public static void init(TextureStitchEvent.Pre event) {
 		
@@ -93,6 +94,7 @@ public class ParticleRegistry {
 		for (int i = 1; i <= 7; i++) {
 			listSeaweed.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/seaweed_section_" + i)));
 		}
+		grass = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/grass"));
 	}
 
 	public static void initPost(TextureStitchEvent.Post event) {

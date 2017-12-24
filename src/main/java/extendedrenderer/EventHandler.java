@@ -58,6 +58,8 @@ public class EventHandler {
 
     public boolean lastFoliageUse = ConfigCoroAI.foliageShaders;
 
+    public static boolean flagFoliageUpdate = false;
+
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void tickRenderScreen(TickEvent.RenderTickEvent event) {
@@ -92,6 +94,11 @@ public class EventHandler {
             }
 
             if (ConfigCoroAI.foliageShaders != lastFoliageUse) {
+                flagFoliageUpdate = true;
+            }
+
+            if (flagFoliageUpdate) {
+                flagFoliageUpdate = false;
                 lastFoliageUse = ConfigCoroAI.foliageShaders;
                 Minecraft.getMinecraft().refreshResources();
             }
