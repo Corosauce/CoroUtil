@@ -127,7 +127,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         rotation = new Quaternion();
 
-        brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)posX, (float)posY, (float)posZ);
+        brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
     }
 
     public boolean isSlantParticleToWind() {
@@ -202,6 +202,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public void onUpdate() {
     	super.onUpdate();
 
+        Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+
         //if (this.entityID % 400 == 0) System.out.println("onUpdate time: " + this.worldObj.getTotalWorldTime());
     	
     	if (!isVanillaMotionDampen()) {
@@ -229,7 +231,6 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
             //case: when on high pillar and rain is falling far below you, start killing it / fading it out
             if (killWhenUnderCameraAtLeast != 0) {
-                Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
                 if (this.posY < ent.posY - killWhenUnderCameraAtLeast) {
                     startDeath();
                 }
@@ -237,7 +238,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
             if (killWhenFarFromCameraAtLeast != 0) {
                 if (getAge() > 20 && getAge() % 5 == 0) {
-                    Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+
                     if (ent.getDistance(this.posX, this.posY, this.posZ) > killWhenFarFromCameraAtLeast) {
                         //System.out.println("far kill");
                         startDeath();
@@ -298,7 +299,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
 
-        updateQuaternion(null);
+        updateQuaternion(ent);
     }
 
     public void startDeath() {

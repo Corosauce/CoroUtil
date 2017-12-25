@@ -380,11 +380,13 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	@Override
 	public void updateQuaternion(Entity camera) {
 
-		if (this.facePlayer) {
-			this.rotationYaw = camera.rotationYaw;
-			this.rotationPitch = camera.rotationPitch;
-		} else if (facePlayerYaw) {
-			this.rotationYaw = camera.rotationYaw;
+		if (camera != null) {
+			if (this.facePlayer) {
+				this.rotationYaw = camera.rotationYaw;
+				this.rotationPitch = camera.rotationPitch;
+			} else if (facePlayerYaw) {
+				this.rotationYaw = camera.rotationYaw;
+			}
 		}
 
 		Quaternion qY = new Quaternion();
