@@ -11,7 +11,7 @@ import java.util.Map;
 public class MeshBufferManagerParticle {
 
     //for prebuffering allowed max
-    public static int numInstances = 100000;
+    public static int numInstances = 50000;
 
     private static HashMap<TextureAtlasSprite, InstancedMeshParticle> lookupParticleToMesh = new HashMap<>();
 

@@ -26,6 +26,6 @@ public class ShaderProgramParticle extends ShaderProgram {
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeModelMatrix+offset, "modelMatrix");
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeBrightness+offset, "brightness");
         //ShaderManager.glBindAttribLocation(programId, vertexShaderAttributeRGBA, "rgba");
-        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeRGBATest+offset, "rgbaTest");
+        ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeRGBATest+offset, "rgba");
     }
 }

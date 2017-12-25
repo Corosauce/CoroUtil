@@ -19,9 +19,9 @@ public class InstancedMeshParticle extends Mesh {
 
     public static final int MATRIX_SIZE_BYTES = MATRIX_SIZE_FLOATS * FLOAT_SIZE_BYTES;
 
-    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * 1/* * 2 + FLOAT_SIZE_BYTES * 2*/;
+    public static final int INSTANCE_SIZE_BYTES = MATRIX_SIZE_BYTES + FLOAT_SIZE_BYTES * (1 + 4)/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
-    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1;// * 2 + 2;
+    public static final int INSTANCE_SIZE_FLOATS = MATRIX_SIZE_FLOATS + 1 + 4;// * 2 + 2;
 
     public static final int INSTANCE_SIZE_BYTES_TEST = FLOAT_SIZE_BYTES * 4/* * 2 + FLOAT_SIZE_BYTES * 2*/;
 
@@ -30,10 +30,10 @@ public class InstancedMeshParticle extends Mesh {
     public final int numInstances;
 
     public final int instanceDataVBO;
-    public final int instanceDataVBOTest;
+    //public final int instanceDataVBOTest;
 
     public FloatBuffer instanceDataBuffer;
-    public FloatBuffer instanceDataBufferTest;
+    //public FloatBuffer instanceDataBufferTest;
 
     public int curBufferPos = 0;
 
@@ -82,10 +82,10 @@ public class InstancedMeshParticle extends Mesh {
          */
 
         //rgba
-        /*glVertexAttribPointer(start, 4, GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
-        strideStart += VECTOR4F_SIZE_BYTES;*/
+        strideStart += VECTOR4F_SIZE_BYTES;
 
         // Light view matrix
         /*for (int i = 0; i < 4; i++) {
@@ -100,7 +100,7 @@ public class InstancedMeshParticle extends Mesh {
         glVertexAttribDivisor(start, 1);*/
 
         //test color to its own vbo
-        instanceDataBufferTest = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_TEST);
+        /*instanceDataBufferTest = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS_TEST);
 
         FloatBuffer colorBuffer = null;
         instanceDataVBOTest = OpenGlHelper.glGenBuffers();
@@ -117,7 +117,7 @@ public class InstancedMeshParticle extends Mesh {
         ShaderManager.glBufferData(GL15.GL_ARRAY_BUFFER, colorBuffer, GL15.GL_DYNAMIC_DRAW);
         GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_TEST, 0);
         ShaderManager.glVertexAttribDivisor(start, 1);
-        start++;
+        start++;*/
 
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         ShaderManager.glBindVertexArray(0);
@@ -131,10 +131,10 @@ public class InstancedMeshParticle extends Mesh {
             this.instanceDataBuffer = null;
         }
 
-        if (this.instanceDataBufferTest != null) {
+        /*if (this.instanceDataBufferTest != null) {
             //MemoryUtil.memFree(this.instanceDataBuffer);
             this.instanceDataBufferTest = null;
-        }
+        }*/
     }
 
     @Override
@@ -151,7 +151,7 @@ public class InstancedMeshParticle extends Mesh {
     public void initRenderVBO1() {
         int start = vboSizeMesh;
         //model matrix + brightness
-        int numElements = 5;
+        int numElements = 5 + 1;
         for (int i = 0; i < numElements; i++) {
             GL20.glEnableVertexAttribArray(start + i);
         }
@@ -161,13 +161,13 @@ public class InstancedMeshParticle extends Mesh {
 
         int start = vboSizeMesh;
         //model matrix + brightness
-        int numElements = 5;
+        int numElements = 5 + 1;
         for (int i = 0; i < numElements; i++) {
             GL20.glDisableVertexAttribArray(start + i);
         }
     }
 
-    public void initRenderVBO2() {
+    /*public void initRenderVBO2() {
         int start = vboSizeMesh;
         //model matrix + brightness
         int numElementsVBO1 = 5;
@@ -185,5 +185,5 @@ public class InstancedMeshParticle extends Mesh {
         for (int i = 0; i < numElementsVBO2; i++) {
             GL20.glDisableVertexAttribArray(start + numElementsVBO1 + i);
         }
-    }
+    }*/
 }

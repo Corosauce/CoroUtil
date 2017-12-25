@@ -480,7 +480,7 @@ public class RotatingParticleManager
                                     //all VBO VertexAttribArrays must be enabled for so glDrawElementsInstanced can use them, so might as well enable all at same time
                                     mesh.initRender();
                                     mesh.initRenderVBO1();
-                                    mesh.initRenderVBO2();
+                                    //mesh.initRenderVBO2();
 
                                     //also resets position
                                     mesh.instanceDataBuffer.clear();
@@ -522,7 +522,7 @@ public class RotatingParticleManager
 
                                         //not working right yet, something not flagging it correctly, only like 10% fps gain atm anyways
                                         //actually, the dynamic render amounts used in TexExtraRender completely breaks the sync
-                                        if (true/* forceVBO2Update*/) {
+                                        /*if (true) {
                                             mesh.curBufferPos = 0;
 
                                             //test
@@ -543,7 +543,7 @@ public class RotatingParticleManager
                                             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);
                                         } else {
                                             //System.out.println("skipped render");
-                                        }
+                                        }*/
 
 
 
@@ -559,7 +559,7 @@ public class RotatingParticleManager
                                     OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
                                     mesh.endRenderVBO1();
-                                    mesh.endRenderVBO2();
+                                    //mesh.endRenderVBO2();
                                     mesh.endRender();
                                 } else {
                                     Tessellator tessellator = Tessellator.getInstance();

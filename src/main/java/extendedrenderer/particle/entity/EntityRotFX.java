@@ -532,7 +532,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         //brightness = CoroUtilBlockLightCache.brightnessPlayer;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
-        /*int rgbaIndex = 0;
+        int rgbaIndex = 0;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
@@ -540,13 +540,13 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());*/
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
         mesh.curBufferPos++;
         
     }
 
-    public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+    /*public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                             float partialTicks, float rotationX, float rotationZ,
                                             float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -563,7 +563,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
                 + (rgbaIndex++), this.getAlphaF());
 
         mesh.curBufferPos++;
-    }
+    }*/
 
 	@Override
 	public float getWindWeight() {
