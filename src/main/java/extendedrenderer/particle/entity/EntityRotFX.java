@@ -512,8 +512,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         //brightness
         float brightness;
-        brightness = CoroUtilBlockLightCache.getBrightnessCached(world, pos.x, pos.y, pos.z);
-        //brightness = brightnessCache;
+        brightness = CoroUtilBlockLightCache.getBrightnessCached(world, (float)this.posX, (float)this.posY, (float)this.posZ);
+        //brightness = -1F;
+        //brightness = CoroUtilBlockLightCache.brightnessPlayer;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
 
         /*int rgbaIndex = 0;
@@ -662,31 +663,6 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             Quaternion.mul(qY, qX, this.rotation);
         }
     }
-
-    /**
-     * Costly method, use cached value
-     *
-     * @param pos
-     * @param partialTicks
-     * @return
-     */
-    /*public float getBrightnessNonLightmap(BlockPos pos, float partialTicks) {
-        //TODO: performance test light getting methods
-        //BlockPos posB = new BlockPos(pos.x, pos.y, pos.z);
-        float brightnessSky = worldObj.getSunBrightness(partialTicks);
-        float brightnessBlock = worldObj.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, pos) / 15F;
-
-        float brightness = brightnessSky;
-        if (brightnessBlock > brightnessSky) {
-            brightness = brightnessBlock;
-        }
-        return brightness;
-
-    }
-
-    public float getBrightnessCached() {
-        return brightnessCache;
-    }*/
 
     @Override
     public void setRBGColorF(float particleRedIn, float particleGreenIn, float particleBlueIn) {

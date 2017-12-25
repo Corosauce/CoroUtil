@@ -128,10 +128,10 @@ public class Foliage implements IShaderRenderedEntity {
         //brightness = brightnessCache;
         //brightness = CoroUtilBlockLightCache.brightnessPlayer;
 
-        int r = (int)(0.2F * 255.0F);
+        /*int r = (int)(0.2F * 255.0F);
         int g = (int)(0.2F * 255.0F);
         int b = (int)(1F * 255.0F);
-        float brightnessTest = -16777216 | r << 16 | g << 8 | b;
+        float brightnessTest = -16777216 | r << 16 | g << 8 | b;*/
 
         //brightness = -0.1F;
         //brightness = brightnessTest;
