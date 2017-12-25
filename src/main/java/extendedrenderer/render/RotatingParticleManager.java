@@ -493,10 +493,14 @@ public class RotatingParticleManager
                                                 if (particle instanceof EntityRotFX) {
                                                     EntityRotFX part = (EntityRotFX) particle;
 
-                                                    part.updateQuaternion(entityIn);
+
 
                                                     //CoroUtilMath.rotation(part.rotation, (float)Math.toRadians(-part.rotationPitch), (float)Math.toRadians(-part.rotationYaw), 0);
                                                     part.renderParticleForShader(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
+
+                                                    //temp hack
+                                                    /*mesh.curBufferPos--;
+                                                    part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);*/
 
                                                 }
                                             }
@@ -508,13 +512,17 @@ public class RotatingParticleManager
 
                                             OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBO);
                                             ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBuffer, GL_DYNAMIC_DRAW);
+
+                                            //temp hack
+                                            /*OpenGlHelper.glBindBuffer(GL_ARRAY_BUFFER, mesh.instanceDataVBOTest);
+                                            ShaderManager.glBufferData(GL_ARRAY_BUFFER, mesh.instanceDataBufferTest, GL_DYNAMIC_DRAW);*/
                                         }
 
 
 
                                         //not working right yet, something not flagging it correctly, only like 10% fps gain atm anyways
                                         //actually, the dynamic render amounts used in TexExtraRender completely breaks the sync
-                                        if (true || forceVBO2Update) {
+                                        if (true/* forceVBO2Update*/) {
                                             mesh.curBufferPos = 0;
 
                                             //test
@@ -522,8 +530,8 @@ public class RotatingParticleManager
                                                 if (particle instanceof EntityRotFX) {
                                                     EntityRotFX part = (EntityRotFX) particle;
 
-                                                    part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
 
+                                                    part.renderParticleForShaderTest(mesh, transformation, viewMatrix, entityIn, partialTicks, f, f4, f1, f2, f3);
                                                 }
                                             }
 

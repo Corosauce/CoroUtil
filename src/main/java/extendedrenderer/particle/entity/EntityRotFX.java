@@ -92,6 +92,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public int killWhenUnderCameraAtLeast = 0;
 
+    public int killWhenFarFromCameraAtLeast = 0;
+
     private float ticksFadeOutMaxOnDeath = -1;
     private float ticksFadeOutCurOnDeath = 0;
     protected boolean fadingOut = false;
@@ -232,6 +234,16 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
                     startDeath();
                 }
             }
+
+            if (killWhenFarFromCameraAtLeast != 0) {
+                if (getAge() > 20 && getAge() % 5 == 0) {
+                    Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+                    if (ent.getDistance(this.posX, this.posY, this.posZ) > killWhenFarFromCameraAtLeast) {
+                        //System.out.println("far kill");
+                        startDeath();
+                    }
+                }
+            }
         }
 
     	if (!collisionSpeedDampen) {
@@ -273,7 +285,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         }
 
         if (world.getTotalWorldTime() % 5 == 0) {
-            brightnessCache = CoroUtilBlockLightCache.getBrightnessNonLightmap(world, (float)posX, (float)posY, (float)posZ);
+            brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
         }
 
         rotationAroundCenter += rotationSpeedAroundCenter;
@@ -285,6 +297,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
+
+        updateQuaternion(null);
     }
 
     public void startDeath() {
@@ -512,7 +526,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         //brightness
         float brightness;
-        brightness = CoroUtilBlockLightCache.getBrightnessCached(world, (float)this.posX, (float)this.posY, (float)this.posZ);
+        //brightness = CoroUtilBlockLightCache.getBrightnessCached(world, (float)this.posX, (float)this.posY, (float)this.posZ);
+        brightness = brightnessCache;
         //brightness = -1F;
         //brightness = CoroUtilBlockLightCache.brightnessPlayer;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
@@ -646,11 +661,13 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public void updateQuaternion(Entity camera) {
 
-        if (this.facePlayer) {
-            this.rotationYaw = camera.rotationYaw;
-            this.rotationPitch = camera.rotationPitch;
-        } else if (facePlayerYaw) {
-            this.rotationYaw = camera.rotationYaw;
+        if (camera != null) {
+            if (this.facePlayer) {
+                this.rotationYaw = camera.rotationYaw;
+                this.rotationPitch = camera.rotationPitch;
+            } else if (facePlayerYaw) {
+                this.rotationYaw = camera.rotationYaw;
+            }
         }
 
         Quaternion qY = new Quaternion();
