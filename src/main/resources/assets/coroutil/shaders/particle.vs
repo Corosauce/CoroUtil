@@ -1,5 +1,5 @@
-#version 120
-
+#version 130
+#extension GL_EXT_gpu_shader4 : enable
 
 attribute vec3 position;
 attribute vec2 texCoord;
@@ -11,7 +11,7 @@ attribute vec4 rgba;
 //in vec2 texOffset;
 
 varying vec2 outTexCoord;
-flat varying float outBrightness;
+//flat varying float outBrightness;
 varying vec4 outRGBA;
 
 uniform mat4 modelViewMatrixCamera;
@@ -36,7 +36,9 @@ void main()
     //float y = (texCoord.y / numRows + texOffset.y);
 
 	outTexCoord = texCoord;
-	outBrightness = brightness;
+	//outBrightness = brightness;
+	int lightMap = int(brightness);
+	vec3 texMap = vec3(float((lightMap >> 16) & 255) / 255.0, float((lightMap >> 8) & 255) / 255.0, float(lightMap & 255) / 255.0);
 
 	//temp
 	//rgba.x = 1;
@@ -45,4 +47,7 @@ void main()
 	//rgba.w = 1;
 
 	outRGBA = rgba;
+	outRGBA.x = rgba.x * texMap.x;
+    outRGBA.y = rgba.y * texMap.y;
+    outRGBA.z = rgba.z * texMap.z;
 }

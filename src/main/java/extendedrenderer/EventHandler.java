@@ -124,6 +124,16 @@ public class EventHandler {
         }
     }*/
 
+    public static boolean queryUseOfShaders() {
+        RotatingParticleManager.useShaders = ShaderManager.canUseShadersInstancedRendering();
+
+        if (ConfigCoroAI.forceShadersOff) {
+            RotatingParticleManager.useShaders = false;
+        }
+
+        return RotatingParticleManager.useShaders;
+    }
+
     @SideOnly(Side.CLIENT)
     public static void hookRenderShaders(float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
@@ -159,11 +169,7 @@ public class EventHandler {
 
 
 
-            RotatingParticleManager.useShaders = ShaderManager.canUseShadersInstancedRendering();
-
-            if (ConfigCoroAI.forceShadersOff) {
-                RotatingParticleManager.useShaders = false;
-            }
+            queryUseOfShaders();
 
             if (RotatingParticleManager.forceShaderReset) {
                 RotatingParticleManager.forceShaderReset = false;

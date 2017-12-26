@@ -1,7 +1,8 @@
-#version 120
+#version 130
+#extension GL_EXT_gpu_shader4 : enable
 
-in int gl_VertexID;
-in int gl_InstanceID;
+//in int gl_VertexID;
+//in int gl_InstanceID;
 //seldom changing or 1 time use data - non instanced:
 attribute vec3 position; //mesh pos
 attribute vec2 texCoord;
@@ -14,7 +15,7 @@ attribute vec4 meta;
 attribute vec2 alphaBrightness;
 
 varying vec2 outTexCoord;
-flat varying float outBrightness;
+//flat varying float outBrightness;
 varying vec4 outRGBA;
 varying float outAlphaInt;
 
@@ -219,8 +220,10 @@ void main()
 
 	outTexCoord = texCoord;
 
-	outBrightness = alphaBrightness.y;
+	//outBrightness = alphaBrightness.y;
+	int lightMap = int(alphaBrightness.y);
+    vec3 texMap = vec3(float((lightMap >> 16) & 255) / 255.0, float((lightMap >> 8) & 255) / 255.0, float(lightMap & 255) / 255.0);
 
-	outRGBA = vec4(rgba.x, rgba.y, rgba.z, alphaBrightness.x);
+	outRGBA = vec4(rgba.x * texMap.x, rgba.y * texMap.y, rgba.z * texMap.z, alphaBrightness.x);
 	//outAlphaInt = 255 - int(outRGBA.w * 255);
 }

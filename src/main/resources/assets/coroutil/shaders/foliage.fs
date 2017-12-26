@@ -1,12 +1,11 @@
-#version 120
-#extension GL_EXT_gpu_shader4 : enable
+#version 130
 
 uniform sampler2D texture_sampler;
 uniform int fogmode;
 //uniform int stipple[64];
 
 varying vec2 outTexCoord;
-flat varying float outBrightness;
+//flat varying float outBrightness;
 varying vec4 outRGBA;
 //varying float outAlphaInt;
 
@@ -40,14 +39,14 @@ void main()
     int ll = lightmapColors[i] >> 8 & 255;
     int ii = lightmapColors[i] & 255;*/
 
-    int lightMap = int(outBrightness);
+    //int lightMap = int(outBrightness);
     //full 1 1 1
     //lightMap = -1;
     //mostly blue
     //lightMap = -13421569;
-    float r = float((lightMap >> 16) & 255) / 255.0;
+    /*float r = float((lightMap >> 16) & 255) / 255.0;
     float g = float((lightMap >> 8) & 255) / 255.0;
-    float b = float(lightMap & 255) / 255.0;
+    float b = float(lightMap & 255) / 255.0;*/
 
     /*r = 0.2F;
     g = 0.2F;
@@ -58,9 +57,9 @@ void main()
     float b = 1F;*/
 
     vec4 fragColor = texture2D(texture_sampler, outTexCoord);
-	fragColor.x *= outRGBA.x * r;
-	fragColor.y *= outRGBA.y * g;
-	fragColor.z *= outRGBA.z * b;
+	fragColor.x *= outRGBA.x;
+	fragColor.y *= outRGBA.y;
+	fragColor.z *= outRGBA.z;
 	fragColor.w *= outRGBA.w;
 
 	/*if (stipple[1] == 0) {
