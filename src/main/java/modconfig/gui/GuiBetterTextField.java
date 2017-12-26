@@ -11,6 +11,7 @@ import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -449,7 +450,7 @@ public class GuiBetterTextField extends Gui
     /**
      * Args: x, y, buttonClicked
      */
-    public void mouseClicked(int par1, int par2, int par3)
+    public void mouseClicked(int par1, int par2, int eventButton)
     {
         boolean flag = par1 >= this.xPos && par1 < this.xPos + this.width && par2 >= this.yPos && par2 < this.yPos + this.height;
 
@@ -458,7 +459,7 @@ public class GuiBetterTextField extends Gui
             this.setFocused(this.isEnabled && flag);
         }
 
-        if (this.isFocused && par3 == 0)
+        if (this.isFocused && eventButton == 0)
         {
             int l = par1 - this.xPos;
 
@@ -469,6 +470,16 @@ public class GuiBetterTextField extends Gui
 
             String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
             this.setCursorPosition(this.fontRenderer.trimStringToWidth(s, l).length() + this.lineScrollOffset);
+
+            if (flag && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
+                //right click boolean toggle
+                if (text.equals("true")) {
+                    text = "false";
+                } else if (text.equals("false")) {
+                    text = "true";
+                }
+                this.setCursorPosition(0);
+            }
         }
     }
 
