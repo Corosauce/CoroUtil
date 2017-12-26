@@ -301,7 +301,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			float brightness;
 			//brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
 			//brightness = this.brightnessCache;
-			brightness = CoroUtilBlockLightCache.brightnessPlayer;
+			if (fastLight) {
+				brightness = CoroUtilBlockLightCache.brightnessPlayer;
+			} else {
+				brightness = CoroUtilBlockLightCache.getBrightnessCached(world, (float)this.posX, (float)this.posY, (float)this.posZ);
+			}
 
 			//brightness to buffer
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
