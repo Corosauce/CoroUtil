@@ -274,6 +274,7 @@ public class FoliageRenderer {
 
             if (mesh == null) {
                 System.out.println("NULL MESH FOR: " + entry.getKey().toString());
+                continue;
             }
 
             mesh.initRender();

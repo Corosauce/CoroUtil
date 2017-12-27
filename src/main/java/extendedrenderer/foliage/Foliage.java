@@ -177,7 +177,7 @@ public class Foliage implements IShaderRenderedEntity {
                 mesh.instanceDataBufferVBO1 = newBuffer;
                 //mesh.instanceDataBufferVBO1.position(mesh.curBufferPosVBO1 * InstancedMeshFoliage.INSTANCE_SIZE_FLOATS);
             } else {
-                System.out.println("hitting max mesh count");
+                //System.out.println("hitting max mesh count");
                 return;
             }
         }
