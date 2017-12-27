@@ -129,7 +129,7 @@ public class CoroUtil {
     
     public static void initTry() {
     	if (initProperNeededForInstance) {
-    		System.out.println("CoroUtil being reinitialized");
+    		CULog.log("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
 	    	PetsManager.instance().nbtReadFromDisk();

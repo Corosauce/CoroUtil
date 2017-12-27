@@ -1,12 +1,10 @@
 package extendedrenderer.shader;
 
 import extendedrenderer.particle.ShaderManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
 
@@ -75,7 +73,7 @@ public class InstancedMeshFoliage extends Mesh {
         int strideStart = 0;
 
         //alpha, brightness
-        GL20.glVertexAttribPointer(start, 2, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        ShaderManager.glVertexAttribPointer(start, 2, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += FLOAT_SIZE_BYTES;
@@ -99,20 +97,20 @@ public class InstancedMeshFoliage extends Mesh {
 
         // Model Matrix
         for (int i = 0; i < 4; i++) {
-            GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+            ShaderManager.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
             ShaderManager.glVertexAttribDivisor(start, 1);
             start++;
             strideStart += VECTOR4F_SIZE_BYTES;
         }
 
         //red, green, blue, rotation
-        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;
 
         //instance index, animation ID, height index
-        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
+        ShaderManager.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES_SELDOM, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;
@@ -174,28 +172,28 @@ public class InstancedMeshFoliage extends Mesh {
     public void initRenderVBO1() {
         int start = vboSizeMesh;
         for (int i = 0; i < getAttribSizeVBO1(); i++) {
-            GL20.glEnableVertexAttribArray(start + i);
+            ShaderManager.glEnableVertexAttribArray(start + i);
         }
     }
 
     public void endRenderVBO1() {
         int start = vboSizeMesh;
         for (int i = 0; i < getAttribSizeVBO1(); i++) {
-            GL20.glDisableVertexAttribArray(start + i);
+            ShaderManager.glDisableVertexAttribArray(start + i);
         }
     }
 
     public void initRenderVBO2() {
         int start = vboSizeMesh;
         for (int i = 0; i < getAttribSizeVBO2(); i++) {
-            GL20.glEnableVertexAttribArray(start + getAttribSizeVBO1() + i);
+            ShaderManager.glEnableVertexAttribArray(start + getAttribSizeVBO1() + i);
         }
     }
 
     public void endRenderVBO2() {
         int start = vboSizeMesh;
         for (int i = 0; i < getAttribSizeVBO2(); i++) {
-            GL20.glDisableVertexAttribArray(start + getAttribSizeVBO1() + i);
+            ShaderManager.glDisableVertexAttribArray(start + getAttribSizeVBO1() + i);
         }
     }
 }

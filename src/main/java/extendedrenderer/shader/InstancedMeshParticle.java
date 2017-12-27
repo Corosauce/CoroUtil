@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
 
@@ -61,7 +60,7 @@ public class InstancedMeshParticle extends Mesh {
         int start = vboSizeMesh;
         int strideStart = 0;
         for (int i = 0; i < 4; i++) {
-            GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+            ShaderManager.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
             ShaderManager.glVertexAttribDivisor(start, 1);
             start++;
             strideStart += VECTOR4F_SIZE_BYTES;
@@ -69,7 +68,7 @@ public class InstancedMeshParticle extends Mesh {
 
         //TODO: might become UV lightmap coord in future
         //brightness
-        GL20.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        ShaderManager.glVertexAttribPointer(start, 1, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += FLOAT_SIZE_BYTES;
@@ -82,7 +81,7 @@ public class InstancedMeshParticle extends Mesh {
          */
 
         //rgba
-        GL20.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
+        ShaderManager.glVertexAttribPointer(start, 4, GL11.GL_FLOAT, false, INSTANCE_SIZE_BYTES, strideStart);
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;
         strideStart += VECTOR4F_SIZE_BYTES;
@@ -153,7 +152,7 @@ public class InstancedMeshParticle extends Mesh {
         //model matrix + brightness
         int numElements = 5 + 1;
         for (int i = 0; i < numElements; i++) {
-            GL20.glEnableVertexAttribArray(start + i);
+            ShaderManager.glEnableVertexAttribArray(start + i);
         }
     }
 
@@ -163,7 +162,7 @@ public class InstancedMeshParticle extends Mesh {
         //model matrix + brightness
         int numElements = 5 + 1;
         for (int i = 0; i < numElements; i++) {
-            GL20.glDisableVertexAttribArray(start + i);
+            ShaderManager.glDisableVertexAttribArray(start + i);
         }
     }
 

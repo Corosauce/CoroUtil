@@ -1,5 +1,6 @@
 package extendedrenderer.particle;
 
+import CoroUtil.forge.CULog;
 import org.lwjgl.opengl.*;
 
 import java.nio.FloatBuffer;
@@ -25,6 +26,7 @@ public class ShaderManager {
     private static boolean useARBInstancedRendering = false;
     private static boolean useARBShaders = false;
     private static boolean useARBVBO = false;
+    private static boolean useARBVAO = false;
     private static boolean useARBInstancedArrays = false;
 
     public static boolean canUseShadersInstancedRendering() {
@@ -43,11 +45,14 @@ public class ShaderManager {
     public static void queryGLCaps() {
         ContextCapabilities contextcapabilities = GLContext.getCapabilities();
 
-        System.out.println("Extended Renderer: detected GLSL version: " + GL11.glGetString(GL_SHADING_LANGUAGE_VERSION));
+        CULog.log("Extended Renderer: Detected GLSL version: " + GL11.glGetString(GL_SHADING_LANGUAGE_VERSION));
 
         useARBVBO = !contextcapabilities.OpenGL15 && contextcapabilities.GL_ARB_vertex_buffer_object;
 
-        if (contextcapabilities.OpenGL21 || contextcapabilities.GL_ARB_vertex_shader && contextcapabilities.GL_ARB_fragment_shader && contextcapabilities.GL_ARB_shader_objects) {
+        if (contextcapabilities.OpenGL21 ||
+                (contextcapabilities.GL_ARB_vertex_shader &&
+                contextcapabilities.GL_ARB_fragment_shader &&
+                contextcapabilities.GL_ARB_shader_objects)) {
             canUseShaders = true;
 
             if (contextcapabilities.OpenGL21) {
@@ -56,15 +61,20 @@ public class ShaderManager {
                 useARBShaders = true;
             }
 
-            if (contextcapabilities.OpenGL33 || (contextcapabilities.GL_ARB_draw_instanced && contextcapabilities.GL_ARB_instanced_arrays)) {
+            if (contextcapabilities.OpenGL33 ||
+                    (contextcapabilities.GL_ARB_draw_instanced &&
+                    contextcapabilities.GL_ARB_instanced_arrays &&
+                    contextcapabilities.GL_ARB_vertex_array_object)) {
                 canUseShadersInstancedRendering = true;
 
                 if (contextcapabilities.OpenGL33) {
                     useARBInstancedRendering = false;
                     useARBInstancedArrays = false;
+                    useARBVAO = false;
                 } else {
                     useARBInstancedRendering = true;
                     useARBInstancedArrays = true;
+                    useARBVAO = true;
                 }
             } else {
                 System.out.println("Extended Renderer WARNING: Unable to use instanced rendering shaders, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
@@ -106,6 +116,30 @@ public class ShaderManager {
         }
     }
 
+    public static void glVertexAttribPointer(int index, int size, int type, boolean normalized, int stride, long buffer_buffer_offset) {
+        if (useARBShaders) {
+            ARBVertexShader.glVertexAttribPointerARB(index, size, type, normalized, stride, buffer_buffer_offset);
+        } else {
+            GL20.glVertexAttribPointer(index, size, type, normalized, stride, buffer_buffer_offset);
+        }
+    }
+
+    public static void glEnableVertexAttribArray(int index) {
+        if (useARBShaders) {
+            ARBVertexShader.glEnableVertexAttribArrayARB(index);
+        } else {
+            GL20.glEnableVertexAttribArray(index);
+        }
+    }
+
+    public static void glDisableVertexAttribArray(int index) {
+        if (useARBShaders) {
+            ARBVertexShader.glDisableVertexAttribArrayARB(index);
+        } else {
+            GL20.glDisableVertexAttribArray(index);
+        }
+    }
+
     public static void glBufferData(int target, FloatBuffer data, int usage) {
         if (useARBVBO) {
             ARBVertexBufferObject.glBufferDataARB(target, data, usage);
@@ -131,7 +165,7 @@ public class ShaderManager {
     }
 
     public static void glBindVertexArray(int array) {
-        if (useARBVBO) {
+        if (useARBVAO) {
             ARBVertexArrayObject.glBindVertexArray(array);
         } else {
             GL30.glBindVertexArray(array);
@@ -139,10 +173,18 @@ public class ShaderManager {
     }
 
     public static void glDeleteVertexArrays(int array) {
-        if (useARBVBO) {
+        if (useARBVAO) {
             ARBVertexArrayObject.glDeleteVertexArrays(array);
         } else {
             GL30.glDeleteVertexArrays(array);
+        }
+    }
+
+    public static int glGenVertexArrays() {
+        if (useARBVAO) {
+            return ARBVertexArrayObject.glGenVertexArrays();
+        } else {
+            return GL30.glGenVertexArrays();
         }
     }
 

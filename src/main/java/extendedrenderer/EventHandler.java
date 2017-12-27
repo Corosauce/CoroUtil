@@ -1,6 +1,7 @@
 package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.FoliageRenderer;
@@ -142,7 +143,7 @@ public class EventHandler {
 
         //update world reference and clear old effects on world change or on no world
         if (lastWorld != mc.world) {
-            CoroUtil.dbg("CoroUtil: resetting rotating particle renderer");
+            CULog.log("CoroUtil: resetting rotating particle renderer");
             ExtendedRenderer.rotEffRenderer.clearEffects(mc.world);
             lastWorld = mc.world;
         }
@@ -172,6 +173,9 @@ public class EventHandler {
             queryUseOfShaders();
 
             if (RotatingParticleManager.forceShaderReset) {
+
+                CULog.log("Extended Renderer: Resetting shaders");
+
                 RotatingParticleManager.forceShaderReset = false;
                 ShaderEngine.cleanup();
                 ShaderListenerRegistry.postReset();
@@ -185,10 +189,13 @@ public class EventHandler {
             if (RotatingParticleManager.useShaders && ShaderEngine.renderer == null) {
                 //currently for if shader compiling fails, which is an ongoing issue for some machines...
                 if (!ShaderEngine.init()) {
+
+                    CULog.log("Extended Renderer: Shaders failed to initialize");
+
                     ShaderManager.disableShaders();
                     RotatingParticleManager.useShaders = false;
                 } else {
-                    System.out.println("Extended Renderer: Initialized instanced rendering shaders");
+                    CULog.log("Extended Renderer: Initialized instanced rendering shaders");
                     ShaderListenerRegistry.postInit();
                 }
             }

@@ -5,8 +5,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL30;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -66,8 +64,9 @@ public class Mesh {
 
 
             // Create the VAO and bind to it
-            vaoId = GL30.glGenVertexArrays();
-            GL30.glBindVertexArray(vaoId);
+            //if (true) throw new IllegalStateException();
+            vaoId = ShaderManager.glGenVertexArrays();
+            ShaderManager.glBindVertexArray(vaoId);
 
 
 
@@ -79,7 +78,7 @@ public class Mesh {
             OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, posVboId);
             ShaderManager.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer, GL15.GL_STATIC_DRAW);
             // Define structure of the data
-            GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+            ShaderManager.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
             //might not be needed, but added when downgrading to GLSL 120
             //glEnableVertexAttribArray(0);
 
@@ -90,7 +89,7 @@ public class Mesh {
             textCoordsBuffer.put(textCoords).flip();
             OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, texVboId);
             ShaderManager.glBufferData(GL15.GL_ARRAY_BUFFER, textCoordsBuffer, GL15.GL_STATIC_DRAW);
-            GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
+            ShaderManager.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 0, 0);
 
             //????
             //glEnableVertexAttribArray(1);
@@ -134,7 +133,7 @@ public class Mesh {
             OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
             // Unbind the VAO
-            GL30.glBindVertexArray(0);
+            ShaderManager.glBindVertexArray(0);
         } finally {
             /**
              * TODO: test if we need to actually free the memory since we have to use BufferUtils.createFloatBuffer instead of MemoryUtil.memAllocFloat
@@ -166,9 +165,9 @@ public class Mesh {
         }*/
 
         // Draw the mesh
-        GL30.glBindVertexArray(getVaoId());
-        GL20.glEnableVertexAttribArray(0);
-        GL20.glEnableVertexAttribArray(1);
+        ShaderManager.glBindVertexArray(getVaoId());
+        ShaderManager.glEnableVertexAttribArray(0);
+        ShaderManager.glEnableVertexAttribArray(1);
         //glEnableVertexAttribArray(2);
         //glEnableVertexAttribArray(3);
         //glEnableVertexAttribArray(4);
@@ -176,12 +175,12 @@ public class Mesh {
 
     protected void endRender() {
         // Restore state
-        GL20.glDisableVertexAttribArray(0);
-        GL20.glDisableVertexAttribArray(1);
+        ShaderManager.glDisableVertexAttribArray(0);
+        ShaderManager.glDisableVertexAttribArray(1);
         //glDisableVertexAttribArray(2);
         //glDisableVertexAttribArray(3);
         //glDisableVertexAttribArray(4);
-        GL30.glBindVertexArray(0);
+        ShaderManager.glBindVertexArray(0);
 
         //glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -221,7 +220,7 @@ public class Mesh {
     }
 
     public void cleanup() {
-        GL20.glDisableVertexAttribArray(0);
+        ShaderManager.glDisableVertexAttribArray(0);
 
         // Delete the VBO
         OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
