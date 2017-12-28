@@ -109,6 +109,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public Quaternion rotation;
 
+    //set to true for direct quaternion control, not EULER conversion helper
+    public boolean quatControl = false;
+
     public boolean fastLight = false;
 
     public float brightnessCache = 0.5F;
@@ -309,7 +312,10 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         }
 
         Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
-        updateQuaternion(ent);
+
+        if (!quatControl) {
+            updateQuaternion(ent);
+        }
     }
 
     public void startDeath() {
