@@ -123,6 +123,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public boolean isCollidedHorizontally = false;
     public boolean isCollidedVerticallyDownwards = false;
     public boolean isCollidedVerticallyUpwards = false;
+    
+    //used for translational rotation around a point
+    public Vector3f rotationAround = new Vector3f();
 
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
