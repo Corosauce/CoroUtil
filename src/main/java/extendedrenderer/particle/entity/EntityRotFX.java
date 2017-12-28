@@ -108,6 +108,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public Quaternion rotation;
 
+    //set to true for direct quaternion control, not EULER conversion helper
+    public boolean quatControl = false;
+
     public boolean fastLight = false;
 
     public float brightnessCache = 0.5F;
@@ -299,7 +302,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
 
-        updateQuaternion(ent);
+        if (!quatControl) {
+            updateQuaternion(ent);
+        }
     }
 
     public void startDeath() {
