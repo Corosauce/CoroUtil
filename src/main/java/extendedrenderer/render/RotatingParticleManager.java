@@ -425,17 +425,20 @@ public class RotatingParticleManager
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
 
-            InstancedMeshParticle mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+            InstancedMeshParticle mesh = null;
 
             //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.rain_white_trans) continue;
 
-            //TODO: register if missing, maybe relocate this
-            if (mesh == null) {
-                MeshBufferManagerParticle.setupMeshForParticle(entry1.getKey());
+            if (useParticleShaders) {
                 mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+                //TODO: register if missing, maybe relocate this
+                if (mesh == null) {
+                    MeshBufferManagerParticle.setupMeshForParticle(entry1.getKey());
+                    mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+                }
             }
 
-            if (mesh != null) {
+            if (mesh != null || !useParticleShaders) {
                 //do cloud layer, then funnel layer
                 for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
                     //do each texture mode, 0 and 1 are the only ones used now

@@ -77,13 +77,14 @@ public class ShaderManager {
                     useARBVAO = true;
                 }
             } else {
-                System.out.println("Extended Renderer WARNING: Unable to use instanced rendering shaders, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
+                CULog.log("Extended Renderer WARNING: Unable to use instanced rendering shaders, OpenGL33: " + contextcapabilities.OpenGL33 + ", (" +
                         "GL_ARB_draw_instanced: " + contextcapabilities.GL_ARB_draw_instanced + ", " +
-                        "GL_ARB_instanced_arrays: " + contextcapabilities.GL_ARB_instanced_arrays + ")");
+                        "GL_ARB_instanced_arrays: " + contextcapabilities.GL_ARB_instanced_arrays + ", " +
+                        "GL_ARB_vertex_array_object: " + contextcapabilities.GL_ARB_vertex_array_object + ")");
                 canUseShadersInstancedRendering = false;
             }
         } else {
-            System.out.println("Extended Renderer WARNING: Unable to use shaders, OpenGL21: " + contextcapabilities.OpenGL21 + ", (" +
+            CULog.log("Extended Renderer WARNING: Unable to use shaders, OpenGL21: " + contextcapabilities.OpenGL21 + ", (" +
                     "GL_ARB_vertex_shader: " + contextcapabilities.GL_ARB_vertex_shader + ", " +
                     "GL_ARB_fragment_shader: " + contextcapabilities.GL_ARB_fragment_shader + ", " +
                     "GL_ARB_shader_objects: " + contextcapabilities.GL_ARB_shader_objects + ")");
