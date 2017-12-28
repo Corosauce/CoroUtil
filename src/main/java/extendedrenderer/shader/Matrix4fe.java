@@ -830,4 +830,29 @@ public class Matrix4fe extends Matrix4f {
         this._properties(2);
         return this;
     }
+
+    public Vector3f getTranslation() {
+        return new Vector3f(m30(), m31(), m32());
+    }
+
+    public org.lwjgl.util.vector.Matrix4f toLWJGLMathMatrix() {
+        org.lwjgl.util.vector.Matrix4f mat = new org.lwjgl.util.vector.Matrix4f();
+        mat.m00 = this.m00;
+        mat.m01 = this.m01;
+        mat.m02 = this.m02;
+        mat.m03 = this.m03;
+        mat.m10 = this.m10;
+        mat.m11 = this.m11;
+        mat.m12 = this.m12;
+        mat.m13 = this.m13;
+        mat.m20 = this.m20;
+        mat.m21 = this.m21;
+        mat.m22 = this.m22;
+        mat.m23 = this.m23;
+        mat.m30 = this.m30;
+        mat.m31 = this.m31;
+        mat.m32 = this.m32;
+        mat.m33 = this.m33;
+        return mat;
+    }
 }
