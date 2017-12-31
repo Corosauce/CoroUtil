@@ -11,6 +11,9 @@ public class CoroUtilCompatibility {
     private static boolean tanInstalled = false;
     private static boolean checkTAN = true;
 
+    private static Class class_SeasonASMHelper = null;
+    private static Method method_getFloatTemperature = null;
+
     public static boolean shouldSnowAt(World world, BlockPos pos) {
         /**
          * ISeasonData data = SeasonHelper.getSeasonData(world);
@@ -26,24 +29,20 @@ public class CoroUtilCompatibility {
 
     public static float getAdjustedTemperature(World world, Biome biome, BlockPos pos) {
 
-        //TODO: cache method/class reference, and maybe results in a blockpos,float hashmap for a second or 2
+        //TODO: consider caching results in a blockpos,float hashmap for a second or 2
         if (isTANInstalled()) {
             try {
-                Class clazz = Class.forName("toughasnails.season.SeasonASMHelper");
-                Method method = clazz.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
-                return (float)method.invoke(null, biome, pos);
-                //ReflectionHelper.findMethod()
+                if (method_getFloatTemperature == null) {
+                    method_getFloatTemperature = class_SeasonASMHelper.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
+                }
+                return (float)method_getFloatTemperature.invoke(null, biome, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return biome.getFloatTemperature(pos);
             }
-            //Method method = Clas
         } else {
             return biome.getFloatTemperature(pos);
         }
-        //float temp = SeasonASMHelper.getFloatTemperature(biome, pos)
-
-
     }
 
     /**
@@ -55,8 +54,8 @@ public class CoroUtilCompatibility {
         if (checkTAN) {
             try {
                 checkTAN = false;
-                Class clazz = Class.forName("toughasnails.season.SeasonASMHelper");
-                if (clazz != null) {
+                class_SeasonASMHelper = Class.forName("toughasnails.season.SeasonASMHelper");
+                if (class_SeasonASMHelper != null) {
                     tanInstalled = true;
                 }
             } catch (Exception ex) {
