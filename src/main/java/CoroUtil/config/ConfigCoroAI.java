@@ -51,6 +51,9 @@ public class ConfigCoroAI implements IConfigCategory {
 
 	public static boolean foliageShaders = true;
 	public static boolean particleShaders = true;
+	public static boolean useLoggingLog = true;
+	public static boolean useLoggingDebug = false;
+	public static boolean useLoggingError = true;
 
 	@Override
 	public String getName() {
