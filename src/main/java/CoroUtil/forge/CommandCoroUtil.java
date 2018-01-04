@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
@@ -18,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -188,29 +191,61 @@ public class CommandCoroUtil extends CommandBase {
 	                    it.remove();
 	                }
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
-	        		String param = null;
-	        		//int dim = world.provider.getDimension();
-	        		int indexStart = 0;
-	        		
-	        		String fullCommand = "";
-	        		for (String entry : var2) {
-	        			fullCommand += entry + " ";
-	        		}
-	        		boolean simple = true;
+					String param = null;
+					//int dim = world.provider.getDimension();
+					int indexStart = 0;
+
+					String fullCommand = "";
+					for (String entry : var2) {
+						fullCommand += entry + " ";
+					}
+					boolean simple = true;
 	        		/*if (fullCommand.contains(" simple")) {
 	        			simple = true;
 	        		} else {*/
-	        			//using index start instead of dimension
-	        			if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
-		        		if (var2.length > 2) param = var2[2];
-	        		//}
-	        		List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
-	                
-	        		CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
-	        		for (String entry : data) {
-	        			CoroUtilMisc.sendCommandSenderMsg(var1, entry);
-	        		}
-	        	}
+					//using index start instead of dimension
+					if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
+					if (var2.length > 2) param = var2[2];
+					//}
+					List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
+
+					CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
+					for (String entry : data) {
+						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
+					}
+				} else if (var2[0].equals("testaabb")) {
+
+				    //added to track down what block from a mod is returning a null AABB that crashes pathfinder
+
+                    System.out.println("");
+                    System.out.println("TRY 1");
+                    System.out.println("");
+                    for (Block block : Block.REGISTRY) {
+					    for (IBlockState state : block.getBlockState().getValidStates()) {
+                            AxisAlignedBB aabb = block.getBoundingBox(state, world, new BlockPos(0, 64, 0));
+                            if (aabb != null) {
+                                System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
+                            } else {
+                                System.out.println("NULL AABB FOR: " + block.getRegistryName() + " aabb: " + aabb);
+                            }
+                        }
+
+					}
+
+                    System.out.println("");
+                    System.out.println("TRY 2");
+                    System.out.println("");
+                    for (Block block : Block.REGISTRY) {
+                        for (IBlockState state : block.getBlockState().getValidStates()) {
+                            AxisAlignedBB aabb = state.getBoundingBox(world, new BlockPos(0, 64, 0));
+                            if (aabb != null) {
+                                System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
+                            } else {
+                                System.out.println("NULL AABB FOR: " + block.getRegistryName() + " aabb: " + aabb);
+                            }
+                        }
+                    }
+				}
 			/*}*/
 		} catch (Exception ex) {
 			System.out.println("Exception handling CoroUtil command");
