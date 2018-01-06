@@ -5,6 +5,7 @@ import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.InstancedMeshParticle;
 import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
@@ -59,30 +60,21 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	}
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
-
-
-		/*int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
-		if (this.posY <= height) this.setExpired();*/
-
-		//this.setExpired();
-
-		/*if (worldObj.getTotalWorldTime() % 5 == 0) {
-			for (int i = 0; i < cachedLight.length; i++) {
-				Vec3 vec = CoroUtilParticle.rainPositions[i];
-				//cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
-			}
-		}*/
+	public void tickExtraRotations() {
+		//super.tickExtraRotations();
 
 		if (isSlantParticleToWind()) {
 			rotationYaw = (float)Math.toDegrees(Math.atan2(motionZ, motionX)) - 90;
 			double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
 			//motionXZ = motionX/* + motionZ*/;
 			rotationPitch = -(float)Math.toDegrees(Math.atan2(motionXZ, Math.abs(motionY)));
-			rotationPitch = rotationPitch;
+			//rotationPitch = rotationPitch;
 			//rotationPitch = -45;
+			//rotationPitch *= 10F;
 		}
+
+		Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+		updateQuaternion(ent);
 	}
 
 	@Override

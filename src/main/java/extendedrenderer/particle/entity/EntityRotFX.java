@@ -294,11 +294,16 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             rotationAroundCenter -= 360;
         }
 
+        tickExtraRotations();
+    }
+
+    public void tickExtraRotations() {
         if (slantParticleToWind) {
             double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
 
+        Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
         updateQuaternion(ent);
     }
 
