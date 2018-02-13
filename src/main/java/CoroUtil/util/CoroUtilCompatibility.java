@@ -59,7 +59,8 @@ public class CoroUtilCompatibility {
                     tanInstalled = true;
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                //not installed
+                //ex.printStackTrace();
             }
         }
 
