@@ -1,5 +1,6 @@
 package CoroUtil.forge;
 
+import CoroUtil.difficulty.DynamicDifficulty;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -30,7 +31,6 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import CoroUtil.world.player.DynamicDifficulty;
 
 public class EventHandlerForge {
 

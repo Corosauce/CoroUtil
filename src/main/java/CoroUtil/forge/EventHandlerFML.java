@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import java.util.ArrayList;
 import java.util.List;
 
+import CoroUtil.difficulty.DynamicDifficulty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -21,7 +22,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
 import CoroUtil.world.WorldDirectorManager;
-import CoroUtil.world.player.DynamicDifficulty;
 public class EventHandlerFML {
 
 	public static World lastWorld = null;

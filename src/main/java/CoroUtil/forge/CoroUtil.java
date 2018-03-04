@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.difficulty.data.DifficultyDataReader;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -60,6 +62,12 @@ public class CoroUtil {
     {
     	ConfigMod.addConfigFile(event, new ConfigCoroAI());
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
+		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
+
+		/*DifficultyDataReader reader = new DifficultyDataReader();
+		reader.loadFiles();*/
+		DifficultyDataReader.init();
+		DifficultyDataReader.loadFiles();
     	
     	eventChannel.register(new EventHandlerPacket());
     }

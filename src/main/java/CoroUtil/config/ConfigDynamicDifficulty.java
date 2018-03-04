@@ -23,22 +23,30 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static int difficulty_BestDPSRadius = 4;
 	
 	public static int difficulty_BestVanillaDPS = 20;
+
+	public static int difficulty_BestVanillaHealth = 20;
+	public static int difficulty_BestVanillaArmor = 20;
+	public static int difficulty_BestVanillaArmorEnchant = 25;
 	
 	public static double difficulty_MaxDPSLoggable = 500;
 	
 	public static double difficulty_MaxDPSRatingAllowed = 5;
-	
+
 	public static double weightPosOccupy = 1D;
 	public static double weightPlayerEquipment = 1.5D;
-	public static double weightPlayerServerTime = 1D;
+	public static double weightPlayerServerTime = 0D;
 	public static double weightDPS = 1.5D;
 	public static double weightHealth = 1D;
 	public static double weightDistFromSpawn = 1D;
+	public static double weightBuffedLocation = 2D;
+	public static double weightDebuffedLocation = 1D;
 	
 	@ConfigComment("-1 = dont cap it")
 	public static double difficulty_Max = -1;
-	
-	public static boolean difficulty_InfernalMobsOverride = false;
+
+	//TODO: if false, will we be double buffing infernal mobs accidentally?
+	@ConfigComment("If true, tie overall chance of infernal mobs to our difficulty system scaling, if false, don't try to control it at all")
+	public static boolean difficulty_OverrideInfernalMobs = true;
 	
 	@ConfigComment("what level of difficulty is required to count as 100% chance")
 	public static double difficulty_Infernal_Elite_Max = 5F;

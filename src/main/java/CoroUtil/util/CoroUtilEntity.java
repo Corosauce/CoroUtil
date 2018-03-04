@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -132,5 +133,26 @@ public class CoroUtilEntity {
         }
 
         return entityplayer;
+    }
+
+    public static boolean canProcessForList(String playerName, String list, boolean whitelistMode) {
+        if (whitelistMode) {
+            if (!list.contains(playerName)) {
+                return false;
+            }
+        } else {
+            if (list.contains(playerName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Class getClassFromRegisty(String name) {
+        Class clazz = EntityList.NAME_TO_CLASS.get(name);
+        if (clazz == null) {
+            clazz = EntityList.NAME_TO_CLASS.get(name.replace("minecraft:", "").replace("minecraft.", ""));
+        }
+        return clazz;
     }
 }

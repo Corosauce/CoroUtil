@@ -1,9 +1,12 @@
 package CoroUtil.forge;
 
+import CoroUtil.block.BlockRepairingBlock;
+import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.blocks.BlockBlank;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.RegistryEvent;
@@ -20,6 +23,8 @@ public class CommonProxy implements IGuiHandler
 
     public CoroUtil mod;
 
+    public static Block blockRepairingBlock;
+
     @GameRegistry.ObjectHolder(CoroUtil.modID + ":blank")
     public static Block blockBlank;
 
@@ -30,6 +35,7 @@ public class CommonProxy implements IGuiHandler
     public void init(CoroUtil pMod)
     {
         mod = pMod;
+        addBlock(blockRepairingBlock = (new BlockRepairingBlock()), TileEntityRepairingBlock.class, "repairing_block");
     }
 
 	@Override
@@ -44,29 +50,28 @@ public class CommonProxy implements IGuiHandler
 		return null;
 	}
 
-    @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        CoroUtil.proxy.addBlock(event, blockBlank = (new BlockBlank(Material.AIR)), "blank");
+    public void addBlock(Block block, Class tEnt, String unlocalizedName) {
+        addBlock(block, tEnt, unlocalizedName, true);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName) {
-        addBlock(event, parBlock, unlocalizedName, true);
+    public void addBlock(Block block, Class tEnt, String unlocalizedName, boolean creativeTab) {
+        addBlock(block, unlocalizedName, creativeTab);
+        GameRegistry.registerTileEntity(tEnt, unlocalizedName);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
-        //vanilla calls
-        //GameRegistry.registerBlock(parBlock, unlocalizedName);
+    public void addBlock(Block parBlock, String unlocalizedName) {
+        addBlock(parBlock, unlocalizedName, true);
+    }
 
-        parBlock.setUnlocalizedName(CoroUtil.modID + "." + unlocalizedName);
-        parBlock.setRegistryName(/*Weather.modID + ":" + */unlocalizedName);
+    public void addBlock(Block parBlock, String unlocalizedName, boolean creativeTab) {
+        GameRegistry.registerBlock(parBlock, unlocalizedName);
 
-        if (event != null) {
-            event.getRegistry().register(parBlock);
-        } else {
-            //GameRegistry.register(parBlock);
-        }
+        parBlock.setUnlocalizedName(getNamePrefixed(unlocalizedName));
 
-        //ForgeRegistries.BLOCKS.register(parBlock);
-        //LanguageRegistry.addName(parBlock, blockNameBase);
+        parBlock.setCreativeTab(CreativeTabs.MISC);
+    }
+
+    public String getNamePrefixed(String name) {
+        return CoroUtil.modID + "." + name;
     }
 }
