@@ -14,8 +14,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.registries.IForgeRegistry;
 
-@Mod.EventBusSubscriber(modid = "coroutil")
+@Mod.EventBusSubscriber(modid = CoroUtil.modID)
 public class CommonProxy implements IGuiHandler
 {
     public World mainWorld;
@@ -35,7 +36,6 @@ public class CommonProxy implements IGuiHandler
     public void init(CoroUtil pMod)
     {
         mod = pMod;
-        addBlock(blockRepairingBlock = (new BlockRepairingBlock()), TileEntityRepairingBlock.class, "repairing_block");
     }
 
 	@Override
@@ -49,6 +49,15 @@ public class CommonProxy implements IGuiHandler
 			int x, int y, int z) {
 		return null;
 	}
+
+    @SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        IForgeRegistry<Block> registry = event.getRegistry();
+
+        CoroUtil.proxy.addBlock(blockRepairingBlock = (new BlockRepairingBlock()), TileEntityRepairingBlock.class, "repairing_block");
+        registry.register(blockRepairingBlock);
+
+    }
 
     public void addBlock(Block block, Class tEnt, String unlocalizedName) {
         addBlock(block, tEnt, unlocalizedName, true);
@@ -64,7 +73,7 @@ public class CommonProxy implements IGuiHandler
     }
 
     public void addBlock(Block parBlock, String unlocalizedName, boolean creativeTab) {
-        GameRegistry.registerBlock(parBlock, unlocalizedName);
+        //GameRegistry.registerBlock(parBlock, unlocalizedName);
 
         parBlock.setUnlocalizedName(getNamePrefixed(unlocalizedName));
 
