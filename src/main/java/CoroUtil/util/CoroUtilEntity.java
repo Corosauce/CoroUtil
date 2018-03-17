@@ -10,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -149,10 +150,12 @@ public class CoroUtilEntity {
     }
 
     public static Class getClassFromRegisty(String name) {
-        Class clazz = EntityList.NAME_TO_CLASS.get(name);
-        if (clazz == null) {
+        //Class clazz = EntityList.NAME_TO_CLASS.get(name);
+        Class clazz = EntityList.getClass(new ResourceLocation(name));
+        //dont think this will be needed for proper registered entity names
+        /*if (clazz == null) {
             clazz = EntityList.NAME_TO_CLASS.get(name.replace("minecraft:", "").replace("minecraft.", ""));
-        }
+        }*/
         return clazz;
     }
 }

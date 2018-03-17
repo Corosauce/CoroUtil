@@ -1,29 +1,30 @@
 package CoroUtil.forge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
+import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -111,7 +112,7 @@ public class CommandCoroUtil extends CommandBase {
 						while(it.hasNext()) {
 							ISimulationTickable loc = it.next();
 							if (loc instanceof BuffedLocation) {
-								wd.removeTickingLocation(loc, true);
+								wd.removeTickingLocation(loc);
 								it.remove();
 								System.out.println("removed buffed zone at " + loc.getOrigin());
 							}
@@ -263,6 +264,149 @@ public class CommandCoroUtil extends CommandBase {
 					CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
 					for (String entry : data) {
 						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
+					}
+				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
+					if ((var1 instanceof EntityPlayerMP)) {
+						EntityPlayerMP ent = (EntityPlayerMP) var1;
+						//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
+						net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
+						BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
+						//long dayNumber = (ent.world.getWorldTime() / 24000) + 1;
+						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player rating: " + DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerEquipment);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightPosOccupy);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightDPS);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
+						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
+					}
+				} else if (var2[0].equalsIgnoreCase("testitem")) {
+					/**
+					 * ResourceLocation resourcelocation = new ResourceLocation(id);
+					 Item item = (Item)Item.REGISTRY.getObject(resourcelocation);
+					 */
+					Item item = Item.getByNameOrId("particleman:particleglove");
+					if (item != null) {
+						System.out.println("! " + item.getRegistryName().toString());
+					}
+					if (player != null) {
+						player.inventory.addItemStackToInventory(new ItemStack(item, 1));
+					}
+				} else if (var2[0].equalsIgnoreCase("testloot")) {
+
+					//TODO: MOVE ALL THIS BELOW TO ITS OWN COMMAND WITHIN COROUTIL LIB
+
+				} else if (var2[0].equalsIgnoreCase("reloadData")) {
+					DifficultyDataReader.loadFiles();
+					var1.sendMessage(new TextComponentString("Difficulty data reloaded"));
+				} else if (var2[0].equalsIgnoreCase("registry")) {
+					/*for (Map.Entry<String, Class <? extends Entity >> entry : EntityList.NAME_TO_CLASS.entrySet()) {
+						var1.sendMessage(new TextComponentString(entry.getKey()));
+						System.out.println(entry.getKey());
+					}*/
+					//TODO: VALIDATE ITEMS!!!
+				} else if (var2[0].equalsIgnoreCase("ts") || var2[0].equalsIgnoreCase("testSpawn")) {
+					if (player != null) {
+						String profileName = var2[1];
+						DataMobSpawnsTemplate profileFound = null;
+						for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+							if (profile.name.equals(profileName)) {
+								profileFound = profile;
+								break;
+							}
+						}
+
+						if (profileFound != null) {
+
+							Random rand = new Random();
+							DataActionMobSpawns spawns = profileFound.spawns.get(rand.nextInt(profileFound.spawns.size()));
+							String spawn = spawns.entities.get(rand.nextInt(spawns.entities.size()));
+
+							//TODO: REVERIFY
+							//TODO: json files were using non registered name for vanilla ones, switch to registered names
+							//was: "Skeleton", probably need: "skeleton" or "minecraft:skeleton"
+							//mc should assume "minecraft:" if its missing / no domain
+							//Entity entL = EntityList.createEntityByName(spawn, world);
+							Class clazz = EntityList.getClass(new ResourceLocation(spawn));
+
+							if (clazz != null) {
+								Entity entL = EntityList.newEntity(clazz, world);
+								if (entL != null && entL instanceof EntityCreature) {
+
+									EntityCreature ent = (EntityCreature) entL;
+
+									BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
+									float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+
+									ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
+									UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
+
+									spawnEntity(player, ent);
+
+									CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+								} else {
+									player.sendMessage(new TextComponentString("entity instance null or not EntityCreature"));
+								}
+							} else {
+								player.sendMessage(new TextComponentString("entity class null"));
+							}
+
+							/*var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+							String data = profileFound.toString();
+							String[] list = data.split(" \\| ");
+							for (String entry : list) {
+								var1.sendMessage(new TextComponentString(entry));
+							}*/
+						} else {
+							var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+						}
+
+					}
+					//TODO: VALIDATE ITEMS!!!
+				} else if (var2[0].equalsIgnoreCase("tp") || var2[0].equalsIgnoreCase("testProfile")) {
+					if (player != null) {
+						try {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(true);
+
+							String profileName = var2[1];
+							DataMobSpawnsTemplate profileFound = null;
+							for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+								if (profile.name.equals(profileName)) {
+									profileFound = profile;
+									break;
+								}
+							}
+
+							if (profileFound != null) {
+								var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+								String data = profileFound.toString();
+								String[] list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.sendMessage(new TextComponentString(entry));
+								}
+
+								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
+
+								var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test with templates flattened"));
+								data = profileFound.toString();
+								list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.sendMessage(new TextComponentString(entry));
+								}
+							} else {
+								var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+							}
+						} finally {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(false);
+						}
+
 					}
 				} else if (var2[0].equals("testaabb")) {
 

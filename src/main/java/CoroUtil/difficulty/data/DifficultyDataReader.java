@@ -135,7 +135,7 @@ public class DifficultyDataReader {
                 String fileContents = Files.toString(file, Charsets.UTF_8);
                 String fileName = file.getName().replace(".json", "");
                 ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
-                LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true);
+                LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true, null);
                 data.lookupLootTables.put(fileName, lootTable);
             } else {
                 GSONBuffInventory.fromJson(new BufferedReader(new FileReader(file)), DifficultyData.class);

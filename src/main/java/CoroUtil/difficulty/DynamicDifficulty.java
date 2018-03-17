@@ -104,7 +104,7 @@ public class DynamicDifficulty {
 	}
 	
 	public static void tickPlayer(EntityPlayer player) {
-		World world = player.worldObj;
+		World world = player.world;
 		if (world.getTotalWorldTime() % tickRate == 0) {
 			
 			long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
@@ -131,9 +131,9 @@ public class DynamicDifficulty {
     			if (player.getRidingEntity() == null) {
     				if (dbg) System.out.println("3");
     				Block block = null;
-    				int pX = MathHelper.floor_double(player.posX);
-    				int pY = MathHelper.floor_double(player.getEntityBoundingBox().minY);
-    				int pZ = MathHelper.floor_double(player.posZ);
+    				int pX = MathHelper.floor(player.posX);
+    				int pY = MathHelper.floor(player.getEntityBoundingBox().minY);
+    				int pZ = MathHelper.floor(player.posZ);
     				boolean foundWall = false;
     				for (int x = -wallScanRange; !foundWall && x <= wallScanRange; x++) {
     					for (int z = -wallScanRange; !foundWall && z <= wallScanRange; z++) {
@@ -143,7 +143,7 @@ public class DynamicDifficulty {
     							block = state.getBlock();
     							if (!block.isAir(state, world, pos)) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player);
+    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player, true);
     								if (list.size() > 0) {
     									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
         								foundWall = true;
@@ -178,7 +178,7 @@ public class DynamicDifficulty {
 	public static void deathPlayer(EntityPlayer player) {
 		//TODO: find existing ones and reset their timer? what about it not buffing the exact new spot
 
-		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(player.worldObj);
+		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(player.world);
 
 		if (wd != null) {
 			BuffedLocation debuff = new BuffedLocation(32, -2);
@@ -198,7 +198,7 @@ public class DynamicDifficulty {
 	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity, int x, int y, int z) {
 
 		//TODO: cache so there is less player lookup thrashing for spawn candidate code
-		EntityPlayer player = spawnedEntity.worldObj.getClosestPlayerToEntity(spawnedEntity, -1);
+		EntityPlayer player = spawnedEntity.world.getClosestPlayerToEntity(spawnedEntity, -1);
 
 		if (player != null) {
 			return getDifficultyScaleAverage(player, x, y, z);
@@ -217,7 +217,7 @@ public class DynamicDifficulty {
 	
 	public static float getDifficultyScaleAverage(EntityPlayer player, BlockCoord pos) {
 		
-		World world = player.worldObj;
+		World world = player.world;
 		
 		//test
 		//if (true) return 2F;
@@ -286,14 +286,14 @@ public class DynamicDifficulty {
 	public static float getDifficultyScaleForPlayerServerTime(EntityPlayer player) {
 		long maxServerTime = ConfigDynamicDifficulty.difficulty_MaxTicksOnServer;
 		long curServerTime = player.getEntityData().getLong(dataPlayerServerTicks);
-		return Math.round(MathHelper.clamp_float((float)curServerTime / (float)maxServerTime, 0F, 1F) * 1000F) / 1000F;
+		return Math.round(MathHelper.clamp((float)curServerTime / (float)maxServerTime, 0F, 1F) * 1000F) / 1000F;
 	}
 	
 	public static float getDifficultyScaleForPlayerEquipment(EntityPlayer player) {
 		boolean calcWeapon = false;
 		int curRating = 0;
 		if (player.getEntityData().hasKey(dataPlayerLastCacheEquipmentRating)) {
-			if (player.worldObj.getTotalWorldTime() % 200 == 0) {
+			if (player.world.getTotalWorldTime() % 200 == 0) {
 				curRating = UtilPlayer.getPlayerRating(player, calcWeapon);
 				player.getEntityData().setInteger(dataPlayerLastCacheEquipmentRating, curRating);
 			} else {
@@ -319,8 +319,8 @@ public class DynamicDifficulty {
 	
 	public static float getDifficultyScaleForDistFromSpawn(EntityPlayer player) {
 		
-		float distX = (float) (player.worldObj.getSpawnPoint().getX() - player.posX);
-		float distZ = (float) (player.worldObj.getSpawnPoint().getZ() - player.posZ);
+		float distX = (float) (player.world.getSpawnPoint().getX() - player.posX);
+		float distZ = (float) (player.world.getSpawnPoint().getZ() - player.posZ);
 		
 		float dist = (float) Math.sqrt(distX * distX + distZ * distZ);
 		
@@ -579,21 +579,21 @@ public class DynamicDifficulty {
 	}
 	
 	public static void logDamage(LivingHurtEvent event) {
-		if (event.getEntity().worldObj.isRemote) return;
+		if (event.getEntity().world.isRemote) return;
 		if (ConfigDynamicDifficulty.trackChunkData) {
 			
 			Entity ent = event.getEntity();
-			World world = ent.worldObj;
+			World world = ent.world;
 			
 			if (ent instanceof IMob && ent instanceof EntityCreature) {
 				EntityCreature entC = (EntityCreature) ent;
 				
 				//dont log common occuring damages, sun burning, random wall glitching
-				if (event.getSource() == DamageSource.inWall || 
-						event.getSource() == DamageSource.inFire || 
-						event.getSource() == DamageSource.onFire || 
-						event.getSource() == DamageSource.drown ||
-						event.getSource() == DamageSource.fall/* || event.source == DamageSource.lava*/) {
+				if (event.getSource() == DamageSource.IN_WALL ||
+						event.getSource() == DamageSource.IN_FIRE ||
+						event.getSource() == DamageSource.IN_FIRE ||
+						event.getSource() == DamageSource.DROWN ||
+						event.getSource() == DamageSource.FALL/* || event.source == DamageSource.lava*/) {
 					return;
 				}
 				
@@ -650,11 +650,11 @@ public class DynamicDifficulty {
 	}
 	
 	public static void logDeath(LivingDeathEvent event) {
-		if (event.getEntity().worldObj.isRemote) return;
+		if (event.getEntity().world.isRemote) return;
 		if (ConfigDynamicDifficulty.trackChunkData) {
 			
 			Entity ent = event.getEntity();
-			World world = ent.worldObj;
+			World world = ent.world;
 			
 			if (ent instanceof IMob && ent instanceof EntityCreature) {
 				if (lookupEntToDamageLog.containsKey(ent.getEntityId())) {
@@ -675,9 +675,9 @@ public class DynamicDifficulty {
 		int recalcRate = 20*2;
 		
 		EntityCreature ent = log.getEnt();
-		World world = ent.worldObj;
-		int chunkX = MathHelper.floor_double(ent.posX / 16);
-		int chunkZ = MathHelper.floor_double(ent.posZ / 16);
+		World world = ent.world;
+		int chunkX = MathHelper.floor(ent.posX / 16);
+		int chunkZ = MathHelper.floor(ent.posZ / 16);
 		ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(chunkX, chunkZ);
 		
 		if (log.getListDPSs().size() == 0 && log.getLastDamage() > 0) {

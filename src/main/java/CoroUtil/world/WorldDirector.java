@@ -189,7 +189,7 @@ public class WorldDirector implements Runnable {
 		lookupNameToUpdatesPerTickCur.put(name, cur);
 	}
 	
-	public ISimulationTickable getTickingSimluationByLocation(BlockCoord parCoords) {
+	public ISimulationTickable getTickingSimulationByLocation(BlockCoord parCoords) {
 		Integer hash = PathPointEx.makeHash(parCoords.posX, parCoords.posY, parCoords.posZ);
 		return lookupTickingManagedLocations.get(hash);
 	}
