@@ -108,7 +108,7 @@ public class DifficultyDataReader {
         File dataFolder = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\");
 
         if (!dataFolder.exists()) {
-            dataFolder = new File("/mnt/e/git/CoroUtil_1.10.2/src/main/resources/assets/coroutil/config/");
+            dataFolder = new File("/mnt/e/git/CoroUtil_1.12.x/src/main/resources/assets/coroutil/config/");
         }
 
         try {
