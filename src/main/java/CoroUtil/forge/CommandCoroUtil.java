@@ -2,6 +2,7 @@ package CoroUtil.forge;
 
 import java.util.*;
 
+import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.BuffedLocation;
 import CoroUtil.difficulty.DynamicDifficulty;
@@ -9,7 +10,7 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
 import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
-import CoroUtil.util.BlockCoord;
+import CoroUtil.util.*;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
@@ -26,6 +27,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -40,9 +42,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.util.CoroUtilMisc;
-import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilItem;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -440,6 +439,27 @@ public class CommandCoroUtil extends CommandBase {
                             }
                         }
                     }
+				} else if (var2[0].equals("testrepair")) {
+					Vec3d vec = var1.getPositionVector();
+					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
+					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());
+					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
+
+					BlockPos pos = new BlockPos(sx, sy, sz);
+					IBlockState state = world.getBlockState(pos);
+
+					if (UtilMining.canConvertToRepairingBlock(world, state)) {
+						var1.sendMessage(new TextComponentString("Setting coord to repairing block, block was: " + state));
+						world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
+						TileEntity tEnt = world.getTileEntity(pos);
+						if (tEnt instanceof TileEntityRepairingBlock) {
+							((TileEntityRepairingBlock) tEnt).setBlockData(state);
+						}
+					} else {
+						var1.sendMessage(new TextComponentString("Coordinate does not support repairing block, block was: " + state));
+						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
+						world.setBlockToAir(pos);*/
+					}
 				}
 			/*}*/
 		} catch (Exception ex) {
