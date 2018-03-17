@@ -75,6 +75,9 @@ public class RotatingParticleManager
     public static FloatBuffer projectionMatrixBuffer = BufferUtils.createFloatBuffer(16);
     public static FloatBuffer viewMatrixBuffer = BufferUtils.createFloatBuffer(16);
 
+    //a hack to enable fog for particles when weather2 sandstorm is active
+    public static float sandstormFogAmount = 0F;
+
     public static boolean forceShaderReset = false;
 
     //mostly failed idea, particle system needs rework if this is going to have a proper benefit
