@@ -124,6 +124,25 @@
               "template": "infernal_skeleton_1"
             }
           ]
+        },
+        {
+          "entities": [
+            "creeper"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
         }
       ]
     },
