@@ -11,8 +11,14 @@ public class CoroUtilCompatibility {
     private static boolean tanInstalled = false;
     private static boolean checkTAN = true;
 
-    private static Class class_SeasonASMHelper = null;
-    private static Method method_getFloatTemperature = null;
+    private static boolean sereneSeasonsInstalled = false;
+    private static boolean checksereneSeasons = true;
+
+    private static Class class_TAN_ASMHelper = null;
+    private static Method method_TAN_getFloatTemperature = null;
+
+    private static Class class_SereneSeasons_ASMHelper = null;
+    private static Method method_sereneSeasons_getFloatTemperature = null;
 
     public static boolean shouldSnowAt(World world, BlockPos pos) {
         /**
@@ -32,10 +38,20 @@ public class CoroUtilCompatibility {
         //TODO: consider caching results in a blockpos,float hashmap for a second or 2
         if (isTANInstalled()) {
             try {
-                if (method_getFloatTemperature == null) {
-                    method_getFloatTemperature = class_SeasonASMHelper.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
+                if (method_TAN_getFloatTemperature == null) {
+                    method_TAN_getFloatTemperature = class_TAN_ASMHelper.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
                 }
-                return (float)method_getFloatTemperature.invoke(null, biome, pos);
+                return (float) method_TAN_getFloatTemperature.invoke(null, biome, pos);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return biome.getFloatTemperature(pos);
+            }
+        } else if (isSereneSeasonsInstalled()) {
+            try {
+                if (method_sereneSeasons_getFloatTemperature == null) {
+                    method_sereneSeasons_getFloatTemperature = class_SereneSeasons_ASMHelper.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
+                }
+                return (float) method_sereneSeasons_getFloatTemperature.invoke(null, biome, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return biome.getFloatTemperature(pos);
@@ -54,16 +70,43 @@ public class CoroUtilCompatibility {
         if (checkTAN) {
             try {
                 checkTAN = false;
-                class_SeasonASMHelper = Class.forName("toughasnails.season.SeasonASMHelper");
-                if (class_SeasonASMHelper != null) {
+                class_TAN_ASMHelper = Class.forName("toughasnails.season.SeasonASMHelper");
+                if (class_TAN_ASMHelper != null) {
+                    System.out.println("CoroUtil detected Tough as Nails season module installed");
                     tanInstalled = true;
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                System.out.println("CoroUtil did not detect Tough as Nails season module installed");
+                //not installed
+                //ex.printStackTrace();
             }
         }
 
         return tanInstalled;
+    }
+
+    /**
+     * Check if Serene Seasons is installed
+     *
+     * @return
+     */
+    public static boolean isSereneSeasonsInstalled() {
+        if (checksereneSeasons) {
+            try {
+                checksereneSeasons = false;
+                class_SereneSeasons_ASMHelper = Class.forName("sereneseasons.season.SeasonASMHelper");
+                if (class_SereneSeasons_ASMHelper != null) {
+                    System.out.println("CoroUtil detected Serene Seasons installed");
+                    sereneSeasonsInstalled = true;
+                }
+            } catch (Exception ex) {
+                System.out.println("CoroUtil did not detect Serene Seasons installed");
+                //not installed
+                //ex.printStackTrace();
+            }
+        }
+
+        return sereneSeasonsInstalled;
     }
 
 }
