@@ -52,7 +52,7 @@ public class ConfigHWMonsters implements IConfigCategory {
 	public static long counterAttackReuseDelay = 30;
 	public static double counterAttackLeapSpeed = 0.8D;
 	public static double counterAttackLeapExtraDamageMultiplier = 0.5D;
-	public static boolean counterAttackLeapArmorPiercing = true;
+	public static boolean counterAttackLeapArmorPiercing = false;
 	
 	public static String blackListPlayers = "";
 	public static boolean useBlacklistAsWhitelist = false;

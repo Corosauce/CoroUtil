@@ -2,7 +2,6 @@ package CoroUtil.forge;
 
 import CoroUtil.block.BlockRepairingBlock;
 import CoroUtil.block.TileEntityRepairingBlock;
-import CoroUtil.blocks.BlockBlank;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
 import net.minecraft.block.material.Material;
