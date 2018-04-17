@@ -51,8 +51,14 @@ public class ConfigCoroAI implements IConfigCategory {
 
 	public static boolean foliageShaders = true;
 	public static boolean particleShaders = true;
+
+	@ConfigComment("For seldom used but important things to print out in production")
 	public static boolean useLoggingLog = true;
+
+	@ConfigComment("For debugging things")
 	public static boolean useLoggingDebug = false;
+
+	@ConfigComment("For logging warnings/errors")
 	public static boolean useLoggingError = true;
 
 	@Override

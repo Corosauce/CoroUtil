@@ -25,8 +25,8 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Nullable
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
-    {
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return NULL_AABB;
     }
 
@@ -37,6 +37,7 @@ public class BlockRepairingBlock extends BlockContainer
 
     @Deprecated
     @SideOnly(Side.CLIENT)
+    @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
         return AABB;
@@ -45,16 +46,19 @@ public class BlockRepairingBlock extends BlockContainer
     /**
      * Used to determine ambient occlusion and culling when rebuilding chunks for render
      */
+    @Override
     public boolean isOpaqueCube(IBlockState state)
     {
         return false;
     }
 
+    @Override
     public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
     {
         return super.canCollideCheck(state, hitIfLiquid);
     }
 
+    @Override
     public boolean isFullCube(IBlockState state)
     {
         return false;/*super.isFullCube(state);*/
@@ -73,6 +77,7 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @SideOnly(Side.CLIENT)
+    @Override
     public BlockRenderLayer getBlockLayer()
     {
         return BlockRenderLayer.CUTOUT;

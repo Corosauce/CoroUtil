@@ -158,10 +158,7 @@ public class CoroUtil {
     	}
     }
     
-	public static void dbg(Object obj) {
-		if (true) {
-			//MinecraftServer.getServer().getLogAgent().logInfo(String.valueOf(obj));
-			System.out.println(obj);
-		}
+	public static void dbg(String obj) {
+    	CULog.dbg(obj);
 	}
 }

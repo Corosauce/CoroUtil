@@ -4,6 +4,7 @@ import CoroUtil.difficulty.data.cmods.CmodTemplateReference;
 import CoroUtil.difficulty.data.conditions.ConditionTemplateReference;
 import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
 import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
+import CoroUtil.forge.CULog;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -27,6 +28,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         DifficultyData data = DifficultyDataReader.getData();//new DifficultyData();
 
         if (format.toLowerCase().equals("mob_spawns")) {
+            CULog.dbg("detected mob spawns to deserialize");
             JsonElement eleTemplates = obj.get("templates");
 
             JsonArray arrTemplates = eleTemplates.getAsJsonArray();
@@ -58,6 +60,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
             }
 
         } else if (format.toLowerCase().equals("cmods")) {
+            CULog.dbg("detected cmods to deserialize");
+
             JsonElement eleTemplates = obj.get("templates");
 
             JsonArray arrTemplates = eleTemplates.getAsJsonArray();
@@ -80,6 +84,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 }
             }
         } else if (format.toLowerCase().equals("conditions")) {
+            CULog.dbg("detected conditions to deserialize");
+
             JsonElement eleTemplates = obj.get("templates");
 
             JsonArray arrTemplates = eleTemplates.getAsJsonArray();

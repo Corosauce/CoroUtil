@@ -12,7 +12,7 @@
       "spawns": [
         {
           "entities": [
-            "minecraft:zombie"
+            "specialmobs:ninjaskeleton"
           ],
           "count": 30
         }
@@ -33,7 +33,7 @@
       "spawns": [
         {
           "entities": [
-            "minecraft:zombie"
+            "specialmobs:ninjaskeleton"
           ],
           "count": 30
         }
@@ -69,7 +69,7 @@
         },
         {
           "entities": [
-            "zombie", "skeleton"
+            "ZombTYPOie", "skeleton"
           ],
           "count": 5,
           "cmods": [
@@ -81,7 +81,7 @@
         },
         {
           "entities": [
-            "skeleton", "zombie"
+            "skeleton", "pretties.skyLantern"
           ],
           "count": 10,
           "cmods": [
@@ -141,6 +141,44 @@
             {
               "cmod": "template",
               "template": "infernal_skeleton_1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "testSpawnBad",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_what_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "zombie", "skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_wuhhhhh"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail_bad"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1_bad"
             }
           ]
         }

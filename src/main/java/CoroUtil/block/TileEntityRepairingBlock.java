@@ -73,6 +73,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     	return new AxisAlignedBB(getPos().getX(), getPos().getY(), getPos().getZ(), getPos().getX() + 1, getPos().getY() + 3, getPos().getZ() + 1);
     }*/
 
+    @Override
     public NBTTagCompound writeToNBT(NBTTagCompound var1)
     {
         String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
@@ -83,6 +84,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         return super.writeToNBT(var1);
     }
 
+    @Override
     public void readFromNBT(NBTTagCompound var1)
     {
         super.readFromNBT(var1);

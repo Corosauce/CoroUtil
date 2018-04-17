@@ -2,18 +2,29 @@ package CoroUtil.difficulty.data;
 
 import CoroUtil.difficulty.data.cmods.*;
 import CoroUtil.difficulty.data.conditions.*;
+import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
+import CoroUtil.util.UtilClasspath;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Corosus on 2/1/2017.
@@ -105,13 +116,62 @@ public class DifficultyDataReader {
 
 
         //temp
-        File dataFolder = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\");
+        /*File dataFolder = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\");
 
         if (!dataFolder.exists()) {
             dataFolder = new File("/mnt/e/git/CoroUtil_1.12.x/src/main/resources/assets/coroutil/config/");
-        }
+        }*/
 
         try {
+            /*List<File> listFiles = UtilClasspath.getClassesForPackage("assets.coroutil.config", ".json");
+            System.out.println(listFiles);*/
+
+            /*final Collection<String> list = UtilClasspath.getResources("");
+            for(final String name : list){
+                CULog.dbg(name);
+            }*/
+
+
+            /*List<String> files = IOUtils.readLines(DifficultyDataReader.class.getClassLoader()
+                    .getResourceAsStream("."), Charsets.UTF_8);*/
+
+            /**
+             * TODO: use this code to copy the json files to a filesystem folder
+             * - config folder or per world folder?
+             * - then user can customize them more like actual configs
+             */
+
+            List<String> listFiles = new ArrayList<>();
+
+            for (ModContainer mod : Loader.instance().getActiveModList()) {
+                //System.out.println(mod.getModId());
+
+                if (mod.getModId().equals(CoroUtil.modID)) {
+                    //UtilClasspath.loadRecipes(mod);
+                    CraftingHelper.findFiles(mod, "assets/" + mod.getModId() + "/config",
+                            null, (root, file) ->
+                            {
+                                //System.out.println("2:" + root + ", " + file);
+                                if (file.toString().endsWith("json")) {
+                                    listFiles.add(file.toString());
+                                }
+                                return true;
+                            }, true, true);
+                }
+            }
+
+            for (String file : listFiles) {
+                processFileFromJarPath(file);
+            }
+
+            //
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        /*try {
 
             if (dataFolder.exists()) {
                 processFolder(dataFolder);
@@ -121,23 +181,55 @@ public class DifficultyDataReader {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
+        }*/
 
         CoroUtil.dbg("done");
     }
 
-    public static void processFile(File file) {
+    //TODO: replace with temp copy from jar to filesystem and load from filesystem for user editability?
+    public static void processFileFromJarPath(String path) {
         try {
 
-            CoroUtil.dbg("processing: " + file.toString());
+            String pathRoot = path.substring(path.indexOf("assets/coroutil/"));
+
+            if (path.contains(lootTablesFolder)) {
+                CULog.dbg("processing, detected as loot table: " + path.substring(path.lastIndexOf("/")+1).toString());
+
+                String temp = pathRoot.replace("assets/" + CoroUtil.modID + "/", "");
+                String fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
+                CULog.dbg("file contents size: " + fileContents.length());
+
+                String fileName = path.substring(path.lastIndexOf("/")+1).replace(".json", "");
+                ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
+                LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true, null);
+                data.lookupLootTables.put(fileName, lootTable);
+            } else {
+                CULog.dbg("processing, detected as DifficultyData: " + path.substring(path.lastIndexOf("/")+1).toString());
+                String temp = pathRoot.replace("assets/" + CoroUtil.modID + "/", "");
+                String fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
+                CULog.dbg("file contents size: " + fileContents.length());
+
+                GSONBuffInventory.fromJson(fileContents, DifficultyData.class);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void processFileFromFilesystem(File file) {
+        try {
+
+            //CoroUtil.dbg("processing: " + file.toString());
             String lastPath = file.getParent().toLowerCase();
             if (lastPath.endsWith(lootTablesFolder)) {
+                CULog.dbg("processing, detected as loot table: " + file.toString());
                 String fileContents = Files.toString(file, Charsets.UTF_8);
                 String fileName = file.getName().replace(".json", "");
                 ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
                 LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true, null);
                 data.lookupLootTables.put(fileName, lootTable);
             } else {
+                CULog.dbg("processing, detected as DifficultyData: " + file.toString());
                 GSONBuffInventory.fromJson(new BufferedReader(new FileReader(file)), DifficultyData.class);
             }
         } catch (Exception ex) {
@@ -145,12 +237,34 @@ public class DifficultyDataReader {
         }
     }
 
+
+    /*public static void processFileFromString(String path, String contents) {
+        try {
+            if (path.contains(lootTablesFolder)) {
+                CULog.dbg("processing, detected as loot table: " + path.toString());
+                //ResourceLocation resLoc = new ResourceLocation();
+                String temp = path.replace("assets/" + CoroUtil.modID, "").replace("/", ".");
+                String fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
+                //String fileContents = Files.toString(path, Charsets.UTF_8);
+                String fileName = path.substring(path.lastIndexOf("/")+1).replace(".json", "");
+                ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
+                LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true, null);
+                data.lookupLootTables.put(fileName, lootTable);
+            } else {
+                CULog.dbg("processing, detected as DifficultyData: " + file.toString());
+                GSONBuffInventory.fromJson(new BufferedReader(new FileReader(file)), DifficultyData.class);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }*/
+
     public static void processFolder(File path) {
         for (File child : path.listFiles()) {
             if (child.isFile()) {
                 try {
                     if (child.toString().endsWith(".json")) {
-                        processFile(child);
+                        processFileFromFilesystem(child);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
