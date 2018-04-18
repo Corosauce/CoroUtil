@@ -8,4 +8,9 @@ import CoroUtil.difficulty.data.DataCondition;
 public class ConditionDifficulty extends DataCondition {
     public double min;
     public double max;
+
+    @Override
+    public String toString() {
+        return "difficulty range: " + min + " to " + max;
+    }
 }

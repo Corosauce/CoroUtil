@@ -322,17 +322,15 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		//entity.world.setBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ, Blocks.AIR);
     		//entity.world.setBlockToAir(posCurMining.toBlockPos());
             if (UtilMining.canConvertToRepairingBlock(entity.world, state)) {
-                entity.world.setBlockState(posCurMining.toBlockPos(), CommonProxy.blockRepairingBlock.getDefaultState());
-                TileEntity tEnt = entity.world.getTileEntity(posCurMining.toBlockPos());
-                if (tEnt instanceof TileEntityRepairingBlock) {
-                    ((TileEntityRepairingBlock) tEnt).setBlockData(state);
-                }
+                TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
             } else {
                 Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1));
 				entity.world.setBlockToAir(posCurMining.toBlockPos());
             }
 
 			setMiningBlock(null, null);
+
+            curBlockDamage = 0;
     		
     	} else {
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, (int)(curBlockDamage * 10D));

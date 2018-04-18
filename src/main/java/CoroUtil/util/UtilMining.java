@@ -3,15 +3,20 @@ package CoroUtil.util;
 import CoroUtil.forge.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class UtilMining {
 
-    public static boolean canMineBlock(World world, BlockCoord pos, Block block) {
+	public static boolean canMineBlock(World world, BlockCoord pos, Block block) {
+		return canMineBlock(world, pos.toBlockPos(), block);
+	}
+
+    public static boolean canMineBlock(World world, BlockPos pos, Block block) {
     	
     	//System.out.println("check: " + block);
     	
-    	IBlockState state = world.getBlockState(pos.toBlockPos());
+    	IBlockState state = world.getBlockState(pos);
 
 
 		/**TODO: check BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, entityPlayer); if is
@@ -21,10 +26,10 @@ public class UtilMining {
 		 */
     	
     	//dont mine tile entities
-    	if (world.getTileEntity(pos.toBlockPos()) != null) {
+    	if (world.getTileEntity(pos) != null) {
     		return false;
     	}
-    	if (block.isAir(state, world, pos.toBlockPos()) || block == CommonProxy.blockRepairingBlock) {
+    	if (block.isAir(state, world, pos) || block == CommonProxy.blockRepairingBlock) {
     		return false;
     	}
     	/*if (block == Blocks.obsidian) {

@@ -1,9 +1,12 @@
 package CoroUtil.forge;
 
+import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.BuffBase;
 import CoroUtil.util.CoroUtilCrossMod;
+import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
@@ -23,6 +26,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -232,6 +236,27 @@ public class EventHandlerForge {
 
 				UtilEntityBuffs.applyBuffPostAll(ent, difficultySpawnedIn);
 			}
+		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void explosionEvent(ExplosionEvent event) {
+		if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks) {
+			//since we currently dont support dealing with them, just prevent them from breaking at all
+			boolean protectTileEntities = true;
+			List<BlockPos> listPos = event.getExplosion().getAffectedBlockPositions();
+
+			for (BlockPos pos : listPos) {
+				IBlockState state = event.getWorld().getBlockState(pos);
+				if (UtilMining.canMineBlock(event.getWorld(), pos, state.getBlock()) &&
+						UtilMining.canConvertToRepairingBlock(event.getWorld(), state)) {
+					TileEntityRepairingBlock.replaceBlockAndBackup(event.getWorld(), pos);
+				} else {
+					//TODO: what do i do with these blocks then, for now just do nothing and they are protected
+				}
+			}
+
+			event.getExplosion().clearAffectedBlockPositions();
 		}
 	}
 }

@@ -145,6 +145,54 @@
           ]
         }
       ]
+    },
+    {
+      "name": "3rd difficulty block",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_3"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "zombie"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "creeper"
+          ],
+          "count": 15
+        }
+      ]
     }
   ]
 

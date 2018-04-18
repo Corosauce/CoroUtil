@@ -59,6 +59,8 @@ public class ConfigHWMonsters implements IConfigCategory {
 
 	public static boolean genTotems = true;
 
+	public static boolean explosionsTurnIntoRepairingBlocks = false;
+
 
 	@Override
 	public String getName() {

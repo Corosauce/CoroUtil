@@ -28,6 +28,10 @@ public class DataMobSpawnsTemplate {
         for (DataActionMobSpawns spawn : spawns) {
             str += spawn.toString() + " | ";
         }
+        str += "| conditions: ";
+        for (DataCondition cond : conditions) {
+            str += cond.toString() + " | ";
+        }
         return str;
     }
 }
