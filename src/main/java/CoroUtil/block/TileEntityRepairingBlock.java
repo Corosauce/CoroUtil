@@ -28,7 +28,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     private float orig_explosionResistance = 1;
 
     private int ticksRepairCount;
-    private int ticksRepairMax = 20/**60*/*5;
+    private int ticksRepairMax = 20*60*5;
 
 	@Override
     public void update()

@@ -20,6 +20,7 @@ import javax.annotation.Nullable;
 public class BlockRepairingBlock extends BlockContainer
 {
 	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0, 0.0F, 0.0F, 0.0F, 0.0F);
 	
     public BlockRepairingBlock()
     {
@@ -36,7 +37,7 @@ public class BlockRepairingBlock extends BlockContainer
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return AABB;
+        return NO_COLLIDE_AABB;
     }
 
     @Deprecated
@@ -44,7 +45,7 @@ public class BlockRepairingBlock extends BlockContainer
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
-        return AABB;
+        return NO_COLLIDE_AABB;
     }
 
     /**
@@ -108,5 +109,16 @@ public class BlockRepairingBlock extends BlockContainer
             return super.getExplosionResistance(world, pos, exploder, explosion);
         }
 
+    }
+
+    @Override
+    public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
+        //deny from happening
+        //super.onBlockExploded(world, pos, explosion);
+    }
+
+    @Override
+    public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
     }
 }

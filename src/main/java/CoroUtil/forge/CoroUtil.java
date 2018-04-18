@@ -113,6 +113,10 @@ public class CoroUtil {
 			}
     	}
 	}
+
+	public void postInit() {
+    	proxy.postInit();
+	}
     
     public CoroUtil() {
     	
