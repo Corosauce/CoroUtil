@@ -47,18 +47,11 @@ public class BuffAI_TaskBase extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
 
-        if (taskToReplace != null) {
-            if (BehaviorModifier.replaceTaskIfMissing(ent, taskToReplace, task, taskPriority)) {
-                return super.applyBuff(ent, difficulty);
-            } else {
-                return false;
-            }
+        if (applyBuffImpl(ent, difficulty, true)) {
+            return super.applyBuff(ent, difficulty);
         } else {
-            UtilEntityBuffs.addTask(ent, task, taskPriority);
+            return false;
         }
-
-
-        return super.applyBuff(ent, difficulty);
     }
 
     @Override
@@ -71,8 +64,22 @@ public class BuffAI_TaskBase extends BuffBase {
 
         //probably redundant if statement, added for safety
         if (canApplyBuff(ent, difficulty)) {
-            this.applyBuff(ent, difficulty);
+            this.applyBuffImpl(ent, difficulty, false);
         }
 
+    }
+
+    public boolean applyBuffImpl(EntityCreature ent, float difficulty, boolean firstTime) {
+        if (taskToReplace != null) {
+            if (BehaviorModifier.replaceTaskIfMissing(ent, taskToReplace, task, taskPriority)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            UtilEntityBuffs.addTask(ent, task, taskPriority);
+        }
+
+        return true;
     }
 }

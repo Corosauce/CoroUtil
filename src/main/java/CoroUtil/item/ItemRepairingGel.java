@@ -1,5 +1,7 @@
 package CoroUtil.item;
 
+import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockOldLog;
 import net.minecraft.block.BlockPlanks;
@@ -14,11 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.NonNullList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -56,14 +55,31 @@ public class ItemRepairingGel extends Item
         }
         else
         {
-            if (!player.capabilities.isCreativeMode)
-            {
-                itemstack.shrink(1);
+            if (!worldIn.isRemote) {
+                if (player.isCreative() && player.isSneaking()) {
+                    IBlockState state = worldIn.getBlockState(pos);
+                    if (UtilMining.canMineBlock(worldIn, pos, state.getBlock())/* &&
+                            UtilMining.canConvertToRepairingBlock(worldIn, state)*/) {
+                        TileEntityRepairingBlock.replaceBlockAndBackup(worldIn, pos);
+                    }
+                } else {
+                    TileEntity tEnt = worldIn.getTileEntity(pos);
+                    if (tEnt instanceof TileEntityRepairingBlock) {
+
+                        ((TileEntityRepairingBlock) tEnt).restoreBlock();
+
+                        if (!player.capabilities.isCreativeMode) {
+                            itemstack.shrink(1);
+                        }
+
+                        return EnumActionResult.SUCCESS;
+                    } else {
+                        return EnumActionResult.PASS;
+                    }
+                }
             }
-
-            return EnumActionResult.SUCCESS;
-
-            //return EnumActionResult.PASS;
         }
+
+        return EnumActionResult.PASS;
     }
 }

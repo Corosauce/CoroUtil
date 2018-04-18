@@ -57,13 +57,17 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
                     if (listTest.size() == 0)
                     {
                         //System.out.println("restoring: " + orig_blockState);
-                        getWorld().setBlockState(this.getPos(), orig_blockState);
+                        restoreBlock();
                     }
                 } else {
                     ticksRepairCount++;
                 }
             }
     	}
+    }
+
+    public void restoreBlock() {
+        getWorld().setBlockState(this.getPos(), orig_blockState);
     }
 
     public void setBlockData(IBlockState state) {

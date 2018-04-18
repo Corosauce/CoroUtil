@@ -1,17 +1,21 @@
 package CoroUtil.block;
 
+import CoroUtil.item.ItemRepairingGel;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,7 +41,11 @@ public class BlockRepairingBlock extends BlockContainer
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return NO_COLLIDE_AABB;
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && source instanceof World) {
+            return getSelectedBoundingBox(state, (World)source, pos);
+        } else {
+            return NO_COLLIDE_AABB;
+        }
     }
 
     @Deprecated
@@ -45,7 +53,16 @@ public class BlockRepairingBlock extends BlockContainer
     @Override
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
     {
-        return NO_COLLIDE_AABB;
+
+        //special behavior to let block only be selectable to repair if correct context
+
+        if (Minecraft.getMinecraft().player != null &&
+                (/*!Minecraft.getMinecraft().player.isSneaking() &&*/
+                        Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
+            return AABB;
+        } else {
+            return NO_COLLIDE_AABB;
+        }
     }
 
     /**

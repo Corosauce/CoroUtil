@@ -42,6 +42,19 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	public static String dataUsePlayerList = "HW_Inv_UsePlayerList";
 	public static String dataWhitelistMode = "HW_Inv_WhitelistMode";
 	public static String dataListPlayers = "HW_Inv_ListPlayers";
+	/*public static String dataListPlayers = "HW_Inv_ActiveTimeStart";
+	public static String dataListPlayers = "HW_Inv_ActiveTimeEnd";*/
+
+	/**
+	 *
+	 * first time init task with time range
+	 * reload check if data is there, if not, init as if first time
+	 * - dont forget about non invasion mode, factor in dataUseInvasionRules
+	 *
+	 * - what about if a mob survives between invasions and still has old task
+	 * -- do we only enhance mobs that just spawned or do we try to rope in alive ones?
+	 *
+	 */
 
     public TaskDigTowardsTarget()
     {
