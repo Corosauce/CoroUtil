@@ -18,6 +18,7 @@ public class BuffAI_TaskBase extends BuffBase {
     private Class taskToReplace;
     private int taskPriority;
     private float minRequiredDifficulty = 0;
+    private boolean isTargetTask = false;
 
     public BuffAI_TaskBase(String buffName, Class task, int taskPriority, Class taskToReplace) {
         this(buffName, task, taskPriority);
@@ -56,7 +57,7 @@ public class BuffAI_TaskBase extends BuffBase {
 
     @Override
     public boolean canApplyBuff(EntityCreature ent, float difficulty) {
-        return !UtilEntityBuffs.hasTask(ent, task);
+        return !UtilEntityBuffs.hasTask(ent, task, isTargetTask);
     }
 
     @Override
@@ -71,15 +72,23 @@ public class BuffAI_TaskBase extends BuffBase {
 
     public boolean applyBuffImpl(EntityCreature ent, float difficulty, boolean firstTime) {
         if (taskToReplace != null) {
-            if (BehaviorModifier.replaceTaskIfMissing(ent, taskToReplace, task, taskPriority)) {
+            if (BehaviorModifier.replaceTaskIfMissing(ent, taskToReplace, task, taskPriority, isTargetTask)) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            UtilEntityBuffs.addTask(ent, task, taskPriority);
+            UtilEntityBuffs.addTask(ent, task, taskPriority, isTargetTask);
         }
 
         return true;
+    }
+
+    public boolean isTargetTask() {
+        return isTargetTask;
+    }
+
+    public void setTargetTask(boolean targetTask) {
+        isTargetTask = targetTask;
     }
 }

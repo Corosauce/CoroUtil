@@ -225,7 +225,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     	
     	int findRange = ConfigHWMonsters.antiAirTryDist;
     	AxisAlignedBB aabb = new AxisAlignedBB(entity.posX, entity.posY, entity.posZ, entity.posX, entity.posY, entity.posZ);
-		aabb = aabb.expand(findRange, findRange, findRange);
+		aabb = aabb.grow(findRange, findRange, findRange);
 		List list = entity.world.getEntitiesWithinAABB(EntityPlayer.class, aabb);
 		boolean found = false;
 		double closest = 99999;

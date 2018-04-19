@@ -72,7 +72,7 @@ public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
     	//System.out.println("calling for help!");
     	int callRange = 150;
     	AxisAlignedBB aabb = new AxisAlignedBB(entity.posX, entity.posY, entity.posZ, entity.posX, entity.posY, entity.posZ);
-		aabb = aabb.expand(callRange, callRange, callRange);
+		aabb = aabb.grow(callRange, callRange, callRange);
 		List list = entity.world.getEntitiesWithinAABB(EntityZombie.class, aabb);
 		boolean found = false;
         for(int j = 0; j < list.size(); j++)

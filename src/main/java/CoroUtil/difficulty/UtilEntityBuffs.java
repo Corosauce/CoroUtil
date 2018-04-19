@@ -394,9 +394,13 @@ public class UtilEntityBuffs {
 
     }
 
-    public static boolean hasTask(EntityCreature ent, Class taskToCheckFor) {
+    public static boolean hasTask(EntityCreature ent, Class taskToCheckFor, boolean isTargetTask) {
+        EntityAITasks tasks = ent.tasks;
+        if (isTargetTask) {
+            tasks = ent.targetTasks;
+        }
         boolean foundTask = false;
-        for (Object entry2 : ent.tasks.taskEntries) {
+        for (Object entry2 : tasks.taskEntries) {
             EntityAITasks.EntityAITaskEntry entry = (EntityAITasks.EntityAITaskEntry) entry2;
             if (taskToCheckFor.isAssignableFrom(entry.action.getClass())) {
                 foundTask = true;
@@ -406,7 +410,11 @@ public class UtilEntityBuffs {
         return foundTask;
     }
 
-    public static boolean addTask(EntityCreature ent, Class taskToInject, int priorityOfTask) {
+    public static boolean addTask(EntityCreature ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
+        EntityAITasks tasks = ent.tasks;
+        if (isTargetTask) {
+            tasks = ent.targetTasks;
+        }
         try {
             Constructor<?> cons = taskToInject.getConstructor();
             Object obj = cons.newInstance();
@@ -414,7 +422,7 @@ public class UtilEntityBuffs {
                 ITaskInitializer task = (ITaskInitializer) obj;
                 task.setEntity(ent);
                 //System.out.println("adding task into zombie: " + taskToInject);
-                ent.tasks.addTask(priorityOfTask, (EntityAIBase) task);
+                tasks.addTask(priorityOfTask, (EntityAIBase) task);
                 //aiEnhanced.put(ent.getEntityId(), true);
 
 

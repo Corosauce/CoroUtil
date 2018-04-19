@@ -183,6 +183,8 @@ public class DynamicDifficulty {
 		if (wd != null) {
 			BuffedLocation debuff = new BuffedLocation(32, -2);
 			debuff.setDecays(true);
+			debuff.setWorld(player.world);
+			debuff.setOrigin(new BlockCoord(player.getPosition()));
 			wd.addTickingLocation(debuff);
 		}
 	}
