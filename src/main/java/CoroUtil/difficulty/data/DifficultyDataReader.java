@@ -74,6 +74,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put("xp", CmodXP.class);
         lookupJsonNameToCmodDeserializer.put("ai_antiair", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_mining", CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put("ai_omniscience", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_counterattack", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_lunge", CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put("ai_infernal", CmodAIInfernal.class);

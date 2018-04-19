@@ -165,6 +165,9 @@
               "cmod": "ai_mining"
             },
             {
+              "cmod": "ai_omniscience"
+            },
+            {
               "cmod": "template",
               "template": "inventory_chainmail"
             }
@@ -190,7 +193,12 @@
           "entities": [
             "creeper"
           ],
-          "count": 15
+          "count": 15,
+          "cmods": [
+            {
+              "cmod": "ai_omniscience"
+            }
+          ]
         }
       ]
     }

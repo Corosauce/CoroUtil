@@ -67,6 +67,7 @@ public class UtilEntityBuffs {
 
     public static String dataEntityBuffed_AI_LungeAndCounterLeap = "ai_counterattack";
     public static String dataEntityBuffed_AI_Digging = "ai_mining";
+    public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";
     public static String dataEntityBuffed_AI_AntiAir = "ai_antiair";
     public static String dataEntityBuffed_AI_Infernal = "ai_infernal";
     public static String dataEntityBuffed_Health = "attribute_health";
@@ -159,6 +160,7 @@ public class UtilEntityBuffs {
         registerBuff(new BuffAI_Infernal());
         registerBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
         registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
+        registerBuff(new BuffAI_TaskOmniscience(dataEntityBuffed_AI_Omniscience));
         registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
     }
 

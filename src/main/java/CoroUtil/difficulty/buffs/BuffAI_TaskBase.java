@@ -13,12 +13,12 @@ import net.minecraft.entity.ai.EntityAIZombieAttack;
  */
 public class BuffAI_TaskBase extends BuffBase {
 
-    private String buffName;
-    private Class task;
-    private Class taskToReplace;
-    private int taskPriority;
-    private float minRequiredDifficulty = 0;
-    private boolean isTargetTask = false;
+    protected String buffName;
+    protected Class task;
+    protected Class taskToReplace;
+    protected int taskPriority;
+    protected float minRequiredDifficulty = 0;
+    protected boolean isTargetTask = false;
 
     public BuffAI_TaskBase(String buffName, Class task, int taskPriority, Class taskToReplace) {
         this(buffName, task, taskPriority);
