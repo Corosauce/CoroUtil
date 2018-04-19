@@ -183,7 +183,7 @@ public class DynamicDifficulty {
 		if (wd != null) {
 			BuffedLocation debuff = new BuffedLocation(32, -2);
 			debuff.setDecays(true);
-			debuff.setWorld(player.world);
+			debuff.setWorldID(player.world.provider.getDimension());
 			debuff.setOrigin(new BlockCoord(player.getPosition()));
 			wd.addTickingLocation(debuff);
 		}
@@ -742,7 +742,7 @@ public class DynamicDifficulty {
 
 	public static BuffedLocation buffLocation(World world, BlockCoord coord, int distRadius, float difficulty) {
 		BuffedLocation zone = new BuffedLocation(distRadius, difficulty);
-		zone.setWorld(world);
+		zone.setWorldID(world.provider.getDimension());
 		zone.setOrigin(coord);
 		WorldDirectorManager.instance().getCoroUtilWorldDirector(world).addTickingLocation(zone);
 		return zone;

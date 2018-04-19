@@ -13,7 +13,7 @@ public interface ISimulationTickable {
 	public void readFromNBT(NBTTagCompound parData);
 	public NBTTagCompound writeToNBT(NBTTagCompound parData);
 	public void cleanup();
-	public void setWorld(World world);
+	public void setWorldID(int ID);
 	public World getWorld();
 	public BlockCoord getOrigin();
 	public void setOrigin(BlockCoord coord);

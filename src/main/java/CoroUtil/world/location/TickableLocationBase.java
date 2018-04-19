@@ -3,6 +3,7 @@ package CoroUtil.world.location;
 import CoroUtil.util.BlockCoord;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 
 /**
  * Base class for ticking locations (threaded ticking optional)
@@ -12,7 +13,8 @@ import net.minecraft.world.World;
  */
     public abstract class TickableLocationBase implements ISimulationTickable {
 
-    public World world;
+    //public World world;
+    public int dimensionID;
     public BlockCoord origin;
     public String classname;
 
@@ -46,6 +48,7 @@ import net.minecraft.world.World;
     @Override
     public void readFromNBT(NBTTagCompound parData) {
         origin = new BlockCoord(parData.getInteger("posX"), parData.getInteger("posY"), parData.getInteger("posZ"));
+        dimensionID = parData.getInteger("dimensionID");
     }
 
     @Override
@@ -54,6 +57,7 @@ import net.minecraft.world.World;
         parData.setInteger("posX", origin.getX());
         parData.setInteger("posY", origin.getY());
         parData.setInteger("posZ", origin.getZ());
+        parData.setInteger("dimensionID", dimensionID);
         return parData;
     }
 
@@ -63,13 +67,13 @@ import net.minecraft.world.World;
     }
 
     @Override
-    public void setWorld(World world) {
-        this.world = world;
+    public void setWorldID(int ID) {
+        this.dimensionID = ID;
     }
 
     @Override
     public World getWorld() {
-        return world;
+        return DimensionManager.getWorld(dimensionID);
     }
 
     @Override
