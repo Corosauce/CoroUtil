@@ -1,9 +1,11 @@
 package CoroUtil.forge;
 
+import CoroUtil.block.BlockBlank;
 import CoroUtil.block.BlockRepairingBlock;
 import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.item.ItemRepairingGel;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -61,6 +63,8 @@ public class CommonProxy implements IGuiHandler
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        //used for replacing foliage with blank for shaders
+        CoroUtil.proxy.addBlock(event, new BlockBlank(Material.AIR), "blank");
         CoroUtil.proxy.addBlock(event, new BlockRepairingBlock(), TileEntityRepairingBlock.class, block_repairing_name);
 
     }

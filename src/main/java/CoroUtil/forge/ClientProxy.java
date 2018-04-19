@@ -1,5 +1,6 @@
 package CoroUtil.forge;
 
+import CoroUtil.block.BlockBlank;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -36,7 +37,9 @@ public class ClientProxy extends CommonProxy
     public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
         super.addBlock(event, parBlock, unlocalizedName, creativeTab);
 
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(parBlock), 0, new ModelResourceLocation(CoroUtil.modID + ":" + unlocalizedName, "inventory"));
+        if (!(parBlock instanceof BlockBlank)) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(parBlock), 0, new ModelResourceLocation(CoroUtil.modID + ":" + unlocalizedName, "inventory"));
+        }
     }
 
     @Override
