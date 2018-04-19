@@ -1,6 +1,8 @@
 package CoroUtil.ai.tasks;
 
+import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.forge.CULog;
 import com.google.common.base.Predicate;
 import java.util.Comparator;
 import javax.annotation.Nullable;
@@ -10,7 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EntitySelectors;
 
-public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBase> extends EntityAITargetBetter implements ITaskInitializer
+public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBase> extends EntityAITargetBetter implements ITaskInitializer, IInvasionControlledTask
 {
     protected Class<EntityPlayer> targetClass;
     private int targetChance;
@@ -19,12 +21,14 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     protected Predicate <? super T > targetEntitySelector;
     protected EntityPlayer targetEntity;
 
+    private boolean disableAtSunrise = true;
+
     public EntityAINearestAttackablePlayerOmniscience() {
         shouldCheckSight = false;
         nearbyOnly = false;
         this.targetClass = EntityPlayer.class;
-        this.targetChance = 5;
-        this.setMutexBits(1);
+        this.targetChance = 40;
+        this.setMutexBits(0);
         this.targetEntitySelector = new Predicate<T>()
         {
             public boolean apply(@Nullable T p_apply_1_)
@@ -81,8 +85,10 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
+    @Override
     public boolean shouldExecute()
     {
+
         if (this.targetChance > 0 && this.taskOwner.getRNG().nextInt(this.targetChance) != 0)
         {
             return false;
@@ -104,6 +110,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     /**
      * Execute a one shot task or start executing a continuous task
      */
+    @Override
     public void startExecuting()
     {
         this.taskOwner.setAttackTarget(this.targetEntity);
@@ -114,6 +121,24 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     public void setEntity(EntityCreature creature) {
         this.taskOwner = creature;
         this.sorter = new EntityAINearestAttackablePlayerOmniscience.Sorter(creature);
+    }
+
+    @Override
+    public boolean shouldBeRemoved() {
+        if (disableAtSunrise) {
+            //once its day, disable forever
+            if (this.taskOwner.world.isDaytime()) {
+                CULog.dbg("removing omniscience");
+                //also detarget
+                if (this.taskOwner.getAttackTarget() instanceof EntityPlayer) {
+                    this.taskOwner.setAttackTarget(null);
+                }
+                return true;
+                //taskActive = false;
+            }
+        }
+
+        return false;
     }
 
     public static class Sorter implements Comparator<Entity>

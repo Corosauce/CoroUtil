@@ -1,5 +1,6 @@
 package CoroUtil.forge;
 
+import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
@@ -10,7 +11,9 @@ import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -43,6 +46,7 @@ import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class EventHandlerForge {
@@ -186,6 +190,38 @@ public class EventHandlerForge {
 								//cleanup for memory
 								WorldDirectorManager.instance().getBlockDataGrid(ent.world).removeBlockData(newX, newY, newZ);
 								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//remove tasks that are marked to be removed
+		if (!ent.world.isRemote) {
+			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
+				if (ent instanceof EntityLiving) {
+					EntityLiving entL = (EntityLiving) ent;
+					Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
+					while (it.hasNext()) {
+						EntityAITasks.EntityAITaskEntry task = it.next();
+						if (task.action instanceof IInvasionControlledTask) {
+							if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+								//entL.tasks.removeTask(task.action);
+								task.action.resetTask();
+								it.remove();
+							}
+						}
+					}
+
+					it = entL.targetTasks.taskEntries.iterator();
+					while (it.hasNext()) {
+						EntityAITasks.EntityAITaskEntry task = it.next();
+						if (task.action instanceof IInvasionControlledTask) {
+							if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+								//entL.targetTasks.removeTask(task.action);
+								task.action.resetTask();
+								it.remove();
 							}
 						}
 					}

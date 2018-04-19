@@ -1,6 +1,8 @@
 package CoroUtil.ai.tasks;
 
+import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilPath;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,7 +17,7 @@ import net.minecraft.world.World;
  * For making use of long distance partial pathing
  * TODO: test it more to make sure it doesnt double up pathfinding work too much
  */
-public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializer
+public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
 {
     World world;
     protected EntityCreature attacker;
@@ -35,6 +37,8 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     private int failedPathFindingPenalty = 0;
     private boolean canPenalize = false;
 
+    private boolean disableAtSunrise = true;
+
     public EntityAIChaseFromFar() {
         this.speedTowardsTarget = 1;
         this.longMemory = false;
@@ -53,8 +57,10 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
+    @Override
     public boolean shouldExecute()
     {
+
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
 
         if (entitylivingbase == null)
@@ -98,6 +104,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
+    @Override
     public boolean shouldContinueExecuting()
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
@@ -127,6 +134,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     /**
      * Execute a one shot task or start executing a continuous task
      */
+    @Override
     public void startExecuting()
     {
         this.attacker.getNavigator().setPath(this.entityPathEntity, this.speedTowardsTarget);
@@ -136,6 +144,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     /**
      * Reset the task's internal state. Called when this task is interrupted by another one
      */
+    @Override
     public void resetTask()
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
@@ -151,6 +160,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     /**
      * Keep ticking a continuous task that has already been started
      */
+    @Override
     public void updateTask()
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
@@ -225,5 +235,20 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     @Override
     public void setEntity(EntityCreature creature) {
         this.attacker = creature;
+    }
+
+    @Override
+    public boolean shouldBeRemoved() {
+
+        if (disableAtSunrise) {
+            //once its day, disable forever
+            if (this.attacker.world.isDaytime()) {
+                CULog.dbg("removing long distance pathing");
+                return true;
+                //taskActive = false;
+            }
+        }
+
+        return false;
     }
 }

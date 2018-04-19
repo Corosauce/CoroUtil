@@ -19,6 +19,17 @@ public class DataActionMobSpawns {
     public List<String> entities = new ArrayList<>();
     public List<DataCmod> cmods = new ArrayList<>();
 
+    public DataActionMobSpawns copy() {
+        DataActionMobSpawns copy = new DataActionMobSpawns();
+        //probably pointless, should always be 0 unless something messed with original copy
+        copy.count = count;
+        copy.entities.addAll(entities);
+        for (DataCmod cmod : cmods) {
+            copy.cmods.add(cmod);
+        }
+        return copy;
+    }
+
     @Override
     public String toString() {
         String str = ChatFormatting.GOLD + "Entities: " + ChatFormatting.RESET;

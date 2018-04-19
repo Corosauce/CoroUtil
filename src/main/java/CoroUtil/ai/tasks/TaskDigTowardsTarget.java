@@ -2,8 +2,10 @@ package CoroUtil.ai.tasks;
 
 import java.util.Random;
 
+import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilPlayer;
@@ -23,7 +25,7 @@ import net.minecraft.util.math.MathHelper;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.util.BlockCoord;
 
-public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer
+public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
 {
     private EntityCreature entity = null;
 	private IBlockState stateCurMining = null;
@@ -69,11 +71,14 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
-    public boolean shouldExecute()
+    @Override
+	public boolean shouldExecute()
     {
+
     	//this method ticks every 3 ticks in best conditions
 		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
-    	
+
+		//TODO: remove this once confirmed task removal way works
     	//prevent day digging, easy way to prevent digging once invasion ends
 		if (forInvasion) {
 			if (entity.world.isDaytime()) return false;
@@ -149,7 +154,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean continueExecuting()
+	@Override
+    public boolean shouldContinueExecuting()
     {
     	//System.out.println("continue!");
     	if (posCurMining == null) return false;
@@ -167,6 +173,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     /**
      * Execute a one shot task or start executing a continuous task
      */
+	@Override
     public void startExecuting()
     {
     	//System.out.println("start!");
@@ -175,6 +182,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     /**
      * Resets the task
      */
+	@Override
     public void resetTask()
     {
     	//System.out.println("reset!");
@@ -186,6 +194,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     /**
      * Updates the task
      */
+
+    @Override
     public void updateTask()
     {
     	//System.out.println("running!");
@@ -350,4 +360,20 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), (int)(curBlockDamage * 10D));
     	}
     }
+
+	@Override
+	public boolean shouldBeRemoved() {
+		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
+
+		if (forInvasion) {
+			//once its day, disable forever
+			if (this.entity.world.isDaytime()) {
+				CULog.dbg("removing digging");
+				return true;
+				//taskActive = false;
+			}
+		}
+
+		return false;
+	}
 }
