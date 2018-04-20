@@ -460,6 +460,16 @@ public class CommandCoroUtil extends CommandBase {
 						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
 						world.setBlockToAir(pos);*/
 					}
+				} else if (var2[0].equals("testPower")) {
+					Vec3d vec = var1.getPositionVector();
+					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
+					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());
+					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
+
+					BlockPos pos = new BlockPos(sx, sy, sz);
+					IBlockState state = world.getBlockState(pos);
+
+					CoroUtilCompatibility.testPowerInfo(player, pos);
 				}
 			/*}*/
 		} catch (Exception ex) {
