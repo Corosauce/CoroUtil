@@ -60,7 +60,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
     public TaskDigTowardsTarget()
     {
-        //this.setMutexBits(3);
+        this.setMutexBits(3);
     }
     
     @Override

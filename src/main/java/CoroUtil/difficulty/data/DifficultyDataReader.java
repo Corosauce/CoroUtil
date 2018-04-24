@@ -14,12 +14,14 @@ import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +48,8 @@ public class DifficultyDataReader {
     //modes used for validating
     private static boolean debugValidate = false;
     private static boolean debugFlattenCmodsAndConditions = false;
+
+    public static File dataFolder = new File("./config/coroutil/data/");
 
     public static boolean debugValidate() {
         return debugValidate;
@@ -96,98 +100,54 @@ public class DifficultyDataReader {
     public static void loadFiles() {
         data.reset();
 
-        CoroUtil.dbg("start reading difficulty files");
-
-        /*File folderLoot = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\" + lootTablesFolder + "\\");
-
-        String fileContents;
-
-        if (folderLoot.exists()) {
-            if (folderLoot.isFile()) {
-                try {
-                    fileContents = Files.toString(folderLoot, Charsets.UTF_8);
-                    LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(GSON_INSTANCE, test, fileContents, true);
-                    System.out.println(lootTable);
-                } catch (Exception ex) {
-
-                }
-            }
-        }*/
-
-
-
-        //temp
-        /*File dataFolder = new File("I:\\newdev\\git\\CoroUtil_1.10.2\\src\\main\\resources\\assets\\coroutil\\config\\");
-
-        if (!dataFolder.exists()) {
-            dataFolder = new File("/mnt/e/git/CoroUtil_1.12.x/src/main/resources/assets/coroutil/config/");
-        }*/
+        CoroUtil.dbg("Start reading CoroUtil json difficulty files");
 
         try {
-            /*List<File> listFiles = UtilClasspath.getClassesForPackage("assets.coroutil.config", ".json");
-            System.out.println(listFiles);*/
 
-            /*final Collection<String> list = UtilClasspath.getResources("");
-            for(final String name : list){
-                CULog.dbg(name);
-            }*/
-
-
-            /*List<String> files = IOUtils.readLines(DifficultyDataReader.class.getClassLoader()
-                    .getResourceAsStream("."), Charsets.UTF_8);*/
-
-            /**
-             * TODO: use this code to copy the json files to a filesystem folder
-             * - config folder or per world folder?
-             * - then user can customize them more like actual configs
-             */
-
-            List<String> listFiles = new ArrayList<>();
-
-            for (ModContainer mod : Loader.instance().getActiveModList()) {
-                //System.out.println(mod.getModId());
-
-                if (mod.getModId().equals(CoroUtil.modID)) {
-                    //UtilClasspath.loadRecipes(mod);
-                    CraftingHelper.findFiles(mod, "assets/" + mod.getModId() + "/config",
-                            null, (root, file) ->
-                            {
-                                //System.out.println("2:" + root + ", " + file);
-                                if (file.toString().endsWith("json")) {
-                                    listFiles.add(file.toString());
-                                }
-                                return true;
-                            }, true, true);
-                }
+            if (!dataFolder.exists() || dataFolder.listFiles().length <= 0) {
+                CULog.log("Detected coroutil json data missing, generating from templates");
+                generateDataTemplates();
             }
 
-            for (String file : listFiles) {
-                processFileFromJarPath(file);
+            if (dataFolder.exists()) {
+                processFolder(dataFolder);
+            } else {
+                CULog.err("CRITICAL Error generating data folder");
             }
-
-            //
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        /*try {
-
-            if (dataFolder.exists()) {
-                processFolder(dataFolder);
-            } else {
-                System.out.println("doesnt exist!");
-            }
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }*/
-
-        CoroUtil.dbg("done");
+        CoroUtil.dbg("done processing difficulty files");
     }
 
-    //TODO: replace with temp copy from jar to filesystem and load from filesystem for user editability?
+    public static void generateDataTemplates() {
+
+        dataFolder.mkdirs();
+
+        List<String> listFiles = new ArrayList<>();
+
+        for (ModContainer mod : Loader.instance().getActiveModList()) {
+
+            if (mod.getModId().equals(CoroUtil.modID)) {
+                CraftingHelper.findFiles(mod, "assets/" + mod.getModId() + "/config",
+                        null, (root, file) ->
+                        {
+                            //System.out.println("2:" + root + ", " + file);
+                            if (file.toString().endsWith("json")) {
+                                listFiles.add(file.toString());
+                            }
+                            return true;
+                        }, true, true);
+            }
+        }
+
+        for (String file : listFiles) {
+            copyFileFromJarPath(file);
+        }
+    }
+
     public static void processFileFromJarPath(String path) {
         try {
 
@@ -217,6 +177,39 @@ public class DifficultyDataReader {
         }
     }
 
+    public static void copyFileFromJarPath(String path) {
+        try {
+
+            String pathRoot = path.substring(path.indexOf("assets/coroutil/"));
+            String pathSub = "assets/coroutil/config";
+            String pathRoot2 = path.substring(path.indexOf(pathSub) + pathSub.length());
+
+            String fileContents = "";
+
+            if (path.contains(lootTablesFolder)) {
+                //CULog.dbg("processing, detected as loot table: " + path.substring(path.lastIndexOf("/")+1).toString());
+                String temp = pathRoot.replace("assets/" + CoroUtil.modID + "/", "");
+                fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
+                //CULog.dbg("file contents size: " + fileContents.length());
+            } else {
+                //CULog.dbg("processing, detected as DifficultyData: " + path.substring(path.lastIndexOf("/")+1).toString());
+                String temp = pathRoot.replace("assets/" + CoroUtil.modID + "/", "");
+                fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
+                //CULog.dbg("file contents size: " + fileContents.length());
+            }
+
+            if (!fileContents.equals("")) {
+                File fileOut = new File(dataFolder + pathRoot2);
+                CULog.log("copying " + path.substring(path.lastIndexOf("/")+1).toString() + " to " + fileOut.toString());
+                FileUtils.writeStringToFile(fileOut, fileContents, StandardCharsets.UTF_8);
+            } else {
+                CULog.err("couldnt get contents of file: " + path);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
     public static void processFileFromFilesystem(File file) {
         try {
 
@@ -237,28 +230,6 @@ public class DifficultyDataReader {
             ex.printStackTrace();
         }
     }
-
-
-    /*public static void processFileFromString(String path, String contents) {
-        try {
-            if (path.contains(lootTablesFolder)) {
-                CULog.dbg("processing, detected as loot table: " + path.toString());
-                //ResourceLocation resLoc = new ResourceLocation();
-                String temp = path.replace("assets/" + CoroUtil.modID, "").replace("/", ".");
-                String fileContents = UtilClasspath.getContentsFromResourceLocation(new ResourceLocation(CoroUtil.modID, temp));
-                //String fileContents = Files.toString(path, Charsets.UTF_8);
-                String fileName = path.substring(path.lastIndexOf("/")+1).replace(".json", "");
-                ResourceLocation resName = new ResourceLocation(CoroUtil.modID + ":loot_tables." + fileName);
-                LootTable lootTable = net.minecraftforge.common.ForgeHooks.loadLootTable(LootTableManager.GSON_INSTANCE, resName, fileContents, true, null);
-                data.lookupLootTables.put(fileName, lootTable);
-            } else {
-                CULog.dbg("processing, detected as DifficultyData: " + file.toString());
-                GSONBuffInventory.fromJson(new BufferedReader(new FileReader(file)), DifficultyData.class);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }*/
 
     public static void processFolder(File path) {
         for (File child : path.listFiles()) {
