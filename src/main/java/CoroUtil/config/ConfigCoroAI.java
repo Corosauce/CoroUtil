@@ -49,7 +49,7 @@ public class ConfigCoroAI implements IConfigCategory {
 
 	public static boolean debugShaders = false;
 
-	public static boolean foliageShaders = true;
+	public static boolean foliageShaders = false;
 	public static boolean particleShaders = true;
 
 	@ConfigComment("For seldom used but important things to print out in production")

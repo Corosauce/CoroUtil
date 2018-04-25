@@ -187,8 +187,11 @@ public class EventHandler {
             }
 
             if (RotatingParticleManager.useShaders && ShaderEngine.renderer == null) {
+
+                boolean simulateFail = false;
+
                 //currently for if shader compiling fails, which is an ongoing issue for some machines...
-                if (!ShaderEngine.init()) {
+                if (!ShaderEngine.init() || simulateFail) {
 
                     CULog.log("Extended Renderer: Shaders failed to initialize");
 
