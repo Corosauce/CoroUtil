@@ -51,12 +51,13 @@ public class CoroUtil {
     public static String eventChannelName = "coroutil";
 	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
     
-    //public static PetsManager petsManager;
+    public static ConfigCoroUtil configCoroUtil = null;
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-    	ConfigMod.addConfigFile(event, new ConfigCoroUtil());
+		configCoroUtil = new ConfigCoroUtil();
+    	ConfigMod.addConfigFile(event, configCoroUtil);
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
 		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
 
