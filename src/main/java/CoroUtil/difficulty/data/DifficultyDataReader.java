@@ -1,5 +1,6 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.difficulty.data.cmods.*;
 import CoroUtil.difficulty.data.conditions.*;
 import CoroUtil.forge.CULog;
@@ -100,26 +101,28 @@ public class DifficultyDataReader {
     public static void loadFiles() {
         data.reset();
 
-        CoroUtil.dbg("Start reading CoroUtil json difficulty files");
+        if (ConfigCoroUtil.tempDisableHWInvFeatures) {
+            CoroUtil.dbg("Start reading CoroUtil json difficulty files");
 
-        try {
+            try {
 
-            if (!dataFolder.exists() || dataFolder.listFiles().length <= 0) {
-                CULog.log("Detected coroutil json data missing, generating from templates");
-                generateDataTemplates();
+                if (!dataFolder.exists() || dataFolder.listFiles().length <= 0) {
+                    CULog.log("Detected coroutil json data missing, generating from templates");
+                    generateDataTemplates();
+                }
+
+                if (dataFolder.exists()) {
+                    processFolder(dataFolder);
+                } else {
+                    CULog.err("CRITICAL Error generating data folder");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            if (dataFolder.exists()) {
-                processFolder(dataFolder);
-            } else {
-                CULog.err("CRITICAL Error generating data folder");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            CoroUtil.dbg("done processing difficulty files");
         }
-
-        CoroUtil.dbg("done processing difficulty files");
     }
 
     public static void generateDataTemplates() {

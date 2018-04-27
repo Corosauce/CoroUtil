@@ -6,10 +6,6 @@ import java.util.Arrays;
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 import CoroUtil.util.DimensionChunkCacheNew;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConfigCoroUtil implements IConfigCategory {
 
@@ -63,6 +59,13 @@ public class ConfigCoroUtil implements IConfigCategory {
 	public static boolean useLoggingError = true;
 
 	public static boolean useCoroPets = false;
+
+	/**
+	 * TODO: while the code is in coroutil, why not just detect a hostile worlds mod THEN gen it?
+	 */
+
+	@ConfigComment("Used until Invasion mod is released")
+	public static boolean tempDisableHWInvFeatures = true;
 
 	@Override
 	public String getName() {
