@@ -101,7 +101,7 @@ public class DifficultyDataReader {
     public static void loadFiles() {
         data.reset();
 
-        if (ConfigCoroUtil.tempDisableHWInvFeatures) {
+        if (!ConfigCoroUtil.tempDisableHWInvFeatures) {
             CoroUtil.dbg("Start reading CoroUtil json difficulty files");
 
             try {
