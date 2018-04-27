@@ -2,11 +2,10 @@ package CoroUtil.util;
 
 import java.util.Random;
 
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.pathfinding.Path;
@@ -122,7 +121,7 @@ public class CoroUtilPath {
 			//theres is 1 case where this happens: https://github.com/Corosauce/ZombieAwareness/issues/27
 			//tracked it down to possibly a null AABB on a block
 			CULog.err("Exception trying to pathfind");
-			if (ConfigCoroAI.useLoggingError) {
+			if (ConfigCoroUtil.useLoggingError) {
 				ex.printStackTrace();
 			}
 		}

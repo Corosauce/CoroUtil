@@ -49,7 +49,7 @@ public class DifficultyDataReader {
     private static boolean debugValidate = false;
     private static boolean debugFlattenCmodsAndConditions = false;
 
-    public static File dataFolder = new File("./config/coroutil/data/");
+    public static File dataFolder = new File("./config/CoroUtil/data/");
 
     public static boolean debugValidate() {
         return debugValidate;

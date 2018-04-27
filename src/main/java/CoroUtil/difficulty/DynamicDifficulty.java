@@ -14,7 +14,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -32,7 +31,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
@@ -85,12 +84,12 @@ public class DynamicDifficulty {
 			}
 			
 			
-			if (ConfigCoroAI.cleanupStrayMobs) {
+			if (ConfigCoroUtil.cleanupStrayMobs) {
 				long dayNumber = (world.getWorldTime() / 24000) + 1;
-				if (dayNumber % ConfigCoroAI.cleanupStrayMobsDayRate == 0) {
+				if (dayNumber % ConfigCoroUtil.cleanupStrayMobsDayRate == 0) {
 					long timeOfDay = world.getWorldTime() % 24000;
 					int killTimeRange = 10;
-					if (timeOfDay >= (long)ConfigCoroAI.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
+					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						System.out.println("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof EntityZombie) {

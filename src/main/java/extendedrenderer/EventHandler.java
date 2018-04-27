@@ -1,47 +1,32 @@
 package extendedrenderer;
 
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.particle.ShaderManager;
-import extendedrenderer.render.FoliageRenderer;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.ShaderEngine;
 import extendedrenderer.shader.ShaderListenerRegistry;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockTallGrass;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.IRegistry;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import extendedrenderer.particle.ParticleRegistry;
-import CoroUtil.forge.CoroUtil;
 import org.lwjgl.opengl.GL11;
 
-import java.nio.FloatBuffer;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class EventHandler {
 
@@ -57,7 +42,7 @@ public class EventHandler {
     //a hack to enable fog for particles when weather2 sandstorm is active
     public static float sandstormFogAmount = 0F;
 
-    public boolean lastFoliageUse = ConfigCoroAI.foliageShaders;
+    public boolean lastFoliageUse = ConfigCoroUtil.foliageShaders;
 
     public static boolean flagFoliageUpdate = false;
 
@@ -94,13 +79,13 @@ public class EventHandler {
                 //}
             }
 
-            if (ConfigCoroAI.foliageShaders != lastFoliageUse) {
+            if (ConfigCoroUtil.foliageShaders != lastFoliageUse) {
                 flagFoliageUpdate = true;
             }
 
             if (flagFoliageUpdate) {
                 flagFoliageUpdate = false;
-                lastFoliageUse = ConfigCoroAI.foliageShaders;
+                lastFoliageUse = ConfigCoroUtil.foliageShaders;
                 Minecraft.getMinecraft().refreshResources();
             }
         }
@@ -110,7 +95,7 @@ public class EventHandler {
 	@SideOnly(Side.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
-        if (!ConfigCoroAI.useEntityRenderHookForShaders) {
+        if (!ConfigCoroUtil.useEntityRenderHookForShaders) {
             EventHandler.hookRenderShaders(event.getPartialTicks());
         }
     }
@@ -128,7 +113,7 @@ public class EventHandler {
     public static boolean queryUseOfShaders() {
         RotatingParticleManager.useShaders = ShaderManager.canUseShadersInstancedRendering();
 
-        if (ConfigCoroAI.forceShadersOff) {
+        if (ConfigCoroUtil.forceShadersOff) {
             RotatingParticleManager.useShaders = false;
         }
 
@@ -150,7 +135,7 @@ public class EventHandler {
 
         EntityRenderer er = mc.entityRenderer;
 
-        if (!ConfigCoroAI.disableParticleRenderer) {
+        if (!ConfigCoroUtil.disableParticleRenderer) {
 
             //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
 
@@ -205,7 +190,7 @@ public class EventHandler {
 
             preShaderRender(mc.getRenderViewEntity(), partialTicks);
 
-            if (ConfigCoroAI.foliageShaders) {
+            if (ConfigCoroUtil.foliageShaders) {
                 ExtendedRenderer.foliageRenderer.render(mc.getRenderViewEntity(), partialTicks);
             }
 
@@ -275,7 +260,7 @@ public class EventHandler {
         mip_mag = 0;
 
         //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
-        if (!ConfigCoroAI.disableMipmapFix) {
+        if (!ConfigCoroUtil.disableMipmapFix) {
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             //                                  3553                10241
             mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
@@ -292,7 +277,7 @@ public class EventHandler {
     public static void postShaderRender(Entity entityIn, float partialTicks) {
 
         //restore original mipmap state
-        if (!ConfigCoroAI.disableMipmapFix) {
+        if (!ConfigCoroUtil.disableMipmapFix) {
             Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);

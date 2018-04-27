@@ -1,5 +1,6 @@
 package CoroUtil.config;
 
+import java.io.File;
 import java.util.Arrays;
 
 import modconfig.ConfigComment;
@@ -10,7 +11,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ConfigCoroAI implements IConfigCategory {
+public class ConfigCoroUtil implements IConfigCategory {
 
 	public static boolean chunkCacheOverworldOnly = false;
 	public static boolean usePlayerRadiusChunkLoadingForFallback = true;
@@ -61,19 +62,21 @@ public class ConfigCoroAI implements IConfigCategory {
 	@ConfigComment("For logging warnings/errors")
 	public static boolean useLoggingError = true;
 
+	public static boolean useCoroPets = false;
+
 	@Override
 	public String getName() {
-		return "CoroUtil";
+		return "General";
 	}
 
 	@Override
 	public String getRegistryName() {
-		return "coroai";
+		return "coroutil_general";
 	}
 
 	@Override
 	public String getConfigFileName() {
-		return getName();
+		return "CoroUtil" + File.separator + getName();
 	}
 
 	@Override

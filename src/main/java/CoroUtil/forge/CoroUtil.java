@@ -1,16 +1,12 @@
 package CoroUtil.forge;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -24,7 +20,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
@@ -60,7 +56,7 @@ public class CoroUtil {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-    	ConfigMod.addConfigFile(event, new ConfigCoroAI());
+    	ConfigMod.addConfigFile(event, new ConfigCoroUtil());
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
 		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
 
@@ -144,6 +140,8 @@ public class CoroUtil {
     		CULog.log("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
+	    	//dont prevent reading in if ConfigCoroUtil.useCoroPets is false,
+			//so they can have the data if they enable it while server running
 	    	PetsManager.instance().nbtReadFromDisk();
 	    	
 	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
@@ -153,8 +151,10 @@ public class CoroUtil {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-    		PetsManager.instance().nbtWriteToDisk();
-	    	if (unloadInstances) PetsManager.instance().reset();
+    		if (ConfigCoroUtil.useCoroPets) {
+				PetsManager.instance().nbtWriteToDisk();
+				if (unloadInstances) PetsManager.instance().reset();
+			}
 	    	PlayerQuestManager.i().saveData(false, unloadInstances);
 	    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     	} catch (Exception ex) {

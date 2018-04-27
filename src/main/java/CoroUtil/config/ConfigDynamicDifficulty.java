@@ -3,6 +3,8 @@ package CoroUtil.config;
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 
+import java.io.File;
+
 public class ConfigDynamicDifficulty implements IConfigCategory {
 
 	@ConfigComment("Track chunk bound data required for some difficulty calculations, disable if issues with server stability relating to CoroUtil")
@@ -61,7 +63,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 
 	@Override
 	public String getName() {
-		return "CoroUtil_DynamicDifficulty";
+		return "DynamicDifficulty";
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 
 	@Override
 	public String getConfigFileName() {
-		return getName();
+		return "CoroUtil" + File.separator + getName();
 	}
 
 	@Override
