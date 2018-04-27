@@ -78,8 +78,8 @@ public class CommonProxy implements IGuiHandler
     public void postInit() {
         ResourceLocation group = new ResourceLocation(CoroUtil.modID, "hw_invasion");
 
-        GameRegistry.addShapedRecipe(new ResourceLocation(CoroUtil.modID, item_repairing_gel_name), group,
-                new ItemStack(itemRepairingGel, 1), new Object[] {"X X", "   ", "XXX", 'X', Items.GOLD_INGOT});
+        /*GameRegistry.addShapedRecipe(new ResourceLocation(CoroUtil.modID, item_repairing_gel_name), group,
+                new ItemStack(itemRepairingGel, 1), new Object[] {"X X", "   ", "XXX", 'X', Items.GOLD_INGOT});*/
     }
 
     public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName) {
