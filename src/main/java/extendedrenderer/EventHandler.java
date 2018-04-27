@@ -46,6 +46,8 @@ public class EventHandler {
 
     public static boolean flagFoliageUpdate = false;
 
+    public static boolean lastLightningBoltLightState = false;
+
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void tickRenderScreen(TickEvent.RenderTickEvent event) {
@@ -68,9 +70,13 @@ public class EventHandler {
                 if (!isPaused()) {
                     ExtendedRenderer.rotEffRenderer.updateEffects();
 
-                    if (mc.world.getTotalWorldTime() % 2 == 0) {
+                    boolean lightningActive = mc.world.getLastLightningBolt() > 0;
+
+                    if (mc.world.getTotalWorldTime() % 2 == 0 || lightningActive != lastLightningBoltLightState) {
                         CoroUtilBlockLightCache.clear();
                     }
+
+                    lastLightningBoltLightState = lightningActive;
                 }
                 //if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
                     //lastWorldTime = mc.theWorld.getTotalWorldTime();
