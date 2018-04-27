@@ -89,6 +89,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     private boolean dontRenderUnderTopmostBlock = false;
 
     private boolean killWhenUnderTopmostBlock = false;
+    private int killWhenUnderTopmostBlock_ScanAheadRange = 0;
 
     public int killWhenUnderCameraAtLeast = 0;
 
@@ -224,7 +225,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
             if (killWhenUnderTopmostBlock) {
                 int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
-                if (this.posY <= height) {
+                if (this.posY - killWhenUnderTopmostBlock_ScanAheadRange <= height) {
                     startDeath();
                 }
             }
@@ -697,5 +698,13 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public void setAlphaF(float alpha) {
         super.setAlphaF(alpha);
         RotatingParticleManager.markDirtyVBO2();
+    }
+
+    public int getKillWhenUnderTopmostBlock_ScanAheadRange() {
+        return killWhenUnderTopmostBlock_ScanAheadRange;
+    }
+
+    public void setKillWhenUnderTopmostBlock_ScanAheadRange(int killWhenUnderTopmostBlock_ScanAheadRange) {
+        this.killWhenUnderTopmostBlock_ScanAheadRange = killWhenUnderTopmostBlock_ScanAheadRange;
     }
 }

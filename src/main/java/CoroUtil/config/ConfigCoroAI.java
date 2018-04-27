@@ -20,7 +20,7 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean trackPlayerData = false;
 	
-	public static boolean useBlackListsAsWhitelist = false;
+	//public static boolean useBlackListsAsWhitelist = false;
 	
 	public static boolean PFQueueDebug = false;
 	
