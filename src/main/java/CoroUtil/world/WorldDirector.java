@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -46,7 +47,7 @@ public class WorldDirector implements Runnable {
 	//TODO: consider locationless ticking simulations
 	public ConcurrentHashMap<Integer, ISimulationTickable> lookupTickingManagedLocations;
 	
-	public List<ISimulationTickable> listTickingLocations;
+	public ConcurrentLinkedQueue<ISimulationTickable> listTickingLocations;
 	
 	//server side only thread
 	public boolean useThreading = false;
@@ -81,8 +82,8 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public WorldDirector() {
-		lookupTickingManagedLocations = new ConcurrentHashMap<Integer, ISimulationTickable>();
-		listTickingLocations = new ArrayList<ISimulationTickable>();
+		lookupTickingManagedLocations = new ConcurrentHashMap<>();
+		listTickingLocations = new ConcurrentLinkedQueue<>();
 	}
 	
 	public void initAndStartThread() {
