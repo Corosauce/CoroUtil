@@ -58,16 +58,18 @@ public class EventHandlerForge {
 
 		PlayerQuestManager.i().onEvent(event);
 
-		if (!event.getEntity().world.isRemote) {
-			if (event.getEntity() instanceof EntityPlayer) {
-				DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
+		if (!ConfigCoroUtil.tempDisableHWInvFeatures) {
+			if (!event.getEntity().world.isRemote) {
+				if (event.getEntity() instanceof EntityPlayer) {
+					DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
 
-				//also remove invasion skip buff since the invaders got what they wanted (also covers edge case of player removing invasion mod and buff remaining)
-				DynamicDifficulty.setInvasionSkipBuff((EntityPlayer) event.getEntity(), 0);
-				//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
+					//also remove invasion skip buff since the invaders got what they wanted (also covers edge case of player removing invasion mod and buff remaining)
+					DynamicDifficulty.setInvasionSkipBuff((EntityPlayer) event.getEntity(), 0);
+					//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
+				}
+
+				UtilEntityBuffs.onDeath(event);
 			}
-
-			UtilEntityBuffs.onDeath(event);
 		}
 	}
 	
