@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import java.util.ArrayList;
 import java.util.List;
 
+import CoroUtil.difficulty.DynamicDifficulty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -21,7 +22,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
 import CoroUtil.world.WorldDirectorManager;
-import CoroUtil.world.player.DynamicDifficulty;
 public class EventHandlerFML {
 
 	public static World lastWorld = null;
@@ -104,17 +104,17 @@ public class EventHandlerFML {
 		//test CoroUtil context render all quests
 		if (FMLClientHandler.instance().getClient().world != null && FMLClientHandler.instance().getClient().player != null) {
 			if (event.phase == Phase.END) {
-				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(FMLClientHandler.instance().getClient().player);
+				//PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(FMLClientHandler.instance().getClient().player);
 				
 				//quests.renderQuestOverlay();
-				if (soundTest == null) soundTest = new SoundTest();
+				/*if (soundTest == null) soundTest = new SoundTest();
 				
 				if (timeLast != FMLClientHandler.instance().getClient().world.getTotalWorldTime()) {
 					timeLast = FMLClientHandler.instance().getClient().world.getTotalWorldTime();
 					if (soundTest.active) {
 						soundTest.tick();
 					}
-				}
+				}*/
 			}
 		}
 	}

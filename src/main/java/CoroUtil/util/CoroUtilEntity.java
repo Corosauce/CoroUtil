@@ -4,11 +4,13 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -132,5 +134,28 @@ public class CoroUtilEntity {
         }
 
         return entityplayer;
+    }
+
+    public static boolean canProcessForList(String playerName, String list, boolean whitelistMode) {
+        if (whitelistMode) {
+            if (!list.contains(playerName)) {
+                return false;
+            }
+        } else {
+            if (list.contains(playerName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Class getClassFromRegisty(String name) {
+        //Class clazz = EntityList.NAME_TO_CLASS.get(name);
+        Class clazz = EntityList.getClass(new ResourceLocation(name));
+        //dont think this will be needed for proper registered entity names
+        /*if (clazz == null) {
+            clazz = EntityList.NAME_TO_CLASS.get(name.replace("minecraft:", "").replace("minecraft.", ""));
+        }*/
+        return clazz;
     }
 }

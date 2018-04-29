@@ -1,5 +1,6 @@
 package extendedrenderer.particle.behavior;
 
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.util.Vec3;
 import extendedrenderer.particle.entity.EntityRotFX;
 
@@ -8,6 +9,11 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 	//Externally updated variables, adjusting how templated behavior works
 	public int curTick = 0;
 	public int ticksMax = 1;
+
+
+
+	//TODO: temp, for comparing until done
+	//public static boolean newCloudWay = false;
 	
 	public ParticleBehaviorFog(Vec3 source) {
 		super(source);
@@ -24,6 +30,8 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		//cloud
 		particle.rotationYaw = rand.nextInt(360);
 		particle.rotationPitch = -90+rand.nextInt(50)-rand.nextInt(50);
+
+
 		
 		particle.setMaxAge(650+rand.nextInt(10));
 		particle.setGravity(0.01F);
@@ -50,7 +58,15 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		particle.setAlphaF(0);
 		
 		float sizeBase = (float) (500+(rand.nextDouble()*40));
-		
+
+		//TEST
+		if (ConfigCoroUtil.optimizedCloudRendering) {
+			sizeBase += 500;
+			particle.rotationPitch = -90 + rand.nextInt(5) - rand.nextInt(5);
+			particle.setTicksFadeInMax(20);
+			particle.setTicksFadeOutMax(20);
+		}
+
 		particle.setScale(sizeBase);
 		//particle.spawnY = (float) particle.posY;
 		//particle.noClip = false;
@@ -73,9 +89,9 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 				particles.remove(particle);
 			} else {
 				if (particle.getEntityId() % 2 == 0) {
-					particle.rotationYaw -= 0.1;
+					particle.rotationYaw -= 0.02;
 				} else {
-					particle.rotationYaw += 0.1;
+					particle.rotationYaw += 0.02;
 				}
 				
 				float ticksFadeInMax = 50;

@@ -16,6 +16,11 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
 		IBlockState state = worldIn.getBlockState(pos);
 		int i = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, this.world, pos, 0);
+		//some mods dont use biome coloring and have their color in texture, so lets fallback to green until a texture scanning solution is used
+		if (i == -1) {
+			//color for vanilla leaf in forest biome
+			i = 5811761;
+		}
         this.particleRed *= (float)(i >> 16 & 255) / 255.0F;
         this.particleGreen *= (float)(i >> 8 & 255) / 255.0F;
         this.particleBlue *= (float)(i & 255) / 255.0F;

@@ -69,13 +69,13 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         }
     }
     
-    protected void mouseClicked(int par1, int par2, int par3)
+    protected void mouseClicked(int par1, int par2, int eventButton)
     {
     	boolean anyHasFocus = false;
     	for (int i = 0; i < config.getData().configData.size(); i++) {
     		
     		try {
-	    		config.getData().configData.get(i).editBox.mouseClicked(par1, par2, par3);
+	    		config.getData().configData.get(i).editBox.mouseClicked(par1, par2, eventButton);
 	    		if (config.getData().configData.get(i).editBox.isFocused()) {
 	    			anyHasFocus = true;
 	    		}

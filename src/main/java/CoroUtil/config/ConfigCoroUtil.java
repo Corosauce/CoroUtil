@@ -1,12 +1,13 @@
 package CoroUtil.config;
 
+import java.io.File;
 import java.util.Arrays;
 
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 import CoroUtil.util.DimensionChunkCacheNew;
 
-public class ConfigCoroAI implements IConfigCategory {
+public class ConfigCoroUtil implements IConfigCategory {
 
 	public static boolean chunkCacheOverworldOnly = false;
 	public static boolean usePlayerRadiusChunkLoadingForFallback = true;
@@ -16,7 +17,7 @@ public class ConfigCoroAI implements IConfigCategory {
 	
 	public static boolean trackPlayerData = false;
 	
-	public static boolean useBlackListsAsWhitelist = false;
+	//public static boolean useBlackListsAsWhitelist = false;
 	
 	public static boolean PFQueueDebug = false;
 	
@@ -34,23 +35,51 @@ public class ConfigCoroAI implements IConfigCategory {
 	public static boolean disableParticleRenderer = false;
 	public static boolean disableMipmapFix = false;
 
+	public static boolean forceShadersOff = false;
+
+	@ConfigComment("Provides better context for shaders/particles to work nice with translucent blocks like glass and water")
+	public static boolean useEntityRenderHookForShaders = true;
+
+	//maybe temp
+	@ConfigComment("WIP, more strict transparent cloud usage, better on fps")
+	public static boolean optimizedCloudRendering = false;
+
+	public static boolean debugShaders = false;
+
+	public static boolean foliageShaders = false;
+	public static boolean particleShaders = true;
+
+	@ConfigComment("For seldom used but important things to print out in production")
 	public static boolean useLoggingLog = true;
+
+	@ConfigComment("For debugging things")
 	public static boolean useLoggingDebug = false;
+
+	@ConfigComment("For logging warnings/errors")
 	public static boolean useLoggingError = true;
+
+	public static boolean useCoroPets = false;
+
+	/**
+	 * TODO: while the code is in coroutil, why not just detect a hostile worlds mod THEN gen it?
+	 */
+
+	@ConfigComment("Used until Invasion mod is released")
+	public static boolean tempDisableHWInvFeatures = true;
 
 	@Override
 	public String getName() {
-		return "CoroUtil";
+		return "General";
 	}
 
 	@Override
 	public String getRegistryName() {
-		return "coroai";
+		return "coroutil_general";
 	}
 
 	@Override
 	public String getConfigFileName() {
-		return getName();
+		return "CoroUtil" + File.separator + getName();
 	}
 
 	@Override

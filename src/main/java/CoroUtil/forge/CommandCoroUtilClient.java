@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import extendedrenderer.render.RotatingParticleManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
@@ -44,6 +45,9 @@ public class CommandCoroUtilClient extends CommandBase {
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
 	                }
+				} else if (var2[0].equalsIgnoreCase("reloadshaders") || var2[0].equalsIgnoreCase("rs")) {
+					//RotatingParticleManager.forceShaderReset = true;
+					Minecraft.getMinecraft().refreshResources();
 				}
 				
 			}

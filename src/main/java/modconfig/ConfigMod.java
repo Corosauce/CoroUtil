@@ -183,6 +183,12 @@ public class ConfigMod {
     	}
     	return false;
     }
+
+    public static void forceSaveAllFilesFromRuntimeSettings() {
+        for (ModConfigData data : configLookup.values()) {
+            data.writeConfigFile(true);
+        }
+    }
     
     /* Sync the HashMap data if an outside source modified one of the config fields */
     public static void updateHashMaps() {

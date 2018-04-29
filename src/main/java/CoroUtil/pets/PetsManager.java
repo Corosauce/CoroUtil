@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -50,13 +51,13 @@ public class PetsManager {
 	}
 	
 	public void hookPetInstanceReloaded(EntityCreature ent) {
-		System.out.println("pet reloaded: " + ent);
+		CULog.dbg("pet reloaded: " + ent);
 		UUID uuid = ent.getUniqueID();
 		initPetsNewInstance(ent);
 	}
 	
 	public void hookPetInstanceUnloaded(EntityCreature ent) {
-		System.out.println("pet unloaded: " + ent);
+		CULog.dbg("pet unloaded: " + ent);
 	}
 	
 	public void initPetsNewInstance(EntityCreature ent) {

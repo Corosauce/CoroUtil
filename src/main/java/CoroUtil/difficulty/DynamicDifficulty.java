@@ -1,9 +1,11 @@
-package CoroUtil.world.player;
+package CoroUtil.difficulty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.BlockOre;
@@ -29,7 +31,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
@@ -37,6 +39,23 @@ import CoroUtil.util.UtilPlayer;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
 
+/**
+ * Design notes:
+ *
+ * - Difficulty for vanillaish ranges from 0 to 1
+ * - 0 = just starting
+ * - 1 = Typical endgame expected scenario, eg best equipment, 50 hours occupying base
+ *
+ * - It can go past 1 for vanilla though with:
+ * -- occupied chunk time
+ * -- server time (default off)
+ * -- dist from spawn
+ * -- dps if they somehow exceed what i consider best vanilla dps possible
+ *
+ * - mod focused buffs
+ * -- max health (tinkers buffs)
+ *
+ */
 public class DynamicDifficulty {
 	
 	public static String dataPlayerServerTicks = "HW_dataPlayerServerTicks";
@@ -45,6 +64,11 @@ public class DynamicDifficulty {
 	public static String dataPlayerHarvestLog = "HW_dataPlayerHarvestLog";
 	public static String dataPlayerHarvestRating = "HW_dataPlayerHarvestRating";
 	public static String dataPlayerDetectInAirTime = "HW_dataPlayerDetectInAirTime";
+
+	public static String dataPlayerInvasionSkipping = "HW_dataPlayerInvasionSkipping";
+	public static String dataPlayerInvasionSkipCount = "HW_dataPlayerInvasionSkipCount";
+
+	public static String dataPlayerInvasionSkipBuff = "HW_dataPlayerInvasionSkipBuff";
 	
 	private static int tickRate = 20;
 	
@@ -60,12 +84,12 @@ public class DynamicDifficulty {
 			}
 			
 			
-			if (ConfigCoroAI.cleanupStrayMobs) {
+			if (ConfigCoroUtil.cleanupStrayMobs) {
 				long dayNumber = (world.getWorldTime() / 24000) + 1;
-				if (dayNumber % ConfigCoroAI.cleanupStrayMobsDayRate == 0) {
+				if (dayNumber % ConfigCoroUtil.cleanupStrayMobsDayRate == 0) {
 					long timeOfDay = world.getWorldTime() % 24000;
 					int killTimeRange = 10;
-					if (timeOfDay >= (long)ConfigCoroAI.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
+					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						System.out.println("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof EntityZombie) {
@@ -89,7 +113,9 @@ public class DynamicDifficulty {
 			player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
 			
 		}
-		
+
+		int wallScanRange = 3;
+
 		boolean autoAttackTest = true;
 		boolean isInAir = false;
 		
@@ -108,14 +134,15 @@ public class DynamicDifficulty {
     				int pY = MathHelper.floor(player.getEntityBoundingBox().minY);
     				int pZ = MathHelper.floor(player.posZ);
     				boolean foundWall = false;
-    				for (int x = -1; !foundWall && x <= 1; x++) {
-    					for (int z = -1; !foundWall && z <= 1; z++) {
-    						for (int y = -1; !foundWall && y <= 1; y++) {
-    							IBlockState state = world.getBlockState(new BlockPos(pX+x, pY+y, pZ+z));
+    				for (int x = -wallScanRange; !foundWall && x <= wallScanRange; x++) {
+    					for (int z = -wallScanRange; !foundWall && z <= wallScanRange; z++) {
+    						for (int y = -wallScanRange; !foundWall && y <= wallScanRange; y++) {
+								BlockPos pos = new BlockPos(pX+x, pY+y, pZ+z);
+    							IBlockState state = world.getBlockState(pos);
     							block = state.getBlock();
-    							if (block != Blocks.AIR) {
+    							if (!block.isAir(state, world, pos)) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player, false);
+    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player, true);
     								if (list.size() > 0) {
     									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
         								foundWall = true;
@@ -146,6 +173,40 @@ public class DynamicDifficulty {
 		}
 		
 	}
+
+	public static void deathPlayer(EntityPlayer player) {
+		//TODO: find existing ones and reset their timer? what about it not buffing the exact new spot
+
+		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(player.world);
+
+		if (wd != null) {
+			BuffedLocation debuff = new BuffedLocation(32, -2);
+			debuff.setDecays(true);
+			debuff.setWorldID(player.world.provider.getDimension());
+			debuff.setOrigin(new BlockCoord(player.getPosition()));
+			wd.addTickingLocation(debuff);
+		}
+	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity) {
+		return getDifficultyAveragedForArea(spawnedEntity, spawnedEntity.getPosition());
+	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity, BlockPos pos) {
+		return getDifficultyAveragedForArea(spawnedEntity, pos.getX(), pos.getY(), pos.getZ());
+	}
+
+	public static float getDifficultyAveragedForArea(EntityCreature spawnedEntity, int x, int y, int z) {
+
+		//TODO: cache so there is less player lookup thrashing for spawn candidate code
+		EntityPlayer player = spawnedEntity.world.getClosestPlayerToEntity(spawnedEntity, -1);
+
+		if (player != null) {
+			return getDifficultyScaleAverage(player, x, y, z);
+		}
+
+		return 0;
+	}
 	
 	public static float getDifficultyScaleAverage(EntityPlayer player, int x, int y, int z) {
 		return getDifficultyScaleAverage(player, new BlockCoord(x, y, z));
@@ -165,15 +226,29 @@ public class DynamicDifficulty {
 		//difficulties designed for stuff only mods are capable of should be a flat out plus to the rating such as:
 		//- max health
 		//- ???
+
+
+
+
+		//TODO: DEBUFF!
+		//consider having no weight for it, or only using it when its != 0
+
+
+
+
 		
 		float weightPosOccupy = (float) ConfigDynamicDifficulty.weightPosOccupy;
 		float weightPlayerEquipment = (float) ConfigDynamicDifficulty.weightPlayerEquipment;
 		float weightPlayerServerTime = (float) ConfigDynamicDifficulty.weightPlayerServerTime;
 		float weightDPS = (float) ConfigDynamicDifficulty.weightDPS;
-		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
 		float weightDistFromSpawn = (float) ConfigDynamicDifficulty.weightDistFromSpawn;
+
+		//buffs that arent added into the total weight
+		float weightHealth = (float) ConfigDynamicDifficulty.weightHealth;
+		float weightBuffedLocation = (float) ConfigDynamicDifficulty.weightBuffedLocation;
+		float weightDebuffedLocation = (float) ConfigDynamicDifficulty.weightDebuffedLocation;
 		
-		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn;
+		float weightTotal = weightPosOccupy + weightPlayerEquipment + weightPlayerServerTime + weightDPS/* + weightHealth*/ + weightDistFromSpawn/* + weightBuffedLocation*/;
 		
 		float difficultyPosOccupy = getDifficultyScaleForPosOccupyTime(world, pos) * weightPosOccupy;
 		float difficultyPlayerEquipment = getDifficultyScaleForPlayerEquipment(player) * weightPlayerEquipment;
@@ -181,9 +256,18 @@ public class DynamicDifficulty {
 		float difficultyDPS = getDifficultyScaleForPosDPS(world, pos) * weightDPS;
 		float difficultyHealth = getDifficultyScaleForHealth(player) * weightHealth;
 		float difficultyDistFromSpawn = getDifficultyScaleForDistFromSpawn(player) * weightDistFromSpawn;
+		float difficultyBuffedLocation = getDifficultyForBuffedLocation(world, pos) * weightBuffedLocation;
+		float difficultyDebuffedLocation = getDifficultyForDebuffedLocation(world, pos) * weightDebuffedLocation;
+
+		float difficultyBuffInvasionSkip = getInvasionSkipBuff(player);
 		
-		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn;
-		
+		float difficultyTotal = difficultyPosOccupy + difficultyPlayerEquipment + difficultyPlayerServerTime + difficultyDPS + difficultyHealth + difficultyDistFromSpawn + difficultyBuffedLocation;
+
+		//debuff
+		difficultyTotal += difficultyDebuffedLocation;
+
+		difficultyTotal += difficultyBuffInvasionSkip;
+
 		float val = difficultyTotal / weightTotal;//(difficultyPos + difficultyPlayerEquipment + difficultyPlayerServerTime) / 3F;
 		val = Math.round(val * 1000F) / 1000F;
 		if (ConfigDynamicDifficulty.difficulty_Max != -1) {
@@ -191,6 +275,12 @@ public class DynamicDifficulty {
 				val = (float) ConfigDynamicDifficulty.difficulty_Max;
 			}
 		}
+
+		//account for debuffs potentially causing less than zero value
+		if (val < 0) {
+			val = 0;
+		}
+
 		return val;
 	}
 	
@@ -222,7 +312,7 @@ public class DynamicDifficulty {
 	}
 	
 	public static float getDifficultyScaleForHealth(EntityPlayer player) {
-		float baseMax = 20F;
+		float baseMax = ConfigDynamicDifficulty.difficulty_BestVanillaHealth;
 		float curMax = player.getMaxHealth();
 		float scale = curMax / baseMax;
 		return scale - 1F;
@@ -243,9 +333,9 @@ public class DynamicDifficulty {
 	
 	public static int getBestPlayerRatingPossibleVanilla(boolean calcWeapon) {
 		//diamond armor
-		int bestArmor = 20;
+		int bestArmor = ConfigDynamicDifficulty.difficulty_BestVanillaArmor;
 		//protection 5 on diamond armor (there is randomization)
-		int bestArmorEnchant = 25;
+		int bestArmorEnchant = ConfigDynamicDifficulty.difficulty_BestVanillaArmorEnchant;
 		int bestWeapon = 8;
 		//6.25 for sharpness 5
 		int bestWeaponEnchant = 6;
@@ -274,12 +364,14 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
-				if (chunk != null && chunk.isLoaded()) {
-					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
-					
-					if (cdp.averageDPS > bestDPS) {
-						bestDPS = cdp.averageDPS;
+				if (world.isBlockLoaded(checkPos.toBlockPos())) {
+					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					if (chunk != null) {
+						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
+
+						if (cdp.averageDPS > bestDPS) {
+							bestDPS = cdp.averageDPS;
+						}
 					}
 				}
 			}
@@ -322,8 +414,8 @@ public class DynamicDifficulty {
 		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
-				Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
-				if (chunk.isLoaded()) {
+				if (world.isBlockLoaded(checkPos.toBlockPos())) {
+					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						totalTime += chunk.getInhabitedTime();
 						count++;
@@ -364,6 +456,18 @@ public class DynamicDifficulty {
 		
 		float scale = convertInhabTimeToDifficultyScale(bestTime);
 		return scale;*/
+	}
+
+	public static float getInvasionSkipBuff(EntityPlayer player) {
+		return player.getEntityData().getFloat(dataPlayerInvasionSkipBuff);
+		/*float buffBase = 0.5F;
+		float skipCount = player.getEntityData().getInteger(dataPlayerInvasionSkipCount);
+		float val = buffBase * skipCount;
+		return val;*/
+	}
+
+	public static void setInvasionSkipBuff(EntityPlayer player, float buff) {
+		player.getEntityData().setFloat(dataPlayerInvasionSkipBuff, buff);
 	}
 	
 	/**
@@ -486,10 +590,11 @@ public class DynamicDifficulty {
 				EntityCreature entC = (EntityCreature) ent;
 				
 				//dont log common occuring damages, sun burning, random wall glitching
-				if (event.getSource() == DamageSource.IN_WALL || 
-						event.getSource() == DamageSource.IN_FIRE || 
-						event.getSource() == DamageSource.ON_FIRE || 
-						event.getSource() == DamageSource.DROWN/* || event.source == DamageSource.lava*/) {
+				if (event.getSource() == DamageSource.IN_WALL ||
+						event.getSource() == DamageSource.IN_FIRE ||
+						event.getSource() == DamageSource.IN_FIRE ||
+						event.getSource() == DamageSource.DROWN ||
+						event.getSource() == DamageSource.FALL/* || event.source == DamageSource.lava*/) {
 					return;
 				}
 				
@@ -630,6 +735,52 @@ public class DynamicDifficulty {
 			
 			cdp.lastDPSRecalc = world.getTotalWorldTime();
 		}
+	}
+
+
+
+	public static BuffedLocation buffLocation(World world, BlockCoord coord, int distRadius, float difficulty) {
+		BuffedLocation zone = new BuffedLocation(distRadius, difficulty);
+		zone.setWorldID(world.provider.getDimension());
+		zone.setOrigin(coord);
+		WorldDirectorManager.instance().getCoroUtilWorldDirector(world).addTickingLocation(zone);
+		return zone;
+	}
+
+	public static float getDifficultyForDebuffedLocation(World world, BlockCoord coord) {
+		return getDifficultyForBuffedLocation(world, coord, true);
+	}
+
+	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord) {
+		return getDifficultyForBuffedLocation(world, coord, false);
+	}
+
+	public static float getDifficultyForBuffedLocation(World world, BlockCoord coord, boolean findDebuffInstead) {
+		//TODO: cache results to minimize lookup thrash
+		float bestDifficulty = 0;
+		//BuffedLocation bestBuff = null;
+		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(world);
+		for (ISimulationTickable loc : wd.listTickingLocations) {
+			if (loc instanceof BuffedLocation) {
+				BuffedLocation buff = (BuffedLocation)loc;
+				if (buff.isDebuff() == findDebuffInstead) {
+					double dist = coord.getDistanceSquared(buff.getOrigin());
+					if (dist < buff.buffDistRadius * buff.buffDistRadius) {
+						if (findDebuffInstead) {
+							if (buff.difficulty < bestDifficulty) {
+								bestDifficulty = buff.difficulty;
+							}
+						} else {
+							if (buff.difficulty > bestDifficulty) {
+								bestDifficulty = buff.difficulty;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return bestDifficulty;
 	}
 	
 	

@@ -1,7 +1,11 @@
 package extendedrenderer.particle.entity;
 
+import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.render.RotatingParticleManager;
-import net.minecraft.client.renderer.ActiveRenderInfo;
+import extendedrenderer.shader.InstancedMeshParticle;
+import extendedrenderer.shader.Matrix4fe;
+import extendedrenderer.shader.Transformation;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
@@ -10,6 +14,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
+import org.lwjgl.util.vector.Quaternion;
+import org.lwjgl.util.vector.Vector4f;
+
+import javax.vecmath.Vector3f;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 
@@ -18,13 +26,21 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	private int extraParticlesBaseAmount = 5;
 
 	public boolean noExtraParticles = false;
+
+	//public float[] cachedLight;
 	
 	public ParticleTexExtraRender(World worldIn, double posXIn, double posYIn,
 			double posZIn, double mX, double mY, double mZ,
 			TextureAtlasSprite par8Item) {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
-		
-		
+
+		/*cachedLight = new float[CoroUtilParticle.rainPositions.length];
+		if (worldObj.getTotalWorldTime() % 5 == 0) {
+			for (int i = 0; i < cachedLight.length; i++) {
+				Vec3 vec = CoroUtilParticle.rainPositions[i];
+				cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
+			}
+		}*/
 	}
 
 	public int getSeverityOfRainRate() {
@@ -44,14 +60,21 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	}
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tickExtraRotations() {
+		//super.tickExtraRotations();
 
+		if (isSlantParticleToWind()) {
+			rotationYaw = (float)Math.toDegrees(Math.atan2(motionZ, motionX)) - 90;
+			double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
+			//motionXZ = motionX/* + motionZ*/;
+			rotationPitch = -(float)Math.toDegrees(Math.atan2(motionXZ, Math.abs(motionY)));
+			//rotationPitch = rotationPitch;
+			//rotationPitch = -45;
+			//rotationPitch *= 10F;
+		}
 
-		/*int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
-		if (this.posY <= height) this.setExpired();*/
-
-		//this.setExpired();
+		Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+		updateQuaternion(ent);
 	}
 
 	@Override
@@ -127,14 +150,20 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			f3 = this.particleTexture.getInterpolatedV(8);*/
         }
 
-		int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
+		//int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
 
         //test
-		//rainDrops = 10;
+		//rainDrops = 100;
 
 		//catch code hotload crash, doesnt help much anyways
 		try {
-			for (int ii = 0; ii < (noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops)); ii++) {
+			for (int ii = 0; ii < renderAmount/*(noExtraParticles ? 1 : Math.min(rainDrops, CoroUtilParticle.maxRainDrops))*/; ii++) {
 				float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
 				float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY) + fixY;
 				float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
@@ -165,9 +194,19 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				/*int height = entityIn.world.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
 
-				int i = 15728640;//this.getBrightnessForRender(partialTicks);
+				int i = this.getBrightnessForRender(partialTicks);
+				i = 15728640;
 				int j = i >> 16 & 65535;
 				int k = i & 65535;
+
+				//range between 0 and 240 for first value, second value always 0
+				//j = 240;
+				//k = 120;
+
+				/*int what = 13 << 20 | 15 << 4;
+				int what2 = what >> 16 & 65535;
+				int what3 = what & 65535;*/
+
 				Vec3d[] avec3d = new Vec3d[] {
 						new Vec3d((double)(-rotationX * scale1 - rotationXY * scale1), (double)(-rotationZ * scale1), (double)(-rotationYZ * scale1 - rotationXZ * scale1)),
 						new Vec3d((double)(-rotationX * scale2 + rotationXY * scale2), (double)(rotationZ * scale2), (double)(-rotationYZ * scale2 + rotationXZ * scale2)),
@@ -201,6 +240,167 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 
         
+	}
+
+	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+										float partialTicks, float rotationX, float rotationZ,
+										float rotationYZ, float rotationXY, float rotationXZ) {
+
+		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks);
+		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks);
+		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks);
+		//Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
+
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
+
+		for (int iii = 0; iii < renderAmount; iii++) {
+
+			if (mesh.curBufferPos >= mesh.numInstances) return;
+
+			Vector3f pos;
+
+			if (iii != 0) {
+				pos = new Vector3f(posX + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+						posY + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+						posZ + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+			} else {
+				pos = new Vector3f(posX, posY, posZ);
+			}
+
+			if (this.isDontRenderUnderTopmostBlock()) {
+				int height = this.world.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
+				if (pos.y <= height) continue;
+			}
+
+			//adjust to relative to camera positions finally
+			pos.x -= interpPosX;
+			pos.y -= interpPosY;
+			pos.z -= interpPosZ;
+
+			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+
+			//adjust to perspective and camera
+			//Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
+			//upload to buffer
+			modelMatrix.get(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), mesh.instanceDataBuffer);
+
+			//brightness
+			float brightness;
+			//brightness = CoroUtilBlockLightCache.getBrightnessCached(worldObj, pos.x, pos.y, pos.z);
+			//brightness = this.brightnessCache;
+			if (fastLight) {
+				brightness = CoroUtilBlockLightCache.brightnessPlayer;
+			} else {
+				brightness = CoroUtilBlockLightCache.getBrightnessCached(world, (float)this.posX, (float)this.posY, (float)this.posZ);
+			}
+
+			//brightness to buffer
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos) + mesh.MATRIX_SIZE_FLOATS, brightness);
+
+			//rgba to buffer
+			int rgbaIndex = 0;
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
+
+			mesh.curBufferPos++;
+		}
+
+	}
+
+	/*@Override
+	public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+
+
+		float posX = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks);
+		float posY = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks);
+		float posZ = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks);
+
+		int renderAmount = 0;
+		if (noExtraParticles) {
+			renderAmount = 1;
+		} else {
+			renderAmount = Math.min(extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5), CoroUtilParticle.maxRainDrops);
+		}
+
+		for (int iii = 0; iii < renderAmount; iii++) {
+
+			if (mesh.curBufferPos >= mesh.numInstances) return;
+
+			Vector3f pos;
+
+			if (iii != 0) {
+				pos = new Vector3f(posX + (float) CoroUtilParticle.rainPositions[iii].xCoord,
+						posY + (float) CoroUtilParticle.rainPositions[iii].yCoord,
+						posZ + (float) CoroUtilParticle.rainPositions[iii].zCoord);
+			} else {
+				pos = new Vector3f(posX, posY, posZ);
+			}
+
+			if (this.isDontRenderUnderTopmostBlock()) {
+				int height = this.world.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
+				if (pos.y <= height) continue;
+			}
+
+			//adjust to relative to camera positions finally
+			pos.x -= interpPosX;
+			pos.y -= interpPosY;
+			pos.z -= interpPosZ;
+
+			int rgbaIndex = 0;
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getRedColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getGreenColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getBlueColorF());
+			mesh.instanceDataBufferTest.put(mesh.INSTANCE_SIZE_FLOATS_TEST * (mesh.curBufferPos)
+					+ (rgbaIndex++), this.getAlphaF());
+
+			mesh.curBufferPos++;
+
+		}
+
+	}*/
+
+	@Override
+	public void updateQuaternion(Entity camera) {
+
+		if (camera != null) {
+			if (this.facePlayer) {
+				this.rotationYaw = camera.rotationYaw;
+				this.rotationPitch = camera.rotationPitch;
+			} else if (facePlayerYaw) {
+				this.rotationYaw = camera.rotationYaw;
+			}
+		}
+
+		Quaternion qY = new Quaternion();
+		Quaternion qX = new Quaternion();
+		qY.setFromAxisAngle(new Vector4f(0, 1, 0, (float)Math.toRadians(-this.rotationYaw - 180F)));
+		qX.setFromAxisAngle(new Vector4f(1, 0, 0, (float)Math.toRadians(-this.rotationPitch)));
+		if (this.rotateOrderXY) {
+			Quaternion.mul(qX, qY, this.rotation);
+		} else {
+			Quaternion.mul(qY, qX, this.rotation);
+
+			if (extraYRotation != 0) {
+				//float rot = (new Random()).nextFloat() * 360F;
+				qY = new Quaternion();
+				qY.setFromAxisAngle(new Vector4f(0, 1, 0, extraYRotation));
+				Quaternion.mul(this.rotation, qY, this.rotation);
+			}
+		}
 	}
 
 }

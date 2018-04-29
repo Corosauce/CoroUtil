@@ -1,0 +1,207 @@
+{
+  "format": "mob_spawns",
+  "templates": [
+    {
+      "name": "invasion_stage_1",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_1"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 30
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2_option_1",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 5
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 30
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_2_option_2",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "zombie", "creeper"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "zombie", "skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "skeleton", "zombie"
+          ],
+          "count": 10,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "testSpawn",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_2"
+        },
+        {
+          "condition": "random",
+          "weight": 15
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "zombie", "skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "creeper"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3rd difficulty block",
+      "conditions": [
+        {
+          "condition": "template",
+          "template": "invasion_stage_3"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "zombie"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "ai_mining"
+            },
+            {
+              "cmod": "ai_omniscience"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "skeleton"
+          ],
+          "count": 5,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "inventory_chainmail"
+            },
+            {
+              "cmod": "template",
+              "template": "infernal_skeleton_1"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "creeper"
+          ],
+          "count": 15,
+          "cmods": [
+            {
+              "cmod": "ai_omniscience"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+
+}

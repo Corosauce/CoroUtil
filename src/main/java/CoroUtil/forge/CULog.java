@@ -1,6 +1,6 @@
 package CoroUtil.forge;
 
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 
 public class CULog {
 
@@ -10,7 +10,7 @@ public class CULog {
      * @param string
      */
     public static void log(String string) {
-        if (ConfigCoroAI.useLoggingLog) {
+        if (ConfigCoroUtil.useLoggingLog) {
             System.out.println(string);
         }
     }
@@ -21,7 +21,7 @@ public class CULog {
      * @param string
      */
     public static void err(String string) {
-        if (ConfigCoroAI.useLoggingError) {
+        if (ConfigCoroUtil.useLoggingError) {
             System.out.println(string);
         }
     }
@@ -32,7 +32,7 @@ public class CULog {
      * @param string
      */
     public static void dbg(String string) {
-        if (ConfigCoroAI.useLoggingDebug) {
+        if (ConfigCoroUtil.useLoggingDebug) {
             System.out.println(string);
         }
     }
