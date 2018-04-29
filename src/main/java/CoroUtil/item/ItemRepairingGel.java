@@ -28,18 +28,7 @@ public class ItemRepairingGel extends Item
 
     public ItemRepairingGel()
     {
-        this.setMaxDamage(0);
-        this.setCreativeTab(CreativeTabs.MATERIALS);
-    }
 
-    /**
-     * Returns the unlocalized name of this item. This version accepts an ItemStack so different stacks can have
-     * different names based on their damage or NBT.
-     */
-    public String getUnlocalizedName(ItemStack stack)
-    {
-        int i = stack.getMetadata();
-        return super.getUnlocalizedName() + "." + EnumDyeColor.byDyeDamage(i).getUnlocalizedName();
     }
 
     /**

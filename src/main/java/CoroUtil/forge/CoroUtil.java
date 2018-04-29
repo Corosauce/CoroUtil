@@ -1,6 +1,14 @@
 package CoroUtil.forge;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
@@ -41,7 +49,7 @@ public class CoroUtil {
 	//public static final String version = "${version}";
 	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production
 	//TODO: find a way to perminently do this for dev only
-	public static final String version = "1.12.1-1.2.3";
+	public static final String version = "1.12.1-1.2.6";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
@@ -56,6 +64,8 @@ public class CoroUtil {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+		migrateOldConfig();
+
 		configCoroUtil = new ConfigCoroUtil();
     	ConfigMod.addConfigFile(event, configCoroUtil);
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
@@ -68,6 +78,48 @@ public class CoroUtil {
     	
     	eventChannel.register(new EventHandlerPacket());
     }
+
+    public static void migrateOldConfig() {
+
+    	File path = new File("." + File.separator + "config" + File.separator + "CoroUtil");
+    	try {
+			path.mkdirs();
+		} catch (Exception ex) {
+    		ex.printStackTrace();
+		}
+
+		File oldFile = new File("." + File.separator + "config" + File.separator + "CoroUtil.cfg");
+		File newFile = new File("." + File.separator + "config" + File.separator + "CoroUtil" + File.separator + "General.cfg");
+
+		fixConfigFile(oldFile, newFile, "coroutil {", "general {");
+
+		oldFile = new File("." + File.separator + "config" + File.separator + "CoroUtil_DynamicDifficulty.cfg");
+		newFile = new File("." + File.separator + "config" + File.separator + "CoroUtil" + File.separator + "DynamicDifficulty.cfg");
+
+		fixConfigFile(oldFile, newFile, "coroutil_dynamicdifficulty {", "dynamicdifficulty {");
+	}
+
+	public static void fixConfigFile(File oldFile, File newFile, String oldCat, String newCat) {
+		if (oldFile.exists() && !newFile.exists()) {
+			CULog.log("Detected old " + oldFile.toString() + ", relocating to " + newFile.toString());
+			try {
+				Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+				//fix category
+				List<String> newLines = new ArrayList<>();
+				for (String line : Files.readAllLines(newFile.toPath(), StandardCharsets.UTF_8)) {
+					if (line.contains(oldCat)) {
+						newLines.add(line.replace(oldCat, newCat));
+					} else {
+						newLines.add(line);
+					}
+				}
+				Files.write(newFile.toPath(), newLines, StandardCharsets.UTF_8);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
     
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
