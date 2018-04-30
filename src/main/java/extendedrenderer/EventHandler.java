@@ -296,7 +296,7 @@ public class EventHandler {
             GlStateManager.disableFog();
         }
 
-        GlStateManager.depthMask(true);
+        GlStateManager.depthMask(false);
         GlStateManager.disableBlend();
         GlStateManager.alphaFunc(516, 0.1F);
     }
