@@ -117,6 +117,10 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public float extraYRotation = 0;
 
+    public boolean isCollidedHorizontally = false;
+    public boolean isCollidedVerticallyDownwards = false;
+    public boolean isCollidedVerticallyUpwards = false;
+
     public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
@@ -633,6 +637,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         //was y != y before
         //this.isCollided = yy != y && yy < 0.0D;
         this.onGround = yy != y || xx != x || zz != z;
+        this.isCollidedHorizontally = xx != x || zz != z;
+        this.isCollidedVerticallyDownwards = yy < y;
+        this.isCollidedVerticallyUpwards = yy > y;
 
         if (xx != x)
         {
@@ -706,5 +713,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public void setKillWhenUnderTopmostBlock_ScanAheadRange(int killWhenUnderTopmostBlock_ScanAheadRange) {
         this.killWhenUnderTopmostBlock_ScanAheadRange = killWhenUnderTopmostBlock_ScanAheadRange;
+    }
+
+    public boolean isCollidedVertically() {
+	    return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
     }
 }

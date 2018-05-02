@@ -8,6 +8,10 @@ import net.minecraft.world.World;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
 
+	//only use positives for now
+	public float rotationYawMomentum = 0;
+	public float rotationPitchMomentum = 0;
+
 	public ParticleTexLeafColor(World worldIn, double posXIn, double posYIn,
 			double posZIn, double mX, double mY, double mZ,
 			TextureAtlasSprite par8Item) {
@@ -26,4 +30,40 @@ public class ParticleTexLeafColor extends ParticleTexFX {
         this.particleBlue *= (float)(i & 255) / 255.0F;
 	}
 
+	@Override
+	public void onUpdate() {
+		super.onUpdate();
+
+		//make leafs catch on the ground and cause them to bounce up and slow a bit for effect
+		if (isCollidedVerticallyDownwards) {
+			this.motionY = 0.05;
+			this.motionX *= 0.6F;
+			this.motionZ *= 0.6F;
+
+			rotationYawMomentum = 30;
+			rotationPitchMomentum = 30;
+		}
+
+		if (rotationYawMomentum > 0) {
+
+			this.rotationYaw += rotationYawMomentum;
+
+			rotationYawMomentum -= 1.5F;
+
+			if (rotationYawMomentum < 0) {
+				rotationYawMomentum = 0;
+			}
+		}
+
+		if (rotationPitchMomentum > 0) {
+
+			this.rotationPitch += rotationPitchMomentum;
+
+			rotationPitchMomentum -= 1.5F;
+
+			if (rotationPitchMomentum < 0) {
+				rotationPitchMomentum = 0;
+			}
+		}
+	}
 }
