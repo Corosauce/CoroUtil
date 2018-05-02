@@ -20,6 +20,11 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
 		IBlockState state = worldIn.getBlockState(pos);
 		int i = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, this.world, pos, 0);
+		//tallgrass apparently isnt colorized or some weird thing, in vanilla
+		if (i == -1) {
+			state = worldIn.getBlockState(pos.down());
+			i = Minecraft.getMinecraft().getBlockColors().colorMultiplier(state, this.world, pos.down(), 0);
+		}
 		//some mods dont use biome coloring and have their color in texture, so lets fallback to green until a texture scanning solution is used
 		if (i == -1) {
 			//color for vanilla leaf in forest biome
@@ -35,13 +40,16 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		super.onUpdate();
 
 		//make leafs catch on the ground and cause them to bounce up and slow a bit for effect
-		if (isCollidedVerticallyDownwards) {
-			this.motionY = 0.05;
-			this.motionX *= 0.6F;
-			this.motionZ *= 0.6F;
+		if (isCollidedVerticallyDownwards && rand.nextInt(10) == 0) {
+			double speed = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+			if (speed > 0.07) {
+				this.motionY = 0.02D + rand.nextDouble() * 0.03D;
+				this.motionX *= 0.6D;
+				this.motionZ *= 0.6D;
 
-			rotationYawMomentum = 30;
-			rotationPitchMomentum = 30;
+				rotationYawMomentum = 30;
+				rotationPitchMomentum = 30;
+			}
 		}
 
 		if (rotationYawMomentum > 0) {
