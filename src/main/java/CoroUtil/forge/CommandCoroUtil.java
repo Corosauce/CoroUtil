@@ -14,7 +14,6 @@ import CoroUtil.util.*;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
-import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
@@ -34,6 +33,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -309,6 +309,7 @@ public class CommandCoroUtil extends CommandBase {
 						System.out.println(entry.getKey());
 					}*/
 					//TODO: VALIDATE ITEMS!!!
+					//actually spawns the mobs
 				} else if (var2[0].equalsIgnoreCase("ts") || var2[0].equalsIgnoreCase("testSpawn")) {
 					if (player != null) {
 						String profileName = var2[1];
@@ -355,7 +356,7 @@ public class CommandCoroUtil extends CommandBase {
 								player.sendMessage(new TextComponentString("entity class null"));
 							}
 
-							/*var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+							/*var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test"));
 							String data = profileFound.toString();
 							String[] list = data.split(" \\| ");
 							for (String entry : list) {
@@ -383,7 +384,7 @@ public class CommandCoroUtil extends CommandBase {
 							}
 
 							if (profileFound != null) {
-								var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test"));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test"));
 								String data = profileFound.toString();
 								String[] list = data.split(" \\| ");
 								for (String entry : list) {
@@ -392,7 +393,7 @@ public class CommandCoroUtil extends CommandBase {
 
 								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
 
-								var1.sendMessage(new TextComponentString(ChatFormatting.GREEN + "Invasion profile validation test with templates flattened"));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test with templates flattened"));
 								data = profileFound.toString();
 								list = data.split(" \\| ");
 								for (String entry : list) {

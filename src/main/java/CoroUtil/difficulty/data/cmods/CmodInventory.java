@@ -2,9 +2,8 @@ package CoroUtil.difficulty.data.cmods;
 
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DifficultyDataReader;
-import CoroUtil.util.CoroUtilEntity;
-import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.item.Item;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Created by Corosus on 2/26/2017.
@@ -33,10 +32,10 @@ public class CmodInventory extends DataCmod {
     public String getValidatedString(String registryName) {
         String code = "";
         if (DifficultyDataReader.debugValidate()) {
-            code = ChatFormatting.GREEN.toString();
+            code = TextFormatting.GREEN.toString();
             Item item = Item.getByNameOrId(registryName);
             if (item == null) {
-                code = ChatFormatting.RED.toString() + "MISSING! ";
+                code = TextFormatting.RED.toString() + "MISSING! ";
             }
         }
         return code + registryName + ", ";

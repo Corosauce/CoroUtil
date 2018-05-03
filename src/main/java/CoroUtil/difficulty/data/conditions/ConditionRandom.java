@@ -7,4 +7,9 @@ import CoroUtil.difficulty.data.DataCondition;
  */
 public class ConditionRandom extends DataCondition {
     public int weight;
+
+    @Override
+    public String toString() {
+        return super.toString() + " { " + "weight: " + weight + " }";
+    }
 }

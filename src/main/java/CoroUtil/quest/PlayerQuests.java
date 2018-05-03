@@ -10,14 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -255,7 +254,7 @@ public class PlayerQuests {
 				qStr = "Type: " + activeQuests.get(i).questType;
 			}*/
 			
-			mc.fontRenderer.drawStringWithShadow(ChatFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
+			mc.fontRenderer.drawStringWithShadow(TextFormatting.BLUE + qStr, startX, startY + ((i) * questSpacing), 0xFFFFFF);
 			mc.fontRenderer.drawStringWithShadow(qStr2, startX, startY + infoSpacing + ((i) * questSpacing), 0xFFFFFF);
 			mc.fontRenderer.drawStringWithShadow(qStr3, startX, startY + (infoSpacing*2) + ((i) * questSpacing), 0xFFFFFF);
 		}

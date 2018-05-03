@@ -11,6 +11,6 @@ public class ConditionDifficulty extends DataCondition {
 
     @Override
     public String toString() {
-        return "difficulty range: " + min + " to " + max;
+        return super.toString() + " { " + "range: " + min + " to " + max + " }";
     }
 }

@@ -1,6 +1,6 @@
 package CoroUtil.difficulty.data;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 /**
  * Created by Corosus on 2/26/2017.
@@ -16,6 +16,6 @@ public class DataCmod {
 
     @Override
     public String toString() {
-        return ChatFormatting.GREEN + cmod + ChatFormatting.RESET;
+        return TextFormatting.GREEN + cmod + TextFormatting.RESET;
     }
 }

@@ -1,8 +1,7 @@
 package CoroUtil.difficulty.data.spawns;
 
 import CoroUtil.difficulty.data.DataCondition;
-import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
-import com.mojang.realmsclient.gui.ChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +23,11 @@ public class DataMobSpawnsTemplate {
 
     @Override
     public String toString() {
-        String str = ChatFormatting.AQUA + "Profile: " + ChatFormatting.RESET + name + " | ";
+        String str = TextFormatting.AQUA + "Profile: " + TextFormatting.RESET + name + " | ";
         for (DataActionMobSpawns spawn : spawns) {
             str += spawn.toString() + " | ";
         }
-        str += "| conditions: ";
+        str += TextFormatting.GOLD + "For conditions: " + TextFormatting.RESET;
         for (DataCondition cond : conditions) {
             str += cond.toString() + " | ";
         }

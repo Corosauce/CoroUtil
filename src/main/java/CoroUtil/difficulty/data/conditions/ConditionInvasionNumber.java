@@ -8,4 +8,9 @@ import CoroUtil.difficulty.data.DataCondition;
 public class ConditionInvasionNumber extends DataCondition {
     public int min;
     public int max;
+
+    @Override
+    public String toString() {
+        return "wave range: " + min + " to " + max;
+    }
 }

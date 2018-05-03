@@ -1,11 +1,10 @@
 package CoroUtil.difficulty.data.spawns;
 
-import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DeserializerAllJson;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.util.CoroUtilEntity;
-import com.mojang.realmsclient.gui.ChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,17 +31,17 @@ public class DataActionMobSpawns {
 
     @Override
     public String toString() {
-        String str = ChatFormatting.GOLD + "Entities: " + ChatFormatting.RESET;
+        String str = TextFormatting.GOLD + "Entities: " + TextFormatting.RESET;
         for (String entity : entities) {
             String code = "";
             if (DifficultyDataReader.debugValidate()) {
-                code = ChatFormatting.GREEN.toString();
+                code = TextFormatting.GREEN.toString();
                 if (CoroUtilEntity.getClassFromRegisty(entity) == null)
-                    code = ChatFormatting.RED.toString() + "MISSING! ";
+                    code = TextFormatting.RED.toString() + "MISSING! ";
             }
             str += code + entity + ", ";
         }
-        str += " | " + ChatFormatting.GOLD + "With cmods: " + ChatFormatting.RESET;
+        str += " | " + TextFormatting.GOLD + "With cmods: " + TextFormatting.RESET;
         List<DataCmod> cmodsToUse = cmods;
         if (DifficultyDataReader.debugFlattenCmodsAndConditions()) {
             cmodsToUse = DeserializerAllJson.getCmodsFlattened(cmods);

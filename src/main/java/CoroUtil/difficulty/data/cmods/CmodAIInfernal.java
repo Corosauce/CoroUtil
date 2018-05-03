@@ -3,7 +3,7 @@ package CoroUtil.difficulty.data.cmods;
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.util.CoroUtilCrossMod;
-import com.mojang.realmsclient.gui.ChatFormatting;
+import net.minecraft.util.text.TextFormatting;
 
 import java.util.List;
 
@@ -19,9 +19,9 @@ public class CmodAIInfernal extends DataCmod {
         for (String entry : modifiers) {
             String code = "";
             if (DifficultyDataReader.debugValidate()) {
-                code = ChatFormatting.GREEN.toString();
+                code = TextFormatting.GREEN.toString();
                 if (!CoroUtilCrossMod.listModifiers.contains(entry)) {
-                    code = ChatFormatting.RED.toString() + "MISSING! ";
+                    code = TextFormatting.RED.toString() + "MISSING! ";
                 }
             }
             mods += code + entry + ", ";

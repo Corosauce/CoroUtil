@@ -195,6 +195,12 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         return list;
     }
 
+    public static List<DataCondition> getConditionFlattened(DataCondition condition) {
+        List<DataCondition> list = new ArrayList<>();
+        list.add(condition);
+        return getConditionsFlattened(list);
+    }
+
     /**
      * Get conditions including ones nested in templates
      * - aiming to use overridable conditions
@@ -244,6 +250,12 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         List<DataCondition> list = new ArrayList<>();
         list.addAll(lookup.values());
         return list;
+    }
+
+    public static List<DataCmod> getCmodFlattened(DataCmod cmod) {
+        List<DataCmod> list = new ArrayList<>();
+        list.add(cmod);
+        return getCmodsFlattened(list);
     }
 
     public static List<DataCmod> getCmodsFlattened(List<DataCmod> cmods) {
