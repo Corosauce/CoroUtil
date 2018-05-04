@@ -37,7 +37,7 @@
         {
           "cmod": "inventory",
 
-          "inv_hand_main": "minecraft:leather_sword",
+          "inv_hand_main": "minecraft:stone_sword",
           "inv_head": "minecraft:leather_helmet",
           "inv_chest": "minecraft:leather_chestplate",
           "inv_legs": "minecraft:leather_leggings",
@@ -51,7 +51,7 @@
         {
           "cmod": "inventory",
 
-          "inv_hand_main": "minecraft:chainmail_sword",
+          "inv_hand_main": "minecraft:stone_sword",
           "inv_head": "minecraft:chainmail_helmet",
           "inv_chest": "minecraft:chainmail_chestplate",
           "inv_legs": "minecraft:chainmail_leggings",

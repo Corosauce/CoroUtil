@@ -499,7 +499,7 @@ public class UtilEntityBuffs {
         EquipmentForDifficulty equipment = new EquipmentForDifficulty();
         //TODO: handle this better?
         try {
-            Item item = Item.getByNameOrId(data.inv_hand_main);
+            Item item = getItemOrNull(data.inv_hand_main);
             if (item != null) {
                 equipment.setWeapon(new ItemStack(item));
             }
@@ -508,7 +508,7 @@ public class UtilEntityBuffs {
         }
 
         try {
-            Item item = Item.getByNameOrId(data.inv_hand_off);
+            Item item = getItemOrNull(data.inv_hand_off);
             if (item != null) {
                 equipment.setWeaponOffhand(new ItemStack(item));
             }
@@ -519,7 +519,7 @@ public class UtilEntityBuffs {
         List<ItemStack> listArmor = new ArrayList<>();
 
         try {
-            Item item = Item.getByNameOrId(data.inv_head);
+            Item item = getItemOrNull(data.inv_head);
             if (item != null) {
                 listArmor.add(new ItemStack(item));
             }
@@ -528,7 +528,7 @@ public class UtilEntityBuffs {
         }
 
         try {
-            Item item = Item.getByNameOrId(data.inv_chest);
+            Item item = getItemOrNull(data.inv_chest);
             if (item != null) {
                 listArmor.add(new ItemStack(item));
             }
@@ -537,7 +537,7 @@ public class UtilEntityBuffs {
         }
 
         try {
-            Item item = Item.getByNameOrId(data.inv_legs);
+            Item item = getItemOrNull(data.inv_legs);
             if (item != null) {
                 listArmor.add(new ItemStack(item));
             }
@@ -546,7 +546,7 @@ public class UtilEntityBuffs {
         }
 
         try {
-            Item item = Item.getByNameOrId(data.inv_feet);
+            Item item = getItemOrNull(data.inv_feet);
             if (item != null) {
                 listArmor.add(new ItemStack(item));
             }
@@ -558,6 +558,13 @@ public class UtilEntityBuffs {
 
         return equipment;
 
+    }
+
+    public static Item getItemOrNull(String name) {
+        if (name == null || name.equals("")) {
+            return null;
+        }
+        return Item.getByNameOrId(name);
     }
 
     public static void onDeath(LivingDeathEvent event) {

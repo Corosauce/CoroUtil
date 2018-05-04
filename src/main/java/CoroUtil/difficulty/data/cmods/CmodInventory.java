@@ -31,13 +31,21 @@ public class CmodInventory extends DataCmod {
 
     public String getValidatedString(String registryName) {
         String code = "";
-        if (DifficultyDataReader.debugValidate()) {
+        if (DifficultyDataReader.debugValidate() && registryName != null && !registryName.equals("")) {
             code = TextFormatting.GREEN.toString();
-            Item item = Item.getByNameOrId(registryName);
+            Item item = null;
+            try {
+                item = Item.getByNameOrId(registryName);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             if (item == null) {
                 code = TextFormatting.RED.toString() + "MISSING! ";
             }
         }
-        return code + registryName + ", ";
+        if (registryName == null || registryName.equals("")) {
+            registryName = "blank";
+        }
+        return code + registryName + TextFormatting.RESET + ", ";
     }
 }

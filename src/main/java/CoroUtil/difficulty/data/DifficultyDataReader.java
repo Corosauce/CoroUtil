@@ -106,7 +106,7 @@ public class DifficultyDataReader {
 
             try {
 
-                if (!dataFolder.exists() || dataFolder.listFiles().length <= 0) {
+                if (!dataFolder.exists() || dataFolder.listFiles().length <= 0 || ConfigCoroUtil.forceDDDataClear) {
                     CULog.log("Detected coroutil json data missing, generating from templates");
                     generateDataTemplates();
                 }

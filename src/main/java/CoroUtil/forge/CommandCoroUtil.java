@@ -323,38 +323,27 @@ public class CommandCoroUtil extends CommandBase {
 
 						if (profileFound != null) {
 
-							Random rand = new Random();
-							DataActionMobSpawns spawns = profileFound.spawns.get(rand.nextInt(profileFound.spawns.size()));
-							String spawn = spawns.entities.get(rand.nextInt(spawns.entities.size()));
+							boolean spawnAll = false;
+							if (var2.length > 1) {
+								spawnAll = var2[2].equalsIgnoreCase("all");
+							}
 
-							//TODO: REVERIFY
-							//TODO: json files were using non registered name for vanilla ones, switch to registered names
-							//was: "Skeleton", probably need: "skeleton" or "minecraft:skeleton"
-							//mc should assume "minecraft:" if its missing / no domain
-							//Entity entL = EntityList.createEntityByName(spawn, world);
-							Class clazz = EntityList.getClass(new ResourceLocation(spawn));
-
-							if (clazz != null) {
-								Entity entL = EntityList.newEntity(clazz, world);
-								if (entL != null && entL instanceof EntityCreature) {
-
-									EntityCreature ent = (EntityCreature) entL;
-
-									BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
-									float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
-
-									ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
-									UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
-
-									spawnEntity(player, ent);
-
-									CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
-								} else {
-									player.sendMessage(new TextComponentString("entity instance null or not EntityCreature"));
+							if (spawnAll) {
+								for (DataActionMobSpawns spawns : profileFound.spawns) {
+									for (String spawn : spawns.entities) {
+										for (int i = 0; i < spawns.count; i++) {
+											spawnInvasionMob(world, player, spawn, spawns, posVec);
+										}
+									}
 								}
 							} else {
-								player.sendMessage(new TextComponentString("entity class null"));
+								Random rand = new Random();
+								DataActionMobSpawns spawns = profileFound.spawns.get(rand.nextInt(profileFound.spawns.size()));
+								String spawn = spawns.entities.get(rand.nextInt(spawns.entities.size()));
+
+								spawnInvasionMob(world, player, spawn, spawns, posVec);
 							}
+
 
 							/*var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test"));
 							String data = profileFound.toString();
@@ -603,6 +592,35 @@ public class CommandCoroUtil extends CommandBase {
         }
         
         return count;
+	}
+
+	public void spawnInvasionMob(World world, EntityPlayer player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
+		Class clazz = EntityList.getClass(new ResourceLocation(spawn));
+
+		if (clazz != null) {
+			Entity entL = EntityList.newEntity(clazz, world);
+			if (entL != null && entL instanceof EntityCreature) {
+
+				EntityCreature ent = (EntityCreature) entL;
+
+				BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
+				float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
+				UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
+
+				spawnEntity(player, ent);
+
+				//add a bit of random to space multi spawns out
+				ent.setPosition(ent.posX + world.rand.nextDouble(), ent.posY, ent.posZ + world.rand.nextDouble());
+
+				//CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+			} else {
+				player.sendMessage(new TextComponentString("entity instance null or not EntityCreature"));
+			}
+		} else {
+			player.sendMessage(new TextComponentString("entity class null"));
+		}
 	}
 	
 	@Override
