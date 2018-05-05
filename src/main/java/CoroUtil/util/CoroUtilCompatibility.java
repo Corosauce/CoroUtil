@@ -1,5 +1,7 @@
 package CoroUtil.util;
 
+import CoroUtil.forge.CULog;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -9,6 +11,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class CoroUtilCompatibility {
@@ -19,11 +22,28 @@ public class CoroUtilCompatibility {
     private static boolean sereneSeasonsInstalled = false;
     private static boolean checksereneSeasons = true;
 
+    private static boolean lycanitesMobsInstalled = false;
+    private static boolean checkLycanitesMobs = true;
+
     private static Class class_TAN_ASMHelper = null;
     private static Method method_TAN_getFloatTemperature = null;
 
     private static Class class_SereneSeasons_ASMHelper = null;
     private static Method method_sereneSeasons_getFloatTemperature = null;
+
+    /**
+     * flying lycanites mob support
+     * - we should also account for LOS, we cant just blind set end node for flyers
+     * -- if we do this we could add support for other flyers, ghasts etc
+     * - how do we know if the mob isnt already pathing for LYC MOBS?
+     * -- if !directNavigator.atTargetPosition()
+     */
+    private static boolean enableFlyingSupport = false;
+    private static Class class_LycanitesMobs_Entity = null;
+    private static Class class_LycanitesMobs_DirectNavigator = null;
+    private static Field field_LycanitesMobs_directNavigator = null;
+    private static Method method_LycanitesMobs_useDirectNavigator = null;
+    private static Method method_LycanitesMobs_setTargetPosition = null;
 
     public static boolean shouldSnowAt(World world, BlockPos pos) {
         /**
@@ -49,6 +69,8 @@ public class CoroUtilCompatibility {
                 return (float) method_TAN_getFloatTemperature.invoke(null, biome, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                //prevent error spam
+                tanInstalled = false;
                 return biome.getFloatTemperature(pos);
             }
         } else if (isSereneSeasonsInstalled()) {
@@ -59,6 +81,8 @@ public class CoroUtilCompatibility {
                 return (float) method_sereneSeasons_getFloatTemperature.invoke(null, biome, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                //prevent error spam
+                sereneSeasonsInstalled = false;
                 return biome.getFloatTemperature(pos);
             }
         } else {
@@ -83,6 +107,8 @@ public class CoroUtilCompatibility {
                 //not installed
                 //ex.printStackTrace();
             }
+
+            CULog.log("CoroUtil detected Tough As Nails Seasons " + (tanInstalled ? "Installed" : "Not Installed") + " for use");
         }
 
         return tanInstalled;
@@ -105,9 +131,35 @@ public class CoroUtilCompatibility {
                 //not installed
                 //ex.printStackTrace();
             }
+
+            CULog.log("CoroUtil detected Serene Seasons " + (sereneSeasonsInstalled ? "Installed" : "Not Installed") + " for use");
         }
 
         return sereneSeasonsInstalled;
+    }
+
+    /**
+     * Check if Serene Seasons is installed
+     *
+     * @return
+     */
+    public static boolean isLycanitesMobsInstalled() {
+        if (checkLycanitesMobs) {
+            try {
+                checkLycanitesMobs = false;
+                class_LycanitesMobs_Entity = Class.forName("com.lycanitesmobs.core.entity.EntityCreatureBase");
+                if (class_LycanitesMobs_Entity != null) {
+                    lycanitesMobsInstalled = true;
+                }
+            } catch (Exception ex) {
+                //not installed
+                //ex.printStackTrace();
+            }
+
+            CULog.log("CoroUtil detected Lycanites Mobs " + (lycanitesMobsInstalled ? "Installed" : "Not Installed") + " for use");
+        }
+
+        return lycanitesMobsInstalled;
     }
 
     /**
@@ -204,5 +256,69 @@ public class CoroUtilCompatibility {
 
         }
     }
+
+    public static boolean tryPathToXYZModCompat(EntityLiving ent, int x, int y, int z, double speed) {
+        /***
+         *
+         * com.lycanitesmobs.core.entity.EntityCreatureBase extends EntityLiving
+         * if .useDirectNavigator()
+         * run .directNavigator.setTargetPosition(new BlockPos(x, y, z), this.speed);
+         *
+         */
+
+        boolean invokedCustom = false;
+        boolean successCustom = false;
+
+        if (enableFlyingSupport && isLycanitesMobsInstalled()) {
+            try {
+                if (class_LycanitesMobs_DirectNavigator == null) {
+                    class_LycanitesMobs_DirectNavigator = Class.forName("com.lycanitesmobs.core.entity.ai.DirectNavigator");
+                    /*if (class_LycanitesMobs_DirectNavigator == null) {
+                        CULog.log("failed to find " + "com.lycanitesmobs.core.entity.ai.DirectNavigator");
+                    } else {
+                        CULog.log("found " + "com.lycanitesmobs.core.entity.ai.DirectNavigator");
+                    }*/
+                }
+                if (method_LycanitesMobs_useDirectNavigator == null) {
+                    method_LycanitesMobs_useDirectNavigator = class_LycanitesMobs_Entity.getDeclaredMethod("useDirectNavigator");
+                }
+                if (method_LycanitesMobs_setTargetPosition == null) {
+                    method_LycanitesMobs_setTargetPosition =
+                            class_LycanitesMobs_DirectNavigator.getDeclaredMethod("setTargetPosition", BlockPos.class, double.class);
+                }
+                if (field_LycanitesMobs_directNavigator == null) {
+                    field_LycanitesMobs_directNavigator = class_LycanitesMobs_Entity.getDeclaredField("directNavigator");
+                }
+
+                if (ent.getClass().isAssignableFrom(class_LycanitesMobs_Entity)) {
+                    if ((boolean)method_LycanitesMobs_useDirectNavigator.invoke(ent)) {
+                        Object directNavigator = field_LycanitesMobs_directNavigator.get(ent);
+                        invokedCustom = true;
+                        successCustom = (boolean)method_LycanitesMobs_setTargetPosition.invoke(directNavigator, new BlockPos(x, y, z), speed);
+                    }
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                //prevent error spam
+                lycanitesMobsInstalled = false;
+                return false;
+            }
+        }
+
+        if (!invokedCustom) {
+            return tryPathToXYZVanilla(ent, x, y, z, speed);
+        } else {
+            return successCustom;
+        }
+    }
+
+    public static boolean tryPathToXYZVanilla(EntityLiving ent, int x, int y, int z, double speed) {
+        return ent.getNavigator().tryMoveToXYZ(x, y, z, speed);
+    }
+
+    /*public static boolean tryPathToXYZLycanitesFlying(World world, EntityLiving ent, int x, int y, int z, double speed) {
+
+    }*/
 
 }

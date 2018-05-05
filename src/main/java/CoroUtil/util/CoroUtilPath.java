@@ -53,7 +53,8 @@ public class CoroUtilPath {
 
 				if (distToPlayer <= followDist) {
 					//boolean success = ent.getNavigator().tryMoveToEntityLiving(player, moveSpeedAmp);
-					success = ent.getNavigator().tryMoveToXYZ(x, y, z, moveSpeedAmp);
+					//success = ent.getNavigator().tryMoveToXYZ(x, y, z, moveSpeedAmp);
+					success = CoroUtilCompatibility.tryPathToXYZModCompat(ent, MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z), moveSpeedAmp);
 					//System.out.println("success? " + success + "- move to player: " + ent + " -> " + player);
 				} else {
 					/*int x = MathHelper.floor(player.posX);
@@ -112,7 +113,8 @@ public class CoroUtilPath {
 					}
 
 					if (tries < 30) {
-						success = ent.getNavigator().tryMoveToXYZ(gatherX, gatherY, gatherZ, moveSpeedAmp);
+						//success = ent.getNavigator().tryMoveToXYZ(gatherX, gatherY, gatherZ, moveSpeedAmp);
+						success = CoroUtilCompatibility.tryPathToXYZModCompat(ent, gatherX, gatherY, gatherZ, moveSpeedAmp);
 						//System.out.println("pp success? " + success + "- move to player: " + ent + " -> " + player);
 					}
 				}

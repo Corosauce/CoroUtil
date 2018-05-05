@@ -218,7 +218,7 @@ public class EventHandler {
 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.alphaFunc(516, 0.003921569F);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.004F);
 
         //TODO: requires AT for EntityRenderer
         boolean testGLUOverride = false;
@@ -298,7 +298,7 @@ public class EventHandler {
 
         GlStateManager.depthMask(false);
         GlStateManager.disableBlend();
-        GlStateManager.alphaFunc(516, 0.1F);
+        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
     }
 	
 	@SideOnly(Side.CLIENT)
