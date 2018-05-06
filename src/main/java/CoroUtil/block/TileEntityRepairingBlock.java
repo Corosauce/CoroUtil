@@ -66,6 +66,14 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     	}
     }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
+            getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
+        }
+    }
+
     public void restoreBlock() {
         getWorld().setBlockState(this.getPos(), orig_blockState);
     }
@@ -88,9 +96,11 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound var1)
     {
-        String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
-        var1.setString("orig_blockName", str);
-        var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
+        if (orig_blockState != null) {
+            String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
+            var1.setString("orig_blockName", str);
+            var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
+        }
         var1.setInteger("ticksRepairCount", ticksRepairCount);
 
         var1.setFloat("orig_hardness", orig_hardness);
@@ -104,11 +114,18 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     {
         super.readFromNBT(var1);
         ticksRepairCount = var1.getInteger("ticksRepairCount");
-        Block block = Block.getBlockFromName(var1.getString("orig_blockName"));
-        if (block != null) {
-            int meta = var1.getInteger("orig_blockMeta");
-            this.orig_blockState = block.getStateFromMeta(meta);
+        try {
+            Block block = Block.getBlockFromName(var1.getString("orig_blockName"));
+            if (block != null) {
+                int meta = var1.getInteger("orig_blockMeta");
+                this.orig_blockState = block.getStateFromMeta(meta);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+
+            this.orig_blockState = Blocks.AIR.getDefaultState();
         }
+
 
         orig_hardness = var1.getFloat("orig_hardness");
         orig_explosionResistance = var1.getFloat("orig_explosionResistance");
