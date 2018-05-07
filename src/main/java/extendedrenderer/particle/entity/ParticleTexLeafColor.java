@@ -18,13 +18,13 @@ import net.minecraft.world.World;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
     
-    // Save a few stack depth by caching this
-    private static BlockColors colors;
-    
-    private static Map<IBlockState, int[]> colorCache = new IdentityHashMap<>();
-    static {        
-        ((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
-    }
+	// Save a few stack depth by caching this
+	private static BlockColors colors;
+
+	private static Map<IBlockState, int[]> colorCache = new IdentityHashMap<>();
+	static {
+		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
+	}
 
 	//only use positives for now
 	public float rotationYawMomentum = 0;
@@ -65,9 +65,9 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		int choice = 32 - Integer.numberOfLeadingZeros(worldIn.rand.nextInt(randMax));
 		int color = colors[choice];
 
-        this.particleRed *= (float)(color >> 16 & 255) / 255.0F;
-        this.particleGreen *= (float)(color >> 8 & 255) / 255.0F;
-        this.particleBlue *= (float)(color & 255) / 255.0F;
+		this.particleRed *= (float) (color >> 16 & 255) / 255.0F;
+		this.particleGreen *= (float) (color >> 8 & 255) / 255.0F;
+		this.particleBlue *= (float) (color & 255) / 255.0F;
 	}
 
 	@Override
