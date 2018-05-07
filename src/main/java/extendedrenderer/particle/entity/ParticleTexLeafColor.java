@@ -113,8 +113,4 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 			}
 		}
 	}
-
-	public static void clearColorCache() {
-		colorCache.clear();
-	}
 }

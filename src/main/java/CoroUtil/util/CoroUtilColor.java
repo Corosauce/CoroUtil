@@ -20,8 +20,7 @@ public class CoroUtilColor {
         }
         IBakedModel model;
 
-        //account for shader foliage replaced models, use backup of map instead
-        //this actually currently contains every IBlockState variant so the else clause probably never runs now
+        //used when foliage shader is on
         if (FoliageData.backupBakedModelStore.containsKey(state)) {
             model = FoliageData.backupBakedModelStore.get(state);
         } else {
