@@ -1,25 +1,32 @@
 package extendedrenderer.particle.entity;
 
-import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
-import net.minecraft.block.Block;
+import org.apache.commons.lang3.ArrayUtils;
+
+import CoroUtil.util.CoroUtilColor;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockDoublePlant.EnumBlockHalf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.registries.IRegistryDelegate;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
     
-    private static final Field _blockColorMap = ReflectionHelper.findField(BlockColors.class, "blockColorMap");
-    
+    // Save a few stack depth by caching this
     private static BlockColors colors;
-    private static Map<IRegistryDelegate<Block>, IBlockColor> blockColorMap;
+    
+    private static Map<IBlockState, int[]> colorCache = new IdentityHashMap<>();
+    static {        
+        ((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
+    }
 
 	//only use positives for now
 	public float rotationYawMomentum = 0;
@@ -32,33 +39,37 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		
 		if (colors == null) {
 		    colors = Minecraft.getMinecraft().getBlockColors();
-		    try {
-                blockColorMap = (Map<IRegistryDelegate<Block>, IBlockColor>) _blockColorMap.get(colors);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
 		}
 		
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
 		IBlockState state = worldIn.getBlockState(pos);
-	    // tallgrass apparently isnt colorized or some weird thing, in vanilla
-		if (!hasColor(state)) {
-		    state = worldIn.getBlockState(pos.down());
-		}
-		
-		int i = colors.colorMultiplier(state, this.world, pos, 0);
-	    //some mods dont use biome coloring and have their color in texture, so lets fallback to green until a texture scanning solution is used
-		if (!hasColor(state) || (i & 0xFFFFFF) == 0xFFFFFF) {
-		    i = 5811761; //color for vanilla leaf in forest biome
+	    // top of double plants doesn't have variant property
+		if (state.getBlock() instanceof BlockDoublePlant && state.getValue(BlockDoublePlant.HALF) == EnumBlockHalf.UPPER) {
+		    state = state.withProperty(BlockDoublePlant.VARIANT, worldIn.getBlockState(pos.down()).getValue(BlockDoublePlant.VARIANT));
 		}
 
-        this.particleRed *= (float)(i >> 16 & 255) / 255.0F;
-        this.particleGreen *= (float)(i >> 8 & 255) / 255.0F;
-        this.particleBlue *= (float)(i & 255) / 255.0F;
-	}
-	
-	private final boolean hasColor(IBlockState state) {
-	    return blockColorMap.containsKey(state.getBlock().delegate);
+		int mult = colors.colorMultiplier(state, this.world, pos, 0);
+		int[] colors = colorCache.get(state);
+		if (colors == null) {
+		    colors = CoroUtilColor.getColors(state, mult);
+		    if (colors.length == 0) {
+		        colors = new int[] { 5811761 }; // fallback to default leaf color
+		    }
+		    while (colors[colors.length - 1] == colors[colors.length - 2]) {
+		        colors = ArrayUtils.remove(colors, colors.length - 1);
+		    }
+		    colorCache.put(state, colors);
+		}
+		
+		// Randomize the color with exponential decrease in likelihood. That is, the first color has a 50% chance, then 25%, etc.
+		System.out.println(colors.length);
+		int randMax = 1 << (colors.length - 1);
+		int choice = 32 - Integer.numberOfLeadingZeros(worldIn.rand.nextInt(randMax));
+		int color = colors[choice];
+
+        this.particleRed *= (float)(color >> 16 & 255) / 255.0F;
+        this.particleGreen *= (float)(color >> 8 & 255) / 255.0F;
+        this.particleBlue *= (float)(color & 255) / 255.0F;
 	}
 
 	@Override
