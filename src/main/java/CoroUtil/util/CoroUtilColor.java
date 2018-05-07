@@ -3,6 +3,7 @@ package CoroUtil.util;
 import java.awt.image.BufferedImage;
 
 import CoroUtil.repack.de.androidpit.colorthief.ColorThief;
+import extendedrenderer.foliage.FoliageData;
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,7 +18,16 @@ public class CoroUtilColor {
         if (state instanceof IExtendedBlockState) {
             state = ((IExtendedBlockState) state).getClean();
         }
-        IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+        IBakedModel model;
+
+        //account for shader foliage replaced models, use backup of map instead
+        //this actually currently contains every IBlockState variant so the else clause probably never runs now
+        if (FoliageData.backupBakedModelStore.containsKey(state)) {
+            model = FoliageData.backupBakedModelStore.get(state);
+        } else {
+            model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+        }
+
         if (model != null && !model.isBuiltInRenderer()) {
             TextureAtlasSprite sprite = model.getParticleTexture();
             if (sprite != null && sprite != Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {

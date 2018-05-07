@@ -1,7 +1,6 @@
 package extendedrenderer.particle.entity;
 
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -21,7 +20,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	// Save a few stack depth by caching this
 	private static BlockColors colors;
 
-	private static Map<IBlockState, int[]> colorCache = new IdentityHashMap<>();
+	private static ConcurrentHashMap<IBlockState, int[]> colorCache = new ConcurrentHashMap<>();
 	static {
 		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
 	}
@@ -41,22 +40,27 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
 		IBlockState state = worldIn.getBlockState(pos);
+
 	    // top of double plants doesn't have variant property
 		if (state.getBlock() instanceof BlockDoublePlant && state.getValue(BlockDoublePlant.HALF) == EnumBlockHalf.UPPER) {
 		    state = state.withProperty(BlockDoublePlant.VARIANT, worldIn.getBlockState(pos.down()).getValue(BlockDoublePlant.VARIANT));
 		}
 
-		int mult = colors.colorMultiplier(state, this.world, pos, 0);
 		int[] colors = colorCache.get(state);
 		if (colors == null) {
+			int mult = this.colors.colorMultiplier(state, this.world, pos, 0);
 		    colors = CoroUtilColor.getColors(state, mult);
+
 		    if (colors.length == 0) {
-		        colors = new int[] { 5811761 }; // fallback to default leaf color
+				// fallback to default leaf color
+		        colors = new int[] { 5811761 }; //color for vanilla leaf in forest biome
 		    }
 		    // Remove duplicate colors from end of array, this will skew the random choice later
-		    while (colors[colors.length - 1] == colors[colors.length - 2]) {
-		        colors = ArrayUtils.remove(colors, colors.length - 1);
-		    }
+			if (colors.length > 1) {
+				while (colors[colors.length - 1] == colors[colors.length - 2]) {
+					colors = ArrayUtils.remove(colors, colors.length - 1);
+				}
+			}
 		    colorCache.put(state, colors);
 		}
 		
@@ -108,5 +112,9 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 				rotationPitchMomentum = 0;
 			}
 		}
+	}
+
+	public static void clearColorCache() {
+		colorCache.clear();
 	}
 }
