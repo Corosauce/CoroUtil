@@ -55,6 +55,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		    if (colors.length == 0) {
 		        colors = new int[] { 5811761 }; // fallback to default leaf color
 		    }
+		    // Remove duplicate colors from end of array, this will skew the random choice later
 		    while (colors[colors.length - 1] == colors[colors.length - 2]) {
 		        colors = ArrayUtils.remove(colors, colors.length - 1);
 		    }
@@ -62,7 +63,6 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		}
 		
 		// Randomize the color with exponential decrease in likelihood. That is, the first color has a 50% chance, then 25%, etc.
-		System.out.println(colors.length);
 		int randMax = 1 << (colors.length - 1);
 		int choice = 32 - Integer.numberOfLeadingZeros(worldIn.rand.nextInt(randMax));
 		int color = colors[choice];
