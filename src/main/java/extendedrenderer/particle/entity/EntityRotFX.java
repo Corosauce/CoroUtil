@@ -359,6 +359,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public void setSize(float par1, float par2)
     {
         super.setSize(par1, par2);
+        // MC-12269 - fix particle being offset to the NW
+        this.setPosition(posX, posY, posZ);
     }
     
     public void setGravity(float par) {
