@@ -67,7 +67,7 @@ public class ConfigCoroUtil implements IConfigCategory {
 	@ConfigComment("Used until Invasion mod is released")
 	public static boolean tempDisableHWInvFeatures = true;
 
-	public static boolean forceDDDataClear = true;
+	//public static boolean forceDDDataClear = true;
 
 	@Override
 	public String getName() {
