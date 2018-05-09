@@ -2,6 +2,7 @@ package CoroUtil.util;
 
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -81,6 +82,7 @@ public class CoroUtilCrossMod {
             } catch (Exception ex) {
                 //ex.printStackTrace();
             }
+            CULog.log("CoroUtil detected Infernal Mobs " + (hasInfernalMobs ? "Installed" : "Not Installed") + " for use");
             return hasInfernalMobs;
         }
     }
@@ -116,6 +118,7 @@ public class CoroUtilCrossMod {
          *
          * need to do this:
          * InfernalMobsCore.proxy.getRareMobs().remove(mob);
+         * - we arent doing this, maybe it was unneeded?
          * InfernalMobsCore.instance().addEntityModifiersByString(mob, modifier);
          *
          */
@@ -167,6 +170,9 @@ public class CoroUtilCrossMod {
 
         if (!ConfigDynamicDifficulty.difficulty_OverrideInfernalMobs) return;
 
+        //disable unless HW monsters is installed which performs the difficulty based replacements
+        if (!CoroUtilCompatibility.isHWMonstersInstalled()) return;
+
         //updated based off of InfernalMobsCore.getNBTTag();
         String infernalNBTString = "InfernalMobsMod";
 
@@ -177,6 +183,7 @@ public class CoroUtilCrossMod {
              */
             if (ent.getEntityData().hasKey(infernalNBTString)) {
                 if (!ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
+                    CULog.dbg("detected infernal mob, overriding its attributes for " + event.getEntity().getName());
                     infernalMobs_RemoveAllModifiers(ent);
                     ent.getEntityData().removeTag(infernalNBTString);
                 }

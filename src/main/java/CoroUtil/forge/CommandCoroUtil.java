@@ -324,7 +324,7 @@ public class CommandCoroUtil extends CommandBase {
 						if (profileFound != null) {
 
 							boolean spawnAll = false;
-							if (var2.length > 1) {
+							if (var2.length > 2) {
 								spawnAll = var2[2].equalsIgnoreCase("all");
 							}
 

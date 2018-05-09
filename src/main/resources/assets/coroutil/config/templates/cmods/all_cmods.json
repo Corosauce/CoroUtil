@@ -55,7 +55,9 @@
         {
           "cmod": "ai_infernal",
           "modifiers": [
-            "Regen", "Cloaking", "Storm"
+            "1UP", "Alchemist", "Berserk", "Blastoff", "Bulwark", "Choke", "Cloaking", "Darkness", "Ender",
+            "Exhaust", "Fiery", "Ghastly", "Gravity", "LifeSteal", "Ninja", "Poisonous", "Quicksand", "Regen",
+            "Rust", "Sapper", "Sprint", "Sticky", "Storm", "Vengeance", "Weakness", "Webber", "Wither"
           ]
         }
       ]

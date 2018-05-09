@@ -50,7 +50,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	@ConfigComment("If true, tie overall chance of infernal mobs to our difficulty system scaling, if false, don't try to control it at all")
 	public static boolean difficulty_OverrideInfernalMobs = true;
 	
-	@ConfigComment("what level of difficulty is required to count as 100% chance")
+	/*@ConfigComment("what level of difficulty is required to count as 100% chance")
 	public static double difficulty_Infernal_Elite_Max = 5F;
 	@ConfigComment("what level of difficulty is required to count as 100% chance")
 	public static double difficulty_Infernal_Ultra_Max = 5F;
@@ -59,7 +59,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	
 	public static double difficulty_Infernal_Elite_ScaleRate = 1F;
 	public static double difficulty_Infernal_Ultra_ScaleRate = 1F;
-	public static double difficulty_Infernal_Infernal_ScaleRate = 1F;
+	public static double difficulty_Infernal_Infernal_ScaleRate = 1F;*/
 
 	@Override
 	public String getName() {

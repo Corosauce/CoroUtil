@@ -45,6 +45,9 @@ public class CoroUtil {
 	public static CoroUtil instance;
 	public static final String modID = "coroutil";
 
+	public static final String modID_HWMonsters = "hw_monsters";
+	public static final String modID_HWInvasions = "hw_inv";
+
 
 	//public static final String version = "${version}";
 	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production

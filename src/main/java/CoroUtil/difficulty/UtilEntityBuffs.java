@@ -9,6 +9,7 @@ import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
+import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
@@ -65,6 +66,10 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
     public static String dataEntityBuffed_MobDrops = "CoroAI_HW_Buffed_MobDrops";*/
 
+    /**
+     * THESE MUST MATCH JSON DATA NAMES
+     */
+
     public static String dataEntityBuffed_AI_LungeAndCounterLeap = "ai_counterattack";
     public static String dataEntityBuffed_AI_Digging = "ai_mining";
     public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";
@@ -102,66 +107,10 @@ public class UtilEntityBuffs {
 
     public static double speedCap = 0.4D;
 
-    public static HashMap<Integer, EquipmentForDifficulty> lookupDifficultyToEquipment = new HashMap<>();
-
-    public static float inventoryStages = 5;
-
     static {
-        EquipmentForDifficulty obj = new EquipmentForDifficulty();
-        List<ItemStack> listItems = new ArrayList<ItemStack>();
-        obj.setListArmor(listItems);
-        lookupDifficultyToEquipment.put(0, obj);
 
-        obj = new EquipmentForDifficulty();
-        listItems = new ArrayList<ItemStack>();
-        listItems.add(new ItemStack(Items.LEATHER_HELMET));
-        listItems.add(new ItemStack(Items.LEATHER_CHESTPLATE));
-        listItems.add(new ItemStack(Items.LEATHER_LEGGINGS));
-        listItems.add(new ItemStack(Items.LEATHER_BOOTS));
-        obj.setListArmor(listItems);
-        obj.setWeapon(new ItemStack(Items.WOODEN_SWORD));
-        lookupDifficultyToEquipment.put(1, obj);
+        //relocated to DifficultyDataReader.init()
 
-        obj = new EquipmentForDifficulty();
-        listItems = new ArrayList<ItemStack>();
-        listItems.add(new ItemStack(Items.CHAINMAIL_HELMET));
-        listItems.add(new ItemStack(Items.CHAINMAIL_CHESTPLATE));
-        listItems.add(new ItemStack(Items.CHAINMAIL_LEGGINGS));
-        listItems.add(new ItemStack(Items.CHAINMAIL_BOOTS));
-        obj.setListArmor(listItems);
-        obj.setWeapon(new ItemStack(Items.STONE_SWORD));
-        lookupDifficultyToEquipment.put(2, obj);
-
-        obj = new EquipmentForDifficulty();
-        listItems = new ArrayList<ItemStack>();
-        listItems.add(new ItemStack(Items.IRON_HELMET));
-        listItems.add(new ItemStack(Items.IRON_CHESTPLATE));
-        listItems.add(new ItemStack(Items.IRON_LEGGINGS));
-        listItems.add(new ItemStack(Items.IRON_BOOTS));
-        obj.setListArmor(listItems);
-        obj.setWeapon(new ItemStack(Items.IRON_SWORD));
-        lookupDifficultyToEquipment.put(3, obj);
-
-        obj = new EquipmentForDifficulty();
-        listItems = new ArrayList<ItemStack>();
-        listItems.add(new ItemStack(Items.DIAMOND_HELMET));
-        listItems.add(new ItemStack(Items.DIAMOND_CHESTPLATE));
-        listItems.add(new ItemStack(Items.DIAMOND_LEGGINGS));
-        listItems.add(new ItemStack(Items.DIAMOND_BOOTS));
-        obj.setListArmor(listItems);
-        obj.setWeapon(new ItemStack(Items.DIAMOND_SWORD));
-        lookupDifficultyToEquipment.put(4, obj);
-
-        registerBuff(new BuffHealth());
-        //registerBuff(new BuffSpeed());
-        registerBuff(new BuffXP());
-        registerBuff(new BuffMobDrops());
-        registerBuff(new BuffInventory());
-        registerBuff(new BuffAI_Infernal());
-        registerBuff(new BuffAI_TaskMining(dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
-        registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
-        registerBuff(new BuffAI_TaskOmniscience(dataEntityBuffed_AI_Omniscience));
-        registerBuff(new BuffAI_TaskBase(dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
     }
 
     /**
@@ -186,10 +135,12 @@ public class UtilEntityBuffs {
 
         //apply the cmods via actual appliers, which also marks entity with easy to check cmod names
         for (DataCmod cmod : cmodsFlat) {
+            CULog.dbg("applyBuff: " + cmod.cmod);
             applyBuff(cmod.cmod, ent, difficulty);
         }
 
         for (DataCmod cmod : cmodsFlat) {
+            CULog.dbg("applyBuffPost: " + cmod.cmod);
             applyBuffPost(cmod.cmod, ent, difficulty);
         }
 

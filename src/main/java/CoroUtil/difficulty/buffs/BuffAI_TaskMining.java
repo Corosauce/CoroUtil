@@ -21,10 +21,7 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
     @Override
     public void applyBuffPost(EntityCreature ent, float difficulty) {
 
-        //a bit of a temp patch, consider alternative due to maybe messing with non invasion enhanced stuff
-        ent.getEntityData().setBoolean(TaskDigTowardsTarget.dataUseInvasionRules, true);
-
-        CULog.dbg("enhancing with digging: " + ent.getName());
+        CULog.dbg("applyBuffPost enhancing with digging: " + ent.getName());
 
         ((PathNavigateGround)ent.getNavigator()).setBreakDoors(false);
 

@@ -1,6 +1,11 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.ai.tasks.EntityAITaskAntiAir;
+import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
+import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.config.ConfigCoroUtil;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.cmods.*;
 import CoroUtil.difficulty.data.conditions.*;
 import CoroUtil.forge.CULog;
@@ -10,6 +15,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.minecraft.entity.ai.EntityAIZombieAttack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -75,18 +81,23 @@ public class DifficultyDataReader {
     public static void init() {
         data = new DifficultyData();
 
+        /**
+         * Deserializers
+         */
+
         lookupJsonNameToCmodDeserializer.clear();
-        lookupJsonNameToCmodDeserializer.put("inventory", CmodInventory.class);
-        lookupJsonNameToCmodDeserializer.put("mob_drops", CmodMobDrops.class);
-        lookupJsonNameToCmodDeserializer.put("attribute_health", CmodAttributeHealth.class);
-        lookupJsonNameToCmodDeserializer.put("attribute_speed", CmodAttributeSpeed.class);
-        lookupJsonNameToCmodDeserializer.put("xp", CmodXP.class);
-        lookupJsonNameToCmodDeserializer.put("ai_antiair", CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put("ai_mining", CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put("ai_omniscience", CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put("ai_counterattack", CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put("ai_lunge", CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put("ai_infernal", CmodAIInfernal.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Inventory, CmodInventory.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_MobDrops, CmodMobDrops.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Health, CmodAttributeHealth.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Speed, CmodAttributeSpeed.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_XP, CmodXP.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Digging, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, CmodAITaskBase.class);
+        //used to be "ai_lunge", how to resolve, separate tasks or a multi buff task that can be configured via adding or post adding?
+        //lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Infernal, CmodAIInfernal.class);
         lookupJsonNameToCmodDeserializer.put("template", CmodTemplateReference.class);
 
         lookupJsonNameToConditionDeserializer.clear();
@@ -96,6 +107,21 @@ public class DifficultyDataReader {
         lookupJsonNameToConditionDeserializer.put("random", ConditionRandom.class);
         lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
         lookupJsonNameToConditionDeserializer.put("template", ConditionTemplateReference.class);
+
+        /**
+         * Buff appliers
+         */
+
+        UtilEntityBuffs.registerBuff(new BuffHealth());
+        //registerBuff(new BuffSpeed());
+        UtilEntityBuffs.registerBuff(new BuffXP());
+        UtilEntityBuffs.registerBuff(new BuffMobDrops());
+        UtilEntityBuffs.registerBuff(new BuffInventory());
+        UtilEntityBuffs.registerBuff(new BuffAI_Infernal());
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskMining(UtilEntityBuffs.dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskOmniscience(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
     }
 
     public static DifficultyData getData() {

@@ -30,11 +30,6 @@
             "conditions": [
                 {
                     "condition": "killed_by_player"
-                },
-                {
-                    "condition": "random_chance_with_looting",
-                    "chance": 0.5,
-                    "looting_multiplier": 0.1
                 }
             ],
             "rolls": 1,
@@ -42,12 +37,12 @@
                 {
                     "type": "item",
                     "name": "minecraft:diamond",
-                    "weight": 1
+                    "weight": 3
                 },
                 {
                     "type": "item",
                     "name": "minecraft:emerald",
-                    "weight": 1
+                    "weight": 3
                 }
             ]
         }

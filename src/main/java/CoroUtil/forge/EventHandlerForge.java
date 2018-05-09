@@ -202,6 +202,9 @@ public class EventHandlerForge {
 		//remove tasks that are marked to be removed
 		if (!ent.world.isRemote) {
 			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
+
+				//TODO: persistance management here too maybe?
+
 				if (ent instanceof EntityLiving) {
 					EntityLiving entL = (EntityLiving) ent;
 					Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();

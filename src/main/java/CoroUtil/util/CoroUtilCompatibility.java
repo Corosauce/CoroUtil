@@ -1,6 +1,7 @@
 package CoroUtil.util;
 
 import CoroUtil.forge.CULog;
+import CoroUtil.forge.CoroUtil;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -10,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.common.Loader;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -320,5 +322,13 @@ public class CoroUtilCompatibility {
     /*public static boolean tryPathToXYZLycanitesFlying(World world, EntityLiving ent, int x, int y, int z, double speed) {
 
     }*/
+
+    public static boolean isHWMonstersInstalled() {
+        return Loader.isModLoaded(CoroUtil.modID_HWMonsters);
+    }
+
+    public static boolean isHWInvasionsInstalled() {
+        return Loader.isModLoaded(CoroUtil.modID_HWInvasions);
+    }
 
 }
