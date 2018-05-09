@@ -368,7 +368,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		if (forInvasion) {
 			//once its day, disable forever
 			if (this.entity.world.isDaytime()) {
-				CULog.dbg("removing digging");
+				CULog.dbg("removing digging from " + this.entity.getName());
 				return true;
 				//taskActive = false;
 			}

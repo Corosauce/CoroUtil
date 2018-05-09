@@ -243,7 +243,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
         if (disableAtSunrise) {
             //once its day, disable forever
             if (this.attacker.world.isDaytime()) {
-                CULog.dbg("removing long distance pathing");
+                CULog.dbg("removing long distance pathing from " + this.attacker.getName());
                 return true;
                 //taskActive = false;
             }

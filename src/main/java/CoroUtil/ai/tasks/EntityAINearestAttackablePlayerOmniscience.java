@@ -128,7 +128,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
         if (disableAtSunrise) {
             //once its day, disable forever
             if (this.taskOwner.world.isDaytime()) {
-                CULog.dbg("removing omniscience");
+                CULog.dbg("removing omniscience from " + this.taskOwner.getName());
                 //also detarget
                 if (this.taskOwner.getAttackTarget() instanceof EntityPlayer) {
                     this.taskOwner.setAttackTarget(null);

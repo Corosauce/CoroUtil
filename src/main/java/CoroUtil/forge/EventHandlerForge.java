@@ -51,7 +51,7 @@ import java.util.List;
 
 public class EventHandlerForge {
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void deathEvent(LivingDeathEvent event) {
 
 		if (event.isCanceled()) return;
@@ -203,30 +203,33 @@ public class EventHandlerForge {
 		if (!ent.world.isRemote) {
 			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
 
-				//TODO: persistance management here too maybe?
+				if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
 
-				if (ent instanceof EntityLiving) {
-					EntityLiving entL = (EntityLiving) ent;
-					Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
-					while (it.hasNext()) {
-						EntityAITasks.EntityAITaskEntry task = it.next();
-						if (task.action instanceof IInvasionControlledTask) {
-							if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
-								//entL.tasks.removeTask(task.action);
-								task.action.resetTask();
-								it.remove();
+					//TODO: persistance management here too maybe?
+
+					if (ent instanceof EntityLiving) {
+						EntityLiving entL = (EntityLiving) ent;
+						Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
+						while (it.hasNext()) {
+							EntityAITasks.EntityAITaskEntry task = it.next();
+							if (task.action instanceof IInvasionControlledTask) {
+								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+									//entL.tasks.removeTask(task.action);
+									task.action.resetTask();
+									it.remove();
+								}
 							}
 						}
-					}
 
-					it = entL.targetTasks.taskEntries.iterator();
-					while (it.hasNext()) {
-						EntityAITasks.EntityAITaskEntry task = it.next();
-						if (task.action instanceof IInvasionControlledTask) {
-							if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
-								//entL.targetTasks.removeTask(task.action);
-								task.action.resetTask();
-								it.remove();
+						it = entL.targetTasks.taskEntries.iterator();
+						while (it.hasNext()) {
+							EntityAITasks.EntityAITaskEntry task = it.next();
+							if (task.action instanceof IInvasionControlledTask) {
+								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+									//entL.targetTasks.removeTask(task.action);
+									task.action.resetTask();
+									it.remove();
+								}
 							}
 						}
 					}
