@@ -57,8 +57,8 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     private static final UUID lungeSpeedUUID = UUID.fromString("A9766B59-9566-4402-BC1F-2EE2A276D836");
     private static final AttributeModifier lungeSpeedModifier = new AttributeModifier(lungeSpeedUUID, "lungeSpeed", ConfigHWMonsters.lungeSpeed, 1);
     
-    private boolean useLunging = false;
-    private boolean useLeapAttack = false;
+    /*private boolean useLunging = false;
+    private boolean useLeapAttack = false;*/
     
     public EntityAITaskEnhancedCombat() {
 		this.classTarget = EntityPlayer.class;
@@ -202,7 +202,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
             
             boolean pathResult = false;
             
-            if (useLunging) {
+            if (canUseLunging()) {
 	            double curSpeed = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
 	            
 	            if (d0 <= lungeDist * lungeDist && curSpeed < UtilEntityBuffs.speedCap) {
@@ -232,7 +232,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
         this.attackTick = Math.max(this.attackTick - 1, 0);
         
         //counter attack leap
-        if (useLeapAttack) {
+        if (canUseLeapAttack()) {
 	        if (this.entity.onGround || entity.isInWater() || entity.isInsideOfMaterial(Material.LAVA)) {
 	        	leapAttacking = false;
 	        	//if (wasInAir) {
@@ -263,6 +263,13 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
 		                		//important, if you clear path to entity, be sure to update or clear where hes supposed to be last moving to
 		                		//if you dont, it could look like they flee
 		                		this.entity.getMoveHelper().setMoveTo(entitylivingbase.posX, entitylivingbase.posY, entitylivingbase.posZ, 1D);
+
+		                		//quick repath on land, should be ok performance wise
+                                Path path = this.entity.getNavigator().getPathToEntityLiving(entitylivingbase);
+                                if (path != null) {
+                                    this.entity.getNavigator().setPath(path, 1D);
+                                }
+
 		                		delayCounter = 0;
 		        			}
 		        			
@@ -320,10 +327,18 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
         }
     }
 
+    public boolean canUseLeapAttack() {
+        return entity.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap);
+    }
+
+    public boolean canUseLunging() {
+        return entity.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Lunge);
+    }
+
 	@Override
 	public void setEntity(EntityCreature creature) {
 		this.entity = creature;
-		this.worldObj = this.entity.world;
+		this.worldObj = this.entity.world;/*
 		
 		EntityPlayer player = DynamicDifficulty.getBestPlayerForArea(worldObj, new BlockCoord(entity));
 		
@@ -344,6 +359,6 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
 			}
 			
 			//System.out.println("leap? " + useLeapAttack + " lunge? " + useLunging);
-		}
+		}*/
 	}
 }

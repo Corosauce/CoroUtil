@@ -20,6 +20,12 @@ public class BuffAI_TaskBase extends BuffBase {
     protected float minRequiredDifficulty = 0;
     protected boolean isTargetTask = false;
 
+    /**
+     * To enable use of multiple enableable buffs that are used within the same AI task, eg counter attack and lunging
+     * First one run will set the task, second one will just skip over if its already added and assume all good
+     */
+    protected boolean allowRedundantAttempts = false;
+
     public BuffAI_TaskBase(String buffName, Class task, int taskPriority, Class taskToReplace) {
         this(buffName, task, taskPriority);
         this.taskToReplace = taskToReplace;
@@ -29,6 +35,11 @@ public class BuffAI_TaskBase extends BuffBase {
         this.buffName = buffName;
         this.task = task;
         this.taskPriority = taskPriority;
+    }
+
+    public BuffAI_TaskBase setAllowRedundantAttempts() {
+        allowRedundantAttempts = true;
+        return this;
     }
 
     @Override
@@ -48,7 +59,7 @@ public class BuffAI_TaskBase extends BuffBase {
     @Override
     public boolean applyBuff(EntityCreature ent, float difficulty) {
 
-        if (applyBuffImpl(ent, difficulty, true)) {
+        if (applyBuffImpl(ent, difficulty, true) || allowRedundantAttempts) {
             return super.applyBuff(ent, difficulty);
         } else {
             return false;
@@ -57,13 +68,14 @@ public class BuffAI_TaskBase extends BuffBase {
 
     @Override
     public boolean canApplyBuff(EntityCreature ent, float difficulty) {
-        return !UtilEntityBuffs.hasTask(ent, task, isTargetTask);
+        return !UtilEntityBuffs.hasTask(ent, task, isTargetTask) || allowRedundantAttempts;
     }
 
     @Override
     public void applyBuffFromReload(EntityCreature ent, float difficulty) {
 
         //probably redundant if statement, added for safety
+        //no longer redundant due to addition of allowRedundantAttempts
         if (canApplyBuff(ent, difficulty)) {
             this.applyBuffImpl(ent, difficulty, false);
         }
@@ -78,10 +90,13 @@ public class BuffAI_TaskBase extends BuffBase {
                 return false;
             }
         } else {
-            UtilEntityBuffs.addTask(ent, task, taskPriority, isTargetTask);
+            //added since addition of allowRedundantAttempts feature
+            if (!UtilEntityBuffs.hasTask(ent, task, isTargetTask)) {
+                return UtilEntityBuffs.addTask(ent, task, taskPriority, isTargetTask);
+            } else {
+                return false;
+            }
         }
-
-        return true;
     }
 
     public boolean isTargetTask() {

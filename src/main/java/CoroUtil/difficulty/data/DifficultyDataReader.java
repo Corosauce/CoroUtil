@@ -22,18 +22,12 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import sun.misc.BASE64Encoder;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -94,9 +88,9 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Digging, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience, CmodAITaskBase.class);
-        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap, CmodAITaskBase.class);
         //used to be "ai_lunge", how to resolve, separate tasks or a multi buff task that can be configured via adding or post adding?
-        //lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Lunge, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Infernal, CmodAIInfernal.class);
         lookupJsonNameToCmodDeserializer.put("template", CmodTemplateReference.class);
 
@@ -118,10 +112,16 @@ public class DifficultyDataReader {
         UtilEntityBuffs.registerBuff(new BuffMobDrops());
         UtilEntityBuffs.registerBuff(new BuffInventory());
         UtilEntityBuffs.registerBuff(new BuffAI_Infernal());
-        UtilEntityBuffs.registerBuff(new BuffAI_TaskMining(UtilEntityBuffs.dataEntityBuffed_AI_Digging, TaskDigTowardsTarget.class, 5));
-        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, EntityAITaskAntiAir.class, 3));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskMining(UtilEntityBuffs.dataEntityBuffed_AI_Digging,
+                TaskDigTowardsTarget.class, 5));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir,
+                EntityAITaskAntiAir.class, 3));
         UtilEntityBuffs.registerBuff(new BuffAI_TaskOmniscience(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience));
-        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap, EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap,
+                EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
+
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Lunge,
+                EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
     }
 
     public static DifficultyData getData() {

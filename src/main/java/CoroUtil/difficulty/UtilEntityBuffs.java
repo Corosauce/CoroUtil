@@ -70,7 +70,8 @@ public class UtilEntityBuffs {
      * THESE MUST MATCH JSON DATA NAMES
      */
 
-    public static String dataEntityBuffed_AI_LungeAndCounterLeap = "ai_counterattack";
+    public static String dataEntityBuffed_AI_CounterLeap = "ai_counterattack";
+    public static String dataEntityBuffed_AI_Lunge = "ai_lunge";
     public static String dataEntityBuffed_AI_Digging = "ai_mining";
     public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";
     public static String dataEntityBuffed_AI_AntiAir = "ai_antiair";

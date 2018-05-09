@@ -4,6 +4,7 @@ import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
+import CoroUtil.forge.CULog;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -37,6 +38,8 @@ public class BuffHealth extends BuffBase {
              * - apply a multiplier that does exactly above, doable by operation 1 aka INCREMENT_MULTIPLY_BASE
              */
 
+            double oldHealth = ent.getMaxHealth();
+
             //set base value if we need to
             if (cmod.base_value != -1) {
                 ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.base_value);
@@ -44,6 +47,8 @@ public class BuffHealth extends BuffBase {
 
             double healthBoostMultiply = (/*1F + */difficulty * cmod.difficulty_multiplier);
             ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+
+            CULog.dbg("mob health went from " + oldHealth + " to " + ent.getMaxHealth());
         }
         /*
         double healthBoostMultiply = (difficulty * ConfigHWMonsters.scaleHealth);

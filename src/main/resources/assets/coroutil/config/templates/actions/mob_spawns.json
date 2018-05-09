@@ -395,6 +395,9 @@
               "cmod": "ai_counterattack"
             },
             {
+              "cmod": "ai_lunge"
+            },
+            {
               "cmod": "ai_infernal",
               "modifiers": [
                 "1UP", "Alchemist", "Berserk", "Blastoff", "Bulwark", "Choke", "Cloaking", "Darkness", "Ender",

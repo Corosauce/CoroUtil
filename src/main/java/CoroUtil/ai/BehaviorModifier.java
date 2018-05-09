@@ -50,7 +50,7 @@ public class BehaviorModifier {
         			
         			//if (parWorld.rand.nextFloat() < chanceToEnhance) {
         			
-	        			if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_LungeAndCounterLeap)) {
+	        			if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap)) {
 	            			for (Class clazz : taskToInject) {
 	    		        		addTask(ent, clazz, priorityOfTask, false);
 	            			}

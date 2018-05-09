@@ -49,8 +49,7 @@
           "cmod": "ai_counterattack"
         },
         {
-          "cmod": "ai_lunge",
-          "comment": "currently exists only within ai_counterattack"
+          "cmod": "ai_lunge"
         },
         {
           "cmod": "ai_infernal",
