@@ -1,27 +1,11 @@
 package CoroUtil.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.JsonContext;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -29,9 +13,13 @@ public class UtilClasspath {
 
     public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
         try {
-            IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-            IResource iresource = resourceManager.getResource(resourceLocation);
-            String contents = IOUtils.toString(iresource.getInputStream(), StandardCharsets.UTF_8);
+            //client side only way
+            /*IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+            IResource iresource = resourceManager.getResource(resourceLocation);*/
+            //server side compatible way
+            String str = "assets/" + resourceLocation.toString().replace(":", "/");
+            InputStream in = UtilClasspath.class.getClassLoader().getResourceAsStream(str);
+            String contents = IOUtils.toString(in, StandardCharsets.UTF_8);
             return contents;
         } catch (Exception ex) {
             ex.printStackTrace();

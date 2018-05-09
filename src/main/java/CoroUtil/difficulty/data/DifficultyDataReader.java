@@ -297,7 +297,7 @@ public class DifficultyDataReader {
 
             if (!fileContents.equals("")) {
                 File fileOut = new File(dataFolder + pathRoot2);
-                CULog.log("copying " + path.substring(path.lastIndexOf("/")+1).toString() + " to " + fileOut.toString());
+                CULog.dbg("copying " + path.substring(path.lastIndexOf("/")+1).toString() + " to " + fileOut.toString());
                 FileUtils.writeStringToFile(fileOut, fileContents, StandardCharsets.UTF_8);
                 md5 = getMD5(fileOut);
             } else {
