@@ -2,6 +2,9 @@ package CoroUtil.difficulty.buffs;
 
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.difficulty.data.cmods.CmodMobDrops;
+import CoroUtil.difficulty.data.cmods.CmodXP;
+import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
@@ -32,9 +35,24 @@ public class BuffMobDrops extends BuffBase {
 
     @Override
     public void applyBuffOnDeath(EntityCreature ent, float difficulty, LivingDeathEvent event) {
-        LootTable loot = UtilEntityBuffs.getRandomLootForDifficulty(ent, difficulty);
-        if (loot != null) {
-            UtilEntityBuffs.processLootTableOnEntity(ent, loot, event);
+        CmodMobDrops cmod = (CmodMobDrops)UtilEntityBuffs.getCmodData(ent, getTagName());
+
+        if (cmod != null) {
+
+            LootTable loot = DifficultyDataReader.getData().lookupLootTables.get(cmod.loot_table);
+
+            //if no coroutil based loot table found, see if its a vanilla loot table, or maybe some other mods loot table
+            if (loot == null) {
+                loot = ent.world.getLootTableManager().getLootTableFromLocation(new ResourceLocation(cmod.loot_table));
+            }
+
+            if (loot != null) {
+                UtilEntityBuffs.processLootTableOnEntity(ent, loot, event);
+            } else {
+                CULog.dbg("couldnt find loot table: " + cmod.loot_table);
+            }
+        } else {
+            CULog.dbg("couldnt get cmod mod drops data");
         }
     }
 }

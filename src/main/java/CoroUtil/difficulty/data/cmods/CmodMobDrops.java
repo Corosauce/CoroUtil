@@ -7,4 +7,9 @@ import CoroUtil.difficulty.data.DataCmod;
  */
 public class CmodMobDrops extends DataCmod {
     public String loot_table;
+
+    @Override
+    public String toString() {
+        return super.toString() + ": " + loot_table;
+    }
 }

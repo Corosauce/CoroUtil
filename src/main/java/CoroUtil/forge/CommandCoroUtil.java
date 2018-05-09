@@ -609,7 +609,9 @@ public class CommandCoroUtil extends CommandBase {
 				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
 				UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
 
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
 				spawnEntity(player, ent);
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, false);
 
 				//add a bit of random to space multi spawns out
 				ent.setPosition(ent.posX + world.rand.nextDouble(), ent.posY, ent.posZ + world.rand.nextDouble());

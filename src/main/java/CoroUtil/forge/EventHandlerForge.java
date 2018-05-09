@@ -253,7 +253,8 @@ public class EventHandlerForge {
 		if (event.getEntity() instanceof EntityCreature) {
 			EntityCreature ent = (EntityCreature) event.getEntity();
 
-			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+			//if buffed and was not literally just spawned (prevents duplicate buff applying from invasion spawning + this code)
+			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed) && !ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityInitialSpawn)) {
 				float difficultySpawnedIn = 0;
 				if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
 					difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
@@ -271,6 +272,7 @@ public class EventHandlerForge {
 						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
 						if (buffObj != null) {
 							//System.out.println("reloading buff: " + buff);
+							CULog.dbg("applyBuffFromReload: " + buff);
 							buffObj.applyBuffFromReload(ent, difficultySpawnedIn);
 						} else {
 							CoroUtil.dbg("warning: unable to find buff by name of " + buff);

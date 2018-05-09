@@ -92,6 +92,7 @@ public class UtilEntityBuffs {
     public static String dataEntityEnhanced = "CoroAI_HW_Inv_Enhanced";
     public static String dataEntityEnhanceTried = "CoroAI_HW_Inv_EnhanceTried";
     public static String dataEntityWaveSpawned = "CoroAI_HW_Inv_WaveSpawned";
+    public static String dataEntityInitialSpawn = "CoroAI_HW_InitialSpawn";
 
     //use for buffs that say they can apply but failed to apply
     //do we need it?
@@ -255,7 +256,7 @@ public class UtilEntityBuffs {
             if (data.getBoolean(buff)) {
                 BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
                 if (buffObj != null) {
-                    //System.out.println("applyBuffPostAll buff: " + buff);
+                    CULog.dbg("applyBuffPostAll buff: " + buff);
                     buffObj.applyBuffPost(ent, difficulty);
                 } else {
                     CoroUtil.dbg("warning: unable to find buff by name of " + buff);
@@ -387,6 +388,7 @@ public class UtilEntityBuffs {
         return false;
     }
 
+    @Deprecated
     public static LootTable getRandomLootForDifficulty(EntityCreature ent, float difficulty) {
         List<DataEntryMobDropsTemplate> listForDifficulty = new ArrayList<>();
 

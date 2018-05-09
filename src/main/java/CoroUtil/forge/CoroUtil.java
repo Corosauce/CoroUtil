@@ -38,10 +38,10 @@ import CoroUtil.world.WorldDirectorManager;
 
 import com.google.common.collect.BiMap;
 
-@Mod(modid = "coroutil", name="coroutil", version=CoroUtil.version, acceptableRemoteVersions="*")
+@Mod(modid = CoroUtil.modID, name=CoroUtil.modID, version=CoroUtil.version, acceptableRemoteVersions="*")
 public class CoroUtil {
 	
-	@Mod.Instance( value = "coroutil" )
+	@Mod.Instance( value = CoroUtil.modID )
 	public static CoroUtil instance;
 	public static final String modID = "coroutil";
 
