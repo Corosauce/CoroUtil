@@ -1,6 +1,7 @@
 package CoroUtil.block;
 
 import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.world.WorldDirector;
@@ -69,9 +70,11 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     @Override
     public void onLoad() {
         super.onLoad();
-        if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
+
+        //i dont currently see any clean ways to init the tile entity with the orig_blockState before onLoad is called, so we cant do this here
+        /*if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
             getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
-        }
+        }*/
     }
 
     public void restoreBlock() {
@@ -157,12 +160,16 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         }
 
         world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
+        //world.setBlockState(pos, Blocks.STONE.getDefaultState());
+        IBlockState wat = world.getBlockState(pos);
         TileEntity tEnt = world.getTileEntity(pos);
         if (tEnt instanceof TileEntityRepairingBlock) {
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
             repairing.setBlockData(oldState);
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
+        } else {
+            CULog.dbg("failed to set repairing block for pos: " + pos);
         }
     }
 
