@@ -1,7 +1,13 @@
 package extendedrenderer.particle.entity;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.color.IBlockColor;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.registries.IRegistryDelegate;
 import org.apache.commons.lang3.ArrayUtils;
 
 import CoroUtil.util.CoroUtilColor;
@@ -20,6 +26,9 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	// Save a few stack depth by caching this
 	private static BlockColors colors;
 
+	private static final Field _blockColorMap = ReflectionHelper.findField(BlockColors.class, "blockColorMap");
+	private static Map<IRegistryDelegate<Block>, IBlockColor> blockColorMap;
+
 	private static ConcurrentHashMap<IBlockState, int[]> colorCache = new ConcurrentHashMap<>();
 	static {
 		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
@@ -36,6 +45,11 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		
 		if (colors == null) {
 		    colors = Minecraft.getMinecraft().getBlockColors();
+			try {
+				blockColorMap = (Map<IRegistryDelegate<Block>, IBlockColor>) _blockColorMap.get(colors);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
@@ -46,14 +60,22 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		    state = state.withProperty(BlockDoublePlant.VARIANT, worldIn.getBlockState(pos.down()).getValue(BlockDoublePlant.VARIANT));
 		}
 
+		int multiplier = this.colors.colorMultiplier(state, this.world, pos, 0);
+
 		int[] colors = colorCache.get(state);
 		if (colors == null) {
-			int mult = this.colors.colorMultiplier(state, this.world, pos, 0);
-		    colors = CoroUtilColor.getColors(state, mult);
+
+		    colors = CoroUtilColor.getColors(state);
 
 		    if (colors.length == 0) {
-				// fallback to default leaf color
-		        colors = new int[] { 5811761 }; //color for vanilla leaf in forest biome
+
+		    	//if there is no color to use AND theres no multiplier, fallback to good ol green
+				if (!hasColor(state) || (multiplier & 0xFFFFFF) == 0xFFFFFF) {
+					multiplier = 5811761; //color for vanilla leaf in forest biome
+				}
+
+				//add just white that will get colormultiplied
+				colors = new int[] { 0xFFFFFF };
 		    }
 		    // Remove duplicate colors from end of array, this will skew the random choice later
 			if (colors.length > 1) {
@@ -69,9 +91,13 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		int choice = 32 - Integer.numberOfLeadingZeros(worldIn.rand.nextInt(randMax));
 		int color = colors[choice];
 
-		this.particleRed *= (float) (color >> 16 & 255) / 255.0F;
-		this.particleGreen *= (float) (color >> 8 & 255) / 255.0F;
-		this.particleBlue *= (float) (color & 255) / 255.0F;
+		float mr = ((multiplier >>> 16) & 0xFF) / 255f;
+		float mg = ((multiplier >>> 8) & 0xFF) / 255f;
+		float mb = (multiplier & 0xFF) / 255f;
+
+		this.particleRed *= (float) (color >> 16 & 255) / 255.0F * mr;
+		this.particleGreen *= (float) (color >> 8 & 255) / 255.0F * mg;
+		this.particleBlue *= (float) (color & 255) / 255.0F * mb;
 	}
 
 	@Override
@@ -113,4 +139,9 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 			}
 		}
 	}
+
+	private final boolean hasColor(IBlockState state) {
+		return blockColorMap.containsKey(state.getBlock().delegate);
+	}
+
 }

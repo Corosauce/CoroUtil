@@ -14,7 +14,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 public class CoroUtilColor {
     
     @SuppressWarnings("null")
-    public static int[] getColors(IBlockState state, int multiplier) {
+    public static int[] getColors(IBlockState state) {
         if (state instanceof IExtendedBlockState) {
             state = ((IExtendedBlockState) state).getClean();
         }
@@ -30,13 +30,13 @@ public class CoroUtilColor {
         if (model != null && !model.isBuiltInRenderer()) {
             TextureAtlasSprite sprite = model.getParticleTexture();
             if (sprite != null && sprite != Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {
-                return getColors(model.getParticleTexture(), multiplier);
+                return getColors(model.getParticleTexture());
             }
         }
         return IntArrays.EMPTY_ARRAY;
     }
 
-    public static int[] getColors(TextureAtlasSprite sprite, int multiplier) {
+    public static int[] getColors(TextureAtlasSprite sprite) {
         int width = sprite.getIconWidth();
         int height = sprite.getIconHeight();
         int frames = sprite.getFrameCount();
@@ -50,17 +50,17 @@ public class CoroUtilColor {
         if (colorData != null) {
             int[] ret = new int[colorData.length];
             for (int i = 0; i < ret.length; i++) {
-                ret[i] = getColor(colorData[i], multiplier);
+                ret[i] = getColor(colorData[i]);
             }
             return ret;
         }
         return IntArrays.EMPTY_ARRAY;
     }
     
-    private static int getColor(int[] colorData, int multiplier) {
-        float mr = ((multiplier >>> 16) & 0xFF) / 255f;
-        float mg = ((multiplier >>> 8) & 0xFF) / 255f;
-        float mb = (multiplier & 0xFF) / 255f;
+    private static int getColor(int[] colorData) {
+        float mr = 1F;//((multiplier >>> 16) & 0xFF) / 255f;
+        float mg = 1F;//((multiplier >>> 8) & 0xFF) / 255f;
+        float mb = 1F;//(multiplier & 0xFF) / 255f;
 
         return 0xFF000000 | (((int) (colorData[0] * mr)) << 16) | (((int) (colorData[1] * mg)) << 8) | (int) (colorData[2] * mb);
     }
