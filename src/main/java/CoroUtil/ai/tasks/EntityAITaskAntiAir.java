@@ -44,6 +44,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
+	@Override
     public boolean shouldExecute()
     {
     	
@@ -64,7 +65,8 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean continueExecuting()
+    @Override
+	public boolean shouldContinueExecuting()
     {
     	
     	if (!ConfigHWMonsters.antiAir) return false;
@@ -80,7 +82,8 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     /**
      * Execute a one shot task or start executing a continuous task
      */
-    public void startExecuting()
+    @Override
+	public void startExecuting()
     {
     	//System.out.println("start!");
     }
@@ -88,7 +91,8 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     /**
      * Resets the task
      */
-    public void resetTask()
+    @Override
+	public void resetTask()
     {
     	for (Entity ent : entity.getRecursivePassengers()) {
     		if (ent instanceof EntityPlayer) {
@@ -109,7 +113,8 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     /**
      * Updates the task
      */
-    public void updateTask()
+    @Override
+	public void updateTask()
     {
     	
     	entity.fallDistance = 0;

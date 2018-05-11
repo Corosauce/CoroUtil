@@ -26,10 +26,10 @@ public class UtilMining {
 		 */
     	
     	//dont mine tile entities
+		if (block.isAir(state, world, pos) || block == CommonProxy.blockRepairingBlock) {
+			return false;
+		}
     	if (world.getTileEntity(pos) != null) {
-    		return false;
-    	}
-    	if (block.isAir(state, world, pos) || block == CommonProxy.blockRepairingBlock) {
     		return false;
     	}
     	/*if (block == Blocks.obsidian) {

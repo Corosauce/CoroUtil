@@ -1,5 +1,8 @@
 package CoroUtil.ai.tasks;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import CoroUtil.ai.IInvasionControlledTask;
@@ -34,8 +37,10 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     private int digTimeCur = 0;
     private int digTimeMax = 15*20;
     private double curBlockDamage = 0D;
-    //doesnt factor in ai tick delay of % 3
     private int noMoveTicks = 0;
+    private ArrayDeque<BlockPos> listPillarToMine = new ArrayDeque<>();
+
+    public boolean debug = true;
 
 	/**
 	 * Fields used when task is added via invasions, but not via hwmonsters, or do we want that too?
@@ -46,17 +51,6 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	public static String dataListPlayers = "HW_Inv_ListPlayers";
 	/*public static String dataListPlayers = "HW_Inv_ActiveTimeStart";
 	public static String dataListPlayers = "HW_Inv_ActiveTimeEnd";*/
-
-	/**
-	 *
-	 * first time init task with time range
-	 * reload check if data is there, if not, init as if first time
-	 * - dont forget about non invasion mode, factor in dataUseInvasionRules
-	 *
-	 * - what about if a mob survives between invasions and still has old task
-	 * -- do we only enhance mobs that just spawned or do we try to rope in alive ones?
-	 *
-	 */
 
     public TaskDigTowardsTarget()
     {
@@ -74,16 +68,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     @Override
 	public boolean shouldExecute()
     {
-
-    	//this method ticks every 3 ticks in best conditions
-		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
-
-		//TODO: remove this once confirmed task removal way works
-    	//prevent day digging, easy way to prevent digging once invasion ends
-		if (forInvasion) {
-			if (entity.world.isDaytime()) return false;
-		}
-    	
+    	dbg("should?");
     	//System.out.println("should?");
     	/**
     	 * Zombies wouldnt try to mine if they are bunched up behind others, as they are still technically pathfinding, this helps resolve that issue, and maybe water related issues
@@ -157,6 +142,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	@Override
     public boolean shouldContinueExecuting()
     {
+		dbg("continue?");
     	//System.out.println("continue!");
     	if (posCurMining == null) return false;
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
@@ -176,6 +162,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	@Override
     public void startExecuting()
     {
+    	dbg("start mining task");
     	//System.out.println("start!");
     }
 
@@ -188,6 +175,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	//System.out.println("reset!");
     	digTimeCur = 0;
     	curBlockDamage = 0;
+    	listPillarToMine.clear();
 		setMiningBlock(null, null);
     }
 
@@ -220,81 +208,172 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		}
 
 		setMiningBlock(null, null);
+
+		double entPosX = Math.floor(entity.posX) + 0.5F;
+		double entPosZ = Math.floor(entity.posZ) + 0.5F;
     	
-    	double vecX = entity.getAttackTarget().posX - entity.posX;
+    	double vecX = entity.getAttackTarget().posX - entPosX;
     	//feet
-    	double vecY = entity.getAttackTarget().posY - entity.getEntityBoundingBox().minY;
-    	double vecZ = entity.getAttackTarget().posZ - entity.posZ;
+    	double vecY = entity.getAttackTarget().getEntityBoundingBox().minY - entity.getEntityBoundingBox().minY;
+    	double vecZ = entity.getAttackTarget().posZ - entPosZ;
+
+    	//get angle, snap it to 90, then reconvert back to scalar which is now locked to best 90 degree option
+		double angle = Math.atan2(vecZ, vecX);
+		angle = Math.round(Math.toDegrees(angle) / 90) * 90;
+		//verified this matched the original scalar version of vecX / Z vars before it was snapped to 90
+		double relX = Math.cos(angle);
+		double relZ = Math.sin(angle);
     	
-    	double dist = (double)MathHelper.sqrt(vecX * vecX/* + vecY * vecY*/ + vecZ * vecZ);
+    	double scanX = entPosX + relX;
+    	double scanZ = entPosZ + relZ;
+
+		double distHoriz = Math.sqrt(vecX * vecX + vecZ * vecZ);
+		if (distHoriz < 0) distHoriz = 1;
+
+		double distVert = vecY;
+
+		double factor = distVert / distHoriz;
+
+		/**
+		 * 0 = even
+		 * - = down
+		 * + = up
+		 *
+		 * use 0.3 has threshold for digging up or down?
+		 */
+
+		dbg("factor: " + factor);
     	
-    	double scanX = entity.posX + (vecX / dist);
-    	double scanZ = entity.posZ + (vecZ / dist);
-    	
-    	Random rand = new Random(entity.world.getTotalWorldTime());
-    	
-    	if (rand.nextBoolean()/*Math.abs(vecX) < Math.abs(vecZ)*/) {
+    	/*if (rand.nextBoolean()) {
     		//scanX = entity.posX;
         	scanZ = entity.posZ + 0;
     	} else {
     		scanX = entity.posX + 0;
         	//scanZ = entity.posZ;
-    	}
-    	
-    	BlockCoord coords = new BlockCoord(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY + 1), MathHelper.floor(scanZ));
-    	
-    	IBlockState state = entity.world.getBlockState(coords.toBlockPos());
-    	Block block = state.getBlock();
-    	//Block block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-    	
-    	//System.out.println("ahead to target: " + block);
-    	
-    	if (UtilMining.canMineBlock(entity.world, coords, block)) {
-			setMiningBlock(state, coords);
-    		//entity.world.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air);
-    		return true;
-    	} else {
-    		if (vecY > 0) {
-    			coords.posY++;
-    			//coords = coords.add(0, 1, 0);
-    			state = entity.world.getBlockState(coords.toBlockPos());
-    	    	//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-        		if (UtilMining.canMineBlock(entity.world, coords, block)) {
-					setMiningBlock(state, coords);
-            		return true;
-        		}
-    		}
-    		
-    		//if dont or cant dig up, continue strait
-    		coords.posY--;
-    		//coords = coords.add(0, -1, 0);
-    		
-    		state = entity.world.getBlockState(coords.toBlockPos());
-	    	block = state.getBlock();
-    		if (UtilMining.canMineBlock(entity.world, coords, block)) {
+    	}*/
+
+		boolean newWay = true;
+
+
+		if (newWay) {
+
+			listPillarToMine.clear();
+
+			//account for being directly above or directly below target
+			if (distHoriz <= 1) {
+				scanX = entPosX;
+				scanZ = entPosZ;
+			}
+
+			BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
+
+			if (factor <= -0.3F) {
+
+				//down
+				dbg("Digging Down");
+				listPillarToMine.add(posFrontFeet.up(1));
+				listPillarToMine.add(posFrontFeet);
+				listPillarToMine.add(posFrontFeet.down(1));
+
+			} else if (factor >= 0.1F) {
+
+				//up
+				dbg("Digging Up");
+				listPillarToMine.add(posFrontFeet.up(1));
+				listPillarToMine.add(posFrontFeet.up(2));
+				listPillarToMine.add(posFrontFeet.up(3));
+
+			} else {
+
+				//strait
+				dbg("Digging Strait");
+				listPillarToMine.add(posFrontFeet.up(1));
+				listPillarToMine.add(posFrontFeet);
+			}
+
+			boolean fail = false;
+			boolean oneMinable = false;
+
+			for (BlockPos pos : listPillarToMine) {
+				IBlockState state = entity.world.getBlockState(pos);
+				dbg("set: " + pos + " - " + state.getBlock());
+			}
+
+			for (BlockPos pos : listPillarToMine) {
+				//allow for air for now
+				if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+					oneMinable = true;
+					break;
+				}
+			}
+
+			if (!oneMinable) {
+				dbg("All air blocks, cancelling");
+				listPillarToMine.clear();
+				return false;
+			}
+
+			setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
+
+			return true;
+		} else {
+			BlockCoord coords = new BlockCoord(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY + 1), MathHelper.floor(scanZ));
+
+			IBlockState state = entity.world.getBlockState(coords.toBlockPos());
+			Block block = state.getBlock();
+			//Block block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
+
+			//System.out.println("ahead to target: " + block);
+
+			if (UtilMining.canMineBlock(entity.world, coords, block)) {
 				setMiningBlock(state, coords);
-        		return true;
-    		} else {
-    			//try to dig down if all else failed and target is below
-    			if (vecY < 0) {
-    				//coords = coords.add(0, -1, 0);
-    				coords.posY--;
-    	    		state = entity.world.getBlockState(coords.toBlockPos());
-    	    		block = state.getBlock();
-    	    		//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-    		    	
-    	    		if (UtilMining.canMineBlock(entity.world, coords, block)) {
+				//entity.world.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air);
+				return true;
+			} else {
+				if (vecY > 0) {
+					coords.posY++;
+					//coords = coords.add(0, 1, 0);
+					state = entity.world.getBlockState(coords.toBlockPos());
+					//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
+					if (UtilMining.canMineBlock(entity.world, coords, block)) {
 						setMiningBlock(state, coords);
-    	        		return true;
-    	    		}
-    			}
-    		}
-    		
-    		return false;
-    	}
+						return true;
+					}
+				}
+
+				//if dont or cant dig up, continue strait
+				coords.posY--;
+				//coords = coords.add(0, -1, 0);
+
+				state = entity.world.getBlockState(coords.toBlockPos());
+				block = state.getBlock();
+				if (UtilMining.canMineBlock(entity.world, coords, block)) {
+					setMiningBlock(state, coords);
+					return true;
+				} else {
+					//try to dig down if all else failed and target is below
+					if (vecY < 0) {
+						//coords = coords.add(0, -1, 0);
+						coords.posY--;
+						state = entity.world.getBlockState(coords.toBlockPos());
+						block = state.getBlock();
+						//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
+
+						if (UtilMining.canMineBlock(entity.world, coords, block)) {
+							setMiningBlock(state, coords);
+							return true;
+						}
+					}
+				}
+
+				return false;
+			}
+		}
+
     }
 
     public void setMiningBlock(IBlockState state, BlockCoord pos) {
+		dbg("setMiningBlock: " + pos + (state != null ? " - " + state.getBlock() : ""));
 		this.posCurMining = pos;
 		this.stateCurMining = state;
 	}
@@ -304,9 +383,23 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 		IBlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
 		Block block = state.getBlock();
+
+		while (entity.world.isAirBlock(posCurMining.toBlockPos())) {
+			dbg("Detected air, moving to next block in list, cur size: " + listPillarToMine.size());
+			if (listPillarToMine.size() > 1) {
+				listPillarToMine.removeFirst();
+				BlockPos pos = listPillarToMine.getFirst();
+				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
+				//return;
+			}
+
+			state = entity.world.getBlockState(posCurMining.toBlockPos());
+			block = state.getBlock();
+		}
     	
     	//force stop mining if pushed away, or if block changed
-    	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 3) {
+    	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 4) {
+			dbg("too far or block changed state");
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
     		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
 			setMiningBlock(null, null);
@@ -347,11 +440,20 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
             if (UtilMining.canConvertToRepairingBlock(entity.world, state)) {
                 TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
             } else {
+            	//TODO: block meta?
                 Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1));
 				entity.world.setBlockToAir(posCurMining.toBlockPos());
             }
 
-			setMiningBlock(null, null);
+            if (listPillarToMine.size() > 1) {
+				listPillarToMine.removeFirst();
+            	BlockPos pos = listPillarToMine.getFirst();
+				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
+			} else {
+            	listPillarToMine.clear();
+				setMiningBlock(null, null);
+			}
+
 
             curBlockDamage = 0;
     		
@@ -375,5 +477,11 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		}
 
 		return false;
+	}
+
+	public void dbg(String str) {
+    	if (debug) {
+			System.out.println(str);
+		}
 	}
 }

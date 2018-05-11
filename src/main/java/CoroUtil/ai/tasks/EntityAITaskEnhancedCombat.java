@@ -84,6 +84,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     /**
      * Returns whether the EntityAIBase should begin execution.
      */
+    @Override
     public boolean shouldExecute()
     {
         EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
@@ -121,7 +122,8 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     /**
      * Returns whether an in-progress EntityAIBase should continue executing
      */
-    public boolean continueExecuting()
+    @Override
+    public boolean shouldContinueExecuting()
     {
         EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
         return entitylivingbase == null ? false : (!entitylivingbase.isEntityAlive() ? false : (!this.longMemory ? !this.entity.getNavigator().noPath() : this.entity.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(entitylivingbase.posX), MathHelper.floor(entitylivingbase.posY), MathHelper.floor(entitylivingbase.posZ)))));
@@ -130,6 +132,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     /**
      * Execute a one shot task or start executing a continuous task
      */
+    @Override
     public void startExecuting()
     {
         this.entity.getNavigator().setPath(this.entityPathEntity, this.speedTowardsTarget);
@@ -139,6 +142,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     /**
      * Resets the task
      */
+    @Override
     public void resetTask()
     {
         this.entity.getNavigator().clearPathEntity();
@@ -147,6 +151,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     /**
      * Updates the task
      */
+    @Override
     public void updateTask()
     {
     	//add to config!
