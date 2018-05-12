@@ -164,7 +164,7 @@ public class TileEntityRepairingBlock extends TileEntity
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
             repairing.timeToRepairAt = world.getTotalWorldTime() + repairing.ticksToRepair;
-            //world.scheduleBlockUpdate(pos, state.getBlock(), 20*30, 1);
+            world.scheduleBlockUpdate(pos, state.getBlock(), 20*30, 1);
         } else {
             CULog.dbg("failed to set repairing block for pos: " + pos);
         }
