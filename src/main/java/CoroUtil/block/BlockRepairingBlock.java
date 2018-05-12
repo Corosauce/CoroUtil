@@ -6,9 +6,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -20,6 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 public class BlockRepairingBlock extends BlockContainer
 {
@@ -31,6 +34,7 @@ public class BlockRepairingBlock extends BlockContainer
         super(Material.PLANTS);
         //stone, fallback default
         setHardness(1.5F);
+        this.setTickRandomly(true);
     }
 
     @Nullable
@@ -137,5 +141,31 @@ public class BlockRepairingBlock extends BlockContainer
     @Override
     public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
         return true;
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos,
+                                            EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
+                                            EntityLivingBase placer) {
+        worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
+        return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+    }
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
+    {
+        if (world.isRemote) return;
+
+        TileEntity tEnt = world.getTileEntity(pos);
+        if (tEnt instanceof TileEntityRepairingBlock) {
+            ((TileEntityRepairingBlock) tEnt).updateScheduledTick();
+        }
+        world.scheduleBlockUpdate(pos, this, 20*30, 1);
+    }
+
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        super.onBlockAdded(worldIn, pos, state);
+        worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
     }
 }

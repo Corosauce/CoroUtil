@@ -1,43 +1,38 @@
 package CoroUtil.block;
 
-import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
-import CoroUtil.util.BlockCoord;
-import CoroUtil.world.WorldDirector;
-import CoroUtil.world.WorldDirectorManager;
-import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public class TileEntityRepairingBlock extends TileEntity implements ITickable
+public class TileEntityRepairingBlock extends TileEntity
 {
 
     private IBlockState orig_blockState;
     private float orig_hardness = 1;
     private float orig_explosionResistance = 1;
 
-    private int ticksRepairCount;
-    private int ticksRepairMax = 20*60*5;
+    /*private int ticksRepairCount;
+    private int ticksRepairMax = 20*60*5;*/
+    private long timeToRepairAt = 0;
+    private int ticksToRepair = 20*60*5;
 
-	@Override
-    public void update()
+    public void updateScheduledTick()
     {
     	if (!world.isRemote) {
 
             //if for some reason data is invalid, remove block
             if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
+                CULog.dbg("invalid state for repairing block, removing");
                 getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
 
                 //temp
@@ -51,7 +46,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
 
                 //System.out.println(listTest.size());
 
-                if (ticksRepairCount >= ticksRepairMax) {
+                if (world.getTotalWorldTime() > timeToRepairAt) {
                     AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
                     aabb = aabb.offset(this.getPos());
                     List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
@@ -60,8 +55,6 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
                         //System.out.println("restoring: " + orig_blockState);
                         restoreBlock();
                     }
-                } else {
-                    ticksRepairCount++;
                 }
             }
     	}
@@ -78,7 +71,9 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     }
 
     public void restoreBlock() {
+        CULog.dbg("restoring block to state: " + orig_blockState);
         getWorld().setBlockState(this.getPos(), orig_blockState);
+        //getWorld().setBlockState(this.getPos(), Blocks.STONE.getDefaultState());
     }
 
     public void setBlockData(IBlockState state) {
@@ -104,7 +99,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
             var1.setString("orig_blockName", str);
             var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
         }
-        var1.setInteger("ticksRepairCount", ticksRepairCount);
+        var1.setLong("timeToRepairAt", timeToRepairAt);
 
         var1.setFloat("orig_hardness", orig_hardness);
         var1.setFloat("orig_explosionResistance", orig_explosionResistance);
@@ -116,7 +111,7 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
     public void readFromNBT(NBTTagCompound var1)
     {
         super.readFromNBT(var1);
-        ticksRepairCount = var1.getInteger("ticksRepairCount");
+        timeToRepairAt = var1.getLong("timeToRepairAt");
         try {
             Block block = Block.getBlockFromName(var1.getString("orig_blockName"));
             if (block != null) {
@@ -162,10 +157,14 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
         TileEntity tEnt = world.getTileEntity(pos);
         if (tEnt instanceof TileEntityRepairingBlock) {
+            IBlockState state = world.getBlockState(pos);
+            CULog.dbg("set repairing block for pos: " + pos + ", " + oldState.getBlock());
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
             repairing.setBlockData(oldState);
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
+            repairing.timeToRepairAt = world.getTotalWorldTime() + repairing.ticksToRepair;
+            //world.scheduleBlockUpdate(pos, state.getBlock(), 20*30, 1);
         } else {
             CULog.dbg("failed to set repairing block for pos: " + pos);
         }
