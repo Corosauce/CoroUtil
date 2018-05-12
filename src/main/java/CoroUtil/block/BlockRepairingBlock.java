@@ -7,6 +7,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumBlockRenderType;
@@ -34,7 +36,7 @@ public class BlockRepairingBlock extends BlockContainer
         super(Material.PLANTS);
         //stone, fallback default
         setHardness(1.5F);
-        this.setTickRandomly(true);
+        //this.setTickRandomly(true);
     }
 
     @Nullable
@@ -147,7 +149,7 @@ public class BlockRepairingBlock extends BlockContainer
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos,
                                             EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
                                             EntityLivingBase placer) {
-        worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
+        //worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
         return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
@@ -165,7 +167,12 @@ public class BlockRepairingBlock extends BlockContainer
 
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-        super.onBlockAdded(worldIn, pos, state);
+        //super.onBlockAdded(worldIn, pos, state);
         worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return Items.AIR;
     }
 }

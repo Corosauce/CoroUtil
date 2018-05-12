@@ -1,8 +1,11 @@
 package CoroUtil.block;
 
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
+import CoroUtil.forge.CoroUtil;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
@@ -24,7 +27,6 @@ public class TileEntityRepairingBlock extends TileEntity
     /*private int ticksRepairCount;
     private int ticksRepairMax = 20*60*5;*/
     private long timeToRepairAt = 0;
-    private int ticksToRepair = 20*60*5;
 
     public void updateScheduledTick()
     {
@@ -32,7 +34,7 @@ public class TileEntityRepairingBlock extends TileEntity
 
             //if for some reason data is invalid, remove block
             if (orig_blockState == null || orig_blockState == this.getBlockType().getDefaultState()) {
-                CULog.dbg("invalid state for repairing block, removing");
+                CULog.dbg("invalid state for repairing block, removing, orig_blockState: " + orig_blockState + " vs " + this.getBlockType().getDefaultState());
                 getWorld().setBlockState(this.getPos(), Blocks.AIR.getDefaultState());
 
                 //temp
@@ -71,8 +73,31 @@ public class TileEntityRepairingBlock extends TileEntity
     }
 
     public void restoreBlock() {
-        CULog.dbg("restoring block to state: " + orig_blockState);
+        //CULog.dbg("restoring block to state: " + orig_blockState + " at " + this.getPos());
         getWorld().setBlockState(this.getPos(), orig_blockState);
+
+        //try to untrigger leaf decay for those large trees too far from wood source//also undo it for neighbors around it
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos posFix = pos.add(x, y, z);
+                    IBlockState state = world.getBlockState(posFix);
+                    if (state.getBlock() instanceof BlockLeaves) {
+                        try {
+                            //CULog.dbg("restoring leaf to non decay state at pos: " + posFix);
+                            world.setBlockState(posFix, state.withProperty(BlockLeaves.CHECK_DECAY, false), 4);
+                        } catch (Exception ex) {
+                            //must be a modded block that doesnt use decay
+                            if (ConfigCoroUtil.useLoggingDebug) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         //getWorld().setBlockState(this.getPos(), Blocks.STONE.getDefaultState());
     }
 
@@ -131,10 +156,11 @@ public class TileEntityRepairingBlock extends TileEntity
 
     @Override
     public void invalidate() {
-        if (!this.getWorld().isRemote) {
-
-        }
         super.invalidate();
+    }
+
+    public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos) {
+        return replaceBlockAndBackup(world, pos, 20*60*5);
     }
 
     /**
@@ -144,7 +170,7 @@ public class TileEntityRepairingBlock extends TileEntity
      * @param world
      * @param pos
      */
-    public static void replaceBlockAndBackup(World world, BlockPos pos) {
+    public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos, int ticksToRepair) {
         IBlockState oldState = world.getBlockState(pos);
         float oldHardness = oldState.getBlockHardness(world, pos);
         float oldExplosionResistance = 1;
@@ -158,15 +184,17 @@ public class TileEntityRepairingBlock extends TileEntity
         TileEntity tEnt = world.getTileEntity(pos);
         if (tEnt instanceof TileEntityRepairingBlock) {
             IBlockState state = world.getBlockState(pos);
-            CULog.dbg("set repairing block for pos: " + pos + ", " + oldState.getBlock());
+            //CULog.dbg("set repairing block for pos: " + pos + ", " + oldState.getBlock());
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
             repairing.setBlockData(oldState);
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
-            repairing.timeToRepairAt = world.getTotalWorldTime() + repairing.ticksToRepair;
-            world.scheduleBlockUpdate(pos, state.getBlock(), 20*30, 1);
+            repairing.timeToRepairAt = world.getTotalWorldTime() + ticksToRepair;
+            //world.scheduleBlockUpdate(pos, state.getBlock(), 20*5, 1);
+            return (TileEntityRepairingBlock) tEnt;
         } else {
             CULog.dbg("failed to set repairing block for pos: " + pos);
+            return null;
         }
     }
 

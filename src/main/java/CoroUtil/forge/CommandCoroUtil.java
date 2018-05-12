@@ -440,11 +440,12 @@ public class CommandCoroUtil extends CommandBase {
 
 					if (UtilMining.canConvertToRepairingBlock(world, state)) {
 						var1.sendMessage(new TextComponentString("Setting coord to repairing block, block was: " + state));
-						world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
+						TileEntityRepairingBlock.replaceBlockAndBackup(world, pos);
+						/*world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
 						TileEntity tEnt = world.getTileEntity(pos);
 						if (tEnt instanceof TileEntityRepairingBlock) {
 							((TileEntityRepairingBlock) tEnt).setBlockData(state);
-						}
+						}*/
 					} else {
 						var1.sendMessage(new TextComponentString("Coordinate does not support repairing block, block was: " + state));
 						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
