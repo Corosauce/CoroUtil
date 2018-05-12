@@ -160,8 +160,6 @@ public class TileEntityRepairingBlock extends TileEntity implements ITickable
         }
 
         world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
-        //world.setBlockState(pos, Blocks.STONE.getDefaultState());
-        IBlockState wat = world.getBlockState(pos);
         TileEntity tEnt = world.getTileEntity(pos);
         if (tEnt instanceof TileEntityRepairingBlock) {
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
