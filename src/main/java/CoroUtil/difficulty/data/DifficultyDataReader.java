@@ -22,9 +22,10 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import org.apache.commons.io.FileUtils;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -196,17 +197,8 @@ public class DifficultyDataReader {
 
     public static String getMD5(File file) {
         try {
-            byte[] buffer= new byte[8192];
-            int count;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-            while ((count = bis.read(buffer)) > 0) {
-                digest.update(buffer, 0, count);
-            }
-            bis.close();
-
-            byte[] hash = digest.digest();
-            return new BASE64Encoder().encode(hash);
+            return String.format("%016x", ByteBuffer.wrap(digest.digest(IOUtils.toByteArray(new FileInputStream(file)))).getLong());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
