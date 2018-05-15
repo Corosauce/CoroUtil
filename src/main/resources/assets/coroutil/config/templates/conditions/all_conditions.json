@@ -38,6 +38,10 @@
           "template": "condition_set_1",
 
           "comment": "//since this is a template within a template, maybe dont allow it for now"
+        },
+        {
+          "condition": "mod_loaded",
+          "mod_id": "infernalmobs"
         }
       ]
     },

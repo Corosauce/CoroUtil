@@ -2,6 +2,7 @@ package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
+import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.RotatingParticleManager;
@@ -90,6 +91,7 @@ public class EventHandler {
             }
 
             if (flagFoliageUpdate) {
+                CULog.dbg("CoroUtil detected a need to reload resource packs, initiating");
                 flagFoliageUpdate = false;
                 lastFoliageUse = ConfigCoroUtil.foliageShaders;
                 Minecraft.getMinecraft().refreshResources();
