@@ -2,9 +2,11 @@ package CoroUtil.util;
 
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -329,6 +331,16 @@ public class CoroUtilCompatibility {
 
     public static boolean isHWInvasionsInstalled() {
         return Loader.isModLoaded(CoroUtil.modID_HWInvasions);
+    }
+
+    public static boolean canTornadoGrabBlockRefinedRules(IBlockState state) {
+        ResourceLocation registeredName = state.getBlock().getRegistryName();
+        if (registeredName.getResourceDomain().equals("dynamictrees")) {
+            if (registeredName.getResourcePath().contains("rooty") || registeredName.getResourcePath().contains("branch")) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
