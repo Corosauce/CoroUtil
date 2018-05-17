@@ -90,7 +90,7 @@ public class DynamicDifficulty {
 					long timeOfDay = world.getWorldTime() % 24000;
 					int killTimeRange = 10;
 					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
-						System.out.println("KILLING ALL ZOMBIES!");
+						//System.out.println("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof EntityZombie) {
 								((EntityZombie) obj).setDead();
