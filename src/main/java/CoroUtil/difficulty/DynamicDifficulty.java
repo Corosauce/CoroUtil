@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.forge.CULog;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
@@ -90,7 +91,7 @@ public class DynamicDifficulty {
 					long timeOfDay = world.getWorldTime() % 24000;
 					int killTimeRange = 10;
 					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
-						//System.out.println("KILLING ALL ZOMBIES!");
+						CULog.dbg("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof EntityZombie) {
 								((EntityZombie) obj).setDead();
