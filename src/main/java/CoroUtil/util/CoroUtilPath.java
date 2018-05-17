@@ -5,6 +5,7 @@ import java.util.Random;
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -87,27 +88,28 @@ public class CoroUtilPath {
 
 					if (!world.isBlockLoaded(pos)) return false;
 
-					Block block = world.getBlockState(pos).getBlock();
+					IBlockState state = world.getBlockState(pos);
+					//Block block = state.getBlock();
 					int tries = 0;
-					if (!CoroUtilBlock.isAir(block)) {
+					if (!CoroUtilBlock.isAir(state.getBlock())) {
 						int offset = -5;
 
 						while (tries < 30) {
-							if (CoroUtilBlock.isAir(block) || !block.isSideSolid(block.getDefaultState(), world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
+							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
 								break;
 							}
 							gatherY += offset++;
-							block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
+							state = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ));
 							tries++;
 						}
 					} else {
 						//int offset = 0;
 						while (tries < 30) {
-							if (!CoroUtilBlock.isAir(block) && block.isSideSolid(block.getDefaultState(), world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
+							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
 								break;
 							}
 							gatherY -= 1;//offset++;
-							block = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ)).getBlock();
+							state = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ));
 							tries++;
 						}
 					}
@@ -116,6 +118,17 @@ public class CoroUtilPath {
 						//success = ent.getNavigator().tryMoveToXYZ(gatherX, gatherY, gatherZ, moveSpeedAmp);
 						success = CoroUtilCompatibility.tryPathToXYZModCompat(ent, gatherX, gatherY, gatherZ, moveSpeedAmp);
 						//System.out.println("pp success? " + success + "- move to player: " + ent + " -> " + player);
+					} else {
+						//fallback for extreme y differences, just path to topmost block, hopefully wont break much for inside structures etc
+
+						pos = world.getHeight(pos).down();
+
+						if (!world.isBlockLoaded(pos)) return false;
+
+						state = world.getBlockState(pos);
+						if (state.isSideSolid(world, pos, EnumFacing.UP)) {
+							success = CoroUtilCompatibility.tryPathToXYZModCompat(ent, pos.getX(), pos.getY(), pos.getZ(), moveSpeedAmp);
+						}
 					}
 				}
 			}

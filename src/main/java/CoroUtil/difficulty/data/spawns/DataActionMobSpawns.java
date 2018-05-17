@@ -36,7 +36,7 @@ public class DataActionMobSpawns {
             String code = "";
             if (DifficultyDataReader.debugValidate()) {
                 code = TextFormatting.GREEN.toString();
-                if (CoroUtilEntity.getClassFromRegisty(entity) == null)
+                if (CoroUtilEntity.getClassFromRegistry(entity) == null)
                     code = TextFormatting.RED.toString() + "MISSING! ";
             }
             str += code + entity + ", ";
