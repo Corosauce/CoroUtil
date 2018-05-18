@@ -479,11 +479,11 @@ public class CommandCoroUtil extends CommandBase {
 		double finalY = player.posY;
 		
 		ent.setPosition(finalX, finalY, finalZ);
-		
-		player.world.spawnEntity(ent);
-		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+
+		//OLD COMMENT: moved to after spawn, so client has an entity at least before syncs fire
+		//new comment: vanilla sets onInitialSpawn before spawning, so do it that way, need for better syncing
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
-		//if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
+		player.world.spawnEntity(ent);
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {

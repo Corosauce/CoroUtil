@@ -28,8 +28,8 @@ import java.util.Random;
 
 public class BlockRepairingBlock extends BlockContainer
 {
-	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0, 0.0F, 1.0F, 1.0F, 1.0F);
-    public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0, 0.0F, 0.0F, 0.0F, 0.0F);
+	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
 	
     public BlockRepairingBlock()
     {
