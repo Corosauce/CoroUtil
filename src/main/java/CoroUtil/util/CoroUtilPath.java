@@ -95,21 +95,23 @@ public class CoroUtilPath {
 						int offset = -5;
 
 						while (tries < 30) {
-							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
+							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isSideSolid(world, pos, EnumFacing.UP)) {
 								break;
 							}
 							gatherY += offset++;
-							state = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ));
+							pos = new BlockPos(gatherX, gatherY, gatherZ);
+							state = world.getBlockState(pos);
 							tries++;
 						}
 					} else {
 						//int offset = 0;
 						while (tries < 30) {
-							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isSideSolid(world, new BlockPos(gatherX, gatherY, gatherZ), EnumFacing.UP)) {
+							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isSideSolid(world, pos, EnumFacing.UP)) {
 								break;
 							}
 							gatherY -= 1;//offset++;
-							state = world.getBlockState(new BlockPos(gatherX, gatherY, gatherZ));
+							pos = new BlockPos(gatherX, gatherY, gatherZ);
+							state = world.getBlockState(pos);
 							tries++;
 						}
 					}
