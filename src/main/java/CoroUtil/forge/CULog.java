@@ -1,8 +1,12 @@
 package CoroUtil.forge;
 
 import CoroUtil.config.ConfigCoroUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CULog {
+
+    private static final Logger LOGGER = LogManager.getLogger(CoroUtil.modID);
 
     /**
      * For seldom used but important things to print out in production
@@ -11,7 +15,7 @@ public class CULog {
      */
     public static void log(String string) {
         if (ConfigCoroUtil.useLoggingLog) {
-            System.out.println(string);
+            LOGGER.info(string);
         }
     }
 
@@ -22,7 +26,7 @@ public class CULog {
      */
     public static void err(String string) {
         if (ConfigCoroUtil.useLoggingError) {
-            System.out.println(string);
+            LOGGER.error(string);
         }
     }
 
@@ -33,7 +37,7 @@ public class CULog {
      */
     public static void dbg(String string) {
         if (ConfigCoroUtil.useLoggingDebug) {
-            System.out.println(string);
+            LOGGER.info(string);
         }
     }
 
