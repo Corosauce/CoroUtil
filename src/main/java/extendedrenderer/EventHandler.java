@@ -2,7 +2,6 @@ package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
-import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.render.RotatingParticleManager;
@@ -43,7 +42,8 @@ public class EventHandler {
     //a hack to enable fog for particles when weather2 sandstorm is active
     public static float sandstormFogAmount = 0F;
 
-    public boolean lastFoliageUse = ConfigCoroUtil.foliageShaders;
+    //initialized at post init after configs loaded in
+    public static boolean foliageUseLast;
 
     public static boolean flagFoliageUpdate = false;
 
@@ -86,14 +86,14 @@ public class EventHandler {
                 //}
             }
 
-            if (ConfigCoroUtil.foliageShaders != lastFoliageUse) {
+            if (ConfigCoroUtil.foliageShaders != foliageUseLast) {
+                foliageUseLast = ConfigCoroUtil.foliageShaders;
                 flagFoliageUpdate = true;
             }
 
             if (flagFoliageUpdate) {
                 CULog.dbg("CoroUtil detected a need to reload resource packs, initiating");
                 flagFoliageUpdate = false;
-                lastFoliageUse = ConfigCoroUtil.foliageShaders;
                 Minecraft.getMinecraft().refreshResources();
             }
         }

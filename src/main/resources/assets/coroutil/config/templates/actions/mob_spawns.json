@@ -408,6 +408,119 @@
           ]
         }
       ]
+    },
+    {
+      "name": "invasion_stage_5_test",
+      "conditions": [
+        {
+          "condition": "difficulty",
+          "min": 10,
+          "max": 9999
+        },
+        {
+          "condition": "invasion_number",
+          "min": 1,
+          "max": 5
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 1,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_diamond"
+            },
+            {
+              "cmod": "attribute_health",
+              "base_value": 30,
+              "difficulty_multiplier": 1.5
+            },
+            {
+              "cmod": "xp",
+              "base_value": 100,
+              "difficulty_multiplier": 1.5
+            },
+            {
+              "cmod": "mob_drops",
+              "loot_table": "testlootboss"
+            },
+            {
+              "cmod": "ai_counterattack"
+            },
+            {
+              "cmod": "ai_lunge"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_5_test2",
+      "conditions": [
+        {
+          "condition": "difficulty",
+          "min": 10,
+          "max": 999
+        },
+        {
+          "condition": "mod_loaded",
+          "mod_id": "infernalmobs"
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 1,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_diamond"
+            },
+            {
+              "cmod": "attribute_health",
+              "base_value": 30,
+              "difficulty_multiplier": 1.5
+            },
+            {
+              "cmod": "xp",
+              "base_value": 100,
+              "difficulty_multiplier": 1.5
+            },
+            {
+              "cmod": "mob_drops",
+              "loot_table": "testlootboss"
+            },
+            {
+              "cmod": "ai_counterattack"
+            },
+            {
+              "cmod": "ai_lunge"
+            },
+            {
+              "cmod": "ai_infernal",
+              "modifiers": [
+                "1UP", "Alchemist", "Berserk", "Blastoff", "Bulwark", "Choke", "Cloaking", "Darkness", "Ender",
+                "Exhaust", "Fiery", "Ghastly", "Gravity", "LifeSteal", "Ninja", "Poisonous", "Quicksand", "Regen",
+                "Rust", "Sapper", "Sprint", "Sticky", "Storm", "Vengeance", "Weakness", "Webber", "Wither"
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 
