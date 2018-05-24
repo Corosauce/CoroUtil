@@ -3,7 +3,10 @@ package CoroUtil.difficulty.buffs;
 import CoroUtil.difficulty.EquipmentForDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
+import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.monster.AbstractSkeleton;
+import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
@@ -40,8 +43,13 @@ public class BuffInventory extends BuffBase {
                     UtilEntityBuffs.setEquipment(ent, itemArmor.getEquipmentSlot(), itemStack);
                 }
             }
+
+            //update skeleton AI for melee/bow
+            if (ent instanceof AbstractSkeleton) {
+                ((AbstractSkeleton) ent).setCombatTask();
+            }
         } else {
-            System.out.println("error, couldnt find cmod data for entity, name: " + getTagName());
+            CULog.err("error, couldnt find cmod data for entity, name: " + getTagName());
             return false;
         }
 

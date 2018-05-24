@@ -15,6 +15,9 @@ import java.util.List;
 public class DataActionMobSpawns {
 
     public int count;
+    public int count_max = -1;
+    public double count_difficulty_multiplier = 0;
+
     public List<String> entities = new ArrayList<>();
     public List<DataCmod> cmods = new ArrayList<>();
 
@@ -22,11 +25,22 @@ public class DataActionMobSpawns {
         DataActionMobSpawns copy = new DataActionMobSpawns();
         //probably pointless, should always be 0 unless something messed with original copy
         copy.count = count;
+        copy.count_max = count_max;
+        copy.count_difficulty_multiplier = count_difficulty_multiplier;
         copy.entities.addAll(entities);
         for (DataCmod cmod : cmods) {
             copy.cmods.add(cmod);
         }
         return copy;
+    }
+
+    public int getMaxMobCountDynamic(float difficulty) {
+        int count = this.count;
+        count += count * (difficulty * count_difficulty_multiplier);
+        if (count_max != -1 && count > count_max) {
+            count = count_max;
+        }
+        return count;
     }
 
     @Override
@@ -40,6 +54,11 @@ public class DataActionMobSpawns {
                     code = TextFormatting.RED.toString() + "MISSING! ";
             }
             str += code + entity + ", ";
+        }
+
+        str += "a count of " + count + " * difficulty * multiplier of " + count_difficulty_multiplier + " maxing at " + count_max;
+        if (DifficultyDataReader.getDebugDifficulty() != -1) {
+            str += ", test calculated to count of " + getMaxMobCountDynamic(DifficultyDataReader.getDebugDifficulty());
         }
         str += " | " + TextFormatting.GOLD + "With cmods: " + TextFormatting.RESET;
         List<DataCmod> cmodsToUse = cmods;

@@ -49,7 +49,7 @@ public class BuffMobDrops extends BuffBase {
             if (loot != null) {
                 UtilEntityBuffs.processLootTableOnEntity(ent, loot, event);
             } else {
-                CULog.dbg("couldnt find loot table: " + cmod.loot_table);
+                CULog.err("couldnt find loot table: " + cmod.loot_table);
             }
         } else {
             CULog.dbg("couldnt get cmod mod drops data");

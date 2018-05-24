@@ -364,6 +364,13 @@ public class CommandCoroUtil extends CommandBase {
 							DifficultyDataReader.setDebugValidate(true);
 
 							String profileName = var2[1];
+
+							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
+							float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+							if (var2.length >= 3) difficultyScale = Float.valueOf(var2[2]);
+
+							DifficultyDataReader.setDebugDifficulty(difficultyScale);
+
 							DataMobSpawnsTemplate profileFound = null;
 							for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
 								if (profile.name.equals(profileName)) {
@@ -373,7 +380,7 @@ public class CommandCoroUtil extends CommandBase {
 							}
 
 							if (profileFound != null) {
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test"));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test, difficulty: " + difficultyScale));
 								String data = profileFound.toString();
 								String[] list = data.split(" \\| ");
 								for (String entry : list) {
@@ -382,7 +389,7 @@ public class CommandCoroUtil extends CommandBase {
 
 								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
 
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test with templates flattened"));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test with templates flattened, difficulty: " + difficultyScale));
 								data = profileFound.toString();
 								list = data.split(" \\| ");
 								for (String entry : list) {
@@ -394,10 +401,11 @@ public class CommandCoroUtil extends CommandBase {
 						} finally {
 							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
 							DifficultyDataReader.setDebugValidate(false);
+							DifficultyDataReader.setDebugDifficulty(-1);
 						}
 
 					}
-				} else if (var2[0].equals("testaabb")) {
+				} else if (var2[0].equalsIgnoreCase("testaabb")) {
 
 				    //added to track down what block from a mod is returning a null AABB that crashes pathfinder
 
@@ -429,7 +437,7 @@ public class CommandCoroUtil extends CommandBase {
                             }
                         }
                     }
-				} else if (var2[0].equals("testrepair")) {
+				} else if (var2[0].equalsIgnoreCase("testRepair")) {
 					Vec3d vec = var1.getPositionVector();
 					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
 					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());
@@ -451,7 +459,7 @@ public class CommandCoroUtil extends CommandBase {
 						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
 						world.setBlockToAir(pos);*/
 					}
-				} else if (var2[0].equals("testPower")) {
+				} else if (var2[0].equalsIgnoreCase("testPower")) {
 					Vec3d vec = var1.getPositionVector();
 					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
 					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());

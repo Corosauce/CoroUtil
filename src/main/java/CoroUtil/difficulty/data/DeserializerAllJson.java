@@ -118,6 +118,12 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         DataActionMobSpawns spawnTemplate = new DataActionMobSpawns();
 
         spawnTemplate.count = json.get("count").getAsInt();
+        if (json.has("count_max")) {
+            spawnTemplate.count_max = json.get("count_max").getAsInt();
+        }
+        if (json.has("count_difficulty_multiplier")) {
+            spawnTemplate.count_difficulty_multiplier = json.get("count_difficulty_multiplier").getAsDouble();
+        }
 
         JsonArray arr2 = json.get("entities").getAsJsonArray();
         Iterator<JsonElement> it2 = arr2.iterator();
@@ -135,6 +141,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
     public static JsonObject serializeSpawns(DataActionMobSpawns spawns) {
         JsonObject obj = new JsonObject();
         obj.addProperty("count", spawns.count);
+        obj.addProperty("count_max", spawns.count_max);
+        obj.addProperty("count_difficulty_multiplier", spawns.count_difficulty_multiplier);
         JsonArray arr1 = new JsonArray();
         for (String str : spawns.entities) {
             arr1.add(new JsonPrimitive(str));

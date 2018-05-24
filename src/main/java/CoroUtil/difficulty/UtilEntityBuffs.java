@@ -338,15 +338,13 @@ public class UtilEntityBuffs {
         UtilEntityBuffs.applyBuffPostAll(ent, difficulty);
     }
 
-    public static void setEquipment(EntityCreature ent, EntityEquipmentSlot slot/*int slot*/, ItemStack stack) {
-        if (slot == EntityEquipmentSlot.MAINHAND/*slot == 0*/ && ent instanceof EntitySkeleton) {
+    public static void setEquipment(EntityCreature ent, EntityEquipmentSlot slot, ItemStack stack) {
+        //used to prevent skeletons from being changed, but lets support it
+        /*if (slot == EntityEquipmentSlot.MAINHAND && ent instanceof EntitySkeleton) {
             return;
-        }
-		/*ent.setCurrentItemOrArmor(slot, stack);
-		ent.setEquipmentDropChance(slot, 0);*/
+        }*/
         ent.setItemStackToSlot(slot, stack);
         ent.setDropChance(slot, 0);
-
     }
 
     public static boolean hasTask(EntityCreature ent, Class taskToCheckFor, boolean isTargetTask) {

@@ -16,6 +16,8 @@
             "minecraft:zombie"
           ],
           "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "template",

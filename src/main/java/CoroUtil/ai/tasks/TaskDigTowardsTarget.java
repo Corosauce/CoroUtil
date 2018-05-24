@@ -68,8 +68,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     @Override
 	public boolean shouldExecute()
     {
-    	dbg("should?");
-    	//System.out.println("should?");
+    	//dbg("should?");
     	/**
     	 * Zombies wouldnt try to mine if they are bunched up behind others, as they are still technically pathfinding, this helps resolve that issue, and maybe water related issues
     	 */
@@ -142,8 +141,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	@Override
     public boolean shouldContinueExecuting()
     {
-		dbg("continue?");
-    	//System.out.println("continue!");
+		//dbg("continue?");
     	if (posCurMining == null) return false;
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
         IBlockState state = entity.world.getBlockState(pos);

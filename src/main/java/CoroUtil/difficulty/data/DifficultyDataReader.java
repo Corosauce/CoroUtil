@@ -49,9 +49,10 @@ public class DifficultyDataReader {
     public static HashMap<String, Class> lookupJsonNameToCmodDeserializer = new HashMap<>();
     public static HashMap<String, Class> lookupJsonNameToConditionDeserializer = new HashMap<>();
 
-    //modes used for validating
+    //modes used for validating and other testing
     private static boolean debugValidate = false;
     private static boolean debugFlattenCmodsAndConditions = false;
+    private static float debugDifficulty = -1;
 
     public static String pathData = "./config/CoroUtil/data/";
     public static File dataFolder = new File(pathData);
@@ -71,6 +72,14 @@ public class DifficultyDataReader {
 
     public static void setDebugFlattenCmodsAndConditions(boolean debugFlattenCmodsAndConditions) {
         DifficultyDataReader.debugFlattenCmodsAndConditions = debugFlattenCmodsAndConditions;
+    }
+
+    public static float getDebugDifficulty() {
+        return debugDifficulty;
+    }
+
+    public static void setDebugDifficulty(float debugDifficulty) {
+        DifficultyDataReader.debugDifficulty = debugDifficulty;
     }
 
     public static void init() {
