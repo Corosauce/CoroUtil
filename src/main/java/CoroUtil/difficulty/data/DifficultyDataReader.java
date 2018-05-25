@@ -52,7 +52,7 @@ public class DifficultyDataReader {
     //modes used for validating and other testing
     private static boolean debugValidate = false;
     private static boolean debugFlattenCmodsAndConditions = false;
-    private static float debugDifficulty = -1;
+    private static double debugDifficulty = -1;
 
     public static String pathData = "./config/CoroUtil/data/";
     public static File dataFolder = new File(pathData);
@@ -74,11 +74,11 @@ public class DifficultyDataReader {
         DifficultyDataReader.debugFlattenCmodsAndConditions = debugFlattenCmodsAndConditions;
     }
 
-    public static float getDebugDifficulty() {
+    public static double getDebugDifficulty() {
         return debugDifficulty;
     }
 
-    public static void setDebugDifficulty(float debugDifficulty) {
+    public static void setDebugDifficulty(double debugDifficulty) {
         DifficultyDataReader.debugDifficulty = debugDifficulty;
     }
 
@@ -108,6 +108,7 @@ public class DifficultyDataReader {
         lookupJsonNameToConditionDeserializer.put("context", ConditionContext.class);
         lookupJsonNameToConditionDeserializer.put("difficulty", ConditionDifficulty.class);
         lookupJsonNameToConditionDeserializer.put("invasion_number", ConditionInvasionNumber.class);
+        lookupJsonNameToConditionDeserializer.put("invasion_rate", ConditionInvasionRate.class);
         lookupJsonNameToConditionDeserializer.put("random", ConditionRandom.class);
         lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
         lookupJsonNameToConditionDeserializer.put("template", ConditionTemplateReference.class);

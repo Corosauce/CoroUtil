@@ -2,12 +2,11 @@
   "format": "mob_spawns",
   "templates": [
     {
-      "name": "invasion_stage_1",
+      "name": "invasion_stage_1_opt_1",
       "conditions": [
         {
-          "condition": "difficulty",
-          "min": 0,
-          "max": 0.33
+          "condition": "random",
+          "weight": 1
         }
       ],
       "spawns": [
@@ -16,7 +15,7 @@
             "minecraft:zombie"
           ],
           "count": 2,
-          "count_max": 10,
+          "count_max": 5,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
@@ -33,7 +32,9 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 3,
+          "count": 5,
+          "count_max": 15,
+          "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "template",
@@ -48,16 +49,11 @@
       ]
     },
     {
-      "name": "invasion_stage_2_1",
+      "name": "invasion_stage_1_opt_2",
       "conditions": [
         {
-          "condition": "difficulty",
-          "min": 0.33,
-          "max": 0.66
-        },
-        {
           "condition": "random",
-          "weight": 5
+          "weight": 1
         }
       ],
       "spawns": [
@@ -65,7 +61,9 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 4,
+          "count": 2,
+          "count_max": 5,
+          "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "template",
@@ -73,7 +71,7 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_chainmail"
+              "template": "inventory_leather"
             }
           ]
         },
@@ -81,7 +79,9 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 6,
+          "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "template",
@@ -89,55 +89,7 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_chainmail"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_2_2",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 0.33,
-          "max": 0.66
-        },
-        {
-          "condition": "random",
-          "weight": 5
-        }
-      ],
-      "spawns": [
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 3,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_chainmail"
-            }
-          ]
-        },
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 3,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_chainmail"
+              "template": "inventory_leather"
             }
           ]
         },
@@ -145,7 +97,9 @@
           "entities": [
             "minecraft:skeleton"
           ],
-          "count": 3,
+          "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "template",
@@ -153,215 +107,27 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_chainmail"
+              "template": "inventory_leather_no_weapon"
             }
           ]
         }
       ]
     },
     {
-      "name": "invasion_stage_3_1",
+      "name": "invasion_wave_override_1",
       "conditions": [
         {
-          "condition": "difficulty",
-          "min": 0.66,
-          "max": 1.0
-        },
-        {
           "condition": "random",
-          "weight": 5
-        }
-      ],
-      "spawns": [
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 5,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_iron"
-            }
-          ]
+          "weight": 99999
         },
         {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 5,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_iron"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_3_2",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 0.66,
-          "max": 1.0
+          "condition": "invasion_rate",
+          "rate": 5
         },
         {
-          "condition": "random",
-          "weight": 5
-        }
-      ],
-      "spawns": [
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 5,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_iron"
-            }
-          ]
-        },
-        {
-          "entities": [
-            "minecraft:skeleton"
-          ],
-          "count": 10,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_iron"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_4_1",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 1.0,
-          "max": 999
-        },
-        {
-          "condition": "random",
-          "weight": 5
-        }
-      ],
-      "spawns": [
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 10,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            }
-          ]
-        },
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 15,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_4_2",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 1.0,
-          "max": 999
-        },
-        {
-          "condition": "random",
-          "weight": 5
-        }
-      ],
-      "spawns": [
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 10,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            }
-          ]
-        },
-        {
-          "entities": [
-            "minecraft:skeleton"
-          ],
-          "count": 15,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_4_3",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 1.0,
-          "max": 999
-        },
-        {
-          "condition": "random",
-          "weight": 5
+          "condition": "mod_loaded",
+          "mod_id": "infernalmobs",
+          "mode_boolean": "invert"
         }
       ],
       "spawns": [
@@ -376,12 +142,8 @@
               "template": "invader_miner"
             },
             {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            },
-            {
               "cmod": "attribute_health",
-              "base_value": 30,
+              "base_value": 150,
               "difficulty_multiplier": 1.5
             },
             {
@@ -400,77 +162,28 @@
               "cmod": "ai_lunge"
             },
             {
-              "cmod": "ai_infernal",
-              "modifiers": [
-                "1UP", "Alchemist", "Berserk", "Blastoff", "Bulwark", "Choke", "Cloaking", "Darkness", "Ender",
-                "Exhaust", "Fiery", "Ghastly", "Gravity", "LifeSteal", "Ninja", "Poisonous", "Quicksand", "Regen",
-                "Rust", "Sapper", "Sprint", "Sticky", "Storm", "Vengeance", "Weakness", "Webber", "Wither"
-              ]
+              "cmod": "template",
+              "template": "inventory_iron"
             }
           ]
         }
       ]
     },
     {
-      "name": "invasion_stage_5_test",
+      "name": "invasion_wave_override_2",
       "conditions": [
         {
           "condition": "difficulty",
-          "min": 10,
-          "max": 9999
+          "min": 0,
+          "max": 999
         },
         {
-          "condition": "invasion_number",
-          "min": 1,
-          "max": 5
-        }
-      ],
-      "spawns": [
+          "condition": "invasion_rate",
+          "rate": 5
+        },
         {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 1,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
-            },
-            {
-              "cmod": "attribute_health",
-              "base_value": 30,
-              "difficulty_multiplier": 1.5
-            },
-            {
-              "cmod": "xp",
-              "base_value": 100,
-              "difficulty_multiplier": 1.5
-            },
-            {
-              "cmod": "mob_drops",
-              "loot_table": "testlootboss"
-            },
-            {
-              "cmod": "ai_counterattack"
-            },
-            {
-              "cmod": "ai_lunge"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_5_test2",
-      "conditions": [
-        {
-          "condition": "difficulty",
-          "min": 10,
-          "max": 999
+          "condition": "random",
+          "weight": 99999
         },
         {
           "condition": "mod_loaded",
@@ -487,10 +200,6 @@
             {
               "cmod": "template",
               "template": "invader_miner"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_diamond"
             },
             {
               "cmod": "attribute_health",

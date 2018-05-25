@@ -366,8 +366,8 @@ public class CommandCoroUtil extends CommandBase {
 							String profileName = var2[1];
 
 							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
-							float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
-							if (var2.length >= 3) difficultyScale = Float.valueOf(var2[2]);
+							double difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+							if (var2.length >= 3) difficultyScale = Double.valueOf(var2[2]);
 
 							DifficultyDataReader.setDebugDifficulty(difficultyScale);
 

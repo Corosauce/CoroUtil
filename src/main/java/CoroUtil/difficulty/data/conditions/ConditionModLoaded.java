@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.Loader;
 public class ConditionModLoaded extends DataCondition {
 
     public String mod_id;
+    public String mode_boolean = "normal";
 
     @Override
     public String toString() {
@@ -22,6 +23,10 @@ public class ConditionModLoaded extends DataCondition {
             }
         }
 
-        return super.toString() + " { " + code + mod_id + " } ";
+        return super.toString() + " { " + code + mod_id + ", mode_boolean: " + mode_boolean + " } ";
+    }
+
+    public boolean isInverted() {
+        return mode_boolean.equals("invert");
     }
 }

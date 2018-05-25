@@ -34,7 +34,7 @@ public class DataActionMobSpawns {
         return copy;
     }
 
-    public int getMaxMobCountDynamic(float difficulty) {
+    public int getMaxMobCountDynamic(double difficulty) {
         int count = this.count;
         count += count * (difficulty * count_difficulty_multiplier);
         if (count_max != -1 && count > count_max) {

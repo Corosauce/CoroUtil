@@ -21,6 +21,12 @@
           "max": 5
         },
         {
+          "condition": "invasion_rate",
+          "rate": 5,
+
+          "comment": "//only use every x invasions, in this example, its considered every 5th invasion"
+        },
+        {
           "condition": "random",
           "weight": 5,
 
@@ -41,7 +47,8 @@
         },
         {
           "condition": "mod_loaded",
-          "mod_id": "infernalmobs"
+          "mod_id": "infernalmobs",
+          "mode_boolean": "invert"
         }
       ]
     },
