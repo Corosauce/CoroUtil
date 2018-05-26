@@ -58,42 +58,44 @@ public class ParticleRegistry {
 		MeshBufferManagerFoliage.cleanup();
 
 		squareGrey = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
-		smoke = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
-		smokeTest = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
-		cloud = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
+		//smoke = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
+		//smokeTest = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
+		//cloud = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
 		cloud256 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256"));
 		cloud256_fire = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_fire"));
 		cloud256_test = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_test"));
-		cloud256_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_5"));
+		//cloud256_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_5"));
+		//ground splash
 		cloud256_6 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_6"));
-		cloud256_7 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_7"));
-		downfall2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall2"));
+		//cloud256_7 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256_7"));
+		//downfall2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall2"));
 		downfall3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall3"));
-		downfall4 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall4"));
+		//downfall4 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall4"));
 		chicken = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/chicken"));
 		potato = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/potato"));
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
-		rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
+		//rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
 		test_texture = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/test_texture"));
 		rain_white = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white"));
-		rain_white_trans = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_trans"));
-		rain_white_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_2"));
+		//rain_white_trans = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_trans"));
+		//rain_white_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_2"));
 		//rain_10 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_10"));
 		//rain_vanilla = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/vanilla/rain"));
 		//snow_vanilla = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/vanilla/snow"));
 		snow = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/snow"));
-		cloud256dark = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256dark"));
-		cloudDownfall = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall"));
+		//cloud256dark = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256dark"));
+		//cloudDownfall = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/downfall"));
 		tumbleweed = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/tumbleweed"));
 		debris_1 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_1"));
 		debris_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_2"));
 		debris_3 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/debris_3"));
-		for (int i = 1; i <= 9; i++) {
+		/*for (int i = 1; i <= 9; i++) {
 			listFish.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/fish_" + i)));
 		}
 		for (int i = 1; i <= 7; i++) {
 			listSeaweed.add(event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/seaweed_section_" + i)));
-		}
+		}*/
+		//used indirectly not via reference
 		grass = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/grass"));
 	}
 

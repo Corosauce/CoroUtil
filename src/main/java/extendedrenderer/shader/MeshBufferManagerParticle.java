@@ -62,6 +62,7 @@ public class MeshBufferManagerParticle {
     }
 
     public static void setupMeshForParticleIfMissing(TextureAtlasSprite sprite) {
+        if (sprite == null) return;
         if (!lookupParticleToMesh.containsKey(sprite)) {
             setupMeshForParticle(sprite);
         }

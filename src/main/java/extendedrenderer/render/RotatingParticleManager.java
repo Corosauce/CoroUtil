@@ -324,12 +324,13 @@ public class RotatingParticleManager
             //temp render ordering setup, last to first
             //background stuff
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_fire);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256);
-            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
+            //MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
             //foreground stuff
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall3);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_6); //ground splash
-            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
+            //MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.snow);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.leaf);
