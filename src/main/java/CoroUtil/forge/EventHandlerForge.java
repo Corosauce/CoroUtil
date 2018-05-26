@@ -206,6 +206,7 @@ public class EventHandlerForge {
 				if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
 
 					//TODO: persistance management here too maybe?
+					//invasion mod preventing this via AllowDespawn event in its handler class
 
 					if (ent instanceof EntityLiving) {
 						EntityLiving entL = (EntityLiving) ent;
