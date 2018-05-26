@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import CoroUtil.forge.CULog;
+import CoroUtil.util.CoroUtilWorldTime;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
@@ -86,9 +87,9 @@ public class DynamicDifficulty {
 			
 			
 			if (ConfigCoroUtil.cleanupStrayMobs) {
-				long dayNumber = (world.getWorldTime() / 24000) + 1;
+				long dayNumber = (world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
 				if (dayNumber % ConfigCoroUtil.cleanupStrayMobsDayRate == 0) {
-					long timeOfDay = world.getWorldTime() % 24000;
+					long timeOfDay = world.getWorldTime() % CoroUtilWorldTime.getDayLength();
 					int killTimeRange = 10;
 					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						CULog.dbg("KILLING ALL ZOMBIES!");
