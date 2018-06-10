@@ -46,6 +46,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite debris_2;
 	public static TextureAtlasSprite debris_3;
 	public static TextureAtlasSprite test_texture;
+	public static TextureAtlasSprite white_square;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
 	public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
 	public static TextureAtlasSprite grass;
@@ -76,6 +77,7 @@ public class ParticleRegistry {
 		leaf = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/leaf"));
 		//rain = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain"));
 		test_texture = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/test_texture"));
+		white_square = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white_square"));
 		rain_white = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white"));
 		//rain_white_trans = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_trans"));
 		//rain_white_2 = event.getMap().registerSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/rain_white_2"));
