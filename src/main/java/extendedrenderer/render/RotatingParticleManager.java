@@ -5,10 +5,7 @@ import java.util.*;
 
 import javax.annotation.Nullable;
 
-import CoroUtil.config.ConfigCoroAI;
-import CoroUtil.util.CoroUtilBlockLightCache;
-import extendedrenderer.ExtendedRenderer;
-import extendedrenderer.foliage.Foliage;
+import CoroUtil.config.ConfigCoroUtil;
 import extendedrenderer.shader.MeshBufferManagerParticle;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
@@ -16,11 +13,9 @@ import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.shader.*;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.math.BlockPos;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
@@ -37,7 +32,6 @@ import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -301,7 +295,7 @@ public class RotatingParticleManager
     public void renderParticles(Entity entityIn, float partialTicks)
     {
 
-        boolean useParticleShaders = useShaders && ConfigCoroAI.particleShaders;
+        boolean useParticleShaders = useShaders && ConfigCoroUtil.particleShaders;
 
         float f = ActiveRenderInfo.getRotationX();
         float f1 = ActiveRenderInfo.getRotationZ();
@@ -330,12 +324,13 @@ public class RotatingParticleManager
             //temp render ordering setup, last to first
             //background stuff
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_test);
+            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_fire);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256);
-            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
+            //MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall2);
             //foreground stuff
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.downfall3);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.cloud256_6); //ground splash
-            MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
+            //MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white_trans);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.rain_white);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.snow);
             MeshBufferManagerParticle.setupMeshForParticleIfMissing(ParticleRegistry.leaf);
@@ -425,17 +420,20 @@ public class RotatingParticleManager
         //do sprite/mesh list
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
 
-            InstancedMeshParticle mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+            InstancedMeshParticle mesh = null;
 
             //if (entry1.getKey() != ParticleRegistry.test_texture && entry1.getKey() != ParticleRegistry.rain_white_trans) continue;
 
-            //TODO: register if missing, maybe relocate this
-            if (mesh == null) {
-                MeshBufferManagerParticle.setupMeshForParticle(entry1.getKey());
+            if (useParticleShaders) {
                 mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+                //TODO: register if missing, maybe relocate this
+                if (mesh == null) {
+                    MeshBufferManagerParticle.setupMeshForParticle(entry1.getKey());
+                    mesh = MeshBufferManagerParticle.getMesh(entry1.getKey());
+                }
             }
 
-            if (mesh != null) {
+            if (mesh != null || !useParticleShaders) {
                 //do cloud layer, then funnel layer
                 for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
                     //do each texture mode, 0 and 1 are the only ones used now
@@ -620,7 +618,7 @@ public class RotatingParticleManager
             ShaderEngine.renderer.getShaderProgram("particle").unbind();
         }
 
-        if (ConfigCoroAI.debugShaders && world.getTotalWorldTime() % 60 == 0) {
+        if (ConfigCoroUtil.debugShaders && world.getTotalWorldTime() % 60 == 0) {
             System.out.println("particles: " + particles);
             System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
             System.out.println("trueRenderCount: " + trueRenderCount);

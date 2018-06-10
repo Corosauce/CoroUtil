@@ -1,0 +1,133 @@
+{
+  "format": "cmods",
+  "templates": [
+    {
+      "name": "invader_miner",
+      "cmods": [
+        {
+          "cmod": "ai_mining"
+        },
+        {
+          "cmod": "ai_omniscience"
+        }
+      ]
+    },
+    {
+      "name": "invader_soldier",
+      "cmods": [
+        {
+          "cmod": "ai_omniscience"
+        }
+      ]
+    },
+    {
+      "name": "infernal_skeleton_1",
+      "cmods": [
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Cloaking", "Storm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inventory_leather",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:stone_sword",
+          "inv_head": "minecraft:leather_helmet",
+          "inv_chest": "minecraft:leather_chestplate",
+          "inv_legs": "minecraft:leather_leggings",
+          "inv_feet": "minecraft:leather_boots"
+        }
+      ]
+    },
+    {
+      "name": "inventory_leather_no_weapon",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:stone_sword",
+          "inv_head": "minecraft:leather_helmet",
+          "inv_chest": "minecraft:leather_chestplate",
+          "inv_legs": "minecraft:leather_leggings",
+          "inv_feet": "minecraft:leather_boots"
+        }
+      ]
+    },
+    {
+      "name": "inventory_chainmail",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:stone_sword",
+          "inv_head": "minecraft:chainmail_helmet",
+          "inv_chest": "minecraft:chainmail_chestplate",
+          "inv_legs": "minecraft:chainmail_leggings",
+          "inv_feet": "minecraft:chainmail_boots"
+        }
+      ]
+    },
+    {
+      "name": "inventory_iron",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:iron_sword",
+          "inv_hand_off": "minecraft:shield",
+          "inv_head": "minecraft:iron_helmet",
+          "inv_chest": "minecraft:iron_chestplate",
+          "inv_legs": "minecraft:iron_leggings",
+          "inv_feet": "minecraft:iron_boots"
+        }
+      ]
+    },
+    {
+      "name": "inventory_diamond",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:diamond_sword",
+          "inv_hand_off": "minecraft:shield",
+          "inv_head": "minecraft:diamond_helmet",
+          "inv_chest": "minecraft:diamond_chestplate",
+          "inv_legs": "minecraft:diamond_leggings",
+          "inv_feet": "minecraft:diamond_boots"
+        }
+      ]
+    },
+    {
+      "name": "infernal_skeleton_1_bad",
+      "cmods": [
+        {
+          "cmod": "ai_infernal",
+          "modifiers": [
+            "Regen", "Claking", "Storm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inventory_chainmail_bad",
+      "cmods": [
+        {
+          "cmod": "inventory",
+
+          "inv_hand_main": "minecraft:diamond_swod",
+          "inv_hand_off": "minecraft:shield",
+          "inv_head": "minecraft:diamond_helmet",
+          "inv_chest": "minecraft:diamond_chestplate",
+          "inv_legs": "minecraft:diamond_leggings",
+          "inv_feet": "minecraft:diamond_boots"
+        }
+      ]
+    }
+  ]
+}

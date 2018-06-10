@@ -89,6 +89,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     private boolean dontRenderUnderTopmostBlock = false;
 
     private boolean killWhenUnderTopmostBlock = false;
+    private int killWhenUnderTopmostBlock_ScanAheadRange = 0;
 
     public int killWhenUnderCameraAtLeast = 0;
 
@@ -118,6 +119,10 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public boolean rotateOrderXY = false;
 
     public float extraYRotation = 0;
+
+    public boolean isCollidedHorizontally = false;
+    public boolean isCollidedVerticallyDownwards = false;
+    public boolean isCollidedVerticallyUpwards = false;
 
     //used for translational rotation around a point
     public Vector3f rotationAround = new Vector3f();
@@ -230,7 +235,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
             if (killWhenUnderTopmostBlock) {
                 int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
-                if (this.posY <= height) {
+                if (this.posY - killWhenUnderTopmostBlock_ScanAheadRange <= height) {
                     startDeath();
                 }
             }
@@ -300,10 +305,16 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             rotationAroundCenter -= 360;
         }
 
+        tickExtraRotations();
+    }
+
+    public void tickExtraRotations() {
         if (slantParticleToWind) {
             double motionXZ = Math.sqrt(motionX * motionX + motionZ * motionZ);
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
+
+        Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
 
         if (!quatControl) {
             updateQuaternion(ent);
@@ -357,6 +368,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public void setSize(float par1, float par2)
     {
         super.setSize(par1, par2);
+        // MC-12269 - fix particle being offset to the NW
+        this.setPosition(posX, posY, posZ);
     }
     
     public void setGravity(float par) {
@@ -603,7 +616,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         if (this.canCollide)
         {
-            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().grow(x, y, z));
+            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().expand(x, y, z));
 
             for (AxisAlignedBB axisalignedbb : list)
             {
@@ -635,6 +648,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         //was y != y before
         //this.isCollided = yy != y && yy < 0.0D;
         this.onGround = yy != y || xx != x || zz != z;
+        this.isCollidedHorizontally = xx != x || zz != z;
+        this.isCollidedVerticallyDownwards = yy < y;
+        this.isCollidedVerticallyUpwards = yy > y;
 
         if (xx != x)
         {
@@ -700,5 +716,17 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     public void setAlphaF(float alpha) {
         super.setAlphaF(alpha);
         RotatingParticleManager.markDirtyVBO2();
+    }
+
+    public int getKillWhenUnderTopmostBlock_ScanAheadRange() {
+        return killWhenUnderTopmostBlock_ScanAheadRange;
+    }
+
+    public void setKillWhenUnderTopmostBlock_ScanAheadRange(int killWhenUnderTopmostBlock_ScanAheadRange) {
+        this.killWhenUnderTopmostBlock_ScanAheadRange = killWhenUnderTopmostBlock_ScanAheadRange;
+    }
+
+    public boolean isCollidedVertically() {
+	    return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
     }
 }

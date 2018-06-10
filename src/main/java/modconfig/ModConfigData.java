@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.forge.CULog;
 import net.minecraftforge.common.config.Configuration;
 import CoroUtil.OldUtil;
 
@@ -141,7 +142,8 @@ public class ModConfigData {
 
     		addToConfig(field, name);
     	}
-    	
+
+		CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
     	preInitConfig.save();
     }
     

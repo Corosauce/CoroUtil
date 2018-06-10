@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import CoroUtil.forge.CULog;
 import modconfig.forge.CommandModConfig;
 import modconfig.forge.EventHandlerPacket;
 import net.minecraft.command.ServerCommandManager;
@@ -182,6 +183,13 @@ public class ConfigMod {
         	return true;
     	}
     	return false;
+    }
+
+    public static void forceSaveAllFilesFromRuntimeSettings() {
+        CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
+        for (ModConfigData data : configLookup.values()) {
+            data.writeConfigFile(true);
+        }
     }
     
     /* Sync the HashMap data if an outside source modified one of the config fields */

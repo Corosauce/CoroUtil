@@ -1,13 +1,26 @@
 package CoroUtil.forge;
 
+import CoroUtil.ai.IInvasionControlledTask;
+import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.buffs.BuffBase;
+import CoroUtil.util.CoroUtilCrossMod;
+import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -16,12 +29,14 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.event.world.WorldEvent.Load;
 import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.test.Headshots;
 import CoroUtil.util.CoroUtilPlayer;
@@ -30,13 +45,32 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import CoroUtil.world.player.DynamicDifficulty;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EventHandlerForge {
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.LOWEST)
 	public void deathEvent(LivingDeathEvent event) {
+
+		if (event.isCanceled()) return;
+
 		PlayerQuestManager.i().onEvent(event);
+
+		if (!ConfigCoroUtil.tempDisableHWInvFeatures) {
+			if (!event.getEntity().world.isRemote) {
+				if (event.getEntity() instanceof EntityPlayer) {
+					DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
+
+					//also remove invasion skip buff since the invaders got what they wanted (also covers edge case of player removing invasion mod and buff remaining)
+					DynamicDifficulty.setInvasionSkipBuff((EntityPlayer) event.getEntity(), 0);
+					//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
+				}
+
+				UtilEntityBuffs.onDeath(event);
+			}
+		}
 	}
 	
 	@SubscribeEvent
@@ -87,7 +121,7 @@ public class EventHandlerForge {
 				//if (event.action == Action.RIGHT_CLICK_AIR) return;
 				if (event instanceof RightClickEmpty) return;
 				
-				if (ConfigCoroAI.trackPlayerData) {
+				if (ConfigCoroUtil.trackPlayerData) {
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.getWorld()).getChunkData(event.getPos().getX() / 16, event.getPos().getZ() / 16);
 					cdp.addToPlayerActivityInteract(event.getEntityPlayer().getGameProfile().getId(), 1);
 				}
@@ -119,7 +153,7 @@ public class EventHandlerForge {
 			}
 		}
 		
-		if (ConfigCoroAI.desirePathDerp) {
+		if (ConfigCoroUtil.desirePathDerp) {
 			
 			int walkOnRate = 5;
 			
@@ -163,6 +197,113 @@ public class EventHandlerForge {
 					}
 				}
 			}
+		}
+
+		//remove tasks that are marked to be removed
+		if (!ent.world.isRemote) {
+			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
+
+				if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+
+					//TODO: persistance management here too maybe?
+					//invasion mod preventing this via AllowDespawn event in its handler class
+
+					if (ent instanceof EntityLiving) {
+						EntityLiving entL = (EntityLiving) ent;
+						Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
+						while (it.hasNext()) {
+							EntityAITasks.EntityAITaskEntry task = it.next();
+							if (task.action instanceof IInvasionControlledTask) {
+								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+									//entL.tasks.removeTask(task.action);
+									task.action.resetTask();
+									it.remove();
+								}
+							}
+						}
+
+						it = entL.targetTasks.taskEntries.iterator();
+						while (it.hasNext()) {
+							EntityAITasks.EntityAITaskEntry task = it.next();
+							if (task.action instanceof IInvasionControlledTask) {
+								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
+									//entL.targetTasks.removeTask(task.action);
+									task.action.resetTask();
+									it.remove();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Called on load from chunk, or spawnEntityInWorld, so do first time effects after spawning in and there will be no double buffs
+	 *
+	 * @param event
+	 */
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void entityCreated(EntityJoinWorldEvent event) {
+		if (event.getEntity().world.isRemote) return;
+		//System.out.println("coroutil event EntityJoinWorldEvent for " + event.getEntity());
+
+		CoroUtilCrossMod.processSpawnOverride(event);
+
+		if (event.getEntity() instanceof EntityCreature) {
+			EntityCreature ent = (EntityCreature) event.getEntity();
+
+			//if buffed and was not literally just spawned (prevents duplicate buff applying from invasion spawning + this code)
+			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed) && !ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityInitialSpawn)) {
+				float difficultySpawnedIn = 0;
+				if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
+					difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
+				} else {
+					//safely get difficulty for area
+					if (ent.world.isBlockLoaded(ent.getPosition())) {
+						difficultySpawnedIn = DynamicDifficulty.getDifficultyAveragedForArea(ent);
+					}
+				}
+
+				List<String> buffs = UtilEntityBuffs.getAllBuffNames();
+				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+				for (String buff : buffs) {
+					if (data.getBoolean(buff)) {
+						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
+						if (buffObj != null) {
+							//System.out.println("reloading buff: " + buff);
+							CULog.dbg("applyBuffFromReload: " + buff);
+							buffObj.applyBuffFromReload(ent, difficultySpawnedIn);
+						} else {
+							CoroUtil.dbg("warning: unable to find buff by name of " + buff);
+						}
+					}
+				}
+
+				UtilEntityBuffs.applyBuffPostAll(ent, difficultySpawnedIn);
+			}
+		}
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void explosionEvent(ExplosionEvent event) {
+		if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks) {
+			//since we currently dont support dealing with them, just prevent them from breaking at all
+			boolean protectTileEntities = true;
+			List<BlockPos> listPos = event.getExplosion().getAffectedBlockPositions();
+
+			for (BlockPos pos : listPos) {
+				IBlockState state = event.getWorld().getBlockState(pos);
+				if (UtilMining.canMineBlock(event.getWorld(), pos, state.getBlock()) &&
+						UtilMining.canConvertToRepairingBlock(event.getWorld(), state)) {
+					TileEntityRepairingBlock.replaceBlockAndBackup(event.getWorld(), pos);
+				} else {
+					//TODO: what do i do with these blocks then, for now just do nothing and they are protected
+				}
+			}
+
+			event.getExplosion().clearAffectedBlockPositions();
 		}
 	}
 }

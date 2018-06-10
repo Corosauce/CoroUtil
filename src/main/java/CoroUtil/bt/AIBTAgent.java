@@ -516,7 +516,7 @@ public class AIBTAgent {
     	PFQueue.pfDelays.remove(ent);
     	if (coordsManagedLocation != null) {
 			WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(ent.world);
-			ISimulationTickable ml = wd.getTickingSimluationByLocation(coordsManagedLocation);
+			ISimulationTickable ml = wd.getTickingSimulationByLocation(coordsManagedLocation);
 			//TODO: readd 1.8.8
 			/*if (ml != null && ml instanceof ManagedLocation) {
 				((ManagedLocation) ml).hookEntityDestroyed(ent);

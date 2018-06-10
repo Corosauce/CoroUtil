@@ -1,26 +1,39 @@
 package CoroUtil.forge;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigDynamicDifficulty;
+import CoroUtil.difficulty.BuffedLocation;
+import CoroUtil.difficulty.DynamicDifficulty;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
+import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
+import CoroUtil.util.*;
+import CoroUtil.world.WorldDirector;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.location.ISimulationTickable;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
@@ -29,9 +42,6 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
-import CoroUtil.util.CoroUtilMisc;
-import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilItem;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -77,6 +87,50 @@ public class CommandCoroUtil extends CommandBase {
 					}
 					
 					plQuests.saveAndSyncPlayer();
+				} else if (var2[0].equals("buffloc")) {
+					int distRadius = 32;
+					float difficulty = 2;
+					if (var2.length > 1) {
+						difficulty = Float.valueOf(var2[1]);
+					}
+					ISimulationTickable zone = WorldDirectorManager.instance().getCoroUtilWorldDirector(world).getTickingSimulationByLocation(new BlockCoord(posBlock));
+					if (zone == null) {
+						DynamicDifficulty.buffLocation(world, new BlockCoord(posBlock), distRadius, difficulty);
+						System.out.println("buffed zone at " + posBlock);
+					} else {
+						System.out.println("buffed zone already at " + posBlock);
+					}
+				} else if (var2[0].equals("buffremove")) {
+					boolean removeAll = false;
+					if (var2.length > 1) {
+						removeAll = var2[1].equalsIgnoreCase("all");
+					}
+					WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(world);
+					if (removeAll) {
+						Iterator<ISimulationTickable> it = wd.listTickingLocations.iterator();
+						while(it.hasNext()) {
+							ISimulationTickable loc = it.next();
+							if (loc instanceof BuffedLocation) {
+								wd.removeTickingLocation(loc);
+								it.remove();
+								System.out.println("removed buffed zone at " + loc.getOrigin());
+							}
+						}
+
+					} else {
+						ISimulationTickable zone = wd.getTickingSimulationByLocation(new BlockCoord(posBlock));
+						if (zone != null) {
+							wd.removeTickingLocation(zone);
+							System.out.println("removed buffed zone at " + posBlock);
+						} else {
+							System.out.println("cant find buffed zone at " + posBlock);
+						}
+					}
+
+				} else if (var2[0].equals("height")) {
+					var1.sendMessage(new TextComponentString("height: " + world.getHeight(posBlock)));
+				} else if (var2[0].equals("heightprecip")) {
+					var1.sendMessage(new TextComponentString("heightprecip: " + world.getPrecipitationHeight(posBlock)));
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(world, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
@@ -188,29 +242,234 @@ public class CommandCoroUtil extends CommandBase {
 	                    it.remove();
 	                }
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
-	        		String param = null;
-	        		//int dim = world.provider.getDimension();
-	        		int indexStart = 0;
-	        		
-	        		String fullCommand = "";
-	        		for (String entry : var2) {
-	        			fullCommand += entry + " ";
-	        		}
-	        		boolean simple = true;
+					String param = null;
+					//int dim = world.provider.getDimension();
+					int indexStart = 0;
+
+					String fullCommand = "";
+					for (String entry : var2) {
+						fullCommand += entry + " ";
+					}
+					boolean simple = true;
 	        		/*if (fullCommand.contains(" simple")) {
 	        			simple = true;
 	        		} else {*/
-	        			//using index start instead of dimension
-	        			if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
-		        		if (var2.length > 2) param = var2[2];
-	        		//}
-	        		List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
-	                
-	        		CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
-	        		for (String entry : data) {
-	        			CoroUtilMisc.sendCommandSenderMsg(var1, entry);
-	        		}
-	        	}
+					//using index start instead of dimension
+					if (var2.length > 1) indexStart = Integer.valueOf(var2[1]);
+					if (var2.length > 2) param = var2[2];
+					//}
+					List<String> data = listEntitiesLocations(param, dimension, simple, indexStart);
+
+					CoroUtilMisc.sendCommandSenderMsg(var1, "Location list for dimension id: " + dimension);
+					for (String entry : data) {
+						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
+					}
+				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
+					if ((var1 instanceof EntityPlayerMP)) {
+						EntityPlayerMP ent = (EntityPlayerMP) var1;
+						//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
+						net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
+						BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
+						//long dayNumber = (ent.world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
+						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player rating: " + DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerEquipment);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightPosOccupy);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightDPS);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
+						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
+						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
+						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
+					}
+				} else if (var2[0].equalsIgnoreCase("testitem")) {
+					/**
+					 * ResourceLocation resourcelocation = new ResourceLocation(id);
+					 Item item = (Item)Item.REGISTRY.getObject(resourcelocation);
+					 */
+					Item item = Item.getByNameOrId("particleman:particleglove");
+					if (item != null) {
+						System.out.println("! " + item.getRegistryName().toString());
+					}
+					if (player != null) {
+						player.inventory.addItemStackToInventory(new ItemStack(item, 1));
+					}
+				} else if (var2[0].equalsIgnoreCase("testloot")) {
+
+					//TODO: MOVE ALL THIS BELOW TO ITS OWN COMMAND WITHIN COROUTIL LIB
+
+				} else if (var2[0].equalsIgnoreCase("reloadData")) {
+					DifficultyDataReader.loadFiles();
+					var1.sendMessage(new TextComponentString("Difficulty data reloaded"));
+				} else if (var2[0].equalsIgnoreCase("registry")) {
+					/*for (Map.Entry<String, Class <? extends Entity >> entry : EntityList.NAME_TO_CLASS.entrySet()) {
+						var1.sendMessage(new TextComponentString(entry.getKey()));
+						System.out.println(entry.getKey());
+					}*/
+					//TODO: VALIDATE ITEMS!!!
+					//actually spawns the mobs
+				} else if (var2[0].equalsIgnoreCase("ts") || var2[0].equalsIgnoreCase("testSpawn")) {
+					if (player != null) {
+						String profileName = var2[1];
+						DataMobSpawnsTemplate profileFound = null;
+						for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+							if (profile.name.equals(profileName)) {
+								profileFound = profile;
+								break;
+							}
+						}
+
+						if (profileFound != null) {
+
+							boolean spawnAll = false;
+							if (var2.length > 2) {
+								spawnAll = var2[2].equalsIgnoreCase("all");
+							}
+
+							if (spawnAll) {
+								for (DataActionMobSpawns spawns : profileFound.spawns) {
+									for (String spawn : spawns.entities) {
+										for (int i = 0; i < spawns.count; i++) {
+											spawnInvasionMob(world, player, spawn, spawns, posVec);
+										}
+									}
+								}
+							} else {
+								Random rand = new Random();
+								DataActionMobSpawns spawns = profileFound.spawns.get(rand.nextInt(profileFound.spawns.size()));
+								String spawn = spawns.entities.get(rand.nextInt(spawns.entities.size()));
+
+								spawnInvasionMob(world, player, spawn, spawns, posVec);
+							}
+
+
+							/*var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test"));
+							String data = profileFound.toString();
+							String[] list = data.split(" \\| ");
+							for (String entry : list) {
+								var1.sendMessage(new TextComponentString(entry));
+							}*/
+						} else {
+							var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+						}
+
+					}
+					//TODO: VALIDATE ITEMS!!!
+				} else if (var2[0].equalsIgnoreCase("tp") || var2[0].equalsIgnoreCase("testProfile")) {
+					if (player != null) {
+						try {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(true);
+
+							String profileName = var2[1];
+
+							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
+							double difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+							if (var2.length >= 3) difficultyScale = Double.valueOf(var2[2]);
+
+							DifficultyDataReader.setDebugDifficulty(difficultyScale);
+
+							DataMobSpawnsTemplate profileFound = null;
+							for (DataMobSpawnsTemplate profile : DifficultyDataReader.getData().listMobSpawnTemplates) {
+								if (profile.name.equals(profileName)) {
+									profileFound = profile;
+									break;
+								}
+							}
+
+							if (profileFound != null) {
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test, difficulty: " + difficultyScale));
+								String data = profileFound.toString();
+								String[] list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.sendMessage(new TextComponentString(entry));
+								}
+
+								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
+
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test with templates flattened, difficulty: " + difficultyScale));
+								data = profileFound.toString();
+								list = data.split(" \\| ");
+								for (String entry : list) {
+									var1.sendMessage(new TextComponentString(entry));
+								}
+							} else {
+								var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+							}
+						} finally {
+							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
+							DifficultyDataReader.setDebugValidate(false);
+							DifficultyDataReader.setDebugDifficulty(-1);
+						}
+
+					}
+				} else if (var2[0].equalsIgnoreCase("testaabb")) {
+
+				    //added to track down what block from a mod is returning a null AABB that crashes pathfinder
+
+                    System.out.println("");
+                    System.out.println("TRY 1");
+                    System.out.println("");
+                    for (Block block : Block.REGISTRY) {
+					    for (IBlockState state : block.getBlockState().getValidStates()) {
+                            AxisAlignedBB aabb = block.getBoundingBox(state, world, new BlockPos(0, 64, 0));
+                            if (aabb != null) {
+                                System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
+                            } else {
+                                System.out.println("NULL AABB FOR: " + block.getRegistryName() + " aabb: " + aabb);
+                            }
+                        }
+
+					}
+
+                    System.out.println("");
+                    System.out.println("TRY 2");
+                    System.out.println("");
+                    for (Block block : Block.REGISTRY) {
+                        for (IBlockState state : block.getBlockState().getValidStates()) {
+                            AxisAlignedBB aabb = state.getBoundingBox(world, new BlockPos(0, 64, 0));
+                            if (aabb != null) {
+                                System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
+                            } else {
+                                System.out.println("NULL AABB FOR: " + block.getRegistryName() + " aabb: " + aabb);
+                            }
+                        }
+                    }
+				} else if (var2[0].equalsIgnoreCase("testRepair")) {
+					Vec3d vec = var1.getPositionVector();
+					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
+					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());
+					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
+
+					BlockPos pos = new BlockPos(sx, sy, sz);
+					IBlockState state = world.getBlockState(pos);
+
+					if (UtilMining.canConvertToRepairingBlock(world, state)) {
+						var1.sendMessage(new TextComponentString("Setting coord to repairing block, block was: " + state));
+						TileEntityRepairingBlock.replaceBlockAndBackup(world, pos);
+						/*world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
+						TileEntity tEnt = world.getTileEntity(pos);
+						if (tEnt instanceof TileEntityRepairingBlock) {
+							((TileEntityRepairingBlock) tEnt).setBlockData(state);
+						}*/
+					} else {
+						var1.sendMessage(new TextComponentString("Coordinate does not support repairing block, block was: " + state));
+						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
+						world.setBlockToAir(pos);*/
+					}
+				} else if (var2[0].equalsIgnoreCase("testPower")) {
+					Vec3d vec = var1.getPositionVector();
+					int sx = MathHelper.floor(parseCoordinate(vec.x, var2[1], false).getResult());
+					int sy = MathHelper.floor(parseCoordinate(vec.y, var2[2], false).getResult());
+					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
+
+					BlockPos pos = new BlockPos(sx, sy, sz);
+					IBlockState state = world.getBlockState(pos);
+
+					CoroUtilCompatibility.testPowerInfo(player, pos);
+				}
 			/*}*/
 		} catch (Exception ex) {
 			System.out.println("Exception handling CoroUtil command");
@@ -228,11 +487,11 @@ public class CommandCoroUtil extends CommandBase {
 		double finalY = player.posY;
 		
 		ent.setPosition(finalX, finalY, finalZ);
-		
-		player.world.spawnEntity(ent);
-		//if (ent instanceof EntityLiving) ((EntityLiving)ent).onSpawnWithEgg(null); //moved to after spawn, so client has an entity at least before syncs fire
+
+		//OLD COMMENT: moved to after spawn, so client has an entity at least before syncs fire
+		//new comment: vanilla sets onInitialSpawn before spawning, so do it that way, need for better syncing
 		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
-		//if (ent instanceof ICoroAI) ((ICoroAI) ent).getAIAgent().spawnedOrNBTReloadedInit();
+		player.world.spawnEntity(ent);
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {
@@ -342,6 +601,37 @@ public class CommandCoroUtil extends CommandBase {
         }
         
         return count;
+	}
+
+	public void spawnInvasionMob(World world, EntityPlayer player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
+		Class clazz = EntityList.getClass(new ResourceLocation(spawn));
+
+		if (clazz != null) {
+			Entity entL = EntityList.newEntity(clazz, world);
+			if (entL != null && entL instanceof EntityCreature) {
+
+				EntityCreature ent = (EntityCreature) entL;
+
+				BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
+				float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
+
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
+				UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
+
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
+				spawnEntity(player, ent);
+				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, false);
+
+				//add a bit of random to space multi spawns out
+				ent.setPosition(ent.posX + world.rand.nextDouble(), ent.posY, ent.posZ + world.rand.nextDouble());
+
+				//CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
+			} else {
+				player.sendMessage(new TextComponentString("entity instance null or not EntityCreature"));
+			}
+		} else {
+			player.sendMessage(new TextComponentString("entity class null"));
+		}
 	}
 	
 	@Override

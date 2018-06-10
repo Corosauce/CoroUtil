@@ -1,6 +1,6 @@
 package extendedrenderer.particle.behavior;
 
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.util.Vec3;
 import extendedrenderer.particle.entity.EntityRotFX;
 
@@ -60,7 +60,7 @@ public class ParticleBehaviorFog extends ParticleBehaviors {
 		float sizeBase = (float) (500+(rand.nextDouble()*40));
 
 		//TEST
-		if (ConfigCoroAI.optimizedCloudRendering) {
+		if (ConfigCoroUtil.optimizedCloudRendering) {
 			sizeBase += 500;
 			particle.rotationPitch = -90 + rand.nextInt(5) - rand.nextInt(5);
 			particle.setTicksFadeInMax(20);

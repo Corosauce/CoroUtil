@@ -3,11 +3,13 @@ package CoroUtil.entity;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -253,17 +255,10 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         	if (temp != null) movingobjectposition = temp;
         }
 
-        /*if (movingobjectposition != null)
+        if (movingobjectposition != null)
         {
-            if (movingobjectposition.typeOfHit == MovingObjectType.BLOCK && this.worldObj.getBlock(movingobjectposition.blockX, movingobjectposition.blockY, movingobjectposition.blockZ) instanceof BlockPortal)
-            {
-                this.setInPortal();
-            }
-            else
-            {
-                this.onImpact(movingobjectposition);
-            }
-        }*/
+            this.onImpact(movingobjectposition);
+        }
 
         /*this.posX += this.motionX;
         this.posY += this.motionY;
@@ -412,7 +407,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         EntityLivingBase entityliving = this.getThrower();
 

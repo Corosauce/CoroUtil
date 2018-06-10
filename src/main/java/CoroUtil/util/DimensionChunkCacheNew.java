@@ -24,7 +24,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.OldUtil;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.pathfinding.PFQueue;
 
 public class DimensionChunkCacheNew implements IBlockAccess {
@@ -58,7 +58,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     		
     		//world.chunkExists(par1, par2)
     		//if (i == 0) {
-    		if (!ConfigCoroAI.chunkCacheOverworldOnly || i == 0) {
+    		if (!ConfigCoroUtil.chunkCacheOverworldOnly || i == 0) {
     			
     		} else {
     			skip = true;
@@ -108,7 +108,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	    	}
     		
     		if (chunks == null) {
-    			if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
+    			if (ConfigCoroUtil.usePlayerRadiusChunkLoadingForFallback) {
     				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
     			} else {
     				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getDimensionType().getName());
@@ -155,7 +155,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		    		}
 	    		}
 	    		
-	    	} else if (ConfigCoroAI.usePlayerRadiusChunkLoadingForFallback) {
+	    	} else if (ConfigCoroUtil.usePlayerRadiusChunkLoadingForFallback) {
 		    	byte playerRadius = 8;
 		    	
 		    	for (int i = 0; i < world.playerEntities.size(); ++i)

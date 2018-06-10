@@ -1,14 +1,8 @@
 package extendedrenderer;
 
-import java.io.File;
-
+import CoroUtil.config.ConfigCoroUtil;
 import extendedrenderer.render.FoliageRenderer;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -53,6 +47,9 @@ public class ExtendedRenderer {
     @Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
     	proxy.postInit();
+
+        //setting last state to track after configs load, but before ticking that uses it
+    	EventHandler.foliageUseLast = ConfigCoroUtil.foliageShaders;
 	}
 
     public ExtendedRenderer() {

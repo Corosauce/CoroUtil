@@ -1,14 +1,20 @@
 package CoroUtil.forge;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
+import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.difficulty.data.DifficultyDataReader;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -22,7 +28,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
-import CoroUtil.config.ConfigCoroAI;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
@@ -32,18 +38,21 @@ import CoroUtil.world.WorldDirectorManager;
 
 import com.google.common.collect.BiMap;
 
-@Mod(modid = "coroutil", name="coroutil", version=CoroUtil.version, acceptableRemoteVersions="*")
+@Mod(modid = CoroUtil.modID, name=CoroUtil.modID, version=CoroUtil.version, acceptableRemoteVersions="*")
 public class CoroUtil {
 	
-	@Mod.Instance( value = "coroutil" )
+	@Mod.Instance( value = CoroUtil.modID )
 	public static CoroUtil instance;
 	public static final String modID = "coroutil";
+
+	public static final String modID_HWMonsters = "hw_monsters";
+	public static final String modID_HWInvasions = "hw_inv";
 
 
 	//public static final String version = "${version}";
 	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production
 	//TODO: find a way to perminently do this for dev only
-	public static final String version = "1.12.1-1.2.2";
+	public static final String version = "1.12.1-1.2.11";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
@@ -53,16 +62,67 @@ public class CoroUtil {
     public static String eventChannelName = "coroutil";
 	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
     
-    //public static PetsManager petsManager;
+    public static ConfigCoroUtil configCoroUtil = null;
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
-    	ConfigMod.addConfigFile(event, new ConfigCoroAI());
+		migrateOldConfig();
+
+		configCoroUtil = new ConfigCoroUtil();
+    	ConfigMod.addConfigFile(event, configCoroUtil);
     	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
+		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
+
+		/*DifficultyDataReader reader = new DifficultyDataReader();
+		reader.loadFiles();*/
+		DifficultyDataReader.init();
+		DifficultyDataReader.loadFiles();
     	
     	eventChannel.register(new EventHandlerPacket());
     }
+
+    public static void migrateOldConfig() {
+
+    	File path = new File("." + File.separator + "config" + File.separator + "CoroUtil");
+    	try {
+			path.mkdirs();
+		} catch (Exception ex) {
+    		ex.printStackTrace();
+		}
+
+		File oldFile = new File("." + File.separator + "config" + File.separator + "CoroUtil.cfg");
+		File newFile = new File("." + File.separator + "config" + File.separator + "CoroUtil" + File.separator + "General.cfg");
+
+		fixConfigFile(oldFile, newFile, "coroutil {", "general {");
+
+		oldFile = new File("." + File.separator + "config" + File.separator + "CoroUtil_DynamicDifficulty.cfg");
+		newFile = new File("." + File.separator + "config" + File.separator + "CoroUtil" + File.separator + "DynamicDifficulty.cfg");
+
+		fixConfigFile(oldFile, newFile, "coroutil_dynamicdifficulty {", "dynamicdifficulty {");
+	}
+
+	public static void fixConfigFile(File oldFile, File newFile, String oldCat, String newCat) {
+		if (oldFile.exists() && !newFile.exists()) {
+			CULog.log("Detected old " + oldFile.toString() + ", relocating to " + newFile.toString());
+			try {
+				Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+				//fix category
+				List<String> newLines = new ArrayList<>();
+				for (String line : Files.readAllLines(newFile.toPath(), StandardCharsets.UTF_8)) {
+					if (line.contains(oldCat)) {
+						newLines.add(line.replace(oldCat, newCat));
+					} else {
+						newLines.add(line);
+					}
+				}
+				Files.write(newFile.toPath(), newLines, StandardCharsets.UTF_8);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
     
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
@@ -105,6 +165,10 @@ public class CoroUtil {
 			}
     	}
 	}
+
+	public void postInit() {
+    	proxy.postInit();
+	}
     
     public CoroUtil() {
     	
@@ -132,6 +196,8 @@ public class CoroUtil {
     		CULog.log("CoroUtil being reinitialized");
     		initProperNeededForInstance = false;
 	    	CoroUtilFile.getWorldFolderName();
+	    	//dont prevent reading in if ConfigCoroUtil.useCoroPets is false,
+			//so they can have the data if they enable it while server running
 	    	PetsManager.instance().nbtReadFromDisk();
 	    	
 	    	//dont read in world director manager stuff, its loaded on demand per registration, for directors and grids
@@ -141,8 +207,10 @@ public class CoroUtil {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-    		PetsManager.instance().nbtWriteToDisk();
-	    	if (unloadInstances) PetsManager.instance().reset();
+    		if (ConfigCoroUtil.useCoroPets) {
+				PetsManager.instance().nbtWriteToDisk();
+				if (unloadInstances) PetsManager.instance().reset();
+			}
 	    	PlayerQuestManager.i().saveData(false, unloadInstances);
 	    	WorldDirectorManager.instance().writeToFile(unloadInstances);
     	} catch (Exception ex) {
@@ -150,10 +218,7 @@ public class CoroUtil {
     	}
     }
     
-	public static void dbg(Object obj) {
-		if (true) {
-			//MinecraftServer.getServer().getLogAgent().logInfo(String.valueOf(obj));
-			System.out.println(obj);
-		}
+	public static void dbg(String obj) {
+    	CULog.dbg(obj);
 	}
 }

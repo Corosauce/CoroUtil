@@ -3,12 +3,18 @@ package CoroUtil.util;
 import java.util.Iterator;
 import java.util.UUID;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -132,5 +138,49 @@ public class CoroUtilEntity {
         }
 
         return entityplayer;
+    }
+
+    public static boolean canProcessForList(String playerName, String list, boolean whitelistMode) {
+        if (whitelistMode) {
+            if (!list.contains(playerName)) {
+                return false;
+            }
+        } else {
+            if (list.contains(playerName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static Class getClassFromRegistry(String name) {
+        //Class clazz = EntityList.NAME_TO_CLASS.get(name);
+        Class clazz = EntityList.getClass(new ResourceLocation(name));
+        //dont think this will be needed for proper registered entity names
+        /*if (clazz == null) {
+            clazz = EntityList.NAME_TO_CLASS.get(name.replace("minecraft:", "").replace("minecraft.", ""));
+        }*/
+        return clazz;
+    }
+
+    /**
+     * Mimicing some of vanillas rules for spawning in a mob
+     *
+     * x y z coords are expected to be the ground the mob is going to spawn on
+     *
+     * @param world
+     * @param x
+     * @param y
+     * @param z
+     * @return
+     */
+    public static boolean canSpawnMobOnGround(World world, int x, int y, int z) {
+        BlockPos pos = new BlockPos(x, y, z);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (CoroUtilBlock.isAir(block) || !block.canCreatureSpawn(state, world, pos, EntityLiving.SpawnPlacementType.ON_GROUND)) {
+            return false;
+        }
+        return true;
     }
 }

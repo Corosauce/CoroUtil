@@ -1,0 +1,70 @@
+{
+  "format": "conditions",
+  "templates": [
+    {
+      "name": "all_conditions",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion/regular/all",
+
+          "comment": "is 'all' even needed? its the same as not using this condition, maybe if recursive templates were a thing, top level one could override lower one"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0,
+          "max": 0.1
+        },
+        {
+          "condition": "invasion_number",
+          "min": 1,
+          "max": 5
+        },
+        {
+          "condition": "invasion_rate",
+          "rate": 5,
+
+          "comment": "//only use every x invasions, in this example, its considered every 5th invasion"
+        },
+        {
+          "condition": "random",
+          "weight": 5,
+
+          "comment": "//weighed against what? what weight is 'dont do anything' ?"
+        },
+        {
+          "condition": "filter_mobs",
+          "mode": "whitelist/blacklist or allow/deny?",
+          "entities": [
+            "minecraft:zombie"
+          ]
+        },
+        {
+          "condition": "template",
+          "template": "condition_set_1",
+
+          "comment": "//since this is a template within a template, maybe dont allow it for now"
+        },
+        {
+          "condition": "mod_loaded",
+          "mod_id": "infernalmobs",
+          "mode_boolean": "invert"
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_22",
+      "conditions": [
+        {
+          "condition": "context",
+          "type": "invasion"
+        },
+        {
+          "condition": "difficulty",
+          "min": 0.1,
+          "max": 0.2
+        }
+      ]
+    }
+  ]
+}
