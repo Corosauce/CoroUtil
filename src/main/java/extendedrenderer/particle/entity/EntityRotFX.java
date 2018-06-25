@@ -108,6 +108,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     private boolean slantParticleToWind = false;
 
     public Quaternion rotation;
+    public Quaternion rotationPrev;
 
     //set to true for direct quaternion control, not EULER conversion helper
     public boolean quatControl = false;
@@ -314,9 +315,9 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             rotationPitch = (float)Math.atan2(motionY, motionXZ);
         }
 
-        Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
-
         if (!quatControl) {
+            rotationPrev = new Quaternion(rotation);
+            Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
             updateQuaternion(ent);
         }
     }
@@ -392,6 +393,11 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     @Override
     public Quaternion getQuaternion() {
         return this.rotation;
+    }
+
+    @Override
+    public Quaternion getQuaternionPrev() {
+        return this.rotationPrev;
     }
 
     @Override
@@ -539,7 +545,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
         Vector3f pos = new Vector3f(posX, posY, posZ);
 
-        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos, partialTicks);
 
         //adjust to perspective and camera
         //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);

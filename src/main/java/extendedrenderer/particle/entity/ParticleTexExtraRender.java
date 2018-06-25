@@ -73,8 +73,10 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			//rotationPitch *= 10F;
 		}
 
-		Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
-		updateQuaternion(ent);
+		if (!quatControl) {
+			Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+			updateQuaternion(ent);
+		}
 	}
 
 	@Override
@@ -282,7 +284,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			pos.y -= interpPosY;
 			pos.z -= interpPosZ;
 
-			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+			Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos, partialTicks);
 
 			//adjust to perspective and camera
 			//Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);

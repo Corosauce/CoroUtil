@@ -1,6 +1,7 @@
 package extendedrenderer.shader;
 
 
+import CoroUtil.util.CoroUtilMath;
 import extendedrenderer.particle.entity.EntityRotFX;
 import org.lwjgl.util.vector.Quaternion;
 
@@ -23,8 +24,12 @@ public class Transformation {
         return viewMatrix.mulAffine(modelMatrix, modelViewMatrix);
     }
 
-    public Matrix4fe buildModelMatrix(IShaderRenderedEntity gameItem, Vector3f posCustom) {
+    public Matrix4fe buildModelMatrix(IShaderRenderedEntity gameItem, Vector3f posCustom, float partialTicks) {
         Quaternion q = gameItem.getQuaternion();
+        if (gameItem.getQuaternionPrev() != null) {
+            q = CoroUtilMath.interpolate(gameItem.getQuaternionPrev(), gameItem.getQuaternion(), partialTicks);
+            //q = gameItem.getQuaternionPrev();
+        }
 
         float scaleAdj = gameItem.getScale();
 

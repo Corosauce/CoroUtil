@@ -86,6 +86,13 @@ public class Foliage implements IShaderRenderedEntity {
         return rotation;
     }
 
+    //TODO: implement prev quat
+    @Override
+    public Quaternion getQuaternionPrev() {
+        //return rotation;
+        return null;
+    }
+
     @Override
     public float getScale() {
         return particleScale;
@@ -189,7 +196,7 @@ public class Foliage implements IShaderRenderedEntity {
         //Vector3f pos = new Vector3f((float) (entityIn.posX - particle.posX), (float) (entityIn.posY - particle.posY), (float) (entityIn.posZ - particle.posZ));
         Vector3f pos = new Vector3f(posX, posY, posZ);
 
-        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos);
+        Matrix4fe modelMatrix = transformation.buildModelMatrix(this, pos, partialTicks);
 
         //adjust to perspective and camera
         //Matrix4fe modelViewMatrix = transformation.buildModelViewMatrix(modelMatrix, viewMatrix);
