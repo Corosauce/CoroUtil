@@ -11,5 +11,7 @@ public interface IShaderRenderedEntity {
     Quaternion getQuaternionPrev();
     //Vector3f getScale();
     float getScale();
+    //boolean hasCustomMatrix();
+
 
 }

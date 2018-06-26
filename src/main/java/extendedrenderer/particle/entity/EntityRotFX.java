@@ -101,9 +101,12 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public float avoidTerrainAngle = 0;
 
-    //halp
+    //this is for yaw only
+    public boolean useRotationAroundCenter = false;
     public float rotationAroundCenter = 0;
+    public float rotationAroundCenterPrev = 0;
     public float rotationSpeedAroundCenter = 0;
+    public float rotationDistAroundCenter = 0;
 
     private boolean slantParticleToWind = false;
 
@@ -302,9 +305,11 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         }
 
         rotationAroundCenter += rotationSpeedAroundCenter;
-        if (rotationAroundCenter >= 360) {
+        rotationAroundCenter %= 360;
+        /*while (rotationAroundCenter >= 360) {
+            System.out.println(rotationAroundCenter);
             rotationAroundCenter -= 360;
-        }
+        }*/
 
         tickExtraRotations();
     }

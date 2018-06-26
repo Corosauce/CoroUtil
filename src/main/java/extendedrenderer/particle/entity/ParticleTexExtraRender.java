@@ -274,6 +274,14 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				pos = new Vector3f(posX, posY, posZ);
 			}
 
+			if (false && useRotationAroundCenter) {
+				float deltaRot = rotationAroundCenterPrev + (rotationAroundCenter - rotationAroundCenterPrev) * partialTicks;
+				float rotX = (float) Math.sin(Math.toRadians(deltaRot));
+				float rotZ = (float) Math.cos(Math.toRadians(deltaRot));
+				pos.x += rotX * rotationDistAroundCenter;
+				pos.z += rotZ * rotationDistAroundCenter;
+			}
+
 			if (this.isDontRenderUnderTopmostBlock()) {
 				int height = this.world.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
 				if (pos.y <= height) continue;
