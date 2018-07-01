@@ -1,5 +1,6 @@
 package CoroUtil.forge;
 
+import CoroUtil.entity.IWorldAccessHooks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -65,6 +66,10 @@ public class CoroAIWorldAccess implements IWorldEventListener {
 		
 		//if (entity instanceof ICoroAI && ((ICoroAI)entity).getAIAgent() != null) ((ICoroAI)entity).getAIAgent().cleanup();
 		if (entity instanceof IBTAgent && ((IBTAgent)entity).getAIBTAgent() != null) ((IBTAgent)entity).getAIBTAgent().cleanup();
+
+		if (entity instanceof IWorldAccessHooks) {
+			((IWorldAccessHooks) entity).onEntityRemoved();
+		}
 	}
 
 	@Override

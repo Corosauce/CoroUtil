@@ -52,7 +52,7 @@ public class CoroUtil {
 	//public static final String version = "${version}";
 	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production
 	//TODO: find a way to perminently do this for dev only
-	public static final String version = "1.12.1-1.2.11";
+	public static final String version = "1.12.1-1.2.12";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
