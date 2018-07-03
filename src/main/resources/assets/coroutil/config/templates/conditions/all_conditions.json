@@ -8,17 +8,21 @@
           "condition": "context",
           "type": "invasion/regular/all",
 
-          "comment": "is 'all' even needed? its the same as not using this condition, maybe if recursive templates were a thing, top level one could override lower one"
+          "comment": "//placeholder for future stuff, dont use for now, dev note: is 'all' even needed? its the same as not using this condition, maybe if recursive templates were a thing, top level one could override lower one"
         },
         {
           "condition": "difficulty",
           "min": 0,
-          "max": 0.1
+          "max": 0.1,
+
+          "comment": "//only use when local difficulty as at or between these numbers, difficulty determined by many things, see CoroUtils DynamicDifficulty.cfg for configuring that"
         },
         {
           "condition": "invasion_number",
           "min": 1,
-          "max": 5
+          "max": 5,
+
+          "comment": "//only use when the active invasion number/count is at or between these numbers, the counter is global and not per player"
         },
         {
           "condition": "invasion_rate",
@@ -37,7 +41,8 @@
           "mode": "whitelist/blacklist or allow/deny?",
           "entities": [
             "minecraft:zombie"
-          ]
+          ],
+          "comment": "//currently unused"
         },
         {
           "condition": "template",
@@ -48,21 +53,9 @@
         {
           "condition": "mod_loaded",
           "mod_id": "infernalmobs",
-          "mode_boolean": "invert"
-        }
-      ]
-    },
-    {
-      "name": "invasion_stage_22",
-      "conditions": [
-        {
-          "condition": "context",
-          "type": "invasion"
-        },
-        {
-          "condition": "difficulty",
-          "min": 0.1,
-          "max": 0.2
+          "mode_boolean": "invert",
+
+          "comment": "//filter waves to only be used when a certain mod is or isnt installed, depending on if mode_boolean is set to invert or not"
         }
       ]
     }

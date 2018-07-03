@@ -263,7 +263,17 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 				scanZ = entPosZ;
 			}
 
+			//i think the y is the block under feet, not where feet occupy
+			//actually, must be where feet occupy...
 			BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
+
+
+			BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(entPosZ));
+
+			/**
+			 * when digging up, or down, need to make sure theres space above to jump up to next pillar
+			 * - just up?
+			 */
 
 			if (factor <= -0.3F) {
 
@@ -273,13 +283,21 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 				listPillarToMine.add(posFrontFeet);
 				listPillarToMine.add(posFrontFeet.down(1));
 
+
 			} else if (factor >= 0.1F) {
 
-				//up
-				dbg("Digging Up");
-				listPillarToMine.add(posFrontFeet.up(1));
-				listPillarToMine.add(posFrontFeet.up(2));
-				listPillarToMine.add(posFrontFeet.up(3));
+				if (!entity.world.isAirBlock(posFeetCheck.up(2))) {
+					dbg("Detected block above head, dig it out");
+					listPillarToMine.add(posFeetCheck.up(2));
+				} else {
+					//up
+					dbg("Digging Up");
+					listPillarToMine.add(posFrontFeet.up(1));
+					listPillarToMine.add(posFrontFeet.up(2));
+					listPillarToMine.add(posFrontFeet.up(3));
+				}
+
+
 
 			} else {
 
