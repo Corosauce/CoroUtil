@@ -6,7 +6,9 @@ import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilPath;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityLookHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.util.EnumHand;
@@ -151,7 +153,14 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
 
         if (entitylivingbase instanceof EntityPlayer && (((EntityPlayer)entitylivingbase).isSpectator() || ((EntityPlayer)entitylivingbase).isCreative()))
         {
-            this.attacker.setAttackTarget((EntityLivingBase)null);
+            /** DO NOT SET NULL TARGET UNLESS ITS A TARGET TASK, will crash vanilla with this otherwise:
+            Caused by: java.lang.NullPointerException
+            at net.minecraft.entity.ai.EntityLookHelper.setLookPositionWithEntity(EntityLookHelper.java:31) ~[EntityLookHelper.class:?]
+            at net.minecraft.entity.ai.EntityAIAttackMelee.updateTask(EntityAIAttackMelee.java:142) ~[EntityAIAttackMelee.class:?]
+            vanilla can get away with this because its own only task this one was based on is the only one that does it in the task list, 2 doing it = crash
+            */
+
+            //this.attacker.setAttackTarget((EntityLivingBase)null);
         }
 
         this.attacker.getNavigator().clearPathEntity();

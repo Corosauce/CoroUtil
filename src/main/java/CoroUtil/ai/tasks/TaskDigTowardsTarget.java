@@ -456,8 +456,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
             if (UtilMining.canConvertToRepairingBlock(entity.world, state)) {
                 TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
             } else {
-            	//TODO: block meta?
-                Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1));
+                Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
 				entity.world.setBlockToAir(posCurMining.toBlockPos());
             }
 
