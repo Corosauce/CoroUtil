@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import CoroUtil.capability.ExtendedWorldStorage;
+import CoroUtil.capability.WorldDataInstance;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -80,6 +83,8 @@ public class CoroUtil {
 		DifficultyDataReader.loadFiles();
     	
     	eventChannel.register(new EventHandlerPacket());
+
+		CapabilityManager.INSTANCE.register(WorldDataInstance.class, new ExtendedWorldStorage(), WorldDataInstance.class);
     }
 
     public static void migrateOldConfig() {
