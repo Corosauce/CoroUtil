@@ -535,43 +535,49 @@ public class DynamicDifficulty {
 	}
 	
 	public static float getBlockImportanceValue(Block block) {
-		
-		boolean test = false;
-		if (test) {
-			System.out.println("TEST INVADE IS ON!");
-			return 30;
-		}
-		
-		float scaleBase = 1F;
-		float defaultIron = scaleBase * 0.3F;
-		
-		if (block instanceof BlockLog) {
-			return scaleBase * 0.1F;
-		} else if (block instanceof BlockSapling) {
-			return scaleBase * 0.3F;
-		} else if (block instanceof BlockOre) {
-			if (block == Blocks.COAL_ORE) {
-				return scaleBase * 0.2F;
-			} else if (block == Blocks.IRON_ORE) {
-				return defaultIron;
-			} else if (block == Blocks.GOLD_ORE) {
-				return scaleBase * 0.4F;
-			} else if (block == Blocks.LIT_REDSTONE_ORE || block == Blocks.REDSTONE_ORE) {
-				return scaleBase * 0.5F;
-			} else if (block == Blocks.LAPIS_ORE) {
-				return scaleBase * 0.6F;
-			} else if (block == Blocks.DIAMOND_ORE) {
-				return scaleBase * 1F;
-			} else if (block == Blocks.EMERALD_ORE) {
-				return scaleBase * 1.2F;
-			} else {
-				return defaultIron;
+
+		try {
+			boolean test = false;
+			if (test) {
+				System.out.println("TEST INVADE IS ON!");
+				return 30;
 			}
-		} else if (OreDictionary.getOres(Block.REGISTRY.getNameForObject(block).toString()).size() > 0) {
-			return defaultIron;
-		} else {
-			return 0;
+
+			float scaleBase = 1F;
+			float defaultIron = scaleBase * 0.3F;
+
+			if (block instanceof BlockLog) {
+				return scaleBase * 0.1F;
+			} else if (block instanceof BlockSapling) {
+				return scaleBase * 0.3F;
+			} else if (block instanceof BlockOre) {
+				if (block == Blocks.COAL_ORE) {
+					return scaleBase * 0.2F;
+				} else if (block == Blocks.IRON_ORE) {
+					return defaultIron;
+				} else if (block == Blocks.GOLD_ORE) {
+					return scaleBase * 0.4F;
+				} else if (block == Blocks.LIT_REDSTONE_ORE || block == Blocks.REDSTONE_ORE) {
+					return scaleBase * 0.5F;
+				} else if (block == Blocks.LAPIS_ORE) {
+					return scaleBase * 0.6F;
+				} else if (block == Blocks.DIAMOND_ORE) {
+					return scaleBase * 1F;
+				} else if (block == Blocks.EMERALD_ORE) {
+					return scaleBase * 1.2F;
+				} else {
+					return defaultIron;
+				}
+				//TODO: possibly risky use of oredict, see issue #267, NPE at CoroUtil.difficulty.DynamicDifficulty.getBlockImportanceValue(DynamicDifficulty.java:569)
+			} else if (OreDictionary.getOres(Block.REGISTRY.getNameForObject(block).toString()).size() > 0) {
+				return defaultIron;
+			} else {
+				return 0;
+			}
+		} catch (Exception ex) {
+			//workaround for issue #267
 		}
+		return 0;
 	}
 	
 	public static EntityPlayer getBestPlayerForArea(World world, BlockCoord pos) {
