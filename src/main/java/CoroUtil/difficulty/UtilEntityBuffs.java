@@ -16,6 +16,7 @@ import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import com.google.gson.JsonArray;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.ai.EntityAIZombieAttack;
@@ -361,6 +362,11 @@ public class UtilEntityBuffs {
             }
         }
         return foundTask;
+    }
+
+    /** example sexier version of hasTask **/
+    public static boolean hasAi(EntityLiving entity, Class<? extends EntityAIBase> clazz) {
+        return entity.tasks.taskEntries.stream().anyMatch(task -> clazz.isAssignableFrom(task.action.getClass()));
     }
 
     public static boolean addTask(EntityCreature ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
