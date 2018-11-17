@@ -16,10 +16,10 @@ import CoroUtil.world.grid.chunk.ChunkDataGrid;
 public class WorldDirectorManager {
 
 	//public PhysicsWorldManager physMan = new PhysicsWorldManager();
-	private List<BlockDataGrid> listGridsBlocks = new ArrayList<BlockDataGrid>();
-	private List<ChunkDataGrid> listGridsChunks = new ArrayList<ChunkDataGrid>();
-	private HashMap<Integer, BlockDataGrid> lookupGridsBlockData = new HashMap<Integer, BlockDataGrid>();
-	private HashMap<Integer, ChunkDataGrid> lookupGridsChunkData = new HashMap<Integer, ChunkDataGrid>();
+	private List<BlockDataGrid> listGridsBlocks = new ArrayList<>();
+	private List<ChunkDataGrid> listGridsChunks = new ArrayList<>();
+	private HashMap<Integer, BlockDataGrid> lookupGridsBlockData = new HashMap<>();
+	private HashMap<Integer, ChunkDataGrid> lookupGridsChunkData = new HashMap<>();
 	
 	//modID<dimID, WorldDirector>
 	private HashMap<String, HashMap<Integer, WorldDirector>> lookupWorldDirectors = new HashMap<String, HashMap<Integer, WorldDirector>>();
@@ -27,10 +27,6 @@ public class WorldDirectorManager {
 	
 	private static WorldDirectorManager instanceServer;
 	private static WorldDirectorManager instanceClient; //not setup yet
-	
-	public static String EPOCHDIM_OVERWORLD_NAME = "epoch_overworld";
-	public static int EPOCHDIM_OVERWORLD_ID = -64;
-	public static String EPOCHDIM_DUNGEON_NAME = "epoch_dungeon";
 	
 	public static WorldDirectorManager instance() {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {

@@ -227,7 +227,7 @@ public class WorldDirector implements Runnable {
 		if (ConfigCoroUtil.trackPlayerData) {
 			if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
 				for (int i = 0; i < world.playerEntities.size(); i++) {
-					EntityPlayer entP = (EntityPlayer) world.playerEntities.get(i);
+					EntityPlayer entP = world.playerEntities.get(i);
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor(entP.posX) / 16, MathHelper.floor(entP.posZ) / 16);
 					cdp.addToPlayerActivityTime(entP.getGameProfile().getId(), PlayerDataGrid.playerTimeSpentUpdateInterval);
 				}
