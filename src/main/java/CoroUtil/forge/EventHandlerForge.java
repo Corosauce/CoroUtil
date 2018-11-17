@@ -6,8 +6,7 @@ import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.BuffBase;
-import CoroUtil.util.CoroUtilCrossMod;
-import CoroUtil.util.UtilMining;
+import CoroUtil.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityCreature;
@@ -39,8 +38,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.test.Headshots;
-import CoroUtil.util.CoroUtilPlayer;
-import CoroUtil.util.Vec3;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
@@ -58,7 +55,7 @@ public class EventHandlerForge {
 
 		PlayerQuestManager.i().onEvent(event);
 
-		if (!ConfigCoroUtil.tempDisableHWInvFeatures) {
+		if (CoroUtilCompatibility.isHWInvasionsInstalled()) {
 			if (!event.getEntity().world.isRemote) {
 				if (event.getEntity() instanceof EntityPlayer) {
 					DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());

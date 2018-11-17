@@ -47,7 +47,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static double difficulty_Max = -1;
 
 	//TODO: if false, will we be double buffing infernal mobs accidentally?
-	@ConfigComment("If true, tie overall chance of infernal mobs to our difficulty system scaling, if false, don't try to control it at all")
+	@ConfigComment("Only used of HWMonsters is installed. If true, tie overall chance of infernal mobs to our difficulty system scaling, if false, don't try to control it at all")
 	public static boolean difficulty_OverrideInfernalMobs = true;
 	
 	/*@ConfigComment("what level of difficulty is required to count as 100% chance")

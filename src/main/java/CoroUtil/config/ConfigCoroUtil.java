@@ -14,7 +14,8 @@ public class ConfigCoroUtil implements IConfigCategory {
 	
 	public static String chunkCacheDimensionBlacklist_IDs = "";
 	public static String chunkCacheDimensionBlacklist_Names = "promised";
-	
+
+	@ConfigComment("Used for tracking time spent in chunk and block right clicks for measuring activity for difficulty")
 	public static boolean trackPlayerData = false;
 	
 	//public static boolean useBlackListsAsWhitelist = false;
@@ -60,14 +61,8 @@ public class ConfigCoroUtil implements IConfigCategory {
 
 	public static boolean useCoroPets = false;
 
-	/**
-	 * TODO: while the code is in coroutil, why not just detect a hostile worlds mod THEN gen it?
-	 */
-
-	@ConfigComment("Used until Invasion mod is released")
-	public static boolean tempDisableHWInvFeatures = true;
-
-	//public static boolean forceDDDataClear = true;
+	@ConfigComment("Use at own risk, will not support, requires game restart on change")
+	public static boolean enableAdvancedDeveloperConfigFiles = false;
 
 	@Override
 	public String getName() {

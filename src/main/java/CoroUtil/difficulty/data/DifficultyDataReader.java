@@ -10,6 +10,7 @@ import CoroUtil.difficulty.data.cmods.*;
 import CoroUtil.difficulty.data.conditions.*;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
+import CoroUtil.util.CoroUtilCompatibility;
 import CoroUtil.util.UtilClasspath;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -145,7 +146,7 @@ public class DifficultyDataReader {
 
 
 
-        if (!ConfigCoroUtil.tempDisableHWInvFeatures) {
+        if (CoroUtilCompatibility.isHWInvasionsInstalled()) {
             CoroUtil.dbg("Start reading CoroUtil json difficulty files");
 
             try {

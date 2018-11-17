@@ -71,8 +71,10 @@ public class CoroUtil {
 
 		configCoroUtil = new ConfigCoroUtil();
     	ConfigMod.addConfigFile(event, configCoroUtil);
-    	ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
-		ConfigMod.addConfigFile(event, new ConfigHWMonsters());
+    	if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
+			ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
+			ConfigMod.addConfigFile(event, new ConfigHWMonsters());
+		}
 
 		/*DifficultyDataReader reader = new DifficultyDataReader();
 		reader.loadFiles();*/
