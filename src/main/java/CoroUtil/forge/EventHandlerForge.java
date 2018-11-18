@@ -184,11 +184,12 @@ public class EventHandlerForge {
 								if (ent.world.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
 									ent.world.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
 								}
-								
-								//BlockRegistry.dirtPath.blockID);
-								//cleanup for memory
-								WorldDirectorManager.instance().getBlockDataGrid(ent.world).removeBlockData(newX, newY, newZ);
-								//ServerTickHandler.wd.getBlockDataGrid(worldObj).removeBlockData(newX, newY, newZ);
+
+								//reset walked on amount since its a new block state
+                                bdp.walkedOnAmount = 0;
+
+								//cleanup for memory if we can
+								WorldDirectorManager.instance().getBlockDataGrid(ent.world).removeBlockDataIfRemovable(newX, newY, newZ);
 							}
 						}
 					}

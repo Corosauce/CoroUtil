@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
@@ -88,6 +89,29 @@ public class BlockDataGrid
             return grid.get(hash);
         }
     }
+
+	/**
+	 * Same as removeBlockData, but only removes if its determined theres no real data being saved
+	 *
+	 * @param i
+	 * @param j
+	 * @param k
+	 */
+	public void removeBlockDataIfRemovable(int i, int j, int k) {
+		int hash = getHash(i, j, k);
+
+		if (grid.containsKey(hash))
+		{
+			BlockDataPoint bdp = grid.get(hash);
+			if (bdp.isRemovable()) {
+				//CULog.dbg("determined block data removable, removing");
+				bdp.cleanup();
+				grid.remove(hash);
+			}
+
+			//System.out.println("grid had removal, new size: " + grid.size());
+		}
+	}
     
     public void removeBlockData(int i, int j, int k) {
     	int hash = getHash(i, j, k);

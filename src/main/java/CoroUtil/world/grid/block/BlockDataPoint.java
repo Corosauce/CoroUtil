@@ -20,8 +20,12 @@ public class BlockDataPoint
     
     //runtime instance data
     public float health;
-    public long lastTickTime; //uses gettotalworldtime
-    public float walkedOnAmount; //beaten paths
+    /** currently used by desire paths **/
+    public long lastTickTimeGrass; //uses gettotalworldtime
+
+    //this is the sub progression stage value used when going between actual block stages
+    public float walkedOnAmount;
+
     public byte creationType;
     
     //static/dependant on source block type data
@@ -53,7 +57,10 @@ public class BlockDataPoint
         zCoord = k;
         hash = makeHash(i, j, k);
         updateCache();
-        health = BlockStaticDataMap.getBlockMaxHealth(blockID);
+
+        //dont waste cpu on this until its actually used
+        //health = BlockStaticDataMap.getBlockMaxHealth(blockID);
+
         //System.out.println("new block data, setting health to " + health);
         //Vec3 vec = Vec3.createVectorHelper(xCoord-centerX, yCoord-centerY, zCoord-centerZ); vec.rotateAroundY((float) Math.toRadians(90));
     }
@@ -64,11 +71,20 @@ public class BlockDataPoint
     	blockID = state.getBlock();
     	blockMeta = state.getBlock().getMetaFromState(state);
     }
-    
+
+    /**
+     * Optimization method, checks if theres any point in keeping this data to disk, if everything is defaults, theres no point and we can remove it from the map
+     * @return
+     */
     public boolean isRemovable() {
-    	if (health < BlockStaticDataMap.getBlockMaxHealth(blockID)) {
+    	/*if (health < BlockStaticDataMap.getBlockMaxHealth(blockID)) {
     		return false;
-    	}
+    	}*/
+    	/** lets count this is keepable data, so that when grass changes stage, we can still scale the rate of growth without a reset
+         * **/
+        if (lastTickTimeGrass > 0F) {
+            return false;
+        }
     	if (walkedOnAmount > 0F) {
     		return false;
     	}
@@ -120,7 +136,7 @@ public class BlockDataPoint
     	blockMeta = nbt.getInteger("blockMeta");
     	
     	health = nbt.getFloat("health");
-    	lastTickTime = nbt.getLong("lastTickTime");
+    	lastTickTimeGrass = nbt.getLong("lastTickTimeGrass");
     	creationType = nbt.getByte("creationType");
     	walkedOnAmount = nbt.getFloat("walkedOnAmount");
     	/*xCoord = nbt.getInteger("xCoord");
@@ -137,7 +153,7 @@ public class BlockDataPoint
     	nbt.setInteger("blockMeta", blockMeta);
     	
     	nbt.setFloat("health", health);
-    	nbt.setLong("lastTickTime", lastTickTime);
+    	nbt.setLong("lastTickTimeGrass", lastTickTimeGrass);
     	nbt.setByte("creationType", creationType);
     	nbt.setFloat("walkedOnAmount", walkedOnAmount);
     	nbt.setInteger("xCoord", xCoord);
@@ -151,8 +167,9 @@ public class BlockDataPoint
     	long curTickTime = grid.world.getTotalWorldTime();
     	
     	//code that scales based on ticktime diff goes here
+
     	
-    	lastTickTime = curTickTime;
+    	lastTickTimeGrass = curTickTime;
     }
     
     public void cleanup() {
