@@ -9,6 +9,7 @@ import CoroUtil.difficulty.buffs.BuffBase;
 import CoroUtil.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -16,6 +17,8 @@ import net.minecraft.entity.ai.EntityAITasks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
@@ -234,6 +237,70 @@ public class EventHandlerForge {
 					}
 				}
 			}
+
+			//trying to get miners to push others out of the way
+
+			NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+			if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
+				List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
+
+				if (!list.isEmpty())
+				{
+
+					for (int l = 0; l < list.size(); ++l)
+					{
+						Entity entityIn = list.get(l);
+
+						//from applyEntityCollision()
+
+						NBTTagCompound data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+
+
+						if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging))
+						{
+							if (!entityIn.noClip && !ent.noClip)
+							{
+								double d0 = entityIn.posX - ent.posX;
+								double d1 = entityIn.posZ - ent.posZ;
+								double d2 = MathHelper.absMax(d0, d1);
+
+								if (d2 >= 0.009999999776482582D)
+								{
+									d2 = (double)MathHelper.sqrt(d2);
+									d0 = d0 / d2;
+									d1 = d1 / d2;
+									double d3 = 1.0D / d2;
+
+									if (d3 > 1.0D)
+									{
+										d3 = 1.0D;
+									}
+
+									d0 = d0 * d3;
+									d1 = d1 * d3;
+									d0 = d0 * 0.10D;
+									d1 = d1 * 0.10D;
+									d0 = d0 * (double)(1.0F - ent.entityCollisionReduction);
+									d1 = d1 * (double)(1.0F - ent.entityCollisionReduction);
+
+									if (!ent.isBeingRidden())
+									{
+										entityIn.addVelocity(d0, 0.0D, d1);
+									}
+
+									if (!entityIn.isBeingRidden())
+									{
+										entityIn.addVelocity(d0, 0.0D, d1);
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+
+
 		}
 	}
 

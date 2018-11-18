@@ -15,6 +15,7 @@ import CoroUtil.util.CoroUtilPlayer;
 import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
@@ -142,13 +143,17 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     public boolean shouldContinueExecuting()
     {
 		//dbg("continue?");
-    	if (posCurMining == null) return false;
+    	if (posCurMining == null) {
+			dbg("shouldContinueExecuting fail because posCurMining == null");
+    		return false;
+		}
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
         IBlockState state = entity.world.getBlockState(pos);
     	if (!entity.world.isAirBlock(pos)) {
     		return true;
     	} else {
 			setMiningBlock(null, null);
+			dbg("shouldContinueExecuting fail because not air");
     		//System.out.println("ending execute");
     		return false;
     	}
@@ -171,6 +176,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     public void resetTask()
     {
     	//System.out.println("reset!");
+		//Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
     	digTimeCur = 0;
     	curBlockDamage = 0;
     	listPillarToMine.clear();
@@ -324,7 +330,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			}
 
 			if (!oneMinable) {
-				dbg("All air blocks, cancelling");
+				dbg("All air blocks or unmineable, cancelling");
 				listPillarToMine.clear();
 				return false;
 			}
@@ -400,13 +406,16 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		IBlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
 		Block block = state.getBlock();
 
-		while (entity.world.isAirBlock(posCurMining.toBlockPos())) {
-			dbg("Detected air, moving to next block in list, cur size: " + listPillarToMine.size());
+		while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getBlock())) {
+			dbg("Detected air or unmineable block, moving to next block in list, cur size: " + listPillarToMine.size());
 			if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
 				BlockPos pos = listPillarToMine.getFirst();
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 				//return;
+			} else {
+				resetTask();
+				return;
 			}
 
 			state = entity.world.getBlockState(posCurMining.toBlockPos());
@@ -414,7 +423,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		}
     	
     	//force stop mining if pushed away, or if block changed
-    	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 4) {
+    	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 6) {
 			dbg("too far or block changed state");
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
     		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
