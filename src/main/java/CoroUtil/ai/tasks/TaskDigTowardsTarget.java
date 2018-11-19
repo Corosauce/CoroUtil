@@ -505,7 +505,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 	public void dbg(String str) {
     	if (debug) {
-			System.out.println(str);
+    	    CULog.dbg(str);
+			//System.out.println(str);
 		}
 	}
 }
