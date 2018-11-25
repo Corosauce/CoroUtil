@@ -88,7 +88,7 @@ public class CommonProxy implements IGuiHandler
 
     public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName, boolean creativeTab) {
         addBlock(event, block, unlocalizedName, creativeTab);
-        GameRegistry.registerTileEntity(tEnt, unlocalizedName);
+        GameRegistry.registerTileEntity(tEnt, CoroUtil.modID + ":" + unlocalizedName);
     }
 
     public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName) {

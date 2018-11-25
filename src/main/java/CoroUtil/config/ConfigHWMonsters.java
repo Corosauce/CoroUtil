@@ -22,7 +22,7 @@ public class ConfigHWMonsters implements IConfigCategory {
 	
 	public static int antiAirLeapRate = 40;
 	
-	public static int antiAirTryDist = 20;
+	public static int antiAirTryDist = 20;/*
 	
 	@ConfigComment("Additional scaling for dynamic difficulty based health boost")
 	public static double scaleHealth = 1D;
@@ -43,7 +43,7 @@ public class ConfigHWMonsters implements IConfigCategory {
 	public static double scaleLeapAttackUseChance = 1D;
 	
 	@ConfigComment("0 to disable")
-	public static double scaleLungeUseChance = 1D;
+	public static double scaleLungeUseChance = 1D;*/
 	
 	public static double lungeDist = 7D;
 	public static double lungeSpeed = 0.3D;

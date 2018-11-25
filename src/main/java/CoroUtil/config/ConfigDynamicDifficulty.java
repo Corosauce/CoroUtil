@@ -7,7 +7,7 @@ import java.io.File;
 
 public class ConfigDynamicDifficulty implements IConfigCategory {
 
-	@ConfigComment("Track chunk bound data required for some difficulty calculations, disable if issues with server stability relating to CoroUtil")
+	@ConfigComment("Track chunk bound data required for some difficulty calculations, disable if issues with server stability relating to CoroUtil, will affect HW-Invasions")
 	public static boolean trackChunkData = true;
 	
 	@ConfigComment("How long it takes to reach max difficulty level for a specific player in gameplay ticks (50 hours)")

@@ -13,7 +13,7 @@ import java.util.List;
 public class CmodAIInfernal extends DataCmod {
     public List<String> modifiers;
 
-    public int count;
+    public int randomly_choose_count;
     public double difficulty_multiplier;
 
     @Override
@@ -29,6 +29,6 @@ public class CmodAIInfernal extends DataCmod {
             }
             mods += code + entry + ", ";
         }
-        return super.toString() + ", mods: " + mods;
+        return super.toString() + " randomly_choose_count: " + randomly_choose_count + ", difficulty_multiplier: " + difficulty_multiplier + ", mods: " + mods;
     }
 }

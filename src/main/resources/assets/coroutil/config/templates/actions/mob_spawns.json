@@ -27,6 +27,24 @@
               "template": "inventory_leather"
             }
           ]
+        },
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 5,
+          "count_max": 15,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_leather"
+            }
+          ]
         }
       ]
     },
@@ -54,6 +72,42 @@
             {
               "cmod": "template",
               "template": "inventory_leather"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_leather"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:skeleton"
+          ],
+          "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_leather_no_weapon"
             }
           ]
         }
@@ -169,6 +223,8 @@
             },
             {
               "cmod": "ai_infernal",
+              "randomly_choose_count": "10",
+              "difficulty_multiplier": 1.0,
               "modifiers": [
                 "1UP", "Alchemist", "Berserk", "Blastoff", "Bulwark", "Choke", "Cloaking", "Darkness", "Ender",
                 "Exhaust", "Fiery", "Ghastly", "Gravity", "LifeSteal", "Ninja", "Poisonous", "Quicksand", "Regen",
