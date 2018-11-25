@@ -87,19 +87,19 @@ public class CoroUtilCrossMod {
         }
     }
 
-    public static boolean infernalMobs_AddRandomModifiers(EntityLivingBase ent, int modifierCount) {
+    public static boolean infernalMobs_AddRandomModifiers(EntityLivingBase ent, List<String> listModifiersToUse, int modifierCount) {
         String listMods = "";
 
-        if (modifierCount >= listModifiers.size()) {
-            modifierCount = listModifiers.size() - 1;
+        if (modifierCount >= listModifiersToUse.size()) {
+            modifierCount = listModifiersToUse.size() - 1;
         }
 
         List<Integer> listInts = new ArrayList<>();
-        for (int i = 0; i < listModifiers.size(); i++) { listInts.add(i); }
+        for (int i = 0; i < listModifiersToUse.size(); i++) { listInts.add(i); }
         Collections.shuffle(listInts);
 
         for (int i = 0; i < modifierCount; i++) {
-            listMods += listModifiers.get(listInts.get(i)) + " ";
+            listMods += listModifiersToUse.get(listInts.get(i)) + " ";
         }
 
         if (!listMods.equals("")) {

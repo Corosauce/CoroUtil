@@ -13,6 +13,9 @@ import java.util.List;
 public class CmodAIInfernal extends DataCmod {
     public List<String> modifiers;
 
+    public int count;
+    public double difficulty_multiplier;
+
     @Override
     public String toString() {
         String mods = "";
