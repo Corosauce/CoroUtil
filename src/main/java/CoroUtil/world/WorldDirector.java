@@ -195,12 +195,12 @@ public class WorldDirector implements Runnable {
 		return lookupTickingManagedLocations.get(hash);
 	}
 	
-	public void tick() {
-		for (int i = 0; i < worldEvents.size(); i++) {
-			WorldEvent event = worldEvents.get(i);
+	public void tick(World world) {
+		for (Iterator<WorldEvent> iter = worldEvents.iterator(); iter.hasNext(); ) {
+			WorldEvent event = iter.next();
 			if (event.isComplete()) {
 				event.cleanup();
-				worldEvents.remove(i--);
+				iter.remove();
 			}
 		}
 		
@@ -220,8 +220,6 @@ public class WorldDirector implements Runnable {
 		for (ISimulationTickable entry : listTickingLocations) {
 			entry.tickUpdate();
 		}
-		
-		World world = getWorld();
 		
 		//update occupance chunk data for each player
 		if (ConfigCoroUtil.trackPlayerData) {

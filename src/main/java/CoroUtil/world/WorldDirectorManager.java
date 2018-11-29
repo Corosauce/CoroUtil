@@ -164,8 +164,9 @@ public class WorldDirectorManager {
 		while (it.hasNext()) {
 			WorldDirector wd = it.next();
 			//check if world is loaded
-			if (DimensionManager.getWorld(wd.dimID) != null) {
-				wd.tick();
+			World world = DimensionManager.getWorld(wd.dimID);
+			if (world != null) {
+				wd.tick(world);
 			}
 		}
 		
