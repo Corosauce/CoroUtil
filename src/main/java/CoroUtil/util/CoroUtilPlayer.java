@@ -6,9 +6,14 @@ import net.minecraft.entity.player.EntityPlayer;
 
 public class CoroUtilPlayer {
 
-	public static WeakHashMap<EntityPlayer, Vec3> lookupPlayerToLastPos = new WeakHashMap<EntityPlayer, Vec3>();
-	public static WeakHashMap<EntityPlayer, Vec3> lookupPlayerToLastSpeed = new WeakHashMap<EntityPlayer, Vec3>();
-	
+	public static WeakHashMap<EntityPlayer, Vec3> lookupPlayerToLastPos = new WeakHashMap<>();
+	public static WeakHashMap<EntityPlayer, Vec3> lookupPlayerToLastSpeed = new WeakHashMap<>();
+
+	/**
+	 * Currently used for tracking player SERVER SIDE speed
+	 *
+	 * @param player
+	 */
 	public static void trackPlayerForSpeed(EntityPlayer player) {
 		
 		//TODO: edge cases like teleporting and respawning, reconnecting, etc
@@ -27,7 +32,14 @@ public class CoroUtilPlayer {
 			lookupPlayerToLastPos.put(player, vecPos);
 		}
 	}
-	
+
+	/**
+	 * Currently used for player SERVER SIDE speed
+	 *
+	 * @param player
+	 * @param max
+	 * @return
+	 */
 	public static Vec3 getPlayerSpeedCapped(EntityPlayer player, float max) {
 		if (lookupPlayerToLastSpeed.containsKey(player)) {
 			Vec3 vec = lookupPlayerToLastSpeed.get(player);
