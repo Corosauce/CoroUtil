@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import modconfig.ConfigMod;
@@ -52,7 +53,7 @@ public class CoroUtil {
 	//public static final String version = "${version}";
 	//when we definitely need to enforce a new CoroUtil version outside dev, use this for production
 	//TODO: find a way to perminently do this for dev only
-	public static final String version = "1.12.1-1.2.14";
+	public static final String version = "1.12.1-1.2.15";
     
     @SidedProxy(clientSide = "CoroUtil.forge.ClientProxy", serverSide = "CoroUtil.forge.CommonProxy")
     public static CommonProxy proxy;
@@ -74,6 +75,7 @@ public class CoroUtil {
     	if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
 			ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
 			ConfigMod.addConfigFile(event, new ConfigHWMonsters());
+			ConfigMod.addConfigFile(event, new ConfigCoroUtilAdvanced());
 		}
 
 		/*DifficultyDataReader reader = new DifficultyDataReader();

@@ -1,5 +1,6 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.data.cmods.CmodTemplateReference;
 import CoroUtil.difficulty.data.conditions.ConditionTemplateReference;
 import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
@@ -27,8 +28,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         //since this class is run on multiple files, we cant just make a new instance each time, consider a refactor? loot tables arent handled in this class either
         DifficultyData data = DifficultyDataReader.getData();//new DifficultyData();
 
-        if (format.toLowerCase().equals("mob_spawns")) {
-            CULog.dbg("detected mob spawns to deserialize");
+        if (format.toLowerCase().equals(ConfigCoroUtilAdvanced.mobSpawnsProfile)) {
+            CULog.dbg("detected mob spawns to deserialize by detecting: " + ConfigCoroUtilAdvanced.mobSpawnsProfile);
             JsonElement eleTemplates = obj.get("templates");
 
             JsonArray arrTemplates = eleTemplates.getAsJsonArray();
@@ -40,10 +41,14 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 DataMobSpawnsTemplate template = new DataMobSpawnsTemplate();
                 template.name = objTemplate.get("name").getAsString();
 
-                //currently mob spawn template names arent referenced for anything, so no need to index by them or check for duplicate names
-                JsonArray arr = objTemplate.get("conditions").getAsJsonArray();
+                JsonArray arr;
 
-                template.conditions.addAll(getArray(arr, DataCondition.class));
+                //currently mob spawn template names arent referenced for anything, so no need to index by them or check for duplicate names
+                if (objTemplate.has("conditions")) {
+                    arr = objTemplate.get("conditions").getAsJsonArray();
+
+                    template.conditions.addAll(getArray(arr, DataCondition.class));
+                }
 
                 arr = objTemplate.get("spawns").getAsJsonArray();
                 Iterator<JsonElement> it = arr.iterator();
