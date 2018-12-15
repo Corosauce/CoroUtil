@@ -479,21 +479,45 @@ public class CommandCoroUtil extends CommandBase {
 					//System.out.println("testing biome entity spawn data for weights, show all? = " + showAll);
 
 					for (Biome biome : Biome.REGISTRY) {
+
+						if (showAll) {
+							var1.sendMessage(new TextComponentString("Processing entries for biome: " + biome.biomeName));
+						}
+
 						for (EnumCreatureType type : EnumCreatureType.values()) {
+
+							if (showAll) {
+								var1.sendMessage(new TextComponentString("Processing entries for EnumCreatureType: " + type.name()));
+							}
+
 							List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
-							boolean found = showAll;
+							boolean found = false;
 							int totalWeight = 0;
+
+							if (showAll) {
+								var1.sendMessage(new TextComponentString("SpawnListEntry size: " + list.size()));
+							}
+
 							for (Biome.SpawnListEntry entry : list) {
 								totalWeight += entry.itemWeight;
 								if (entry.itemWeight == 0) {
-									var1.sendMessage(new TextComponentString("found zero weight entry: " + entry.entityClass.getName()));
+									var1.sendMessage(new TextComponentString("found zero weight entry: " + entry.entityClass.getName() + " for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name()));
+									found = true;
 								} else if (showAll) {
 									var1.sendMessage(new TextComponentString("weight entry: " + entry.entityClass.getName() + "weight: " + entry.itemWeight));
 								}
 							}
+
 							if (found) {
-								var1.sendMessage(new TextComponentString("total weight: " + totalWeight + ", type: " + type.name()));
-								var1.sendMessage(new TextComponentString("biome: " + biome.getBiomeName()));
+								if (totalWeight == 0) {
+									var1.sendMessage(new TextComponentString("CRASH RISK! total weight is 0 but list is not empty, mods that add the entity classes above need to sanitize their config input to avoid adding 0 weight spawnables"));
+									var1.sendMessage(new TextComponentString("issue for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name() + "', SpawnListEntry size: " + list.size()));
+								}
+
+							}
+
+							if (showAll) {
+								var1.sendMessage(new TextComponentString("total weight of list: " + totalWeight));
 							}
 						}
 					}
