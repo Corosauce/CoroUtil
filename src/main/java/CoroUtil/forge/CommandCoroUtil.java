@@ -35,6 +35,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
 import CoroUtil.pathfinding.PFQueue;
@@ -469,6 +470,33 @@ public class CommandCoroUtil extends CommandBase {
 					IBlockState state = world.getBlockState(pos);
 
 					CoroUtilCompatibility.testPowerInfo(player, pos);
+				} else if (var2[0].equalsIgnoreCase("testBiomeSpawns")) {
+
+					boolean showAll = false;
+					if (var2.length >= 2) showAll = (var2[1].equalsIgnoreCase("all"));
+
+					var1.sendMessage(new TextComponentString("testing biome entity spawn data for weights, show all? = " + showAll));
+					//System.out.println("testing biome entity spawn data for weights, show all? = " + showAll);
+
+					for (Biome biome : Biome.REGISTRY) {
+						for (EnumCreatureType type : EnumCreatureType.values()) {
+							List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
+							boolean found = showAll;
+							int totalWeight = 0;
+							for (Biome.SpawnListEntry entry : list) {
+								totalWeight += entry.itemWeight;
+								if (entry.itemWeight == 0) {
+									var1.sendMessage(new TextComponentString("found zero weight entry: " + entry.entityClass.getName()));
+								} else if (showAll) {
+									var1.sendMessage(new TextComponentString("weight entry: " + entry.entityClass.getName() + "weight: " + entry.itemWeight));
+								}
+							}
+							if (found) {
+								var1.sendMessage(new TextComponentString("total weight: " + totalWeight + ", type: " + type.name()));
+								var1.sendMessage(new TextComponentString("biome: " + biome.getBiomeName()));
+							}
+						}
+					}
 				}
 			/*}*/
 		} catch (Exception ex) {
