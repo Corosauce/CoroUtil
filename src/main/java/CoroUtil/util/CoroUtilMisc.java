@@ -1,11 +1,16 @@
 package CoroUtil.util;
 
+import CoroUtil.forge.CULog;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.biome.Biome;
+
+import java.util.List;
 
 public class CoroUtilMisc {
 
@@ -103,5 +108,50 @@ public class CoroUtilMisc {
             }
         }
         return source;
+    }
+
+    /**
+     * Game likes to force an exception and crash out if a mod adds a zero weight spawn entry to a biome+enum ceature type when the total weight is zero for all entries in the list
+     * this method checks for this and removes them
+     */
+    public static void fixBadBiomeEntitySpawns() {
+        for (Biome biome : Biome.REGISTRY) {
+
+            for (EnumCreatureType type : EnumCreatureType.values()) {
+
+                List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
+                boolean found = false;
+                String str = "";
+                int totalWeight = 0;
+
+                for (Biome.SpawnListEntry entry : list) {
+                    totalWeight += entry.itemWeight;
+                    if (entry.itemWeight == 0) {
+                        found = true;
+                        str += entry.entityClass.getName() + ", ";
+                    }
+                }
+
+                if (found) {
+                    if (totalWeight == 0) {
+                        CULog.log("Detected issue for entity(s)" + str);
+                        CULog.log("Biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name() + "', SpawnListEntry size: " + list.size());
+                        CULog.log("Clearing relevant spawnableList to fix issue");
+                        //detected crashable state of data, clear out spawnlist then
+                        if (type == EnumCreatureType.MONSTER) {
+                            biome.spawnableMonsterList.clear();
+                        } else if (type == EnumCreatureType.CREATURE) {
+                            biome.spawnableCreatureList.clear();
+                        } else if (type == EnumCreatureType.WATER_CREATURE) {
+                            biome.spawnableWaterCreatureList.clear();
+                        } else if (type == EnumCreatureType.AMBIENT) {
+                            biome.spawnableCaveCreatureList.clear();
+                        } else {
+                            //theres also Biome.modSpawnableLists for modded entries, but ive decided not to care about this one
+                        }
+                    }
+                }
+            }
+        }
     }
 }

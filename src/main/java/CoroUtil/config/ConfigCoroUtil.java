@@ -61,6 +61,9 @@ public class ConfigCoroUtil implements IConfigCategory {
 
 	public static boolean useCoroPets = false;
 
+	@ConfigComment("Fix WorldEntitySpawner crash caused by other mods that look like this https://github.com/pWn3d1337/Techguns/issues/132")
+	public static boolean fixBadBiomeEntitySpawnEntries = false;
+
 	@ConfigComment("Use at own risk, will not support, requires game restart on change")
 	public static boolean enableAdvancedDeveloperConfigFiles = false;
 

@@ -13,6 +13,7 @@ import java.util.List;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.util.CoroUtilMisc;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
@@ -168,6 +169,13 @@ public class CoroUtil {
 				e.printStackTrace();
 			}
     	}
+
+    	if (ConfigCoroUtil.fixBadBiomeEntitySpawnEntries) {
+
+            CULog.log("fixBadBiomeEntitySpawnEntries enabled, scanning and fixing all biome entity spawn lists for potential crash risks");
+
+            CoroUtilMisc.fixBadBiomeEntitySpawns();
+        }
 	}
 
 	public void postInit() {
