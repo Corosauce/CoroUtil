@@ -2,6 +2,7 @@ package CoroUtil.ai.tasks;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
 import com.google.common.base.Predicate;
 import java.util.Comparator;
@@ -22,33 +23,6 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     protected EntityPlayer targetEntity;
 
     private boolean disableAtSunrise = true;
-
-    public EntityAINearestAttackablePlayerOmniscience() {
-        shouldCheckSight = false;
-        nearbyOnly = false;
-        this.targetClass = EntityPlayer.class;
-        this.targetChance = 40;
-        this.setMutexBits(0);
-        this.targetEntitySelector = new Predicate<T>()
-        {
-            public boolean apply(@Nullable T p_apply_1_)
-            {
-                if (p_apply_1_ == null)
-                {
-                    return false;
-                }
-                else
-                {
-                    return !EntitySelectors.NOT_SPECTATING.apply(p_apply_1_) ? false : true;
-                }
-            }
-        };
-    }
-
-    public EntityAINearestAttackablePlayerOmniscience(EntityCreature creature, boolean checkSight)
-    {
-        this(creature, checkSight, false);
-    }
 
     public EntityAINearestAttackablePlayerOmniscience(EntityCreature creature, boolean checkSight, boolean onlyNearby)
     {
@@ -76,10 +50,30 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
                 }
                 else
                 {
-                    return !EntitySelectors.NOT_SPECTATING.apply(p_apply_1_) ? false : true/*EntityAINearestAttackablePlayerOmniscience.this.isSuitableTarget(p_apply_1_, false)*/;
+                    return !EntitySelectors.NOT_SPECTATING.apply(p_apply_1_) ? false : EntityAINearestAttackablePlayerOmniscience.this.isPlayerItSpawnedForOrBlank(p_apply_1_);
                 }
             }
         };
+    }
+
+    /**
+     * A method used to see if an entity is a suitable target through a number of checks. Args : entity,
+     * canTargetInvinciblePlayer
+     */
+    protected boolean isPlayerItSpawnedForOrBlank(@Nullable EntityLivingBase target)
+    {
+        if (target instanceof EntityPlayer) {
+            if (this.taskOwner.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
+                String spawnName = this.taskOwner.getEntityData().getString(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor);
+                if (spawnName != null && target.getName().equals(spawnName)) {
+                    return true;
+                }
+            } else {
+                //if for some reason no name set, allow it to target any player
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
