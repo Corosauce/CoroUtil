@@ -35,21 +35,9 @@ public abstract class EntityAITargetBetter extends EntityAIBase
     protected EntityLivingBase target;
     protected int unseenMemoryTicks;
 
+    //needed for generic instantiation
     public EntityAITargetBetter() {
 
-    }
-
-    public EntityAITargetBetter(EntityCreature creature, boolean checkSight)
-    {
-        this(creature, checkSight, false);
-    }
-
-    public EntityAITargetBetter(EntityCreature creature, boolean checkSight, boolean onlyNearby)
-    {
-        this.unseenMemoryTicks = 60;
-        this.taskOwner = creature;
-        this.shouldCheckSight = checkSight;
-        this.nearbyOnly = onlyNearby;
     }
 
     /**

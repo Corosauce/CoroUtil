@@ -13,6 +13,7 @@ public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
     private EntityCreature entity = null;
     //private EntityLivingBase targetLastTracked = null;
 
+    //needed for generic instantiation
     public TaskCallForHelp()
     {
         //this.setMutexBits(3);

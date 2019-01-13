@@ -24,27 +24,18 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
 
     private boolean disableAtSunrise = true;
 
-    public EntityAINearestAttackablePlayerOmniscience(EntityCreature creature, boolean checkSight, boolean onlyNearby)
-    {
-        this(creature, 10, checkSight, onlyNearby, (Predicate)null);
-    }
-
-    public EntityAINearestAttackablePlayerOmniscience(EntityCreature creature, int chance, boolean checkSight, boolean onlyNearby, @Nullable final Predicate <? super T > targetSelector)
-    {
-        super(creature, checkSight, onlyNearby);
+    //needed for generic instantiation
+    public EntityAINearestAttackablePlayerOmniscience() {
+        shouldCheckSight = false;
+        nearbyOnly = false;
         this.targetClass = EntityPlayer.class;
-        this.targetChance = chance;
-        this.sorter = new EntityAINearestAttackablePlayerOmniscience.Sorter(creature);
-        this.setMutexBits(1);
+        this.targetChance = 40;
+        this.setMutexBits(0);
         this.targetEntitySelector = new Predicate<T>()
         {
             public boolean apply(@Nullable T p_apply_1_)
             {
                 if (p_apply_1_ == null)
-                {
-                    return false;
-                }
-                else if (targetSelector != null && !targetSelector.apply(p_apply_1_))
                 {
                     return false;
                 }

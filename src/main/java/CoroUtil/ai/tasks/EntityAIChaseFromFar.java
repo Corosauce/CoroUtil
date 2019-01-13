@@ -41,19 +41,11 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
 
     private boolean disableAtSunrise = true;
 
+    //needed for generic instantiation
     public EntityAIChaseFromFar() {
         this.speedTowardsTarget = 1;
         this.longMemory = false;
         this.setMutexBits(0);
-    }
-
-    public EntityAIChaseFromFar(EntityCreature creature, double speedIn, boolean useLongMemory)
-    {
-        this.attacker = creature;
-        this.world = creature.world;
-        this.speedTowardsTarget = speedIn;
-        this.longMemory = useLongMemory;
-        this.setMutexBits(3);
     }
 
     /**

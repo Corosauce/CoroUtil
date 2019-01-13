@@ -11,7 +11,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class EntityAIAttackMelee extends EntityAIBase implements ITaskInitializer
+public class EntityAIAttackMeleePassiveMobs extends EntityAIBase implements ITaskInitializer
 {
     World world;
     protected EntityCreature attacker;
@@ -31,19 +31,11 @@ public class EntityAIAttackMelee extends EntityAIBase implements ITaskInitialize
     private int failedPathFindingPenalty = 0;
     private boolean canPenalize = false;
 
-    public EntityAIAttackMelee()
+    //needed for generic instantiation
+    public EntityAIAttackMeleePassiveMobs()
     {
         this.speedTowardsTarget = 1;
         this.longMemory = false;
-        this.setMutexBits(3);
-    }
-
-    public EntityAIAttackMelee(EntityCreature creature, double speedIn, boolean useLongMemory)
-    {
-        this.attacker = creature;
-        this.world = creature.world;
-        this.speedTowardsTarget = speedIn;
-        this.longMemory = useLongMemory;
         this.setMutexBits(3);
     }
 

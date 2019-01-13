@@ -3,6 +3,7 @@
   "templates": [
     {
       "name": "invasion_stage_1_opt_1",
+      "wave_message": "mad cows!",
       "spawns": [
         {
           "entities": [

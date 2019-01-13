@@ -53,6 +53,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	/*public static String dataListPlayers = "HW_Inv_ActiveTimeStart";
 	public static String dataListPlayers = "HW_Inv_ActiveTimeEnd";*/
 
+	//needed for generic instantiation
     public TaskDigTowardsTarget()
     {
         this.setMutexBits(3);

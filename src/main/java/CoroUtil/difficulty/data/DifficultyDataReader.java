@@ -1,10 +1,9 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.ai.tasks.EntityAIAttackMelee;
+import CoroUtil.ai.tasks.EntityAIAttackMeleePassiveMobs;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.cmods.*;
@@ -141,7 +140,7 @@ public class DifficultyDataReader {
                 EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Attack_Melee,
-                EntityAIAttackMelee.class, 2));
+                EntityAIAttackMeleePassiveMobs.class, 2));
     }
 
     public static DifficultyData getData() {

@@ -12,6 +12,7 @@ import java.util.List;
 public class DataMobSpawnsTemplate {
 
     public String name;
+    public String wave_message = "<NULL>";
     public List<DataCondition> conditions = new ArrayList<>();
     public List<DataActionMobSpawns> spawns = new ArrayList<>();
 
@@ -24,6 +25,7 @@ public class DataMobSpawnsTemplate {
     @Override
     public String toString() {
         String str = TextFormatting.AQUA + "Profile: " + TextFormatting.RESET + name + " | ";
+        str += TextFormatting.AQUA + "Wave Message: " + TextFormatting.RESET + wave_message + " | ";
         for (DataActionMobSpawns spawn : spawns) {
             str += spawn.toString() + " | ";
         }

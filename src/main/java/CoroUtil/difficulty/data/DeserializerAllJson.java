@@ -41,6 +41,10 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
                 DataMobSpawnsTemplate template = new DataMobSpawnsTemplate();
                 template.name = objTemplate.get("name").getAsString();
 
+                if (objTemplate.has("wave_message")) {
+                    template.wave_message = objTemplate.get("wave_message").getAsString();
+                }
+
                 JsonArray arr;
 
                 //currently mob spawn template names arent referenced for anything, so no need to index by them or check for duplicate names

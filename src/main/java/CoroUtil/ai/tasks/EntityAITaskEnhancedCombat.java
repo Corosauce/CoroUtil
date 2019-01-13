@@ -59,27 +59,13 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     
     /*private boolean useLunging = false;
     private boolean useLeapAttack = false;*/
-    
+
+    //needed for generic instantiation
     public EntityAITaskEnhancedCombat() {
 		this.classTarget = EntityPlayer.class;
 		this.speedTowardsTarget = 1D;
         this.longMemory = false;
 	}
-
-    public EntityAITaskEnhancedCombat(EntityCreature p_i1635_1_, Class p_i1635_2_, double p_i1635_3_, boolean p_i1635_5_)
-    {
-        this(p_i1635_1_, p_i1635_3_, p_i1635_5_);
-        this.classTarget = p_i1635_2_;
-    }
-
-    public EntityAITaskEnhancedCombat(EntityCreature p_i1636_1_, double p_i1636_2_, boolean p_i1636_4_)
-    {
-        this.entity = p_i1636_1_;
-        this.worldObj = p_i1636_1_.world;
-        this.speedTowardsTarget = p_i1636_2_;
-        this.longMemory = p_i1636_4_;
-        this.setMutexBits(3);
-    }
 
     /**
      * Returns whether the EntityAIBase should begin execution.

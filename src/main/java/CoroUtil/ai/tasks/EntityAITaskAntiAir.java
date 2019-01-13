@@ -31,6 +31,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     
     private String dataPlayerLastPullDownTick = "HW_M_lastPullDownTick";
 
+	//needed for generic instantiation
     public EntityAITaskAntiAir()
     {
         //this.setMutexBits(3);
