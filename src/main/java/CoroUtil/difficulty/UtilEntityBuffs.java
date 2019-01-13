@@ -51,6 +51,10 @@ public class UtilEntityBuffs {
     //cached difficulty for when he was buffed, for reloading from disk
     public static String dataEntityBuffed_Difficulty = "CoroAI_HW_Difficulty";
 
+    //storing the player it spawned for, so we can make things like omniscience only work for specific player
+    //- important since we want other players to be able to opt out and be mostly safe
+    public static String dataEntityBuffed_PlayerSpawnedFor = "CoroAI_HW_PlayerSpawnedFor";
+
     //deprecating?
     public static String dataEntityBuffed_Tried = "CoroAI_HW_Buffed_AI_Tried";
 

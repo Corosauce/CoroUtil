@@ -40,7 +40,7 @@ public class BuffInventory extends BuffBase {
                 if (itemStack.getItem() instanceof ItemArmor) {
                     ItemArmor itemArmor = (ItemArmor) itemStack.getItem();
 
-                    UtilEntityBuffs.setEquipment(ent, itemArmor.getEquipmentSlot(), itemStack);
+                    UtilEntityBuffs.setEquipment(ent, itemArmor.armorType, itemStack);
                 }
             }
 
