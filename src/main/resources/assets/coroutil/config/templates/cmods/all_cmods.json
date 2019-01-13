@@ -37,6 +37,13 @@
           "comment": "//set the base health of a mob, difficulty_multiplier is used to multiply their health based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base health 40 * local difficulty 2.0 * multiplier 1.5 = 120 health"
         },
         {
+          "cmod": "attribute_attackdamage",
+          "base_value": 5,
+          "difficulty_multiplier": 1.5,
+
+          "comment": "//set the base damage of a mob, difficulty_multiplier is used to multiply their damage based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base health 5 * local difficulty 2.0 * multiplier 1.5 = 15 damage"
+        },
+        {
           "cmod": "attribute_speed",
           "base_value": 0.23,
           "difficulty_multiplier": 1.1,
@@ -69,6 +76,11 @@
           "cmod": "ai_lunge",
 
           "comment": "//gives a mob the ability to move faster towards the target when they are close"
+        },
+        {
+          "cmod": "ai_attack_melee",
+
+          "comment": "//gives a mob the ability to chase and hurt a target, use on mobs that didnt have a melee attack like passive mobs, use attribute_attackdamage cmod to set their attack damage"
         },
         {
           "cmod": "ai_infernal",

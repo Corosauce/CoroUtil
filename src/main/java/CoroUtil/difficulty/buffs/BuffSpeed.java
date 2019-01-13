@@ -4,6 +4,7 @@ import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.difficulty.data.cmods.CmodAttributeSpeed;
+import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilAttributes;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
@@ -45,6 +46,8 @@ public class BuffSpeed extends BuffBase {
              * - apply a multiplier that does exactly above, doable by operation 1 aka INCREMENT_MULTIPLY_BASE
              */
 
+            double oldVal = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+
             //set base value if we need to
             if (cmod.base_value != -1) {
                 ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
@@ -52,6 +55,8 @@ public class BuffSpeed extends BuffBase {
 
             double extraMultiplier = (difficulty * cmod.difficulty_multiplier);
             ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+
+            CULog.dbg("mob speed went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
         }
 
         /*double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();

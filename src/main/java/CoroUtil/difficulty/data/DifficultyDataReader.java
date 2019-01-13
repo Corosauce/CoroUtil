@@ -1,5 +1,6 @@
 package CoroUtil.difficulty.data;
 
+import CoroUtil.ai.tasks.EntityAIAttackMelee;
 import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
@@ -94,6 +95,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Inventory, CmodInventory.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_MobDrops, CmodMobDrops.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Health, CmodAttributeHealth.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AttackDamage, CmodAttributeAttackDamage.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Speed, CmodAttributeSpeed.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_XP, CmodXP.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, CmodAITaskBase.class);
@@ -102,6 +104,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap, CmodAITaskBase.class);
         //used to be "ai_lunge", how to resolve, separate tasks or a multi buff task that can be configured via adding or post adding?
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Lunge, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Attack_Melee, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Infernal, CmodAIInfernal.class);
         lookupJsonNameToCmodDeserializer.put("template", CmodTemplateReference.class);
 
@@ -120,7 +123,8 @@ public class DifficultyDataReader {
          */
 
         UtilEntityBuffs.registerBuff(new BuffHealth());
-        //registerBuff(new BuffSpeed());
+        UtilEntityBuffs.registerBuff(new BuffSpeed());
+        UtilEntityBuffs.registerBuff(new BuffAttackDamage());
         UtilEntityBuffs.registerBuff(new BuffXP());
         UtilEntityBuffs.registerBuff(new BuffMobDrops());
         UtilEntityBuffs.registerBuff(new BuffInventory());
@@ -135,6 +139,9 @@ public class DifficultyDataReader {
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Lunge,
                 EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
+
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Attack_Melee,
+                EntityAIAttackMelee.class, 2));
     }
 
     public static DifficultyData getData() {

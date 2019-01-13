@@ -5,14 +5,14 @@ import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -182,5 +182,67 @@ public class CoroUtilEntity {
             return false;
         }
         return true;
+    }
+
+    public static boolean attackEntityAsMobForPassives(EntityLivingBase source, Entity entityIn)
+    {
+
+        float f;
+        if (source.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE) != null) {
+            f = (float)source.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        } else {
+            //use default zombie damage of 3
+            f = 3;
+        }
+
+        int i = 0;
+
+        if (entityIn instanceof EntityLivingBase)
+        {
+            f += EnchantmentHelper.getModifierForCreature(source.getHeldItemMainhand(), ((EntityLivingBase)entityIn).getCreatureAttribute());
+            i += EnchantmentHelper.getKnockbackModifier(source);
+        }
+
+        boolean flag = entityIn.attackEntityFrom(DamageSource.causeMobDamage(source), f);
+
+        if (flag)
+        {
+            if (i > 0 && entityIn instanceof EntityLivingBase)
+            {
+                ((EntityLivingBase)entityIn).knockBack(source, (float)i * 0.5F, (double)MathHelper.sin(source.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(source.rotationYaw * 0.017453292F)));
+                source.motionX *= 0.6D;
+                source.motionZ *= 0.6D;
+            }
+
+            int j = EnchantmentHelper.getFireAspectModifier(source);
+
+            if (j > 0)
+            {
+                entityIn.setFire(j * 4);
+            }
+
+            if (entityIn instanceof EntityPlayer)
+            {
+                EntityPlayer entityplayer = (EntityPlayer)entityIn;
+                ItemStack itemstack = source.getHeldItemMainhand();
+                ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
+
+                if (!itemstack.isEmpty() && !itemstack1.isEmpty() && itemstack.getItem().canDisableShield(itemstack, itemstack1, entityplayer, source) && itemstack1.getItem().isShield(itemstack1, entityplayer))
+                {
+                    float f1 = 0.25F + (float)EnchantmentHelper.getEfficiencyModifier(source) * 0.05F;
+
+                    if (source.world.rand.nextFloat() < f1)
+                    {
+                        entityplayer.getCooldownTracker().setCooldown(itemstack1.getItem(), 100);
+                        source.world.setEntityState(entityplayer, (byte)30);
+                    }
+                }
+            }
+
+            //protected access, disable or use AT
+            //source.applyEnchantments(source, entityIn);
+        }
+
+        return flag;
     }
 }

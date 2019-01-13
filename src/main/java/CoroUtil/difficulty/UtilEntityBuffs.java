@@ -77,7 +77,9 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";
     public static String dataEntityBuffed_AI_AntiAir = "ai_antiair";
     public static String dataEntityBuffed_AI_Infernal = "ai_infernal";
+    public static String dataEntityBuffed_AI_Attack_Melee = "ai_attack_melee";
     public static String dataEntityBuffed_Health = "attribute_health";
+    public static String dataEntityBuffed_AttackDamage = "attribute_attackdamage";
     //public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
     public static String dataEntityBuffed_Inventory = "inventory";
     public static String dataEntityBuffed_Speed = "attribute_speed";
@@ -231,6 +233,7 @@ public class UtilEntityBuffs {
 
             return lookupBuffs.get(buffName).applyBuff(ent, difficulty);
         } else {
+            CULog.dbg("failed to find buff applying class by name: " + buffName);
             return false;
         }
     }
