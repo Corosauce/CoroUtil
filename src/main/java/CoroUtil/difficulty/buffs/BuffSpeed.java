@@ -16,9 +16,15 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
  */
 public class BuffSpeed extends BuffBase {
 
+    public boolean flying;
+
+    public BuffSpeed(boolean flying) {
+        this.flying = flying;
+    }
+
     @Override
     public String getTagName() {
-        return UtilEntityBuffs.dataEntityBuffed_Speed;
+        return flying ? UtilEntityBuffs.dataEntityBuffed_Speed_Flying : UtilEntityBuffs.dataEntityBuffed_Speed;
     }
 
     @Override
@@ -46,17 +52,33 @@ public class BuffSpeed extends BuffBase {
              * - apply a multiplier that does exactly above, doable by operation 1 aka INCREMENT_MULTIPLY_BASE
              */
 
-            double oldVal = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+            double extraMultiplier = (difficulty * cmod.difficulty_multiplier);
 
-            //set base value if we need to
-            if (cmod.base_value != -1) {
-                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
+            if (flying) {
+                if (ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED) != null) {
+                    double oldValFlying = ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue();
+                    ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.base_value);
+                    ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "flying speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+                    CULog.dbg("mob flying speed went from " + oldValFlying + " to " + ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
+                } else {
+                    //TODO: probably correct, maybe edge case where we should register it?
+                    CULog.err("mob flying cmod used on a mob that doesnt have a flying attribute registered");
+                }
+            } else {
+                double oldVal = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+
+                //set base value if we need to
+                if (cmod.base_value != -1) {
+                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
+                }
+                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+
+                CULog.dbg("mob speed went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
             }
 
-            double extraMultiplier = (difficulty * cmod.difficulty_multiplier);
-            ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
-            CULog.dbg("mob speed went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+
+
         }
 
         /*double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();

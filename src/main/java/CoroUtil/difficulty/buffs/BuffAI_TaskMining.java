@@ -23,7 +23,9 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
 
         CULog.dbg("applyBuffPost enhancing with digging: " + ent.getName());
 
-        ((PathNavigateGround)ent.getNavigator()).setBreakDoors(false);
+        if (ent.getNavigator() instanceof PathNavigateGround) {
+            ((PathNavigateGround)ent.getNavigator()).setBreakDoors(false);
+        }
 
         /**
          * These 2 might be redundantly applied during deserialization

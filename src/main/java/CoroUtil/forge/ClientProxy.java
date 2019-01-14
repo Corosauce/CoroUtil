@@ -1,12 +1,19 @@
 package CoroUtil.forge;
 
 import CoroUtil.block.BlockBlank;
+import CoroUtil.entity.EntityBatSmart;
+import CoroUtil.entity.render.RenderBatSmart;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderBat;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
@@ -24,6 +31,8 @@ public class ClientProxy extends CommonProxy
         super.init(pMod);
         
         ClientCommandHandler.instance.registerCommand(new CommandCoroUtilClient());
+
+        addMapping(EntityBatSmart.class, new RenderBatSmart(Minecraft.getMinecraft().getRenderManager()));
     }
 
     @Override
@@ -47,5 +56,9 @@ public class ClientProxy extends CommonProxy
         super.addItemBlock(event, item);
 
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+    }
+
+    private static void addMapping(Class<? extends Entity> entityClass, Render render) {
+        RenderingRegistry.registerEntityRenderingHandler(entityClass, render);
     }
 }

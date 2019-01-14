@@ -87,6 +87,7 @@ public class UtilEntityBuffs {
     //public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
     public static String dataEntityBuffed_Inventory = "inventory";
     public static String dataEntityBuffed_Speed = "attribute_speed";
+    public static String dataEntityBuffed_Speed_Flying = "attribute_speed_flying";
     public static String dataEntityBuffed_XP = "xp";
     public static String dataEntityBuffed_MobDrops = "mob_drops";
 

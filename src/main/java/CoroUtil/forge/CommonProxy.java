@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import CoroUtil.block.BlockBlank;
 import CoroUtil.block.BlockRepairingBlock;
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.entity.EntityBatSmart;
 import CoroUtil.item.ItemRepairingGel;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -18,6 +19,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod.EventBusSubscriber(modid = CoroUtil.modID)
@@ -47,6 +49,8 @@ public class CommonProxy implements IGuiHandler
     public void init(CoroUtil pMod)
     {
         mod = pMod;
+
+        addMapping(EntityBatSmart.class, "bat_smart", 0, 64, 2, true);
     }
 
 	@Override
@@ -136,5 +140,9 @@ public class CommonProxy implements IGuiHandler
 
     public String getNameDomained(String name) {
         return CoroUtil.modID + ":" + name;
+    }
+
+    public void addMapping(Class par0Class, String par1Str, int entityId, int distSync, int tickRateSync, boolean syncMotion) {
+        EntityRegistry.registerModEntity(new ResourceLocation(CoroUtil.modID, par1Str), par0Class, par1Str, entityId, CoroUtil.instance, distSync, tickRateSync, syncMotion);
     }
 }

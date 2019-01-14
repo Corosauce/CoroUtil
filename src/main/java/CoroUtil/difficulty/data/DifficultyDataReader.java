@@ -96,6 +96,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Health, CmodAttributeHealth.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AttackDamage, CmodAttributeAttackDamage.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Speed, CmodAttributeSpeed.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Speed_Flying, CmodAttributeSpeed.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_XP, CmodXP.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Digging, CmodAITaskBase.class);
@@ -122,7 +123,8 @@ public class DifficultyDataReader {
          */
 
         UtilEntityBuffs.registerBuff(new BuffHealth());
-        UtilEntityBuffs.registerBuff(new BuffSpeed());
+        UtilEntityBuffs.registerBuff(new BuffSpeed(false));
+        UtilEntityBuffs.registerBuff(new BuffSpeed(true));
         UtilEntityBuffs.registerBuff(new BuffAttackDamage());
         UtilEntityBuffs.registerBuff(new BuffXP());
         UtilEntityBuffs.registerBuff(new BuffMobDrops());

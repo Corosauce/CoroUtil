@@ -48,7 +48,14 @@
           "base_value": 0.23,
           "difficulty_multiplier": 1.1,
 
-          "comment": "//set the base speed of the mob, multiplication formula works the same as attribute_health, be carefull with this one so you dont get hyper speed mobs, vanilla zombie speed is 0.23 for reference"
+          "comment": "//set the base ground movement speed of the mob, multiplication formula works the same as attribute_health, be carefull with this one so you dont get hyper speed mobs, vanilla zombie speed is 0.23 for reference"
+        },
+        {
+          "cmod": "attribute_speed_flying",
+          "base_value": 0.4,
+          "difficulty_multiplier": 0.0,
+
+          "comment": "//same as attribute_speed but for flying entities when they arent touching the ground, because mojang, youll generally want a value 2-3x higher than the attribute_speed which is used for ground"
         },
         {
           "cmod": "xp",

@@ -3,27 +3,31 @@
   "templates": [
     {
       "name": "invasion_stage_1_opt_1",
-      "wave_message": "mad cows!",
+      "wave_message": "mad bats!",
       "spawns": [
         {
           "entities": [
-            "minecraft:cow"
+            "minecraft:bat"
           ],
-          "count": 5,
-          "count_max": 10,
+          "count": 25,
+          "count_max": 50,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
               "cmod": "ai_attack_melee"
             },
             {
-              "cmod": "attribute_attackdamage",
-              "base_value": 5,
-              "difficulty_multiplier": 1.5
+              "cmod": "template",
+              "template": "invader_miner"
             },
             {
-              "cmod": "attribute_speed",
-              "base_value": 0.30,
+              "cmod": "attribute_attackdamage",
+              "base_value": 5,
+              "difficulty_multiplier": 0.0
+            },
+            {
+              "cmod": "attribute_speed_flying",
+              "base_value": 3.0,
               "difficulty_multiplier": 0.0
             }
           ]
