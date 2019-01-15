@@ -1,5 +1,6 @@
 package CoroUtil.config;
 
+import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 
 import java.io.File;
@@ -7,6 +8,11 @@ import java.io.File;
 public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	public static String mobSpawnsProfile = "mob_spawns";
+
+	public static int ticksToRepairBlock = 20*60*5;
+
+	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the update, which is 30 seconds")
+	public static boolean repairBlockNextRandomTick = false;
 
 	@Override
 	public String getName() {

@@ -9,7 +9,8 @@
 
           "template": "boringvanilla",
 
-          "comment": "//since this is a template within a template, maybe dont allow it for now"
+          "comment": "//to save on copying and pasting, you can define templates with a set of cmods and refer to them using the template cmod, see invasions_cmods for my actual uses of them, and mob_spawns_example_commented for usage of them",
+          "comment2": "//you cant do templates within templates, so this entry isnt technically valid its just here to explain things, but within the mob_spawns json it would be valid"
         },
         {
           "cmod": "inventory",
@@ -34,14 +35,14 @@
           "base_value": 40,
           "difficulty_multiplier": 1.5,
 
-          "comment": "//set the base health of a mob, difficulty_multiplier is used to multiply their health based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base health 40 * local difficulty 2.0 * multiplier 1.5 = 120 health"
+          "comment": "//set the base health of a mob, difficulty_multiplier is used to multiply their health based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base value 40 + (base health 40 * local difficulty 2.0 * multiplier 1.5) = 120 health, set difficulty_multiplier to 0 or dont include the tag to make the value always be the base value"
         },
         {
           "cmod": "attribute_attackdamage",
           "base_value": 5,
           "difficulty_multiplier": 1.5,
 
-          "comment": "//set the base damage of a mob, difficulty_multiplier is used to multiply their damage based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base health 5 * local difficulty 2.0 * multiplier 1.5 = 15 damage"
+          "comment": "//set the base damage of a mob, difficulty_multiplier is used to multiply their damage based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base value 5 + (base value 5 * local difficulty 2.0 * multiplier 1.5) = 15 damage"
         },
         {
           "cmod": "attribute_speed",

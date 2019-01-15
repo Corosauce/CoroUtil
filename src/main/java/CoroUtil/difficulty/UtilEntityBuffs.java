@@ -1,28 +1,21 @@
 package CoroUtil.difficulty;
 
 import CoroUtil.ai.ITaskInitializer;
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DeserializerAllJson;
-import CoroUtil.difficulty.data.cmodinventory.DataEntryInventoryTemplate;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
-import CoroUtil.ai.tasks.EntityAITaskAntiAir;
-import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import com.google.gson.JsonArray;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.ai.EntityAIZombieAttack;
-import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -78,6 +71,7 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_AI_CounterLeap = "ai_counterattack";
     public static String dataEntityBuffed_AI_Lunge = "ai_lunge";
     public static String dataEntityBuffed_AI_Digging = "ai_mining";
+    public static String dataEntityBuffed_AI_ExplodeOnStuck = "ai_explodeonstuck";
     public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";
     public static String dataEntityBuffed_AI_AntiAir = "ai_antiair";
     public static String dataEntityBuffed_AI_Infernal = "ai_infernal";

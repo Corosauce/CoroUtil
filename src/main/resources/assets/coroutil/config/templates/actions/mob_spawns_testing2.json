@@ -7,18 +7,17 @@
       "spawns": [
         {
           "entities": [
-            "minecraft:bat"
+            "minecraft:creeper"
           ],
           "count": 25,
           "count_max": 50,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
-              "cmod": "ai_attack_melee"
+              "cmod": "ai_omniscience"
             },
             {
-              "cmod": "template",
-              "template": "invader_miner"
+              "cmod": "ai_explodeonstuck"
             },
             {
               "cmod": "attribute_attackdamage",

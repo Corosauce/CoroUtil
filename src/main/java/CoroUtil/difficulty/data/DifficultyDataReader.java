@@ -1,9 +1,6 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.ai.tasks.EntityAIAttackMeleePassiveMobs;
-import CoroUtil.ai.tasks.EntityAITaskAntiAir;
-import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.ai.tasks.*;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.cmods.*;
@@ -100,6 +97,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_XP, CmodXP.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Digging, CmodAITaskBase.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_ExplodeOnStuck, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap, CmodAITaskBase.class);
         //used to be "ai_lunge", how to resolve, separate tasks or a multi buff task that can be configured via adding or post adding?
@@ -132,6 +130,8 @@ public class DifficultyDataReader {
         UtilEntityBuffs.registerBuff(new BuffAI_Infernal());
         UtilEntityBuffs.registerBuff(new BuffAI_TaskMining(UtilEntityBuffs.dataEntityBuffed_AI_Digging,
                 TaskDigTowardsTarget.class, 5));
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_ExplodeOnStuck,
+                TaskExplodeTowardsTarget.class, 3));
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_AntiAir,
                 EntityAITaskAntiAir.class, 3));
         UtilEntityBuffs.registerBuff(new BuffAI_TaskOmniscience(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience));

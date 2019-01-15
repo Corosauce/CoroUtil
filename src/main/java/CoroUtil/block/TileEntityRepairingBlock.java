@@ -1,6 +1,7 @@
 package CoroUtil.block;
 
 import CoroUtil.config.ConfigCoroUtil;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import CoroUtil.forge.CoroUtil;
@@ -48,7 +49,7 @@ public class TileEntityRepairingBlock extends TileEntity
 
                 //System.out.println(listTest.size());
 
-                if (world.getTotalWorldTime() > timeToRepairAt) {
+                if (world.getTotalWorldTime() > timeToRepairAt || ConfigCoroUtilAdvanced.repairBlockNextRandomTick) {
                     AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
                     aabb = aabb.offset(this.getPos());
                     List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
@@ -160,7 +161,7 @@ public class TileEntityRepairingBlock extends TileEntity
     }
 
     public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos) {
-        return replaceBlockAndBackup(world, pos, 20*60*5);
+        return replaceBlockAndBackup(world, pos, ConfigCoroUtilAdvanced.ticksToRepairBlock);
     }
 
     /**

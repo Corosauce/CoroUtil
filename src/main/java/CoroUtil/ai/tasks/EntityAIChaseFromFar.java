@@ -73,6 +73,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
                 {
                     //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
                     CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
+                    this.entityPathEntity = attacker.getNavigator().getPath();
                     this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
                     return this.entityPathEntity != null;
                 }
@@ -83,6 +84,9 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             }
             //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
             CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
+
+            //oops, didnt set the field before...
+            this.entityPathEntity = attacker.getNavigator().getPath();
 
             if (this.entityPathEntity != null)
             {
@@ -165,6 +169,11 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     public void updateTask()
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+        //fix edge case where other code was causing this situation
+        if (entitylivingbase == null) {
+            resetTask();
+            return;
+        }
         this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
         double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
         --this.delayCounter;
