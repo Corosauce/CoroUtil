@@ -25,14 +25,20 @@
           ],
           "comment": "//a list of entities spawnable for this profile, minimum entry of 1 required, will randomize between them",
           "count": 2,
-          "comment2": "//the minimum base amount that will spawn at difficulty of 0, if the entities list above has multiple entries, it will not increase the amount spawned",
+          "comment": "//the minimum base amount that will spawn at difficulty of 0, if the entities list above has multiple entries, it will not increase the amount spawned",
           "count_max": 5,
-          "comment3": "//optional, a safety hard limit on the max spawnable, even if difficulty multiplier is over this amount",
+          "comment": "//optional, a safety hard limit on the max spawnable, even if difficulty multiplier is over this amount",
           "count_difficulty_multiplier": 2,
-          "comment4": "//multiplies the amount that will spawn by local dynamic difficulty * this multiplier",
-          "comment5": "//the formula is: count + (count * difficulty * count_difficulty_multiplier)",
-          "comment6": "//example: with a count of 5, difficulty of 0.5 and count_difficulty_multiplier of 2: 5 + (5 * 0.5 * 2) = 10",
-          "comment7": "//setting count_difficulty_multiplier to 0 will make the amount of mobs spawned always equal the count field",
+          "comment": "//multiplies the amount that will spawn by local dynamic difficulty * this multiplier",
+          "comment": "//the formula is: count + (count * difficulty * count_difficulty_multiplier)",
+          "comment": "//example: with a count of 5, difficulty of 0.5 and count_difficulty_multiplier of 2: 5 + (5 * 0.5 * 2) = 10",
+          "comment": "//setting count_difficulty_multiplier to 0 will make the amount of mobs spawned always equal the count field",
+          "spawn_type": "ground",
+          "comment": "//optional, specifies how to spawn the entities in the list, choices are: ground, air, water",
+          "comment": "//if ground: will try to spawn either on the surface or in a cave depending on where the player is",
+          "comment": "//if air: will try to spawn in open air, not requiring a block under it",
+          "comment": "//if water: will try to spawn underwater",
+
           "cmods": [
             {
               "cmod": "template",
@@ -47,7 +53,7 @@
           "comment": "//cmods are optional, but should be structured like this above, see json file all_cmods for everything you can use"
         },
         {
-          "comment0": "//you can have multiple object entries in the spawns array, this is the second, this is the last comment, everything below is just more examples of the same structures",
+          "comment": "//you can have multiple object entries in the spawns array, this is the second, this is the last comment, everything below is just more examples of the same structures",
           "entities": [
             "minecraft:zombie"
           ],

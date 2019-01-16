@@ -4,6 +4,7 @@ import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DeserializerAllJson;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.util.CoroUtilEntity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class DataActionMobSpawns {
     public int count;
     public int count_max = -1;
     public double count_difficulty_multiplier = 0;
+    public EntityLiving.SpawnPlacementType spawnType = EntityLiving.SpawnPlacementType.ON_GROUND;
 
     public List<String> entities = new ArrayList<>();
     public List<DataCmod> cmods = new ArrayList<>();

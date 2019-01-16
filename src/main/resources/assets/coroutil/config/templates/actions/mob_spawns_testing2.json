@@ -9,9 +9,14 @@
           "entities": [
             "minecraft:creeper"
           ],
-          "count": 25,
-          "count_max": 50,
+          "count": 100,
+          "count_max": 150,
           "count_difficulty_multiplier": 2,
+          "spawn_type": "ground",
+          "spawn_type": "surface",
+          "spawn_type": "caves",
+          "spawn_type": "air",
+          "spawn_type": "water",
           "cmods": [
             {
               "cmod": "ai_omniscience"

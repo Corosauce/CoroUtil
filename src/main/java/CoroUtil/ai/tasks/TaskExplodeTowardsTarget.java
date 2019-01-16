@@ -176,6 +176,8 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
 	}
 
 	/**
+	 * Figure out if we are as close as possible to target and cant path any better route
+	 *
 	 * Since we cant be fully sure last time they tried to path and it failed, lets do it ourselves
 	 * must be carefull to not overuse, this is expensive
 	 * might be best to just be a temp solution?
@@ -190,7 +192,41 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
 				failedPathCount = 0;
 				return false;
 			}
-			if (entity.onGround) {
+			if (entity.onGround || entity.isInWater()) {
+
+				//new rule to fix being above target but always pathing
+				//AIChaseFromFar uses my long distance pathing, which tries really hard to give them a path, even when directly below their target
+				//so they keep wandering around randomly given paths never staying still for long, this code is to work around that issue
+				boolean explodeAboveInstantly = true;
+				if (explodeAboveInstantly) {
+					double vecX = entity.getAttackTarget().posX - entity.posX;
+					//feet
+					double vecY = entity.getAttackTarget().getEntityBoundingBox().minY - entity.getEntityBoundingBox().minY;
+					double vecZ = entity.getAttackTarget().posZ - entity.posZ;
+
+					double distHoriz = Math.sqrt(vecX * vecX + vecZ * vecZ);
+					if (distHoriz < 0) distHoriz = 1;
+
+					double factor = vecY / distHoriz;
+
+					/**
+					 * target is:
+					 * 0 = even
+					 * - = down
+					 * + = up
+					 */
+
+					//if 5 blocks above them and within 5 away xz
+					if (factor < -5 && distHoriz < 5) {
+						//dbg("factor: " + factor + ", " + noMoveTicks);
+						//special rule, just force the explode if theyve just barely not moved
+						if (noMoveTicks > 15) {
+							explode();
+							resetTask();
+						}
+						return true;
+					}
+				}
 
 				//abort any future cpu use if it actually has a current path
 				if (!entity.getNavigator().noPath() || (entity.getNavigator().getPath() != null && entity.getNavigator().getPath().getCurrentPathLength() > 1)) {
@@ -205,6 +241,7 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
 				//this probably isnt actually needed since we above made sure they didnt already have a good path, but ehhh
 				Path lastPath = entity.getNavigator().getPath();
 
+				//Path newPath = this.entity.getNavigator().getPathToEntityLiving(entity.getAttackTarget());
 				CoroUtilPath.tryMoveToEntityLivingLongDist(entity, entity.getAttackTarget(), 1);
 
 				//now that tryMoveToEntityLivingLongDist, get the path it maybe set
@@ -221,7 +258,7 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
 						CULog.dbg("path len: " + newPath.getCurrentPathLength());
 					}*/
 					failedPathCount++;
-					CULog.dbg("failedPathCount: " + failedPathCount + ", noMoveTicks: " + noMoveTicks);
+					//CULog.dbg("failedPathCount: " + failedPathCount + ", noMoveTicks: " + noMoveTicks);
 					if (failedPathCount >= 2) {
 						failedPathCount = 0;
 						return true;

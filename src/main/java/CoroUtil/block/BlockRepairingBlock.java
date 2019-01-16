@@ -116,7 +116,7 @@ public class BlockRepairingBlock extends BlockContainer
         TileEntity tEnt = worldIn.getTileEntity(pos);
 
         if (tEnt instanceof TileEntityRepairingBlock) {
-            return ((TileEntityRepairingBlock) tEnt).getOrig_hardness();
+            return 0;//((TileEntityRepairingBlock) tEnt).getOrig_hardness();
         } else {
             return super.getBlockHardness(blockState, worldIn, pos);
         }
@@ -127,7 +127,8 @@ public class BlockRepairingBlock extends BlockContainer
         TileEntity tEnt = world.getTileEntity(pos);
 
         if (tEnt instanceof TileEntityRepairingBlock) {
-            return ((TileEntityRepairingBlock) tEnt).getOrig_explosionResistance();
+            //was preventing explosions from spreading more, so use 0, its not supposed to interfere
+            return 0;//((TileEntityRepairingBlock) tEnt).getOrig_explosionResistance();
         } else {
             return super.getExplosionResistance(world, pos, exploder, explosion);
         }

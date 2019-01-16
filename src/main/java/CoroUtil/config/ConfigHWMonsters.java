@@ -59,7 +59,11 @@ public class ConfigHWMonsters implements IConfigCategory {
 
 	public static boolean genTotems = true;
 
+	@ConfigComment("This will also do what explosionsDontDestroyTileEntities does since I cant convert those to repairing blocks")
 	public static boolean explosionsTurnIntoRepairingBlocks = false;
+
+	@ConfigComment("This will protect things like chests, furnaces, any more complex blocks that have inventories etc")
+	public static boolean explosionsDontDestroyTileEntities = false;
 
 
 	@Override

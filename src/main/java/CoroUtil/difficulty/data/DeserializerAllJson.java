@@ -7,6 +7,7 @@ import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
 import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import CoroUtil.forge.CULog;
 import com.google.gson.*;
+import net.minecraft.entity.EntityLiving;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -132,6 +133,17 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         }
         if (json.has("count_difficulty_multiplier")) {
             spawnTemplate.count_difficulty_multiplier = json.get("count_difficulty_multiplier").getAsDouble();
+        }
+
+        if (json.has("spawn_type")) {
+            String spawnType = json.get("spawn_type").getAsString();
+            if (spawnType.equals("ground")) {
+                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.ON_GROUND;
+            } else if (spawnType.equals("air")) {
+                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.IN_AIR;
+            } else if (spawnType.equals("water")) {
+                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.IN_WATER;
+            }
         }
 
         JsonArray arr2 = json.get("entities").getAsJsonArray();

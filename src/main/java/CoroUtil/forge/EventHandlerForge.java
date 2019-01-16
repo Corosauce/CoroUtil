@@ -353,22 +353,32 @@ public class EventHandlerForge {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void explosionEvent(ExplosionEvent event) {
-		if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks) {
+
+		if (event.getWorld().isRemote) return;
+
+		if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks || ConfigHWMonsters.explosionsDontDestroyTileEntities) {
 			//since we currently dont support dealing with them, just prevent them from breaking at all
 			boolean protectTileEntities = true;
 			List<BlockPos> listPos = event.getExplosion().getAffectedBlockPositions();
 
-			for (BlockPos pos : listPos) {
-				IBlockState state = event.getWorld().getBlockState(pos);
-				if (UtilMining.canMineBlock(event.getWorld(), pos, state.getBlock()) &&
-						UtilMining.canConvertToRepairingBlock(event.getWorld(), state)) {
-					TileEntityRepairingBlock.replaceBlockAndBackup(event.getWorld(), pos);
-				} else {
-					//TODO: what do i do with these blocks then, for now just do nothing and they are protected
+			//listPos.forEach(() -> );
+			for (Iterator<BlockPos> it = listPos.iterator(); it.hasNext();) {
+				BlockPos pos = it.next();
+				if (ConfigHWMonsters.explosionsDontDestroyTileEntities && event.getWorld().getTileEntity(pos) != null) {
+					it.remove();
+				} else if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks) {
+					IBlockState state = event.getWorld().getBlockState(pos);
+					if (UtilMining.canMineBlock(event.getWorld(), pos, state.getBlock()) &&
+							UtilMining.canConvertToRepairingBlock(event.getWorld(), state)) {
+						TileEntityRepairingBlock.replaceBlockAndBackup(event.getWorld(), pos);
+					}
+
+					//always protect when this setting on, either its replaced (block) or not destroyed (tile entity)
+					it.remove();
 				}
 			}
 
-			event.getExplosion().clearAffectedBlockPositions();
+			//event.getExplosion().clearAffectedBlockPositions();
 		}
 	}
 }

@@ -219,6 +219,11 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             {
                 this.delayCounter += 15;
             }
+
+            /*if (!this.attacker.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.speedTowardsTarget))
+            {
+                this.delayCounter += 15;
+            }*/
         }
 
         this.attackTick = Math.max(this.attackTick - 1, 0);
