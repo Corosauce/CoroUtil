@@ -20,6 +20,8 @@ public class BlockDataPoint
     
     //runtime instance data
     public float health;
+    public float digDamage;
+    public long lastTickTimeDig; //uses gettotalworldtime
     /** currently used by desire paths **/
     public long lastTickTimeGrass; //uses gettotalworldtime
 
@@ -80,6 +82,9 @@ public class BlockDataPoint
     	/*if (health < BlockStaticDataMap.getBlockMaxHealth(blockID)) {
     		return false;
     	}*/
+        if (digDamage > 0F) {
+            return false;
+        }
     	/** lets count this is keepable data, so that when grass changes stage, we can still scale the rate of growth without a reset
          * **/
         if (lastTickTimeGrass > 0F) {
@@ -136,7 +141,9 @@ public class BlockDataPoint
     	blockMeta = nbt.getInteger("blockMeta");
     	
     	health = nbt.getFloat("health");
+        digDamage = nbt.getFloat("digDamage");
     	lastTickTimeGrass = nbt.getLong("lastTickTimeGrass");
+        lastTickTimeDig = nbt.getLong("lastTickTimeDig");
     	creationType = nbt.getByte("creationType");
     	walkedOnAmount = nbt.getFloat("walkedOnAmount");
     	/*xCoord = nbt.getInteger("xCoord");
@@ -153,7 +160,9 @@ public class BlockDataPoint
     	nbt.setInteger("blockMeta", blockMeta);
     	
     	nbt.setFloat("health", health);
+        nbt.setFloat("digDamage", digDamage);
     	nbt.setLong("lastTickTimeGrass", lastTickTimeGrass);
+        nbt.setLong("lastTickTimeDig", lastTickTimeDig);
     	nbt.setByte("creationType", creationType);
     	nbt.setFloat("walkedOnAmount", walkedOnAmount);
     	nbt.setInteger("xCoord", xCoord);

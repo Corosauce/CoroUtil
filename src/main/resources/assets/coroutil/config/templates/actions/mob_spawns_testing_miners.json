@@ -1,0 +1,40 @@
+{
+  "format": "mob_spawns_testing_miners",
+  "templates": [
+    {
+      "name": "invasion_stage_1_opt_1",
+      "wave_message": "miners!",
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 10,
+          "count_difficulty_multiplier": 0,
+          "spawn_type": "surface",
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_leather"
+            },
+            {
+              "cmod": "attribute_attackdamage",
+              "base_value": 5,
+              "difficulty_multiplier": 0.0
+            },
+            {
+              "cmod": "attribute_speed",
+              "base_value": 0.33,
+              "difficulty_multiplier": 0.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+
+}

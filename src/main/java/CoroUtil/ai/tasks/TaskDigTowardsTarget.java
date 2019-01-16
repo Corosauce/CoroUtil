@@ -7,12 +7,15 @@ import java.util.Random;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilPlayer;
 import CoroUtil.util.UtilMining;
+import CoroUtil.world.WorldDirectorManager;
+import CoroUtil.world.grid.block.BlockDataPoint;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -28,6 +31,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.util.BlockCoord;
+import net.minecraft.util.math.Vec3d;
 
 public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
 {
@@ -37,11 +41,13 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     private EntityLivingBase targetLastTracked = null;
     private int digTimeCur = 0;
     private int digTimeMax = 15*20;
-    private double curBlockDamage = 0D;
+    //private double curBlockDamage = 0D;
     private int noMoveTicks = 0;
     private ArrayDeque<BlockPos> listPillarToMine = new ArrayDeque<>();
 
-    public boolean debug = true;
+	private Vec3d posLastTracked = null;
+
+    public boolean debug = false;
 
 	/**
 	 * Fields used when task is added via invasions, but not via hwmonsters, or do we want that too?
@@ -76,14 +82,25 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	 */
     	double movementThreshold = 0.05D;
     	int noMoveThreshold = 5;
-    	if (posCurMining == null && entity.motionX < movementThreshold && entity.motionX > -movementThreshold && 
+    	/*if (posCurMining == null && entity.motionX < movementThreshold && entity.motionX > -movementThreshold &&
     			entity.motionZ < movementThreshold && entity.motionZ > -movementThreshold) {
     		
     		noMoveTicks++;
     		
     	} else {
     		noMoveTicks = 0;
-    	}
+    	}*/
+
+		if (posLastTracked == null) {
+			posLastTracked = entity.getPositionVector();
+		} else {
+			if (posLastTracked.distanceTo(entity.getPositionVector()) < 2) {
+				noMoveTicks++;
+			} else {
+				posLastTracked = entity.getPositionVector();
+				noMoveTicks = 0;
+			}
+		}
     	
     	//System.out.println("noMoveTicks: " + noMoveTicks);
     	/*if (noMoveTicks > noMoveThreshold) {
@@ -149,8 +166,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		return false;
 		}
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
-        IBlockState state = entity.world.getBlockState(pos);
-    	if (!entity.world.isAirBlock(pos)) {
+        //IBlockState state = entity.world.getBlockState(pos);
+    	if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
     		return true;
     	} else {
 			setMiningBlock(null, null);
@@ -179,7 +196,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	//System.out.println("reset!");
 		//Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
     	digTimeCur = 0;
-    	curBlockDamage = 0;
+    	//curBlockDamage = 0;
     	listPillarToMine.clear();
 		setMiningBlock(null, null);
     }
@@ -192,6 +209,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     public void updateTask()
     {
     	//System.out.println("running!");
+		entity.idleTime = 0;
     	
     	if (entity.getAttackTarget() != null) {
     		targetLastTracked = entity.getAttackTarget();
@@ -216,6 +234,10 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 		double entPosX = Math.floor(entity.posX) + 0.5F;
 		double entPosZ = Math.floor(entity.posZ) + 0.5F;
+
+		//hmm trying to fix a weird diagonal bug:
+		/*entPosX = entity.posX;
+		entPosZ = entity.posZ;*/
     	
     	double vecX = entity.getAttackTarget().posX - entPosX;
     	//feet
@@ -224,7 +246,11 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
     	//get angle, snap it to 90, then reconvert back to scalar which is now locked to best 90 degree option
 		double angle = Math.atan2(vecZ, vecX);
-		angle = Math.round(Math.toDegrees(angle) / 90) * 90;
+		//i think angle snapping is having issues, doing weird things to xz diagonal digging
+		//more random!
+		//if (entity.world.rand.nextBoolean()) {
+			angle = Math.round(Math.toDegrees(angle) / 90D) * 90;
+		//}
 		//verified this matched the original scalar version of vecX / Z vars before it was snapped to 90
 		double relX = Math.cos(angle);
 		double relZ = Math.sin(angle);
@@ -282,6 +308,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			 * - just up?
 			 */
 
+			boolean wasDiggingStrait = false;
+
 			if (factor <= -0.3F) {
 
 				//down
@@ -293,7 +321,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 			} else if (factor >= 0.1F) {
 
-				if (!entity.world.isAirBlock(posFeetCheck.up(2))) {
+				if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
 					dbg("Detected block above head, dig it out");
 					listPillarToMine.add(posFeetCheck.up(2));
 				} else {
@@ -308,6 +336,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 			} else {
 
+				wasDiggingStrait = true;
 				//strait
 				dbg("Digging Strait");
 				listPillarToMine.add(posFrontFeet.up(1));
@@ -331,9 +360,62 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			}
 
 			if (!oneMinable) {
-				dbg("All air blocks or unmineable, cancelling");
+				dbg("All air blocks or unmineable, trying to fallback to alternate");
 				listPillarToMine.clear();
-				return false;
+
+				//second try, to try to fix an AI loop maybe caused by aquard angles or the repairing block, a bit of a hack fix, and messy duplicated code
+				//TODO: also consider trying the alternate too, if up or down is failing, dig strait instead, both should realign eachother?
+				//we are now
+
+				//weird issues, lets try random again
+				wasDiggingStrait = entity.world.rand.nextBoolean();
+				if (wasDiggingStrait) {
+					if (factor < 0F) {
+						//down
+						dbg("Digging Down Fallback try, but not infront of feet, instead directly under");
+						listPillarToMine.add(posFeetCheck.up(1));
+						listPillarToMine.add(posFeetCheck);
+						listPillarToMine.add(posFeetCheck.down(1));
+					} else if (factor >= 0F) {
+						if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+							IBlockState check = entity.world.getBlockState(posFeetCheck.up(2));
+							dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
+							listPillarToMine.add(posFeetCheck.up(2));
+						} else {
+							//up
+							dbg("Digging Up Fallback try");
+							listPillarToMine.add(posFrontFeet.up(1));
+							listPillarToMine.add(posFrontFeet.up(2));
+							listPillarToMine.add(posFrontFeet.up(3));
+						}
+					}
+				} else {
+					dbg("Digging Strait Fallback try");
+					listPillarToMine.add(posFrontFeet.up(1));
+					listPillarToMine.add(posFrontFeet);
+				}
+
+
+				for (BlockPos pos : listPillarToMine) {
+					IBlockState state = entity.world.getBlockState(pos);
+					dbg("set try2: " + pos + " - " + state.getBlock());
+				}
+
+				for (BlockPos pos : listPillarToMine) {
+					//allow for air for now
+					if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+						oneMinable = true;
+						break;
+					}
+				}
+
+				if (!oneMinable) {
+					dbg("All air blocks or unmineable, fallback failed, cancelling");
+					listPillarToMine.clear();
+					return false;
+				}
+
+				//return false;
 			}
 
 			setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
@@ -415,6 +497,9 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 				//return;
 			} else {
+				//try to move into the spot, sometimes vanilla/my other pathing wont move them into it
+				//nm might have been cause testing while spectating in a wall
+				//entity.getNavigator().tryMoveToXYZ(posCurMining.posX, posCurMining.posY, posCurMining.posZ, 1);
 				resetTask();
 				return;
 			}
@@ -432,7 +517,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		return;
     	}
     	
-    	entity.getNavigator().clearPathEntity();
+    	//entity.getNavigator().clearPathEntity();
     	
     	//Block block = entity.world.getBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
     	//double blockStrength = block.getBlockHardness(entity.world, posCurMining.posX, posCurMining.posY, posCurMining.posZ);
@@ -452,13 +537,25 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			entity.swingArm(EnumHand.MAIN_HAND);
 			//System.out.println("swing!");
 
-			entity.world.playSound(null, new BlockPos(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ()), block.getSoundType(state, entity.world, posCurMining.toBlockPos(), entity).getBreakSound(), SoundCategory.HOSTILE, 0.5F, 1F);
+			entity.world.playSound(null, posCurMining.toBlockPos(), block.getSoundType(state, entity.world, posCurMining.toBlockPos(), entity).getBreakSound(), SoundCategory.HOSTILE, 0.5F, 1F);
 			//entity.world.playSoundEffect(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ(), block.stepSound.getBreakSound(), 0.5F, 1F);
 		}
     	
-    	curBlockDamage += 0.01D / blockStrength;
+    	//curBlockDamage += 0.01D / blockStrength;
+		BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(entity.world).getBlockData(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ());// ServerTickHandler.wd.getBlockDataGrid(world).getBlockData(newX, newY, newZ);
+		//only allow continual progress if was dug at within last 30 seconds
+		int maxTimeBetweenDigProgress = 20*30;
+		if (bdp.lastTickTimeDig + maxTimeBetweenDigProgress > entity.world.getTotalWorldTime()) {
+			//do nothing?
+		} else {
+			//reset it
+			bdp.digDamage = 0;
+		}
+		bdp.lastTickTimeDig = entity.world.getTotalWorldTime();
+		double digSpeed = ConfigCoroUtilAdvanced.digSpeed;
+		bdp.digDamage += digSpeed / blockStrength;
     	
-    	if (curBlockDamage > 1D) {
+    	if (bdp.digDamage > 1D) {
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
     		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
     		//entity.world.setBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ, Blocks.AIR);
@@ -480,11 +577,11 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			}
 
 
-            curBlockDamage = 0;
+			bdp.digDamage = 0;
     		
     	} else {
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, (int)(curBlockDamage * 10D));
-    		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), (int)(curBlockDamage * 10D));
+    		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), (int)(bdp.digDamage * 10D));
     	}
     }
 
@@ -505,6 +602,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	}
 
 	public void dbg(String str) {
+		debug = true;
     	if (debug) {
     	    CULog.dbg(str);
 			//System.out.println(str);

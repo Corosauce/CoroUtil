@@ -34,8 +34,10 @@
           "comment": "//example: with a count of 5, difficulty of 0.5 and count_difficulty_multiplier of 2: 5 + (5 * 0.5 * 2) = 10",
           "comment": "//setting count_difficulty_multiplier to 0 will make the amount of mobs spawned always equal the count field",
           "spawn_type": "ground",
-          "comment": "//optional, specifies how to spawn the entities in the list, choices are: ground, air, water",
+          "comment": "//optional, specifies how to spawn the entities in the list, choices are: ground, surface, cave, air, water",
           "comment": "//if ground: will try to spawn either on the surface or in a cave depending on where the player is",
+          "comment": "//if surface: will try to spawn on the surface, a place that can see the sky",
+          "comment": "//if cave: will try to spawn in a cave, a dark stoney place that cant see the sky",
           "comment": "//if air: will try to spawn in open air, not requiring a block under it",
           "comment": "//if water: will try to spawn underwater",
 

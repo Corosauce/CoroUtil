@@ -6,6 +6,7 @@ import CoroUtil.difficulty.data.conditions.ConditionTemplateReference;
 import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
 import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import CoroUtil.forge.CULog;
+import CoroUtil.util.EnumSpawnPlacementType;
 import com.google.gson.*;
 import net.minecraft.entity.EntityLiving;
 
@@ -138,11 +139,15 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         if (json.has("spawn_type")) {
             String spawnType = json.get("spawn_type").getAsString();
             if (spawnType.equals("ground")) {
-                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.ON_GROUND;
+                spawnTemplate.spawnType = EnumSpawnPlacementType.GROUND;
+            } else if (spawnType.equals("surface")) {
+                spawnTemplate.spawnType = EnumSpawnPlacementType.SURFACE;
+            } else if (spawnType.equals("cave")) {
+                spawnTemplate.spawnType = EnumSpawnPlacementType.CAVE;
             } else if (spawnType.equals("air")) {
-                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.IN_AIR;
+                spawnTemplate.spawnType = EnumSpawnPlacementType.AIR;
             } else if (spawnType.equals("water")) {
-                spawnTemplate.spawnType = EntityLiving.SpawnPlacementType.IN_WATER;
+                spawnTemplate.spawnType = EnumSpawnPlacementType.WATER;
             }
         }
 

@@ -51,6 +51,8 @@ public class TileEntityRepairingBlock extends TileEntity
 
                 if (world.getTotalWorldTime() > timeToRepairAt || ConfigCoroUtilAdvanced.repairBlockNextRandomTick) {
                     AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
+                    //i think its using no collide AABB so this fixes it
+                    aabb = Block.FULL_BLOCK_AABB;
                     aabb = aabb.offset(this.getPos());
                     List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
                     if (listTest.size() == 0)

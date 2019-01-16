@@ -239,66 +239,69 @@ public class EventHandlerForge {
 			}
 
 			//trying to get miners to push others out of the way
+			boolean pushMobsAwayForMiners = false;
+			if (pushMobsAwayForMiners) {
+				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+				if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
+					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
 
-			NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
-			if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
-				List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
-
-				if (!list.isEmpty())
-				{
-
-					for (int l = 0; l < list.size(); ++l)
+					if (!list.isEmpty())
 					{
-						Entity entityIn = list.get(l);
 
-						//from applyEntityCollision()
-
-						NBTTagCompound data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
-
-
-						if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging))
+						for (int l = 0; l < list.size(); ++l)
 						{
-							if (!entityIn.noClip && !ent.noClip)
+							Entity entityIn = list.get(l);
+
+							//from applyEntityCollision()
+
+							NBTTagCompound data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+
+
+							if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging))
 							{
-								double d0 = entityIn.posX - ent.posX;
-								double d1 = entityIn.posZ - ent.posZ;
-								double d2 = MathHelper.absMax(d0, d1);
-
-								if (d2 >= 0.009999999776482582D)
+								if (!entityIn.noClip && !ent.noClip)
 								{
-									d2 = (double)MathHelper.sqrt(d2);
-									d0 = d0 / d2;
-									d1 = d1 / d2;
-									double d3 = 1.0D / d2;
+									double d0 = entityIn.posX - ent.posX;
+									double d1 = entityIn.posZ - ent.posZ;
+									double d2 = MathHelper.absMax(d0, d1);
 
-									if (d3 > 1.0D)
+									if (d2 >= 0.009999999776482582D)
 									{
-										d3 = 1.0D;
-									}
+										d2 = (double)MathHelper.sqrt(d2);
+										d0 = d0 / d2;
+										d1 = d1 / d2;
+										double d3 = 1.0D / d2;
 
-									d0 = d0 * d3;
-									d1 = d1 * d3;
-									d0 = d0 * 0.10D;
-									d1 = d1 * 0.10D;
-									d0 = d0 * (double)(1.0F - ent.entityCollisionReduction);
-									d1 = d1 * (double)(1.0F - ent.entityCollisionReduction);
+										if (d3 > 1.0D)
+										{
+											d3 = 1.0D;
+										}
 
-									if (!ent.isBeingRidden())
-									{
-										entityIn.addVelocity(d0, 0.0D, d1);
-									}
+										d0 = d0 * d3;
+										d1 = d1 * d3;
+										d0 = d0 * 0.10D;
+										d1 = d1 * 0.10D;
+										d0 = d0 * (double)(1.0F - ent.entityCollisionReduction);
+										d1 = d1 * (double)(1.0F - ent.entityCollisionReduction);
 
-									if (!entityIn.isBeingRidden())
-									{
-										entityIn.addVelocity(d0, 0.0D, d1);
+										if (!ent.isBeingRidden())
+										{
+											entityIn.addVelocity(d0, 0.0D, d1);
+										}
+
+										if (!entityIn.isBeingRidden())
+										{
+											entityIn.addVelocity(d0, 0.0D, d1);
+										}
 									}
 								}
 							}
-						}
 
+						}
 					}
 				}
 			}
+
 
 
 		}

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
@@ -182,6 +183,27 @@ public class CoroUtilEntity {
             return false;
         }
         return true;
+    }
+
+    public static boolean isInDarkCave(World world, int x, int y, int z, boolean checkSpaceToSpawn) {
+        BlockPos pos = new BlockPos(x, y, z);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        //TODO: verify canSeeSky doesnt need the air block, currently its being passed solid block pos
+        if (!world.canSeeSky(pos) && world.getLightFromNeighbors(pos) < 5) {
+            if (!CoroUtilBlock.isAir(block) && state.getMaterial() == Material.ROCK/*(block != Blocks.grass || block.getMaterial() != Material.grass)*/) {
+
+                if (!checkSpaceToSpawn) {
+                    return true;
+                } else {
+                    if (world.isAirBlock(pos.up(1)) && world.isAirBlock(pos.up(2))) {
+                        return true;
+                    }
+
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean attackEntityAsMobForPassives(EntityLivingBase source, Entity entityIn)
