@@ -3,15 +3,11 @@ package CoroUtil.difficulty.buffs;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmods.CmodMobDrops;
-import CoroUtil.difficulty.data.cmods.CmodXP;
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.LootTable;
-import net.minecraft.world.storage.loot.LootTableManager;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 /**
  * Created by Corosus on 1/9/2017.

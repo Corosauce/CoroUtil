@@ -4,8 +4,6 @@ import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DeserializerAllJson;
-import CoroUtil.difficulty.data.DifficultyDataReader;
-import CoroUtil.difficulty.data.cmodmobdrops.DataEntryMobDropsTemplate;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
@@ -20,7 +18,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
@@ -50,20 +47,6 @@ public class UtilEntityBuffs {
 
     //deprecating?
     public static String dataEntityBuffed_Tried = "CoroAI_HW_Buffed_AI_Tried";
-
-    //consider moving these buff name fields to their own class for easy reference
-
-    /*public static String dataEntityBuffed_AI_LungeAndCounterLeap = "CoroAI_HW_Buffed_AI_LungeAndCounterLeap";
-    public static String dataEntityBuffed_AI_Digging = "CoroAI_HW_Buffed_AI_Digging";
-    public static String dataEntityBuffed_AI_AntiAir = "CoroAI_HW_Buffed_AI_AntiAir";
-    public static String dataEntityBuffed_AI_Infernal = "CoroAI_HW_Buffed_AI_Infernal";
-    public static String dataEntityBuffed_Health = "CoroAI_HW_Buffed_Health";
-    public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
-    public static String dataEntityBuffed_Inventory = "CoroAI_HW_Buffed_Inventory";
-    public static String dataEntityBuffed_Speed = "CoroAI_HW_Buffed_Speed";
-    public static String dataEntityBuffed_XP = "CoroAI_HW_Buffed_XP";
-    public static String dataEntityBuffed_MobDrops = "CoroAI_HW_Buffed_MobDrops";*/
-
     /**
      * THESE MUST MATCH JSON DATA NAMES
      */
@@ -97,25 +80,7 @@ public class UtilEntityBuffs {
     public static String dataEntityWaveSpawned = "CoroAI_HW_Inv_WaveSpawned";
     public static String dataEntityInitialSpawn = "CoroAI_HW_InitialSpawn";
 
-    //use for buffs that say they can apply but failed to apply
-    //do we need it?
-    public static String dataFlagFailed = "_Failed";
-
-    //public static String dataFlagApplied = "_Applied";
-
-    //public static Class[] tasksToInject = new Class[] { EntityAITaskEnhancedCombat.class, EntityAITaskAntiAir.class };
-    //public static int[] taskPriorities = { 2, 3 };
-
-    //public static Class[] tasksToInjectInv = new Class[] { TaskDigTowardsTarget.class, TaskCallForHelp.class };
-    //public static int[] taskPrioritiesInv = {5, 5};
-
     public static double speedCap = 0.4D;
-
-    static {
-
-        //relocated to DifficultyDataReader.init()
-
-    }
 
     /**
      * Currently overrides any pre-existing cmod data present
@@ -181,31 +146,6 @@ public class UtilEntityBuffs {
     public static boolean hasBuff(EntityCreature ent, String buff) {
         NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
         return data.getBoolean(buff);
-    }
-
-    /**
-     * Non batch based buff applying, checks if buff was not already applied, then calls applyBuff and applyBuffPost
-     *
-     * @param buffName
-     * @param ent
-     * @param difficulty
-     * @return
-     */
-    public static boolean applyBuffSingularTry(String buffName, EntityCreature ent, float difficulty) {
-        if (!hasBuff(ent, buffName)) {
-            BuffBase buff = getBuff(buffName);
-            if (buff != null) {
-                if (buff.canApplyBuff(ent, difficulty)) {
-                    if (!applyBuff(buffName, ent, difficulty)) {
-                        return false;
-                    } else {
-                        applyBuffPost(buffName, ent, difficulty);
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     /**
@@ -393,44 +333,6 @@ public class UtilEntityBuffs {
             e.printStackTrace();
         }
         return false;
-    }
-
-    @Deprecated
-    public static LootTable getRandomLootForDifficulty(EntityCreature ent, float difficulty) {
-        List<DataEntryMobDropsTemplate> listForDifficulty = new ArrayList<>();
-
-        /*for (DataEntryMobDropsTemplate entry : DifficultyDataReader.getData().listTemplatesMobDrops) {
-            if (difficulty >= entry.level_min && difficulty <= entry.level_max) {
-                listForDifficulty.add(entry);
-            }
-        }*/
-
-        //TODO: do weighted random stuff here, for now just choose one at pure random
-        if (listForDifficulty.size() > 0) {
-            Random rand = new Random();
-            int choice = rand.nextInt(listForDifficulty.size());
-
-            DataEntryMobDropsTemplate entry = listForDifficulty.get(choice);
-
-            LootTable loot = DifficultyDataReader.getData().lookupLootTables.get(entry.loot_table);
-
-            if (loot != null) {
-                return loot;
-            } else {
-                loot = ent.world.getLootTableManager().getLootTableFromLocation(new ResourceLocation(entry.loot_table));
-                if (loot != null) {
-                    return loot;
-                } else {
-                    CoroUtil.dbg("couldnt find loot table: " + entry.loot_table);
-                }
-
-            }
-
-        } else {
-            CoroUtil.dbg("couldnt find loot to drop within difficulty range");
-        }
-
-        return null;
     }
 
     public static void processLootTableOnEntity(EntityCreature ent, LootTable loottable, LivingDeathEvent event) {

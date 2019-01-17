@@ -283,197 +283,139 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
         	//scanZ = entity.posZ;
     	}*/
 
-		boolean newWay = true;
+        listPillarToMine.clear();
+
+        //account for being directly above or directly below target
+        if (distHoriz <= 1) {
+            scanX = entPosX;
+            scanZ = entPosZ;
+        }
+
+        //i think the y is the block under feet, not where feet occupy
+        //actually, must be where feet occupy...
+        BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
 
 
-		if (newWay) {
+        BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(entPosZ));
 
-			listPillarToMine.clear();
+        /**
+         * when digging up, or down, need to make sure theres space above to jump up to next pillar
+         * - just up?
+         */
 
-			//account for being directly above or directly below target
-			if (distHoriz <= 1) {
-				scanX = entPosX;
-				scanZ = entPosZ;
-			}
+        boolean wasDiggingStrait = false;
 
-			//i think the y is the block under feet, not where feet occupy
-			//actually, must be where feet occupy...
-			BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
+        if (factor <= -0.3F) {
 
-
-			BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(entPosZ));
-
-			/**
-			 * when digging up, or down, need to make sure theres space above to jump up to next pillar
-			 * - just up?
-			 */
-
-			boolean wasDiggingStrait = false;
-
-			if (factor <= -0.3F) {
-
-				//down
-				dbg("Digging Down");
-				listPillarToMine.add(posFrontFeet.up(1));
-				listPillarToMine.add(posFrontFeet);
-				listPillarToMine.add(posFrontFeet.down(1));
+            //down
+            dbg("Digging Down");
+            listPillarToMine.add(posFrontFeet.up(1));
+            listPillarToMine.add(posFrontFeet);
+            listPillarToMine.add(posFrontFeet.down(1));
 
 
-			} else if (factor >= 0.1F) {
+        } else if (factor >= 0.1F) {
 
-				if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
-					dbg("Detected block above head, dig it out");
-					listPillarToMine.add(posFeetCheck.up(2));
-				} else {
-					//up
-					dbg("Digging Up");
-					listPillarToMine.add(posFrontFeet.up(1));
-					listPillarToMine.add(posFrontFeet.up(2));
-					listPillarToMine.add(posFrontFeet.up(3));
-				}
+            if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+                dbg("Detected block above head, dig it out");
+                listPillarToMine.add(posFeetCheck.up(2));
+            } else {
+                //up
+                dbg("Digging Up");
+                listPillarToMine.add(posFrontFeet.up(1));
+                listPillarToMine.add(posFrontFeet.up(2));
+                listPillarToMine.add(posFrontFeet.up(3));
+            }
 
 
 
-			} else {
+        } else {
 
-				wasDiggingStrait = true;
-				//strait
-				dbg("Digging Strait");
-				listPillarToMine.add(posFrontFeet.up(1));
-				listPillarToMine.add(posFrontFeet);
-			}
+            wasDiggingStrait = true;
+            //strait
+            dbg("Digging Strait");
+            listPillarToMine.add(posFrontFeet.up(1));
+            listPillarToMine.add(posFrontFeet);
+        }
 
-			boolean fail = false;
-			boolean oneMinable = false;
+        boolean fail = false;
+        boolean oneMinable = false;
 
-			for (BlockPos pos : listPillarToMine) {
-				IBlockState state = entity.world.getBlockState(pos);
-				dbg("set: " + pos + " - " + state.getBlock());
-			}
+        for (BlockPos pos : listPillarToMine) {
+            IBlockState state = entity.world.getBlockState(pos);
+            dbg("set: " + pos + " - " + state.getBlock());
+        }
 
-			for (BlockPos pos : listPillarToMine) {
-				//allow for air for now
-				if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
-					oneMinable = true;
-					break;
-				}
-			}
+        for (BlockPos pos : listPillarToMine) {
+            //allow for air for now
+            if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+                oneMinable = true;
+                break;
+            }
+        }
 
-			if (!oneMinable) {
-				dbg("All air blocks or unmineable, trying to fallback to alternate");
-				listPillarToMine.clear();
+        if (!oneMinable) {
+            dbg("All air blocks or unmineable, trying to fallback to alternate");
+            listPillarToMine.clear();
 
-				//second try, to try to fix an AI loop maybe caused by aquard angles or the repairing block, a bit of a hack fix, and messy duplicated code
-				//TODO: also consider trying the alternate too, if up or down is failing, dig strait instead, both should realign eachother?
-				//we are now
+            //second try, to try to fix an AI loop maybe caused by aquard angles or the repairing block, a bit of a hack fix, and messy duplicated code
+            //TODO: also consider trying the alternate too, if up or down is failing, dig strait instead, both should realign eachother?
+            //we are now
 
-				//weird issues, lets try random again
-				wasDiggingStrait = entity.world.rand.nextBoolean();
-				if (wasDiggingStrait) {
-					if (factor < 0F) {
-						//down
-						dbg("Digging Down Fallback try, but not infront of feet, instead directly under");
-						listPillarToMine.add(posFeetCheck.up(1));
-						listPillarToMine.add(posFeetCheck);
-						listPillarToMine.add(posFeetCheck.down(1));
-					} else if (factor >= 0F) {
-						if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
-							IBlockState check = entity.world.getBlockState(posFeetCheck.up(2));
-							dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
-							listPillarToMine.add(posFeetCheck.up(2));
-						} else {
-							//up
-							dbg("Digging Up Fallback try");
-							listPillarToMine.add(posFrontFeet.up(1));
-							listPillarToMine.add(posFrontFeet.up(2));
-							listPillarToMine.add(posFrontFeet.up(3));
-						}
-					}
-				} else {
-					dbg("Digging Strait Fallback try");
-					listPillarToMine.add(posFrontFeet.up(1));
-					listPillarToMine.add(posFrontFeet);
-				}
+            //weird issues, lets try random again
+            wasDiggingStrait = entity.world.rand.nextBoolean();
+            if (wasDiggingStrait) {
+                if (factor < 0F) {
+                    //down
+                    dbg("Digging Down Fallback try, but not infront of feet, instead directly under");
+                    listPillarToMine.add(posFeetCheck.up(1));
+                    listPillarToMine.add(posFeetCheck);
+                    listPillarToMine.add(posFeetCheck.down(1));
+                } else if (factor >= 0F) {
+                    if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+                        IBlockState check = entity.world.getBlockState(posFeetCheck.up(2));
+                        dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
+                        listPillarToMine.add(posFeetCheck.up(2));
+                    } else {
+                        //up
+                        dbg("Digging Up Fallback try");
+                        listPillarToMine.add(posFrontFeet.up(1));
+                        listPillarToMine.add(posFrontFeet.up(2));
+                        listPillarToMine.add(posFrontFeet.up(3));
+                    }
+                }
+            } else {
+                dbg("Digging Strait Fallback try");
+                listPillarToMine.add(posFrontFeet.up(1));
+                listPillarToMine.add(posFrontFeet);
+            }
 
 
-				for (BlockPos pos : listPillarToMine) {
-					IBlockState state = entity.world.getBlockState(pos);
-					dbg("set try2: " + pos + " - " + state.getBlock());
-				}
+            for (BlockPos pos : listPillarToMine) {
+                IBlockState state = entity.world.getBlockState(pos);
+                dbg("set try2: " + pos + " - " + state.getBlock());
+            }
 
-				for (BlockPos pos : listPillarToMine) {
-					//allow for air for now
-					if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
-						oneMinable = true;
-						break;
-					}
-				}
+            for (BlockPos pos : listPillarToMine) {
+                //allow for air for now
+                if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+                    oneMinable = true;
+                    break;
+                }
+            }
 
-				if (!oneMinable) {
-					dbg("All air blocks or unmineable, fallback failed, cancelling");
-					listPillarToMine.clear();
-					return false;
-				}
+            if (!oneMinable) {
+                dbg("All air blocks or unmineable, fallback failed, cancelling");
+                listPillarToMine.clear();
+                return false;
+            }
 
-				//return false;
-			}
+            //return false;
+        }
 
-			setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
+        setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
 
-			return true;
-		} else {
-			BlockCoord coords = new BlockCoord(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY + 1), MathHelper.floor(scanZ));
-
-			IBlockState state = entity.world.getBlockState(coords.toBlockPos());
-			Block block = state.getBlock();
-			//Block block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-
-			//System.out.println("ahead to target: " + block);
-
-			if (UtilMining.canMineBlock(entity.world, coords, block)) {
-				setMiningBlock(state, coords);
-				//entity.world.setBlock(coords.posX, coords.posY, coords.posZ, Blocks.air);
-				return true;
-			} else {
-				if (vecY > 0) {
-					coords.posY++;
-					//coords = coords.add(0, 1, 0);
-					state = entity.world.getBlockState(coords.toBlockPos());
-					//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-					if (UtilMining.canMineBlock(entity.world, coords, block)) {
-						setMiningBlock(state, coords);
-						return true;
-					}
-				}
-
-				//if dont or cant dig up, continue strait
-				coords.posY--;
-				//coords = coords.add(0, -1, 0);
-
-				state = entity.world.getBlockState(coords.toBlockPos());
-				block = state.getBlock();
-				if (UtilMining.canMineBlock(entity.world, coords, block)) {
-					setMiningBlock(state, coords);
-					return true;
-				} else {
-					//try to dig down if all else failed and target is below
-					if (vecY < 0) {
-						//coords = coords.add(0, -1, 0);
-						coords.posY--;
-						state = entity.world.getBlockState(coords.toBlockPos());
-						block = state.getBlock();
-						//block = entity.world.getBlock(coords.posX, coords.posY, coords.posZ);
-
-						if (UtilMining.canMineBlock(entity.world, coords, block)) {
-							setMiningBlock(state, coords);
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-		}
+        return true;
 
     }
 
