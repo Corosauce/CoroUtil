@@ -30,6 +30,7 @@ public class DataActionMobSpawns {
         copy.count = count;
         copy.count_max = count_max;
         copy.count_difficulty_multiplier = count_difficulty_multiplier;
+        copy.spawnType = spawnType;
         copy.entities.addAll(entities);
         for (DataCmod cmod : cmods) {
             copy.cmods.add(cmod);

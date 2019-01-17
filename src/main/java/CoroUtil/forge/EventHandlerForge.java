@@ -239,7 +239,7 @@ public class EventHandlerForge {
 			}
 
 			//trying to get miners to push others out of the way
-			boolean pushMobsAwayForMiners = false;
+			boolean pushMobsAwayForMiners = true;
 			if (pushMobsAwayForMiners) {
 				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 				if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {

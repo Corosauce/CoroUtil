@@ -11,7 +11,7 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	public static int ticksToRepairBlock = 20*60*5;
 
-	public static double digSpeed = 0.01D;
+	public static double digSpeed = 0.05D;
 
 	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the update, which is 30 seconds")
 	public static boolean repairBlockNextRandomTick = false;
