@@ -1,5 +1,6 @@
 package CoroUtil.forge;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 import CoroUtil.block.TileEntityRepairingBlock;
@@ -273,17 +274,41 @@ public class CommandCoroUtil extends CommandBase {
 						BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
 						//long dayNumber = (ent.world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
 						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
-						CoroUtilMisc.sendCommandSenderMsg(ent, "player rating: " + DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerEquipment);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) + " weight: " + ConfigDynamicDifficulty.weightPlayerServerTime);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightPosOccupy);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) + " weight: " + ConfigDynamicDifficulty.weightDPS);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + DynamicDifficulty.getDifficultyScaleForHealth(ent) + " weight: " + ConfigDynamicDifficulty.weightHealth);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) + " weight: " + ConfigDynamicDifficulty.weightDistFromSpawn);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightBuffedLocation);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) + " weight: " + ConfigDynamicDifficulty.weightDebuffedLocation);
-						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + DynamicDifficulty.getInvasionSkipBuff(ent));
+						CoroUtilMisc.sendCommandSenderMsg(ent, "equipment rating: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerEquipment + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) * ConfigDynamicDifficulty.weightPlayerEquipment)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerServerTime + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) * ConfigDynamicDifficulty.weightPlayerServerTime)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPosOccupy + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) * ConfigDynamicDifficulty.weightPosOccupy)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDPS + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) * ConfigDynamicDifficulty.weightDPS)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForHealth(ent))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightHealth + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForHealth(ent) * ConfigDynamicDifficulty.weightHealth)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDistFromSpawn + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) * ConfigDynamicDifficulty.weightDistFromSpawn)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForBuffedLocation(world, pos))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightBuffedLocation + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) * ConfigDynamicDifficulty.weightBuffedLocation)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos))
+								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDebuffedLocation + TextFormatting.RESET + " = "
+								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) * ConfigDynamicDifficulty.weightDebuffedLocation)));
+
+						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getInvasionSkipBuff(ent)));
 						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
-						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
+						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + TextFormatting.GREEN + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
 					}
 				} else if (var2[0].equalsIgnoreCase("testitem")) {
 					/**
@@ -684,6 +709,16 @@ public class CommandCoroUtil extends CommandBase {
 		} else {
 			player.sendMessage(new TextComponentString("entity class null"));
 		}
+	}
+
+	public String roundVal(float val) {
+		DecimalFormat df = new DecimalFormat("#.##");
+		return df.format(val);
+	}
+
+	public String roundVal(double val) {
+		DecimalFormat df = new DecimalFormat("#.##");
+		return df.format(val);
 	}
 	
 	@Override

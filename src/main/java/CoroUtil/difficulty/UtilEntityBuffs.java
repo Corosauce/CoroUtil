@@ -5,6 +5,8 @@ import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.DataCmod;
 import CoroUtil.difficulty.data.DeserializerAllJson;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
+import CoroUtil.difficulty.data.cmods.CmodInventoryDifficultyScaled;
+import CoroUtil.difficulty.data.cmods.CmodInventoryEntry;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
@@ -63,6 +65,7 @@ public class UtilEntityBuffs {
     public static String dataEntityBuffed_AttackDamage = "attribute_attackdamage";
     //public static String dataEntityBuffed_Damage = "CoroAI_HW_Buffed_Damage";
     public static String dataEntityBuffed_Inventory = "inventory";
+    public static String dataEntityBuffed_InventoryDifficultyScaled = "inventory_difficulty_scaled";
     public static String dataEntityBuffed_Speed = "attribute_speed";
     public static String dataEntityBuffed_Speed_Flying = "attribute_speed_flying";
     public static String dataEntityBuffed_XP = "xp";
@@ -92,6 +95,29 @@ public class UtilEntityBuffs {
     public static void registerAndApplyCmods(EntityCreature ent, List<DataCmod> cmods, float difficulty) {
 
         List<DataCmod> cmodsFlat = DeserializerAllJson.getCmodsFlattened(cmods);
+
+        //now lets process inventory_difficulty_scaled into just inventory
+        //update: this was a good idea and saved me having to write a serializer for it, but i forgot i still need to serialize the full thing for world reloading
+        //might be worth keeping for the entity nbt to keep it slimmer, technically saves disk space
+        boolean flattenConditionalInventory = false;
+        if (flattenConditionalInventory) {
+            for (ListIterator<DataCmod> it = cmodsFlat.listIterator(); it.hasNext(); ) {
+                DataCmod cmod = it.next();
+                if (cmod instanceof CmodInventoryDifficultyScaled) {
+                    CmodInventory cmodInventory = null;
+                    for (CmodInventoryEntry entry : ((CmodInventoryDifficultyScaled) cmod).listInventories) {
+                        if (difficulty >= entry.min && difficulty <= entry.max) {
+                            cmodInventory = entry.inventory;
+                            break;
+                        }
+                    }
+                    //replace with the actual inventory determined to be used
+                    if (cmodInventory != null) {
+                        it.set(cmodInventory);
+                    }
+                }
+            }
+        }
 
         if (!ent.getEntityData().hasKey(dataEntityBuffed_Data)) {
             ent.getEntityData().setTag(dataEntityBuffed_Data, new NBTTagCompound());

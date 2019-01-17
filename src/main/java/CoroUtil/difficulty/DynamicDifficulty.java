@@ -222,23 +222,13 @@ public class DynamicDifficulty {
 		
 		World world = player.world;
 		
-		//test
-		//if (true) return 2F;
-		
 		//difficulties designed for stuff only mods are capable of should be a flat out plus to the rating such as:
 		//- max health
 		//- ???
 
-
-
-
 		//TODO: DEBUFF!
 		//consider having no weight for it, or only using it when its != 0
 
-
-
-
-		
 		float weightPosOccupy = (float) ConfigDynamicDifficulty.weightPosOccupy;
 		float weightPlayerEquipment = (float) ConfigDynamicDifficulty.weightPlayerEquipment;
 		float weightPlayerServerTime = (float) ConfigDynamicDifficulty.weightPlayerServerTime;

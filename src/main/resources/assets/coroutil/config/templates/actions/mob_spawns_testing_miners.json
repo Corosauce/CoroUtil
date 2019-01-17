@@ -11,15 +11,39 @@
           ],
           "count": 10,
           "count_difficulty_multiplier": 0,
-          "spawn_type": "water",
+          "spawn_type": "ground",
           "cmods": [
             {
               "cmod": "template",
               "template": "invader_miner"
             },
             {
-              "cmod": "template",
-              "template": "inventory_leather"
+              "cmod": "inventory_difficulty_scaled",
+
+              "stages": [
+                {
+                  "min": 0,
+                  "max": 0.3,
+
+                  "inv_hand_off": "minecraft:shield",
+                  "inv_hand_main": "minecraft:stone_sword",
+                  "inv_head": "minecraft:leather_helmet",
+                  "inv_chest": "minecraft:leather_chestplate",
+                  "inv_legs": "minecraft:leather_leggings",
+                  "inv_feet": "minecraft:leather_boots"
+                },
+                {
+                  "min": 0.3,
+                  "max": 6,
+
+                  "inv_hand_off": "minecraft:shield",
+                  "inv_hand_main": "minecraft:diamond_sword",
+                  "inv_head": "minecraft:diamond_helmet",
+                  "inv_chest": "minecraft:diamond_chestplate",
+                  "inv_legs": "minecraft:diamond_leggings",
+                  "inv_feet": "minecraft:diamond_boots"
+                }
+              ]
             },
             {
               "cmod": "ai_attack_melee"

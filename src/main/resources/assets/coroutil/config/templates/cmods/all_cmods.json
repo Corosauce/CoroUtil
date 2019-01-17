@@ -22,7 +22,37 @@
           "inv_legs": "minecraft:diamond_leggings",
           "inv_feet": "minecraft:diamond_boots",
 
-          "comment": "//give inventory to a mob, up to you to make sure the mob you are giving it to supports it, should crash if they dont"
+          "comment": "//give inventory to a mob, up to you to make sure the mob you are giving it to supports it, could crash if they dont"
+        },
+        {
+          "cmod": "inventory_difficulty_scaled",
+
+          "stages": [
+            {
+              "min": 0,
+              "max": 0.3,
+
+              "inv_hand_off": "minecraft:shield",
+              "inv_hand_main": "minecraft:stone_sword",
+              "inv_head": "minecraft:leather_helmet",
+              "inv_chest": "minecraft:leather_chestplate",
+              "inv_legs": "minecraft:leather_leggings",
+              "inv_feet": "minecraft:leather_boots"
+            },
+            {
+              "min": 0.3,
+              "max": 6,
+
+              "inv_hand_off": "minecraft:shield",
+              "inv_hand_main": "minecraft:diamond_sword",
+              "inv_head": "minecraft:diamond_helmet",
+              "inv_chest": "minecraft:diamond_chestplate",
+              "inv_legs": "minecraft:diamond_leggings",
+              "inv_feet": "minecraft:diamond_boots"
+            }
+          ],
+
+          "comment": "//give inventory depending on difficulty of area, for easy re-use within mob spawn profiles"
         },
         {
           "cmod": "mob_drops",

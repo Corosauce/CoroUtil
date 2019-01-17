@@ -89,6 +89,7 @@ public class DifficultyDataReader {
 
         lookupJsonNameToCmodDeserializer.clear();
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Inventory, CmodInventory.class);
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_InventoryDifficultyScaled, CmodInventoryDifficultyScaled.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_MobDrops, CmodMobDrops.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_Health, CmodAttributeHealth.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AttackDamage, CmodAttributeAttackDamage.class);
@@ -127,6 +128,7 @@ public class DifficultyDataReader {
         UtilEntityBuffs.registerBuff(new BuffXP());
         UtilEntityBuffs.registerBuff(new BuffMobDrops());
         UtilEntityBuffs.registerBuff(new BuffInventory());
+        UtilEntityBuffs.registerBuff(new BuffInventoryDifficultyScaled());
         UtilEntityBuffs.registerBuff(new BuffAI_Infernal());
         UtilEntityBuffs.registerBuff(new BuffAI_TaskMining(UtilEntityBuffs.dataEntityBuffed_AI_Digging,
                 TaskDigTowardsTarget.class, 5));

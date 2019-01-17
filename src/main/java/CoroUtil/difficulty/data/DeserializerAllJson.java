@@ -1,6 +1,10 @@
 package CoroUtil.difficulty.data;
 
 import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.difficulty.UtilEntityBuffs;
+import CoroUtil.difficulty.data.cmods.CmodInventory;
+import CoroUtil.difficulty.data.cmods.CmodInventoryDifficultyScaled;
+import CoroUtil.difficulty.data.cmods.CmodInventoryEntry;
 import CoroUtil.difficulty.data.cmods.CmodTemplateReference;
 import CoroUtil.difficulty.data.conditions.ConditionTemplateReference;
 import CoroUtil.difficulty.data.spawns.DataActionMobSpawns;
@@ -169,26 +173,28 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         obj.addProperty("count", spawns.count);
         obj.addProperty("count_max", spawns.count_max);
         obj.addProperty("count_difficulty_multiplier", spawns.count_difficulty_multiplier);
+        obj.addProperty("spawnType", spawns.spawnType.name().toLowerCase());
         JsonArray arr1 = new JsonArray();
         for (String str : spawns.entities) {
             arr1.add(new JsonPrimitive(str));
         }
         obj.add("entities", arr1);
-        /*JsonArray arr2 = new JsonArray();
-        for (DataCmod cmod : spawns.cmods) {
-            arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
-            //arr2.add(new JsonPrimitive(((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod)))));
-        }*/
         obj.add("cmods", serializeCmods(spawns.cmods));
         return obj;
-        //arr1.add();
-        //obj.add("entities");
     }
 
     public static JsonArray serializeCmods(List<DataCmod> cmods) {
         JsonArray arr2 = new JsonArray();
         for (DataCmod cmod : cmods) {
-            arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
+            if (cmod instanceof CmodInventoryDifficultyScaled) {
+                //CULog.err("design flaw in serialization, CmodInventoryDifficultyScaled shouldnt exist here, it was supposed to be processed and turned into CmodInventory on entity spawn");
+                //need to serialize for game state sake, so we can reload game and still spawn more entities
+                //JsonSerializer<CmodInventoryDifficultyScaled> serializer = new JsonSerializer<CmodInventoryDifficultyScaled>();
+                JsonElement ele = ((CmodInventoryDifficultyScaled) cmod).serialize(null, null, null);
+                arr2.add(ele.getAsJsonObject());
+            } else {
+                arr2.add((new JsonParser()).parse((new Gson()).toJson(cmod, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(cmod.cmod))).getAsJsonObject());
+            }
         }
         return arr2;
     }
@@ -219,9 +225,36 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
 
                 if (DifficultyDataReader.lookupJsonNameToCmodDeserializer.containsKey(name)) {
                     //DataCmod cmod = context.deserialize(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
-                    DataCmod cmod = (DataCmod)(new Gson()).fromJson(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
 
-                    list.add(clazz.cast(cmod));
+                    //custom de-serialization of scaled inventory cmod
+                    try {
+                        DataCmod cmod;
+                        if (name.equals(UtilEntityBuffs.dataEntityBuffed_InventoryDifficultyScaled)) {
+                            cmod = new CmodInventoryDifficultyScaled();
+                            cmod.cmod = UtilEntityBuffs.dataEntityBuffed_InventoryDifficultyScaled;
+
+                            JsonArray stages = obj.getAsJsonArray("stages");
+                            for (JsonElement stage : stages) {
+                                CmodInventoryEntry entry = new CmodInventoryEntry();
+
+                                entry.min = stage.getAsJsonObject().get("min").getAsDouble();
+                                entry.max = stage.getAsJsonObject().get("max").getAsDouble();
+                                entry.inventory = (new Gson()).fromJson(stage.getAsJsonObject(), CmodInventory.class);
+                                //probably not used in this case but hey lets set it
+                                entry.inventory.cmod = UtilEntityBuffs.dataEntityBuffed_Inventory;
+                                ((CmodInventoryDifficultyScaled) cmod).listInventories.add(entry);
+                            }
+
+                        } else {
+                            cmod = (DataCmod) (new Gson()).fromJson(obj, DifficultyDataReader.lookupJsonNameToCmodDeserializer.get(name));
+                        }
+
+                        list.add(clazz.cast(cmod));
+                    } catch (Exception ex) {
+                        CULog.err("critical error deserializing " + name);
+                        ex.printStackTrace();
+                    }
+
                 }
             }
         }
