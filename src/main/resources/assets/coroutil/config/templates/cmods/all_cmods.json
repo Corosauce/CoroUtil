@@ -128,6 +128,7 @@
         {
           "cmod": "ai_infernal",
           "randomly_choose_count": "10",
+          "randomly_choose_count_max": "15",
           "difficulty_multiplier": 1.0,
 
           "modifiers": [
@@ -136,9 +137,11 @@
             "Rust", "Sapper", "Sprint", "Sticky", "Storm", "Vengeance", "Weakness", "Webber", "Wither"
           ],
 
-          "comment": "//if atomicstrykers infernal mobs mod is installed, this gives a mob a random amount of the abilities you list above, the above list is all the options available from the mod",
-          "comment2": "//you can specify the modifiers and a number of them to randomly choose from, in the above example config, at a local difficulty of 0.1, it will choose 1 modifier from the list, at 0.5, it will choose 5, etc",
-          "comment3": "//this functionality depends on my code knowing how to interact with their mods code, if they change theirs, this cmod may break"
+          "comment": "//if atomicstrykers Infernal Mobs mod is installed, this gives a mob a random amount of the abilities you list above, the above list is all the options available from the mod",
+          "comment": "//you can specify the modifiers and a number of them to randomly choose from, in the above example config, at a local difficulty of 0.1, it will choose 1 modifier from the list, at 0.5, it will choose 5, etc",
+          "comment": "//randomly_choose_count_max is optional, since its set, itll never choose more than 15 no matter the difficulty",
+          "comment": "//this functionality depends on my code knowing how to interact with their mods code, if they change theirs, this cmod may break",
+          "comment": "//you can safely try to use this even if Infernal Mobs isnt installed, it will just not be used"
         }
       ]
     }

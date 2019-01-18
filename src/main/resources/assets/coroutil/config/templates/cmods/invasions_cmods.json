@@ -17,6 +17,12 @@
       "cmods": [
         {
           "cmod": "ai_omniscience"
+        },
+        {
+          "cmod": "ai_counterattack"
+        },
+        {
+          "cmod": "ai_lunge"
         }
       ]
     },
@@ -77,6 +83,57 @@
 
               "inv_hand_off": "minecraft:shield",
               "inv_hand_main": "minecraft:diamond_sword",
+              "inv_head": "minecraft:diamond_helmet",
+              "inv_chest": "minecraft:diamond_chestplate",
+              "inv_legs": "minecraft:diamond_leggings",
+              "inv_feet": "minecraft:diamond_boots"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inventory_all_scales_no_weapon",
+      "cmods": [
+        {
+          "cmod": "inventory_difficulty_scaled",
+
+          "stages": [
+            {
+              "min": 0,
+              "max": 0.25,
+
+              "inv_hand_off": "minecraft:shield",
+              "inv_head": "minecraft:leather_helmet",
+              "inv_chest": "minecraft:leather_chestplate",
+              "inv_legs": "minecraft:leather_leggings",
+              "inv_feet": "minecraft:leather_boots"
+            },
+            {
+              "min": 0.25,
+              "max": 0.5,
+
+              "inv_hand_off": "minecraft:shield",
+              "inv_head": "minecraft:chainmail_helmet",
+              "inv_chest": "minecraft:chainmail_chestplate",
+              "inv_legs": "minecraft:chainmail_leggings",
+              "inv_feet": "minecraft:chainmail_boots"
+            },
+            {
+              "min": 0.5,
+              "max": 0.75,
+
+              "inv_hand_off": "minecraft:shield",
+              "inv_head": "minecraft:iron_helmet",
+              "inv_chest": "minecraft:iron_chestplate",
+              "inv_legs": "minecraft:iron_leggings",
+              "inv_feet": "minecraft:iron_boots"
+            },
+            {
+              "min": 0.75,
+              "max": 999,
+
+              "inv_hand_off": "minecraft:shield",
               "inv_head": "minecraft:diamond_helmet",
               "inv_chest": "minecraft:diamond_chestplate",
               "inv_legs": "minecraft:diamond_leggings",

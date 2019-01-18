@@ -59,7 +59,7 @@
           "mod_id": "infernalmobs",
           "mode_boolean": "invert",
 
-          "comment": "//filter waves to only be used when a certain mod is or isnt installed, depending on if mode_boolean is set to invert or not"
+          "comment": "//filter waves to only be used when a certain mod is or isnt installed, depending on if mode_boolean is set to normal or invert, normal = is mod loaded, invert = is mod not loaded"
         }
       ]
     }

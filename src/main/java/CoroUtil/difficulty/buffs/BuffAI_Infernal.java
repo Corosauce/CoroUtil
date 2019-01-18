@@ -41,7 +41,11 @@ public class BuffAI_Infernal extends BuffBase {
             }
             CoroUtilCrossMod.infernalMobs_AddModifiers(ent, infernalmods);*/
 
-            CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, cmod.modifiers, (int)((float)cmod.randomly_choose_count * cmod.difficulty_multiplier * difficulty));
+            int count = (int)((float)cmod.randomly_choose_count * cmod.difficulty_multiplier * difficulty);
+            if (cmod.randomly_choose_count_max != -1 && count > cmod.randomly_choose_count_max) {
+                count = cmod.randomly_choose_count_max;
+            }
+            CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, cmod.modifiers, count);
 
         }
         //CoroUtilCrossMod.infernalMobs_AddRandomModifiers(ent, getBuffsForDifficulty(difficulty));

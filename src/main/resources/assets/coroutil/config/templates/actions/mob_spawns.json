@@ -2,11 +2,12 @@
   "format": "mob_spawns",
   "templates": [
     {
-      "name": "invasion_stage_1_opt_1",
+      "name": "invasion_stage_1",
       "conditions": [
         {
-          "condition": "random",
-          "weight": 1
+          "condition": "invasion_number",
+          "min": 1,
+          "max": 1
         }
       ],
       "spawns": [
@@ -24,7 +25,7 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_leather"
+              "template": "inventory_all_scales"
             }
           ]
         },
@@ -42,18 +43,19 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_leather"
+              "template": "inventory_all_scales"
             }
           ]
         }
       ]
     },
     {
-      "name": "invasion_stage_1_opt_2",
+      "name": "invasion_stage_2",
       "conditions": [
         {
-          "condition": "random",
-          "weight": 1
+          "condition": "invasion_number",
+          "min": 2,
+          "max": 2
         }
       ],
       "spawns": [
@@ -71,25 +73,7 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_leather"
-            }
-          ]
-        },
-        {
-          "entities": [
-            "minecraft:zombie"
-          ],
-          "count": 2,
-          "count_max": 10,
-          "count_difficulty_multiplier": 2,
-          "cmods": [
-            {
-              "cmod": "template",
-              "template": "invader_soldier"
-            },
-            {
-              "cmod": "template",
-              "template": "inventory_leather"
+              "template": "inventory_all_scales"
             }
           ]
         },
@@ -107,7 +91,109 @@
             },
             {
               "cmod": "template",
-              "template": "inventory_leather_no_weapon"
+              "template": "inventory_all_scales_no_weapon"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_3_opt_1",
+      "conditions": [
+        {
+          "condition": "invasion_number",
+          "min": 3
+        },
+        {
+          "condition": "random",
+          "weight": 10
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 2,
+          "count_max": 5,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_all_scales"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 5,
+          "count_max": 15,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_all_scales"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "invasion_stage_3_opt_2",
+      "conditions": [
+        {
+          "condition": "invasion_number",
+          "min": 3
+        },
+        {
+          "condition": "random",
+          "weight": 10
+        }
+      ],
+      "spawns": [
+        {
+          "entities": [
+            "minecraft:zombie"
+          ],
+          "count": 2,
+          "count_max": 5,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_miner"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_all_scales"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "minecraft:skeleton"
+          ],
+          "count": 2,
+          "count_max": 10,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "inventory_all_scales_no_weapon"
             }
           ]
         }

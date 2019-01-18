@@ -1,16 +1,17 @@
 {
-  "format": "mob_spawns_testing_miners",
+  "format": "mob_spawns_testing_jockeys",
   "templates": [
     {
       "name": "invasion_stage_1_opt_1",
-      "wave_message": "miners!",
+      "wave_message": "jockeys!",
       "spawns": [
         {
           "entities": [
-            "minecraft:enderman"
+            "minecraft:spider", "minecraft:skeleton", "minecraft:zombie"
           ],
           "count": 10,
-          "count_difficulty_multiplier": 0,
+          "count_max": 30,
+          "count_difficulty_multiplier": 1,
           "spawn_type": "ground",
           "cmods": [
             {
@@ -23,6 +24,11 @@
             },
             {
               "cmod": "ai_attack_melee"
+            },
+            {
+              "cmod": "ai_jockey",
+              "target_jockey": "minecraft:skeleton",
+              "target_to_ride": "minecraft:spider"
             },
             {
               "cmod": "attribute_attackdamage",
