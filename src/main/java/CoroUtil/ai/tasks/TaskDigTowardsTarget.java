@@ -454,7 +454,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	if (stateCurMining != state || entity.getDistance(posCurMining.posX, posCurMining.posY, posCurMining.posZ) > 6) {
 			dbg("too far or block changed state");
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
-    		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
+			entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
 			setMiningBlock(null, null);
     		return;
     	}
@@ -498,15 +498,20 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		bdp.digDamage += digSpeed / blockStrength;
     	
     	if (bdp.digDamage > 1D) {
-    		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, 0);
-    		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), 0);
-    		//entity.world.setBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ, Blocks.AIR);
-    		//entity.world.setBlockToAir(posCurMining.toBlockPos());
+    		entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
             if (UtilMining.canConvertToRepairingBlock(entity.world, state)) {
-                TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
+				if (UtilMining.canGrabEventCheck(entity.world, state, posCurMining.toBlockPos())) {
+					TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
+				}
             } else {
-                Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
-				entity.world.setBlockToAir(posCurMining.toBlockPos());
+            	boolean useFakePlayer = true;
+            	if (useFakePlayer) {
+            		UtilMining.tryRemoveBlockWithFakePlayer(entity.world, posCurMining.toBlockPos());
+				} else {
+            		//this method has issues and shouldnt be used without more care, eg itemizing things that shouldnt exist like top/bottom piece of double grass, causes missing tex items
+					Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
+					entity.world.setBlockToAir(posCurMining.toBlockPos());
+				}
             }
 
             if (listPillarToMine.size() > 1) {
@@ -523,7 +528,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		
     	} else {
     		//entity.world.destroyBlockInWorldPartially(entity.getEntityId(), posCurMining.posX, posCurMining.posY, posCurMining.posZ, (int)(curBlockDamage * 10D));
-    		entity.world.sendBlockBreakProgress(entity.getEntityId(), posCurMining.toBlockPos(), (int)(bdp.digDamage * 10D));
+			//entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
+    		entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), (int)(bdp.digDamage * 10D));
     	}
     }
 

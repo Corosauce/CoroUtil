@@ -8,6 +8,10 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.BuffBase;
 import CoroUtil.util.*;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDynamicLiquid;
+import net.minecraft.block.BlockLiquid;
+import net.minecraft.block.BlockStaticLiquid;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -21,6 +25,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -243,6 +248,33 @@ public class EventHandlerForge {
 			if (pushMobsAwayForMiners) {
 				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 				if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
+
+					//cancel out water motion for miners
+					//copied from vec using code copied World.handleMaterialAcceleration
+					//perfectly cancels flow but only when their center is actually in the water
+					boolean waterfix = true;
+					if (waterfix) {
+						if (ent.isInWater()) {
+							//backup motion
+							double motionXOld = ent.motionX;
+							double motionYOld = ent.motionY;
+							double motionZOld = ent.motionZ;
+							//remove motion so only difference is material influenced
+							ent.motionX = 0;
+							ent.motionY = 0;
+							ent.motionZ = 0;
+							ent.world.handleMaterialAcceleration(ent.getEntityBoundingBox(), Material.WATER, ent);
+							//get changes
+							double motionXChange = ent.motionX;
+							double motionYChange = ent.motionY;
+							double motionZChange = ent.motionZ;
+							//apply old motion with inverted material influence
+							ent.motionX = motionXOld + (motionXChange * -1);
+							ent.motionY = motionYOld + (motionYChange * -1);
+							ent.motionZ = motionZOld + (motionZChange * -1);
+						}
+					}
+
 					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
 
 					if (!list.isEmpty())

@@ -11,10 +11,13 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	public static int ticksToRepairBlock = 20*60*5;
 
-	public static double digSpeed = 0.05D;
+	public static double digSpeed = 0.01D;
 
 	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the update, which is 30 seconds")
 	public static boolean repairBlockNextRandomTick = false;
+
+	@ConfigComment("Probably usefull if you want zombie miners get stopped by FTBU claimed chunks for example, but i dont want this behavior by default")
+	public static boolean blockBreakingInvokesCancellableEvent = false;
 
 	@Override
 	public String getName() {
