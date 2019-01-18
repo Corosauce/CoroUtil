@@ -550,7 +550,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	}
 
 	public void dbg(String str) {
-		debug = true;
+		debug = false;
     	if (debug) {
     	    CULog.dbg(str);
 			//System.out.println(str);

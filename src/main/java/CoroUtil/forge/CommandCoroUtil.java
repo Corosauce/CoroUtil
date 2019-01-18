@@ -310,6 +310,9 @@ public class CommandCoroUtil extends CommandBase {
 						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
 						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + TextFormatting.GREEN + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
 					}
+				} else if (var2[0].equalsIgnoreCase("resetdps")) {
+					DynamicDifficulty.resetDifficultyScaleForPosDPS(world, new BlockCoord(player.getPosition()));
+					CoroUtilMisc.sendCommandSenderMsg(player, "reset dps for loaded chunks within 50 block radius");
 				} else if (var2[0].equalsIgnoreCase("testitem")) {
 					/**
 					 * ResourceLocation resourcelocation = new ResourceLocation(id);

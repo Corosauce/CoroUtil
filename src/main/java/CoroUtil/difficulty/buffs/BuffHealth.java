@@ -48,6 +48,12 @@ public class BuffHealth extends BuffBase {
             double healthBoostMultiply = (/*1F + */difficulty * cmod.difficulty_multiplier);
             ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
+            //cap
+            if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue() > cmod.max_value) {
+                ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeAllModifiers();
+                ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.max_value);
+            }
+
             CULog.dbg("mob health went from " + oldHealth + " to " + ent.getMaxHealth());
         }
         /*

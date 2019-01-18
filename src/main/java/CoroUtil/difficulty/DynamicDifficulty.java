@@ -373,6 +373,38 @@ public class DynamicDifficulty {
 		float scale = convertDPSToDifficultyScale(bestDPS);
 		return scale;
 	}
+
+	public static void resetDifficultyScaleForPosDPS(World world, BlockCoord pos) {
+		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSRadius;
+		chunkRange = 50;
+		int chunkX = pos.getX() / 16;
+		int chunkZ = pos.getZ() / 16;
+		//int count = 0;
+		//float bestDPS = 0;
+		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
+			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
+				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
+				if (world.isBlockLoaded(checkPos.toBlockPos())) {
+					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					if (chunk != null) {
+						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
+
+						cdp.averageDPS = 0;
+						cdp.lastDPSRecalc = 0;
+						cdp.listDPSAveragesShortTerm.clear();
+						cdp.listDPSAveragesLongTerm.clear();
+
+						/*if (cdp.averageDPS > bestDPS) {
+							bestDPS = cdp.averageDPS;
+						}*/
+					}
+				}
+			}
+		}
+		//long averageTime = bestTime / count;
+
+		//float scale = convertDPSToDifficultyScale(bestDPS);
+	}
 	
 	public static float convertDPSToDifficultyScale(float dps) {
 		float scale = (float)dps / (float)getBestPlayerDPSRatingPossibleVanilla();
@@ -590,7 +622,7 @@ public class DynamicDifficulty {
 				//dont log common occuring damages, sun burning, random wall glitching
 				if (event.getSource() == DamageSource.IN_WALL ||
 						event.getSource() == DamageSource.IN_FIRE ||
-						event.getSource() == DamageSource.IN_FIRE ||
+						/*event.getSource() == DamageSource.ON_FIRE ||*/
 						event.getSource() == DamageSource.DROWN ||
 						event.getSource() == DamageSource.FALL/* || event.source == DamageSource.lava*/) {
 					return;
@@ -621,11 +653,24 @@ public class DynamicDifficulty {
 					float timeDiffSeconds = (float)timeDiff / 20F;
 					if (timeDiff > 0) {
 						float damage = log.getLastDamage() / timeDiffSeconds;
+
+						boolean bigDamage = false;
 						
 						if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && damage > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
 							damage = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
+							CULog.dbg("!!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
+							bigDamage = true;
 						}
-						
+
+						if (damage > ConfigDynamicDifficulty.difficulty_BestVanillaDPS) {
+							CULog.dbg("!!! damage was greater than expected vanilla capabilities!!!");
+							bigDamage = true;
+						}
+
+						if (bigDamage) {
+							CULog.dbg("logging damageToLog: " + damageToLog + "damage: " + damage + ", log.getLastDamage(): " + log.getLastDamage() + " to " + entC.getClass() + " by " + event.getSource().getTrueSource() + " with " + event.getSource().damageType + " timediffinsecs: " + timeDiffSeconds);
+						}
+
 						log.getListDPSs().add(damage);
 						
 						//System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
@@ -686,7 +731,8 @@ public class DynamicDifficulty {
 			if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && instaKillDPSCalc > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
 				instaKillDPSCalc = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
 			}
-			
+
+			CULog.dbg("logging instakill: " + instaKillDPSCalc);
 			log.getListDPSs().add(instaKillDPSCalc);
 		}
 		
@@ -696,6 +742,8 @@ public class DynamicDifficulty {
 				avgDPS += val;
 			}
 			avgDPS /= log.getListDPSs().size();
+
+			CULog.dbg("logging short term average: " + avgDPS);
 			cdp.listDPSAveragesShortTerm.add(avgDPS);
 		}
 		
@@ -713,6 +761,8 @@ public class DynamicDifficulty {
 					avgDPS2 += val;
 				}
 				avgDPS2 /= cdp.listDPSAveragesShortTerm.size();
+
+				CULog.dbg("logging long term average: " + avgDPS2);
 				cdp.listDPSAveragesLongTerm.add(avgDPS2);
 			}
 			if (cdp.listDPSAveragesLongTerm.size() > maxLongTermSize) {
@@ -725,7 +775,8 @@ public class DynamicDifficulty {
 					avgDPS3 += val;
 				}
 				avgDPS3 /= cdp.listDPSAveragesLongTerm.size();
-				
+
+				CULog.dbg("logging chunk dps average: " + avgDPS3);
 				cdp.averageDPS = avgDPS3;
 				
 				//System.out.println("average of the average of the average: " + avgDPS3);

@@ -63,13 +63,16 @@
         {
           "cmod": "attribute_health",
           "base_value": 40,
+          "max_value": 80,
           "difficulty_multiplier": 1.5,
 
-          "comment": "//set the base health of a mob, difficulty_multiplier is used to multiply their health based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base value 40 + (base health 40 * local difficulty 2.0 * multiplier 1.5) = 120 health, set difficulty_multiplier to 0 or dont include the tag to make the value always be the base value"
+          "comment": "//set the base health of a mob, difficulty_multiplier is used to multiply their health based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base value 40 + (base health 40 * local difficulty 2.0 * multiplier 1.5) = 120 health, set difficulty_multiplier to 0 or dont include the tag to make the value always be the base value",
+          "comment": "//max_value is optional, if local dynamic difficulty combined with difficulty_multiplier puts the health over what max_value is set to, it will cap the health to max_value"
         },
         {
           "cmod": "attribute_attackdamage",
           "base_value": 5,
+          "max_value": 10,
           "difficulty_multiplier": 1.5,
 
           "comment": "//set the base damage of a mob, difficulty_multiplier is used to multiply their damage based on the rated difficulty of the area, so if difficulty in area was 2.0, the math would be: base value 5 + (base value 5 * local difficulty 2.0 * multiplier 1.5) = 15 damage"
@@ -77,6 +80,7 @@
         {
           "cmod": "attribute_speed",
           "base_value": 0.23,
+          "max_value": 0.3,
           "difficulty_multiplier": 1.1,
 
           "comment": "//set the base ground movement speed of the mob, multiplication formula works the same as attribute_health, be carefull with this one so you dont get hyper speed mobs, vanilla zombie speed is 0.23 for reference"
@@ -84,6 +88,7 @@
         {
           "cmod": "attribute_speed_flying",
           "base_value": 0.4,
+          "max_value": 0.5,
           "difficulty_multiplier": 0.0,
 
           "comment": "//same as attribute_speed but for flying entities when they arent touching the ground, because mojang, youll generally want a value 2-3x higher than the attribute_speed which is used for ground"

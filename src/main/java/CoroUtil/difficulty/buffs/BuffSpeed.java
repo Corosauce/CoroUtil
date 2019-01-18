@@ -59,6 +59,13 @@ public class BuffSpeed extends BuffBase {
                     double oldValFlying = ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue();
                     ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.base_value);
                     ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "flying speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+
+                    //cap
+                    if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue() > cmod.max_value) {
+                        ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).removeAllModifiers();
+                        ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.max_value);
+                    }
+
                     CULog.dbg("mob flying speed went from " + oldValFlying + " to " + ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
                 } else {
                     //TODO: probably correct, maybe edge case where we should register it?
@@ -72,6 +79,12 @@ public class BuffSpeed extends BuffBase {
                     ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
                 }
                 ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+
+                //a bit of a hack, but will do until we encounter cross mod issues
+                if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue() > cmod.max_value) {
+                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeAllModifiers();
+                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.max_value);
+                }
 
                 CULog.dbg("mob speed went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
             }

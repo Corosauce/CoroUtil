@@ -18,32 +18,8 @@
               "template": "invader_miner"
             },
             {
-              "cmod": "inventory_difficulty_scaled",
-
-              "stages": [
-                {
-                  "min": 0,
-                  "max": 0.3,
-
-                  "inv_hand_off": "minecraft:shield",
-                  "inv_hand_main": "minecraft:stone_sword",
-                  "inv_head": "minecraft:leather_helmet",
-                  "inv_chest": "minecraft:leather_chestplate",
-                  "inv_legs": "minecraft:leather_leggings",
-                  "inv_feet": "minecraft:leather_boots"
-                },
-                {
-                  "min": 0.3,
-                  "max": 6,
-
-                  "inv_hand_off": "minecraft:shield",
-                  "inv_hand_main": "minecraft:diamond_sword",
-                  "inv_head": "minecraft:diamond_helmet",
-                  "inv_chest": "minecraft:diamond_chestplate",
-                  "inv_legs": "minecraft:diamond_leggings",
-                  "inv_feet": "minecraft:diamond_boots"
-                }
-              ]
+              "cmod": "template",
+              "template": "inventory_all_scales"
             },
             {
               "cmod": "ai_attack_melee"
@@ -51,17 +27,26 @@
             {
               "cmod": "attribute_attackdamage",
               "base_value": 5,
-              "difficulty_multiplier": 0.0
+              "max_value": 10,
+              "difficulty_multiplier": 1.0
+            },
+            {
+              "cmod": "attribute_health",
+              "base_value": 20,
+              "max_value": 50,
+              "difficulty_multiplier": 1.0
             },
             {
               "cmod": "attribute_speed",
-              "base_value": 0.33,
-              "difficulty_multiplier": 0.0
+              "base_value": 0.28,
+              "max_value": 0.3,
+              "difficulty_multiplier": 1.0
             },
             {
               "cmod": "attribute_speed_flying",
               "base_value": 3.0,
-              "difficulty_multiplier": 0.0
+              "max_value": 5,
+              "difficulty_multiplier": 1.0
             }
           ]
         }

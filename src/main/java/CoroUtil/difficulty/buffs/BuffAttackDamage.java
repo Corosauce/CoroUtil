@@ -38,6 +38,12 @@ public class BuffAttackDamage extends BuffBase {
             double boostMultiply = (/*1F + */difficulty * cmod.difficulty_multiplier);
             ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("damage multiplier boost", boostMultiply, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
+            //cap
+            if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue() > cmod.max_value) {
+                ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeAllModifiers();
+                ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(cmod.max_value);
+            }
+
             CULog.dbg("mob damage went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue());
         }
         /*

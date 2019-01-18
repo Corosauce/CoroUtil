@@ -22,11 +22,12 @@ import CoroUtil.difficulty.data.DifficultyDataReader;
  */
 public class CmodAttributeBaseSimple extends DataCmod {
     public double base_value = -1;
+    public double max_value = -1;
     public double difficulty_multiplier;
 
     @Override
     public String toString() {
-        String str = ": " + base_value + " + (" + base_value + " * difficulty * " + difficulty_multiplier + ")";
+        String str = ": " + base_value + " + (" + base_value + " * difficulty * " + difficulty_multiplier + ") max_value: " + max_value;
         if (DifficultyDataReader.getDebugDifficulty() != -1) {
             double val = base_value + (base_value * DifficultyDataReader.getDebugDifficulty() * difficulty_multiplier);
             return super.toString() + str + " = " + val;
