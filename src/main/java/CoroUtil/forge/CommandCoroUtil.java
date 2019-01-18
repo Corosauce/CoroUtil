@@ -684,6 +684,11 @@ public class CommandCoroUtil extends CommandBase {
 	}
 
 	public void spawnInvasionMob(World world, EntityPlayer player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
+
+		if (spawn.equals("minecraft:bat")) {
+			spawn = "coroutil:bat_smart";
+		}
+
 		Class clazz = EntityList.getClass(new ResourceLocation(spawn));
 
 		if (clazz != null) {
