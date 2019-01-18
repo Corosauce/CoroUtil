@@ -10,7 +10,7 @@
           "template": "boringvanilla",
 
           "comment": "//to save on copying and pasting, you can define templates with a set of cmods and refer to them using the template cmod, see invasions_cmods for my actual uses of them, and mob_spawns_example_commented for usage of them",
-          "comment2": "//you cant do templates within templates, so this entry isnt technically valid its just here to explain things, but within the mob_spawns json it would be valid"
+          "comment": "//you cant do templates within templates, so this entry isnt technically valid its just here to explain things, but within the mob_spawns json it would be valid"
         },
         {
           "cmod": "inventory",

@@ -16,8 +16,8 @@
           "max": 0.1,
 
           "comment": "//only use when local dynamic difficulty as at or between these numbers, difficulty determined by many things, see CoroUtils DynamicDifficulty.cfg for configuring that",
-          "comment2": "//things that can affect difficulty: damage per second, armor rating, server time (default off), vanilla local chunk occupancy time, max health, distance from spawn, buffed location (unused), debuffed location (unused)",
-          "comment3": "//difficulty starts at 0, and goes up to 1 for vanilla and default config, if difficulty goes above 1 its likely due to other mods (like a high damage weapon or stronger than diamond armor, or health over 20)"
+          "comment": "//things that can affect difficulty: damage per second, armor rating, server time (default off), vanilla local chunk occupancy time, max health, distance from spawn, buffed location (unused), debuffed location (unused)",
+          "comment": "//difficulty starts at 0, and goes up to 1 for vanilla and default config, if difficulty goes above 1 its likely due to other mods (like a high damage weapon or stronger than diamond armor, or health over 20)"
         },
         {
           "condition": "invasion_number",
@@ -37,8 +37,8 @@
           "weight": 5,
 
           "comment": "//when you want to randomize between multiple invasion wave profiles, more weight = more likely, if this isnt set, a default weight of 1 is set",
-          "comment2": "//random is evaluated last after all other conditions, if there is more than 1 invasion profile still usable after all other conditions met, it will then randomize between them using these weights",
-          "comment3": "//if there is more than 1 invasion profile still usable after all other conditions met, it will then randomize between them using these weights"
+          "comment": "//random is evaluated last after all other conditions, if there is more than 1 invasion profile still usable after all other conditions met, it will then randomize between them using these weights",
+          "comment": "//if there is more than 1 invasion profile still usable after all other conditions met, it will then randomize between them using these weights"
         },
         {
           "condition": "filter_mobs",
