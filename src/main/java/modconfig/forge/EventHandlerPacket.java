@@ -3,6 +3,7 @@ package modconfig.forge;
 import java.util.Collections;
 import java.util.Iterator;
 
+import CoroUtil.forge.CULog;
 import modconfig.ConfigComparatorName;
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
@@ -49,7 +50,12 @@ public class EventHandlerPacket {
 							String str3 = "";//dis.readUTF();
 							ConfigMod.configLookup.get(modID).configData.add(new ConfigEntryInfo(pos++, str1, str2, str3));
 						}
-						Collections.sort(ConfigMod.configLookup.get(modID).configData, new ConfigComparatorName());
+						try {
+							Collections.sort(ConfigMod.configLookup.get(modID).configData, new ConfigComparatorName());
+						} catch (Exception ex) {
+							CULog.err("coroutil configmod exception sorting config values");
+							//shh
+						}
 					}
 				} else if (command.equals("openGUI")) {
 					Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());

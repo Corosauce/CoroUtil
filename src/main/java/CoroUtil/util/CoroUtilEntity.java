@@ -185,18 +185,18 @@ public class CoroUtilEntity {
         return true;
     }
 
-    public static boolean isInDarkCave(World world, int x, int y, int z, boolean checkSpaceToSpawn) {
+    public static boolean isInDarkCave(World world, int x, int y, int z, boolean checkSpaceToSpawn, boolean skipLightCheck) {
         BlockPos pos = new BlockPos(x, y, z);
+        BlockPos posAir = new BlockPos(x, y + 1, z);
         IBlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        //TODO: verify canSeeSky doesnt need the air block, currently its being passed solid block pos
-        if (!world.canSeeSky(pos) && world.getLightFromNeighbors(pos) < 5) {
+        if (!world.canSeeSky(posAir) && (skipLightCheck || world.getLightFromNeighbors(posAir) < 5)) {
             if (!CoroUtilBlock.isAir(block) && state.getMaterial() == Material.ROCK/*(block != Blocks.grass || block.getMaterial() != Material.grass)*/) {
 
                 if (!checkSpaceToSpawn) {
                     return true;
                 } else {
-                    if (world.isAirBlock(pos.up(1)) && world.isAirBlock(pos.up(2))) {
+                    if (world.isAirBlock(posAir) && world.isAirBlock(pos.up(2))) {
                         return true;
                     }
 
