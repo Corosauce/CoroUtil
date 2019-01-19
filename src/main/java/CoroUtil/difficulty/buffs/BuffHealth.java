@@ -5,6 +5,7 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.forge.CULog;
+import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -50,7 +51,7 @@ public class BuffHealth extends BuffBase {
 
             //cap
             if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue() > cmod.max_value) {
-                ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeAllModifiers();
+                CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH));
                 ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.max_value);
             }
 

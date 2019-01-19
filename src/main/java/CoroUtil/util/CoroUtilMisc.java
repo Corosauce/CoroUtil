@@ -1,15 +1,19 @@
 package CoroUtil.util;
 
 import CoroUtil.forge.CULog;
+import com.google.common.collect.Lists;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.biome.Biome;
 
+import java.util.Collection;
 import java.util.List;
 
 public class CoroUtilMisc {
@@ -151,6 +155,19 @@ public class CoroUtilMisc {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    //because the vanilla method is flagged client only
+    public static void removeAllModifiers(IAttributeInstance attributeInstance) {
+        Collection<AttributeModifier> collection = attributeInstance.getModifiers();
+
+        if (collection != null)
+        {
+            for (AttributeModifier attributemodifier : Lists.newArrayList(collection))
+            {
+                attributeInstance.removeModifier(attributemodifier);
             }
         }
     }

@@ -4,6 +4,7 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAttributeAttackDamage;
 import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.forge.CULog;
+import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -40,7 +41,7 @@ public class BuffAttackDamage extends BuffBase {
 
             //cap
             if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue() > cmod.max_value) {
-                ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeAllModifiers();
+                CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE));
                 ent.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(cmod.max_value);
             }
 

@@ -6,6 +6,7 @@ import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.difficulty.data.cmods.CmodAttributeSpeed;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilAttributes;
+import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.util.EnumAttribModifierType;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -62,7 +63,7 @@ public class BuffSpeed extends BuffBase {
 
                     //cap
                     if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue() > cmod.max_value) {
-                        ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).removeAllModifiers();
+                        CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED));
                         ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.max_value);
                     }
 
@@ -82,7 +83,7 @@ public class BuffSpeed extends BuffBase {
 
                 //a bit of a hack, but will do until we encounter cross mod issues
                 if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue() > cmod.max_value) {
-                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeAllModifiers();
+                    CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED));
                     ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.max_value);
                 }
 
