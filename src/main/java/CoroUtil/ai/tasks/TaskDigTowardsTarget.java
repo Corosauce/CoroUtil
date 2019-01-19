@@ -537,7 +537,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 	public boolean shouldBeRemoved() {
 		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
 
-		if (forInvasion) {
+		if (forInvasion && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
 			//once its day, disable forever
 			if (this.entity.world.isDaytime()) {
 				CULog.dbg("removing digging from " + this.entity.getName());

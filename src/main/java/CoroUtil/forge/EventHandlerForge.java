@@ -2,6 +2,7 @@ package CoroUtil.forge;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
@@ -209,9 +210,9 @@ public class EventHandlerForge {
 		if (!ent.world.isRemote) {
 			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
 
-				if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+				if (ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone && ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
 
-					//TODO: persistance management here too maybe?
+					//persistance management here too maybe?
 					//invasion mod preventing this via AllowDespawn event in its handler class
 
 					if (ent instanceof EntityLiving) {

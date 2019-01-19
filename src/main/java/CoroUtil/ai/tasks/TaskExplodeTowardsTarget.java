@@ -3,6 +3,7 @@ package CoroUtil.ai.tasks;
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
@@ -146,7 +147,7 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
 	public boolean shouldBeRemoved() {
 		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
 
-		if (forInvasion) {
+		if (forInvasion && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
 			//once its day, disable forever
 			if (this.entity.world.isDaytime()) {
 				CULog.dbg("removing digging from " + this.entity.getName());

@@ -2,6 +2,7 @@ package CoroUtil.ai.tasks;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilPath;
 import net.minecraft.entity.EntityCreature;
@@ -255,7 +256,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     @Override
     public boolean shouldBeRemoved() {
 
-        if (disableAtSunrise) {
+        if (disableAtSunrise && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
             //once its day, disable forever
             if (this.attacker.world.isDaytime()) {
                 CULog.dbg("removing long distance pathing from " + this.attacker.getName());

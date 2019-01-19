@@ -2,6 +2,7 @@ package CoroUtil.ai.tasks;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
 import com.google.common.base.Predicate;
@@ -110,7 +111,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
 
     @Override
     public boolean shouldBeRemoved() {
-        if (disableAtSunrise) {
+        if (disableAtSunrise && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
             //once its day, disable forever
             if (this.taskOwner.world.isDaytime()) {
                 CULog.dbg("removing omniscience from " + this.taskOwner.getName());

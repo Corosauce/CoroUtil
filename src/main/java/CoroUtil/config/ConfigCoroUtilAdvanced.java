@@ -9,6 +9,9 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	public static String mobSpawnsProfile = "mob_spawns";
 
+	@ConfigComment("Force a specific profile to spawn, will ignore conditions and force it too, usefull for testing to see how a custom invasion will play out in normal circumstances")
+	public static String mobSpawnsWaveToForceUse = "";
+
 	public static int ticksToRepairBlock = 20*60*5;
 
 	public static double digSpeed = 0.01D;
@@ -18,6 +21,8 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	@ConfigComment("Probably usefull if you want zombie miners get stopped by FTBU claimed chunks for example, but i dont want this behavior by default")
 	public static boolean blockBreakingInvokesCancellableEvent = false;
+
+	public static boolean removeInvasionAIWhenInvasionDone = true;
 
 	@Override
 	public String getName() {

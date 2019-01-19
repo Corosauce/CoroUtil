@@ -5,6 +5,8 @@
     {
       "name": "invasion_stage_1_opt_1",
       "comment": "//name of this wave option, should be uniquely named for troubleshooting, not used anywhere else",
+      "wave_message": "miners!",
+      "comment": "//optional, custom invasion start message",
       "conditions": [
         {
           "condition": "random",
