@@ -21,6 +21,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.*;
+import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
@@ -44,6 +45,8 @@ import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.quest.quests.ItemQuest;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class CommandCoroUtil extends CommandBase {
 
@@ -243,6 +246,13 @@ public class CommandCoroUtil extends CommandBase {
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();
 	                }
+				} else if (var2[0].equalsIgnoreCase("printEntities")) {
+					player.sendMessage(new TextComponentString("Printing all entities names that might be usable in HW-Invasions, use these names in the mob_spawns json, copy these from forge logs for easier use"));
+					for (Map.Entry<ResourceLocation, EntityEntry> entry : ForgeRegistries.ENTITIES.getEntries()) {
+						if (EntityCreature.class.isAssignableFrom(entry.getValue().getEntityClass())) {
+							player.sendMessage(new TextComponentString(entry.getValue().getRegistryName().toString()));
+						}
+					}
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
 					String param = null;
 					//int dim = world.provider.getDimension();
