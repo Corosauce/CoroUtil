@@ -111,6 +111,11 @@
           "comment": "//gives a mob the ability to dig towards their target, only use for mobs the size of a zombie"
         },
         {
+          "cmod": "ai_explodeonstuck",
+
+          "comment": "//gives a mob the ability to explode once they cant get any closer to their target"
+        },
+        {
           "cmod": "ai_counterattack",
 
           "comment": "//gives a mob the ability to counter attack with a leap towards the target after theyre hit"

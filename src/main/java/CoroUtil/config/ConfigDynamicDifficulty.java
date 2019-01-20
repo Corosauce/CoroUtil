@@ -31,6 +31,18 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static int difficulty_BestVanillaArmorEnchant = 25;
 	
 	public static double difficulty_MaxDPSLoggable = 500;
+
+	@ConfigComment("Enable to exclude things like passive mobs, cows, etc")
+	public static boolean difficulty_OnlyLogDPSToHostiles = false;
+
+	@ConfigComment("Enable to only log things that can be tracked back to player, melee, bow usage, things like being on fire")
+	public static boolean difficulty_OnlyLogDPSFromPlayerAsSource = false;
+
+	@ConfigComment("Skip logging things like being in fire, being on fire, suffocation, fall damage. Lava damage will still be counted")
+	public static boolean difficulty_DontLogDPSFromEnvironment = true;
+
+	@ConfigComment("-1 to disable. Not counting instant hits, this is a workaround for an ongoing issue where extremely high hit rates are logged causing super high dps")
+	public static double difficulty_MaxAttackSpeedLoggable = 10;
 	
 	public static double difficulty_MaxDPSRatingAllowed = 5;
 

@@ -616,59 +616,117 @@ public class DynamicDifficulty {
 			Entity ent = event.getEntity();
 			World world = ent.world;
 			
-			if (ent instanceof IMob && ent instanceof EntityCreature) {
+			if (ent instanceof EntityCreature && (!ConfigDynamicDifficulty.difficulty_OnlyLogDPSToHostiles || ent instanceof IMob)) {
 				EntityCreature entC = (EntityCreature) ent;
 				
 				//dont log common occuring damages, sun burning, random wall glitching
-				if (event.getSource() == DamageSource.IN_WALL ||
-						event.getSource() == DamageSource.IN_FIRE ||
-						/*event.getSource() == DamageSource.ON_FIRE ||*/
-						event.getSource() == DamageSource.DROWN ||
-						event.getSource() == DamageSource.FALL/* || event.source == DamageSource.lava*/) {
-					return;
+				if (ConfigDynamicDifficulty.difficulty_DontLogDPSFromEnvironment) {
+					if (event.getSource() == DamageSource.IN_WALL ||
+							event.getSource() == DamageSource.IN_FIRE ||
+							event.getSource() == DamageSource.ON_FIRE ||
+							event.getSource() == DamageSource.DROWN ||
+							event.getSource() == DamageSource.FALL) {
+						return;
+					}
+				}
+
+				if (ConfigDynamicDifficulty.difficulty_OnlyLogDPSFromPlayerAsSource) {
+					if (!(event.getSource().getImmediateSource() instanceof EntityPlayer) && !(event.getSource().getTrueSource() instanceof EntityPlayer)) {
+						return;
+					}
 				}
 				
 				
-				
-				AttackData log = null;
+				AttackData log;
 				if (!lookupEntToDamageLog.containsKey(ent.getEntityId())) {
 					log = new AttackData(entC);
 					lookupEntToDamageLog.put(ent.getEntityId(), log);
 				} else {
 					int lastLogTimeThreshold = 20*5;
 					log = lookupEntToDamageLog.get(ent.getEntityId());
+
+					//if it took too long for next hit, do a full reset
+					//lets also not log the damage, as it'd be logged as a sloooow attack, lets hope for better data to come
 					if (log.getLastLogTime() + lastLogTimeThreshold < world.getTotalWorldTime()) {
+						CULog.dbg("damage expired, resetting");
 						logToChunk(log);
 						log.cleanup();
 						log = new AttackData(entC);
 						lookupEntToDamageLog.put(ent.getEntityId(), log);
-					} else {
-						
+					} else if (!log.isSameSource(event.getSource())) {
+						CULog.dbg("damage source mismatch, resetting");
+						//if a different source is damaging it, do a full reset
+						//TODO: it is possible that no dps will ever get logged if a perfect cycle of 2 alternating damage sources are hitting it
+						//a solution would be to have multiple damage source trackers per entity
+						//might be overkill, we dont have to track everything perfectly
+						logToChunk(log);
+						log.cleanup();
+						log = new AttackData(entC);
+						lookupEntToDamageLog.put(ent.getEntityId(), log);
 					}
 				}
-				
+
+				//we do nothing with first freshly tracked hit
+				//we do nothing with last timed out hit
+				//only if same source of hit happens again within 5 seconds, track it
+				//- we actually track single hits with no follow up, will count as instahit of half second interval
+				//prevent less than 10 tick hits to protect against potential bug
+				//if same tick damage happens from same source, assume a mod is just doing odd things and add them up to be 1 hit
+
+
+				//TODO: TRACK SOURCE OF DAMAGE AND RESET IF IT DIFFERS! THIS IS THE BUG WITH DPS
+				//hitting right after fire damage = high dps
+				//if source mismatch, log last damage and reset
+				//or just reset?
+
+				/**
+				 *
+				 * shortest time allowed: 10 ticks
+				 *
+				 * longest time allowed: 20*5 ticks
+				 * - if this is hit, dont count it, reset
+				 *
+				 * scenarios:
+				 *
+				 * normal:
+				 *
+				 * log damage source 1
+				 * small time passes
+				 * log damage source 1
+				 * - calculates dps
+				 * - cycle can repeat
+				 *
+				 *
+				 */
+
 				float damageToLog = event.getAmount();
+				float timeDiffSeconds = 0;
+				float damage = 0;
+				boolean bigDamage;
 				if (log.getLastDamage() > 0) {
 					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
-					float timeDiffSeconds = (float)timeDiff / 20F;
-					if (timeDiff > 0) {
-						float damage = log.getLastDamage() / timeDiffSeconds;
 
-						boolean bigDamage = false;
+					//catch potentially game breaking fast hits, mainly to fix buggy edge cases, might not be needed with new source tracking code
+					if (timeDiff != 0 && ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable != -1 && timeDiff < ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable) {
+						CULog.dbg("DPS WARNING: detected high hit rate of " + timeDiff + ", adjusting to max allowed rate of " + ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable);
+						timeDiff = (long) ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable;
+					}
+
+					timeDiffSeconds = (float)timeDiff / 20F;
+					if (timeDiff > 0) {
+						damage = log.getLastDamage() / timeDiffSeconds;
+
+
 						
 						if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && damage > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
 							damage = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
-							CULog.dbg("!!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
+							CULog.dbg("DPS WARNING: !!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
 							bigDamage = true;
 						}
 
 						if (damage > ConfigDynamicDifficulty.difficulty_BestVanillaDPS) {
-							CULog.dbg("!!! damage was greater than expected vanilla capabilities!!!");
+							CULog.dbg("DPS WARNING: !!! damage was greater than expected vanilla capabilities!!!");
 							bigDamage = true;
-						}
-
-						if (bigDamage) {
-							CULog.dbg("logging damageToLog: " + damageToLog + "damage: " + damage + ", log.getLastDamage(): " + log.getLastDamage() + " to " + entC.getClass() + " by " + event.getSource().getTrueSource() + " with " + event.getSource().damageType + " timediffinsecs: " + timeDiffSeconds);
 						}
 
 						log.getListDPSs().add(damage);
@@ -680,10 +738,17 @@ public class DynamicDifficulty {
 						//if no time passed, just add last entry onto current entry
 						damageToLog += log.getLastDamage();
 					}
-					
-					
 				}
-				
+
+				if (true || bigDamage) {
+					String source = "null";
+					if (event.getSource().getTrueSource() != null) {
+						source = event.getSource().getTrueSource().getClass().getSimpleName();
+					}
+					CULog.dbg("logging damageToLog: " + damageToLog + " damage: " + damage + ", log.getLastDamage(): " + log.getLastDamage() + " to " + entC.getClass().getSimpleName() + " by source " + source + " with " + event.getSource().damageType + " timediffinsecs: " + timeDiffSeconds);
+				}
+
+				log.trackSources(event.getSource());
 				log.setLastDamage(damageToLog);
 				log.setLastLogTime(world.getTotalWorldTime());
 			}
@@ -698,14 +763,15 @@ public class DynamicDifficulty {
 		if (ConfigDynamicDifficulty.trackChunkData) {
 			
 			Entity ent = event.getEntity();
-			World world = ent.world;
 			
-			if (ent instanceof IMob && ent instanceof EntityCreature) {
+			if (ent instanceof EntityCreature && (!ConfigDynamicDifficulty.difficulty_OnlyLogDPSToHostiles || ent instanceof IMob)) {
 				if (lookupEntToDamageLog.containsKey(ent.getEntityId())) {
 					AttackData log = lookupEntToDamageLog.get(ent.getEntityId());
-					logToChunk(log);
-					log.cleanup();
-					lookupEntToDamageLog.remove(ent.getEntityId());
+					if (log != null) {
+						logToChunk(log);
+						log.cleanup();
+						lookupEntToDamageLog.remove(ent.getEntityId());
+					}
 				}
 				
 			}
@@ -732,7 +798,7 @@ public class DynamicDifficulty {
 				instaKillDPSCalc = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
 			}
 
-			CULog.dbg("logging instakill: " + instaKillDPSCalc);
+			CULog.dbg("logging one time hit of: " + instaKillDPSCalc);
 			log.getListDPSs().add(instaKillDPSCalc);
 		}
 		
