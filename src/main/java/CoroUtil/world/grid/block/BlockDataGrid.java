@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import CoroUtil.forge.AsyncSaveTask;
 import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -162,8 +163,8 @@ public class BlockDataGrid
     		
     		NBTTagCompound data = new NBTTagCompound();
     		
-    		Collection playerDataCl = grid.values();
-			Iterator it = playerDataCl.iterator();
+    		Collection<BlockDataPoint> playerDataCl = grid.values();
+			Iterator<BlockDataPoint> it = playerDataCl.iterator();
 			
 			while (it.hasNext()) {
 				BlockDataPoint bdp = (BlockDataPoint)it.next();
@@ -175,8 +176,7 @@ public class BlockDataGrid
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
     		FileOutputStream fos = new FileOutputStream(saveFolder + "BlockDataDim_" + world.provider.getDimension() + ".dat");
-	    	CompressedStreamTools.writeCompressed(data, fos);
-	    	fos.close();
+    		new AsyncSaveTask(data, fos).start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

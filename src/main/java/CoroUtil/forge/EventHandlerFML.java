@@ -45,23 +45,24 @@ public class EventHandlerFML {
 		if (event.phase == Phase.START) {
 			//System.out.println("tick coroutil");
 			//if (formationManager == null) formationManager = new Manager();
+			World worlds[] = DimensionManager.getWorlds();
+			if(worlds.length == 0)
+				return;
 			
 			//might not account for dynamic dimension addition during runtime
-	    	if (lastWorld != DimensionManager.getWorld(0)) {
-	    		lastWorld = DimensionManager.getWorld(0);
+	    	if (lastWorld != worlds[0]) {
+	    		lastWorld = worlds[0];
 	    		
-	    		World worlds[] = DimensionManager.getWorlds();
-	    		for (int i = 0; i < worlds.length; i++) {
-	    			worlds[i].addEventListener(new CoroAIWorldAccess());
+	    		for (World world: worlds) {
+	    			world.addEventListener(new CoroAIWorldAccess());
 	    		}
 	    	}
 			
 			//if (formationManager != null) formationManager.tickUpdate();
 			
 			//Quest system
-	    	World worlds[] = DimensionManager.getWorlds();
-			for (int i = 0; i < worlds.length; i++) {
-				PlayerQuestManager.i().tick(worlds[i]);
+	    	for (World world: worlds) {
+				PlayerQuestManager.i().tick(world);
 			}
 			
 			WorldDirectorManager.instance().onTick();
@@ -93,7 +94,7 @@ public class EventHandlerFML {
 				
 			}
 			
-			DynamicDifficulty.tickServer(event);
+			DynamicDifficulty.tickServer(event, worlds[0]);
 		}
 		
 	}

@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import CoroUtil.forge.AsyncSaveTask;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.quest.quests.ActiveQuest;
@@ -301,9 +302,7 @@ public class PlayerQuests {
 				
 			FileOutputStream fos = new FileOutputStream(URL + playerName + ".dat");
 			
-	    	CompressedStreamTools.writeCompressed(nbt, fos);
-	    	
-	    	fos.close();
+			new AsyncSaveTask(nbt, fos).start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

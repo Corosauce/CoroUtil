@@ -22,6 +22,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.event.WorldEvent;
+import CoroUtil.forge.AsyncSaveTask;
 import CoroUtil.pathfinding.PathPointEx;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilFile;
@@ -195,12 +196,12 @@ public class WorldDirector implements Runnable {
 		return lookupTickingManagedLocations.get(hash);
 	}
 	
-	public void tick() {
-		for (int i = 0; i < worldEvents.size(); i++) {
-			WorldEvent event = worldEvents.get(i);
+	public void tick(World world) {
+		for (Iterator<WorldEvent> iter = worldEvents.iterator(); iter.hasNext(); ) {
+			WorldEvent event = iter.next();
 			if (event.isComplete()) {
 				event.cleanup();
-				worldEvents.remove(i--);
+				iter.remove();
 			}
 		}
 		
@@ -220,8 +221,6 @@ public class WorldDirector implements Runnable {
 		for (ISimulationTickable entry : listTickingLocations) {
 			entry.tickUpdate();
 		}
-		
-		World world = getWorld();
 		
 		//update occupance chunk data for each player
 		if (ConfigCoroUtil.trackPlayerData) {
@@ -326,8 +325,7 @@ public class WorldDirector implements Runnable {
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
     		FileOutputStream fos = new FileOutputStream(saveFolder + "WorldData_" + modID + "_" + dimID + "_" + type + ".dat");
-	    	CompressedStreamTools.writeCompressed(nbt, fos);
-	    	fos.close();
+    		new AsyncSaveTask(nbt, fos).start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

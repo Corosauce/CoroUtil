@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import CoroUtil.forge.AsyncSaveTask;
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -110,9 +111,7 @@ public class PetsManager {
 				
 			FileOutputStream fos = new FileOutputStream(URL + "tamedPets" + ".dat");
 			
-	    	CompressedStreamTools.writeCompressed(nbt, fos);
-	    	
-	    	fos.close();
+			new AsyncSaveTask(nbt, fos).start();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

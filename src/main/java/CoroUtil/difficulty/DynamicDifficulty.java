@@ -76,24 +76,21 @@ public class DynamicDifficulty {
 	
 	public static HashMap<Integer, AttackData> lookupEntToDamageLog = new HashMap<Integer, AttackData>();
 
-	public static void tickServer(ServerTickEvent event) {
-		World world = DimensionManager.getWorld(0);
-		if (world != null) {
-			for (Object player : world.playerEntities) {
-				if (player instanceof EntityPlayer) {
-					tickPlayer((EntityPlayer)player);
-				}
+	public static void tickServer(ServerTickEvent event, World overworld) {
+		if (overworld != null) {
+			for (EntityPlayer player : overworld.playerEntities) {
+				tickPlayer(player);
 			}
 			
 			
 			if (ConfigCoroUtil.cleanupStrayMobs) {
-				long dayNumber = (world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
+				long dayNumber = (overworld.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
 				if (dayNumber % ConfigCoroUtil.cleanupStrayMobsDayRate == 0) {
-					long timeOfDay = world.getWorldTime() % CoroUtilWorldTime.getDayLength();
+					long timeOfDay = overworld.getWorldTime() % CoroUtilWorldTime.getDayLength();
 					int killTimeRange = 10;
 					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						CULog.dbg("KILLING ALL ZOMBIES!");
-						for (Object obj : world.loadedEntityList) {
+						for (Object obj : overworld.loadedEntityList) {
 							if (obj instanceof EntityZombie) {
 								((EntityZombie) obj).setDead();
 							}

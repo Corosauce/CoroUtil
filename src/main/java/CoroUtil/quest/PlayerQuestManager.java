@@ -16,21 +16,13 @@ public class PlayerQuestManager {
 	//public static PlayerQuestManager i;
 	public HashMap<String, PlayerQuests> playerQuests;
 	
-	private static PlayerQuestManager serverManager;
-	private static PlayerQuestManager clientManager;
+	private static PlayerQuestManager manager;
 	
 	public static PlayerQuestManager i() {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			if (serverManager == null) {
-				serverManager = new PlayerQuestManager();
-			}
-			return serverManager;
-		} else {
-			if (clientManager == null) {
-				clientManager = new PlayerQuestManager();
-			}
-			return clientManager;
+		if (manager == null) {
+			manager = new PlayerQuestManager();
 		}
+		return manager;
 	}
 	
 	public PlayerQuestManager() {
