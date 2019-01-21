@@ -70,7 +70,7 @@ public class BuffSpeed extends BuffBase {
                     CULog.dbg("mob flying speed went from " + oldValFlying + " to " + ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
                 } else {
                     //TODO: probably correct, maybe edge case where we should register it?
-                    CULog.err("mob flying cmod used on a mob that doesnt have a flying attribute registered");
+                    CULog.dbg("mob flying cmod used on a mob that doesnt have a flying attribute registered");
                 }
             } else {
                 double oldVal = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
