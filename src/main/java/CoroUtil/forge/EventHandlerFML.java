@@ -7,6 +7,7 @@ import CoroUtil.difficulty.DynamicDifficulty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
@@ -24,7 +25,6 @@ import CoroUtil.test.SoundTest;
 import CoroUtil.world.WorldDirectorManager;
 public class EventHandlerFML {
 
-	public static World lastWorld = null;
 	//public static Manager formationManager;
 	
 	@SideOnly(Side.CLIENT)
@@ -38,6 +38,13 @@ public class EventHandlerFML {
 			CoroUtil.initTry();
 		}
 	}
+
+	@SubscribeEvent
+	public void worldLoad(WorldEvent.Load event) {
+		int dimID = event.getWorld().provider.getDimension();
+		CULog.dbg("adding CoroUtil world listener for dimID: " + dimID + ", remote?: " + event.getWorld().isRemote);
+		event.getWorld().addEventListener(new CoroAIWorldAccess());
+	}
 	
 	@SubscribeEvent
 	public void tickServer(ServerTickEvent event) {
@@ -45,16 +52,6 @@ public class EventHandlerFML {
 		if (event.phase == Phase.START) {
 			//System.out.println("tick coroutil");
 			//if (formationManager == null) formationManager = new Manager();
-			
-			//might not account for dynamic dimension addition during runtime
-	    	if (lastWorld != DimensionManager.getWorld(0)) {
-	    		lastWorld = DimensionManager.getWorld(0);
-	    		
-	    		World worlds[] = DimensionManager.getWorlds();
-	    		for (int i = 0; i < worlds.length; i++) {
-	    			worlds[i].addEventListener(new CoroAIWorldAccess());
-	    		}
-	    	}
 			
 			//if (formationManager != null) formationManager.tickUpdate();
 			
