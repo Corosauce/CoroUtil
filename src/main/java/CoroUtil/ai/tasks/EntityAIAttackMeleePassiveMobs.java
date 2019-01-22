@@ -141,6 +141,13 @@ public class EntityAIAttackMeleePassiveMobs extends EntityAIBase implements ITas
     public void updateTask()
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+
+        //patch for a problem i hope wont happen else where, might be because im doing this on passive mobs
+        if (entitylivingbase == null) {
+            resetTask();
+            return;
+        }
+
         this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
         double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
         --this.delayCounter;

@@ -630,6 +630,11 @@ public class DynamicDifficulty {
 					}
 				}
 
+				//must always exclude, /kill command uses it
+				if (event.getSource() == DamageSource.OUT_OF_WORLD) {
+					return;
+				}
+
 				if (ConfigDynamicDifficulty.difficulty_OnlyLogDPSFromPlayerAsSource) {
 					if (!(event.getSource().getImmediateSource() instanceof EntityPlayer) && !(event.getSource().getTrueSource() instanceof EntityPlayer)) {
 						return;
