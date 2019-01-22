@@ -101,7 +101,7 @@ public class DifficultyDataReader {
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_ExplodeOnStuck, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap, CmodAITaskBase.class);
-        //used to be "ai_lunge", how to resolve, separate tasks or a multi buff task that can be configured via adding or post adding?
+        lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Hoist, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Lunge, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Attack_Melee, CmodAITaskBase.class);
         lookupJsonNameToCmodDeserializer.put(UtilEntityBuffs.dataEntityBuffed_AI_Infernal, CmodAIInfernal.class);
@@ -142,6 +142,9 @@ public class DifficultyDataReader {
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Lunge,
                 EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
+
+        UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Hoist,
+                EntityAIHoist.class, 2).setAllowRedundantAttempts());
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Attack_Melee,
                 EntityAIAttackMeleePassiveMobs.class, 2));

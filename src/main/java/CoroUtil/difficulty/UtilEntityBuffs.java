@@ -55,6 +55,7 @@ public class UtilEntityBuffs {
 
     public static String dataEntityBuffed_AI_CounterLeap = "ai_counterattack";
     public static String dataEntityBuffed_AI_Lunge = "ai_lunge";
+    public static String dataEntityBuffed_AI_Hoist = "ai_hoist";
     public static String dataEntityBuffed_AI_Digging = "ai_mining";
     public static String dataEntityBuffed_AI_ExplodeOnStuck = "ai_explodeonstuck";
     public static String dataEntityBuffed_AI_Omniscience = "ai_omniscience";

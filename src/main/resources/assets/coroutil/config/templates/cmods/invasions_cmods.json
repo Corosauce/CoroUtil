@@ -23,6 +23,9 @@
         },
         {
           "cmod": "ai_lunge"
+        },
+        {
+          "cmod": "ai_hoist"
         }
       ]
     },

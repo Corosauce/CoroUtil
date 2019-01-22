@@ -16,7 +16,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 3,
           "count_max": 5,
           "count_difficulty_multiplier": 2,
           "spawn_type": "ground",
@@ -38,7 +38,7 @@
           "count": 5,
           "count_max": 15,
           "count_difficulty_multiplier": 2,
-          "spawn_type": "cave",
+          "spawn_type": "ground",
           "cmods": [
             {
               "cmod": "template",
@@ -67,7 +67,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 3,
           "count_max": 5,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -85,7 +85,7 @@
           "entities": [
             "minecraft:skeleton"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -119,7 +119,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -179,7 +179,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -239,7 +239,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -295,7 +295,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -351,7 +351,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -410,7 +410,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
@@ -470,7 +470,7 @@
           "entities": [
             "minecraft:zombie"
           ],
-          "count": 2,
+          "count": 5,
           "count_max": 10,
           "count_difficulty_multiplier": 2,
           "cmods": [
