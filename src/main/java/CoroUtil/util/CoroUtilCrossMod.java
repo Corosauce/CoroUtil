@@ -1,17 +1,14 @@
 package CoroUtil.util;
 
-import CoroUtil.config.ConfigDynamicDifficulty;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -175,7 +172,7 @@ public class CoroUtilCrossMod {
 
         if (!hasInfernalMobs()) return;
 
-        if (!ConfigDynamicDifficulty.difficulty_OverrideInfernalMobs) return;
+        if (!ConfigCoroUtilAdvanced.difficulty_OverrideInfernalMobs) return;
 
         //disable unless HW monsters is installed which performs the difficulty based replacements
         if (!CoroUtilCompatibility.isHWMonstersInstalled()) return;

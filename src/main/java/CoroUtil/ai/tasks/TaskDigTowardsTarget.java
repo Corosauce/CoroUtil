@@ -1,30 +1,22 @@
 package CoroUtil.ai.tasks;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
-import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.forge.CULog;
-import CoroUtil.forge.CommonProxy;
 import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilPlayer;
 import CoroUtil.util.UtilMining;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -494,7 +486,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 			bdp.digDamage = 0;
 		}
 		bdp.lastTickTimeDig = entity.world.getTotalWorldTime();
-		double digSpeed = ConfigCoroUtilAdvanced.digSpeed;
+		double digSpeed = ConfigDynamicDifficulty.digSpeed;
 		bdp.digDamage += digSpeed / blockStrength;
     	
     	if (bdp.digDamage > 1D) {

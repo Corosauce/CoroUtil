@@ -13,6 +13,7 @@ import java.util.List;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.data.DifficultyDataReader;
+import CoroUtil.util.CoroUtilCompatibility;
 import CoroUtil.util.CoroUtilMisc;
 import modconfig.ConfigMod;
 import net.minecraft.entity.Entity;
@@ -73,8 +74,10 @@ public class CoroUtil {
 
 		configCoroUtil = new ConfigCoroUtil();
     	ConfigMod.addConfigFile(event, configCoroUtil);
-    	if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
+		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles || CoroUtilCompatibility.isHWInvasionsInstalled() || CoroUtilCompatibility.isHWMonstersInstalled()) {
 			ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
+		}
+    	if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
 			ConfigMod.addConfigFile(event, new ConfigHWMonsters());
 			ConfigMod.addConfigFile(event, new ConfigCoroUtilAdvanced());
 		}

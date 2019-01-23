@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilWorldTime;
 import CoroUtil.world.WorldDirector;
@@ -16,6 +17,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -178,6 +180,8 @@ public class DynamicDifficulty {
 
 	public static void deathPlayer(EntityPlayer player) {
 		//TODO: find existing ones and reset their timer? what about it not buffing the exact new spot
+		//worth noting, this wont adjust existing entities in the area, only new ones
+		//so they will still have strong enemies hanging around their death spot if its for an invasion
 
 		WorldDirector wd = WorldDirectorManager.instance().getCoroUtilWorldDirector(player.world);
 
@@ -348,7 +352,7 @@ public class DynamicDifficulty {
 	}
 	
 	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos) {
-		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSRadius;
+		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSChunkRadius;
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
 		//int count = 0;
@@ -375,7 +379,7 @@ public class DynamicDifficulty {
 	}
 
 	public static void resetDifficultyScaleForPosDPS(World world, BlockCoord pos) {
-		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSRadius;
+		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSChunkRadius;
 		chunkRange = 50;
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
@@ -407,9 +411,9 @@ public class DynamicDifficulty {
 	}
 	
 	public static float convertDPSToDifficultyScale(float dps) {
-		float scale = (float)dps / (float)getBestPlayerDPSRatingPossibleVanilla();
-		if (scale > ConfigDynamicDifficulty.difficulty_MaxDPSRatingAllowed) {
-			scale = (float) ConfigDynamicDifficulty.difficulty_MaxDPSRatingAllowed;
+		float scale = dps / getBestPlayerDPSRatingPossibleVanilla();
+		if (scale > ConfigCoroUtilAdvanced.difficulty_MaxDPSRatingAllowed) {
+			scale = (float) ConfigCoroUtilAdvanced.difficulty_MaxDPSRatingAllowed;
 		}
 		return scale;
 	}
@@ -611,7 +615,7 @@ public class DynamicDifficulty {
 	
 	public static void logDamage(LivingHurtEvent event) {
 		if (event.getEntity().world.isRemote) return;
-		if (ConfigDynamicDifficulty.trackChunkData) {
+		if (ConfigCoroUtilAdvanced.trackChunkData) {
 			
 			Entity ent = event.getEntity();
 			World world = ent.world;
@@ -640,6 +644,11 @@ public class DynamicDifficulty {
 						return;
 					}
 				}
+
+				//dont log sources from AI, this fixes things like creepers damaging zombies, wolfs attacking sheep, etc
+				if (event.getSource().getTrueSource() instanceof EntityLiving) {
+				    return;
+                }
 				
 				
 				AttackData log;
@@ -712,9 +721,9 @@ public class DynamicDifficulty {
 					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
 
 					//catch potentially game breaking fast hits, mainly to fix buggy edge cases, might not be needed with new source tracking code
-					if (timeDiff != 0 && ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable != -1 && timeDiff < ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable) {
-						CULog.dbg("DPS WARNING: detected high hit rate of " + timeDiff + ", adjusting to max allowed rate of " + ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable);
-						timeDiff = (long) ConfigDynamicDifficulty.difficulty_MaxAttackSpeedLoggable;
+					if (timeDiff != 0 && ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable != -1 && timeDiff < ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable) {
+						CULog.dbg("DPS WARNING: detected high hit rate of " + timeDiff + ", adjusting to max allowed rate of " + ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable);
+						timeDiff = (long) ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable;
 					}
 
 					timeDiffSeconds = (float)timeDiff / 20F;
@@ -723,8 +732,8 @@ public class DynamicDifficulty {
 
 
 						
-						if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && damage > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
-							damage = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
+						if (ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable != -1 && damage > ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable) {
+							damage = (float) ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable;
 							CULog.dbg("DPS WARNING: !!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
 							bigDamage = true;
 						}
@@ -765,7 +774,7 @@ public class DynamicDifficulty {
 	
 	public static void logDeath(LivingDeathEvent event) {
 		if (event.getEntity().world.isRemote) return;
-		if (ConfigDynamicDifficulty.trackChunkData) {
+		if (ConfigCoroUtilAdvanced.trackChunkData) {
 			
 			Entity ent = event.getEntity();
 			
@@ -799,8 +808,8 @@ public class DynamicDifficulty {
 			//add an insta kill dps that assumes can be done every half second
 			float instaKillDPSCalc = log.getLastDamage() * 2;
 			
-			if (ConfigDynamicDifficulty.difficulty_MaxDPSLoggable != -1 && instaKillDPSCalc > ConfigDynamicDifficulty.difficulty_MaxDPSLoggable) {
-				instaKillDPSCalc = (float) ConfigDynamicDifficulty.difficulty_MaxDPSLoggable;
+			if (ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable != -1 && instaKillDPSCalc > ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable) {
+				instaKillDPSCalc = (float) ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable;
 			}
 
 			CULog.dbg("logging one time hit of: " + instaKillDPSCalc);

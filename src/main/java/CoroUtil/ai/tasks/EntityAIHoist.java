@@ -2,6 +2,7 @@ package CoroUtil.ai.tasks;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
+import CoroUtil.block.BlockRepairingBlock;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilBlock;
@@ -233,7 +234,7 @@ public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IIn
                         BlockPos pos = new BlockPos(tryX, tryY, tryZ);
                         IBlockState state = entity.world.getBlockState(pos);
                         //Block id = entity.world.getBlock((int)(tryX), (int)(tryY), (int)(tryZ));
-                        if (!CoroUtilBlock.isAir(state.getBlock()) && (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS)) {
+                        if (!CoroUtilBlock.isAir(state.getBlock()) && (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) && !(state.getBlock() instanceof BlockRepairingBlock)) {
                             //System.out.println("remove leafs!");
                             entity.world.setBlockToAir(pos);
                         }

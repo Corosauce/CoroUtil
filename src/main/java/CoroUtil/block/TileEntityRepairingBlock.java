@@ -2,9 +2,9 @@ package CoroUtil.block;
 
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
-import CoroUtil.forge.CoroUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.state.IBlockState;
@@ -163,7 +163,7 @@ public class TileEntityRepairingBlock extends TileEntity
     }
 
     public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos) {
-        return replaceBlockAndBackup(world, pos, ConfigCoroUtilAdvanced.ticksToRepairBlock);
+        return replaceBlockAndBackup(world, pos, ConfigDynamicDifficulty.ticksToRepairBlock);
     }
 
     /**

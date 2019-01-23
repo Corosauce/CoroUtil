@@ -205,6 +205,7 @@ public class EventHandlerForge {
 		if (!ent.world.isRemote) {
 			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
 
+				//NOTE: this code doesnt actually know if its an invasion, it just assumes if it has the buff and its now daytime, invasion is over
 				if (ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone && ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
 
 					//persistance management here too maybe?

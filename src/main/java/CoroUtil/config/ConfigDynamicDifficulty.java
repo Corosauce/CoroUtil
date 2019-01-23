@@ -7,9 +7,6 @@ import java.io.File;
 
 public class ConfigDynamicDifficulty implements IConfigCategory {
 
-	@ConfigComment("Track chunk bound data required for some difficulty calculations, disable if issues with server stability relating to CoroUtil, will affect HW-Invasions")
-	public static boolean trackChunkData = true;
-	
 	@ConfigComment("How long it takes to reach max difficulty level for a specific player in gameplay ticks (50 hours)")
 	public static int difficulty_MaxTicksOnServer = 20*60*60*50;
 	
@@ -21,18 +18,23 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	public static int difficulty_DistFromSpawnMax = 5000;
 	/*@ConfigComment("How fast it increases difficulty to max distance")
 	public static double difficulty_ScaleRate = 1D;*/
-	
-	public static int difficulty_BestDPSRadius = 4;
-	
+
+	@ConfigComment("How far around a player to lookup DPS info to average out a DPS calculation for local difficulty")
+	public static int difficulty_BestDPSChunkRadius = 4;
+
+	@ConfigComment("The expected best dps possible without mods, used to scale rating from 0 to 1")
 	public static int difficulty_BestVanillaDPS = 20;
 
+	@ConfigComment("The expected best health possible without mods, used to scale rating from 0 to 1")
 	public static int difficulty_BestVanillaHealth = 20;
-	public static int difficulty_BestVanillaArmor = 20;
-	public static int difficulty_BestVanillaArmorEnchant = 25;
-	
-	public static double difficulty_MaxDPSLoggable = 500;
 
-	@ConfigComment("Enable to exclude things like passive mobs, cows, etc")
+	@ConfigComment("The expected best armor possible without mods, used to scale rating from 0 to 1")
+	public static int difficulty_BestVanillaArmor = 20;
+
+	@ConfigComment("The expected best armor enchantment bonus possible without mods, used to scale rating from 0 to 1")
+	public static int difficulty_BestVanillaArmorEnchant = 25;
+
+	@ConfigComment("Enable to exclude things like passive mobs, cows, etc from being used to figure out DPS for a chunk")
 	public static boolean difficulty_OnlyLogDPSToHostiles = false;
 
 	@ConfigComment("Enable to only log things that can be tracked back to player, melee, bow usage, things like being on fire")
@@ -41,37 +43,44 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	@ConfigComment("Skip logging things like being in fire, being on fire, suffocation, fall damage. Lava damage will still be counted")
 	public static boolean difficulty_DontLogDPSFromEnvironment = true;
 
-	@ConfigComment("-1 to disable. Not counting instant hits, this is a workaround for an ongoing issue where extremely high hit rates are logged causing super high dps")
-	public static double difficulty_MaxAttackSpeedLoggable = 10;
-	
-	public static double difficulty_MaxDPSRatingAllowed = 5;
-
+	@ConfigComment("How much influence vanilla chunk inhabited time has on the averaged difficulty rating, higher number = more")
 	public static double weightPosOccupy = 1D;
+
+	@ConfigComment("How much influence player equipment rating has on the averaged difficulty rating, higher number = more")
 	public static double weightPlayerEquipment = 1.5D;
+
+	@ConfigComment("How much influence the players time in the game has on the averaged difficulty rating, higher number = more")
 	public static double weightPlayerServerTime = 0D;
+
+	@ConfigComment("How much influence a players calculated damage per second has on the averaged difficulty rating, higher number = more")
 	public static double weightDPS = 1.5D;
+
+	@ConfigComment("How much influence a players max health has on the averaged difficulty rating, higher number = more")
 	public static double weightHealth = 1D;
+
+	@ConfigComment("How much influence a players distance from spawn has on the averaged difficulty rating, higher number = more")
 	public static double weightDistFromSpawn = 1D;
+
+	@ConfigComment("How much influence a buffed location has on the averaged difficulty rating, higher number = more, currently unused")
 	public static double weightBuffedLocation = 2D;
+
+	@ConfigComment("How much influence debuffed location has on the averaged difficulty rating, higher number = more")
 	public static double weightDebuffedLocation = 1D;
 	
-	@ConfigComment("-1 = dont cap it")
+	@ConfigComment("unmodded difficulty is expected from 0 to 1, anything above 1 should be from mods, use this if you feel mods are making the difficulty way too high, -1 = dont cap it")
 	public static double difficulty_Max = -1;
 
-	//TODO: if false, will we be double buffing infernal mobs accidentally?
-	@ConfigComment("Only used of HWMonsters is installed. If true, tie overall chance of infernal mobs to our difficulty system scaling, if false, don't try to control it at all")
-	public static boolean difficulty_OverrideInfernalMobs = true;
-	
-	/*@ConfigComment("what level of difficulty is required to count as 100% chance")
-	public static double difficulty_Infernal_Elite_Max = 5F;
-	@ConfigComment("what level of difficulty is required to count as 100% chance")
-	public static double difficulty_Infernal_Ultra_Max = 5F;
-	@ConfigComment("what level of difficulty is required to count as 100% chance")
-	public static double difficulty_Infernal_Infernal_Max = 5F;
-	
-	public static double difficulty_Infernal_Elite_ScaleRate = 1F;
-	public static double difficulty_Infernal_Ultra_ScaleRate = 1F;
-	public static double difficulty_Infernal_Infernal_ScaleRate = 1F;*/
+	@ConfigComment("How many game ticks until a repairing block fully restores to its original block")
+	public static int ticksToRepairBlock = 20*60*5;
+
+	@ConfigComment("For entities with block mining ability, how fast they mine a block per tick, higher is faster")
+	public static double digSpeed = 0.01D;
+
+	@ConfigComment("Prevents permanent damage caused by explosions during invasions, since zombie miners will be making holes they can get in")
+	public static boolean convertExplodedBlocksToRepairingBlocksDuringInvasion = true;
+
+	@ConfigComment("Chests, machines, etc, arent normal blocks that we can convert to repairing blocks, so instead this setting just protects them from being harmed at all by explosions")
+	public static boolean preventExplodedTileEntitiesDuringInvasions = true;
 
 	@Override
 	public String getName() {
