@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
 import modconfig.forge.CommandModConfig;
 import modconfig.forge.EventHandlerPacket;
@@ -66,25 +67,31 @@ public class ConfigMod {
     }
     
     public static void populateData(String modid) {
-    	
-    	configLookup.get(modid).configData.clear();
-    	
-    	ModConfigData data = configLookup.get(modid);
-        
-        if (data != null) {
-        	//int pos = 0;
-        	
-        	processHashMap(modid, data.valsInteger);
-        	processHashMap(modid, data.valsDouble);
-        	processHashMap(modid, data.valsBoolean);
-        	processHashMap(modid, data.valsString);
-        } else {
-        	System.out.println("error: cant find config data for gui");
+
+        try {
+            configLookup.get(modid).configData.clear();
+
+            ModConfigData data = configLookup.get(modid);
+
+            if (data != null) {
+                //int pos = 0;
+
+                processHashMap(modid, data.valsInteger);
+                processHashMap(modid, data.valsDouble);
+                processHashMap(modid, data.valsBoolean);
+                processHashMap(modid, data.valsString);
+            } else {
+                System.out.println("error: cant find config data for gui");
+            }
+
+            //sort it here!
+            Collections.sort(configLookup.get(modid).configData, new ConfigComparatorName());
+            //configLookup.get(modid).configData.
+        } catch (Exception ex) {
+            if (ConfigCoroUtil.useLoggingDebug) {
+                ex.printStackTrace();
+            }
         }
-        
-        //sort it here!
-        Collections.sort(configLookup.get(modid).configData, new ConfigComparatorName());
-        //configLookup.get(modid).configData.
     }
     
     public static void processHashMap(String modid, Map map) {
