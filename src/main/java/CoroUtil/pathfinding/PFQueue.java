@@ -3,6 +3,7 @@ package CoroUtil.pathfinding;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFence;
 import net.minecraft.entity.Entity;
@@ -13,7 +14,6 @@ import net.minecraft.util.IntHashMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import CoroUtil.ChunkCoordinatesSize;
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.DimensionChunkCacheNew;
 
@@ -148,7 +148,7 @@ public class PFQueue implements Runnable {
     			manageQueue();
     			//Thread.sleep(50);
     		} catch (Exception ex) {
-    			if (ConfigCoroUtil.PFQueueDebug) System.out.println("Serious PFQueue crash, reinitializing");
+    			if (ConfigCoroUtilAdvanced.PFQueueDebug) System.out.println("Serious PFQueue crash, reinitializing");
     			//ex.printStackTrace();
     			instance = null;
     		}

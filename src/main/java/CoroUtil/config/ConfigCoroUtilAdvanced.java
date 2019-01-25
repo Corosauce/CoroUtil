@@ -7,11 +7,6 @@ import java.io.File;
 
 public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
-	public static String mobSpawnsProfile = "mob_spawns";
-
-	@ConfigComment("Force a specific profile to spawn, will ignore conditions and force it too, usefull for testing to see how a custom invasion will play out in normal circumstances")
-	public static String mobSpawnsWaveToForceUse = "";
-
 	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the update, which is 30 seconds")
 	public static boolean repairBlockNextRandomTick = false;
 
@@ -34,6 +29,24 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	public static double difficulty_MaxDPSRatingAllowed = 5;
 
 	public static double difficulty_MaxDPSLoggable = 500;
+    public static boolean chunkCacheOverworldOnly = false;
+    public static boolean usePlayerRadiusChunkLoadingForFallback = true;
+    public static String chunkCacheDimensionBlacklist_IDs = "";
+    public static String chunkCacheDimensionBlacklist_Names = "promised";
+    @ConfigComment("Used for tracking time spent in chunk and block right clicks for measuring activity for difficulty, currently unused")
+    public static boolean trackPlayerData = false;
+    public static boolean PFQueueDebug = false;
+    @ConfigComment("Test admin thing for kcauldron issues, kills zombies a bit after sunrise every cleanupStrayMobsDayRate days")
+    public static boolean cleanupStrayMobs = false;
+    public static int cleanupStrayMobsDayRate = 5;
+    public static int cleanupStrayMobsTimeOfDay = 2000;
+    public static boolean desirePathDerp = false;
+    public static boolean headshots = false;
+    public static boolean useCoroPets = false;
+    @ConfigComment("Fix WorldEntitySpawner crash caused by other mods that look like this https://github.com/pWn3d1337/Techguns/issues/132")
+    public static boolean fixBadBiomeEntitySpawnEntries = false;
+	public static boolean disableParticleRenderer = false;
+	public static boolean disableMipmapFix = false;
 
 	@Override
 	public String getName() {

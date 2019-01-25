@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,7 +21,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.event.WorldEvent;
 import CoroUtil.pathfinding.PathPointEx;
 import CoroUtil.util.BlockCoord;
@@ -224,7 +224,7 @@ public class WorldDirector implements Runnable {
 		World world = getWorld();
 		
 		//update occupance chunk data for each player
-		if (ConfigCoroUtil.trackPlayerData) {
+		if (ConfigCoroUtilAdvanced.trackPlayerData) {
 			if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
 				for (int i = 0; i < world.playerEntities.size(); i++) {
 					EntityPlayer entP = world.playerEntities.get(i);

@@ -67,7 +67,7 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	@ConfigComment("How much influence debuffed location has on the averaged difficulty rating, higher number = more")
 	public static double weightDebuffedLocation = 1D;
 	
-	@ConfigComment("unmodded difficulty is expected from 0 to 1, anything above 1 should be from mods, use this if you feel mods are making the difficulty way too high, -1 = dont cap it")
+	@ConfigComment("Unmodded difficulty is expected from 0 to 1, anything above 1 should be from mods, use this if you feel mods are making the difficulty way too high, -1 = dont cap it")
 	public static double difficulty_Max = -1;
 
 	@ConfigComment("How many game ticks until a repairing block fully restores to its original block")

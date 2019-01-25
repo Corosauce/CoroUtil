@@ -18,6 +18,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,7 +36,6 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.world.BlockEvent.HarvestDropsEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.oredict.OreDictionary;
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.entity.data.AttackData;
 import CoroUtil.util.BlockCoord;
@@ -72,6 +72,8 @@ public class DynamicDifficulty {
 	public static String dataPlayerInvasionSkipping = "HW_dataPlayerInvasionSkipping";
 	public static String dataPlayerInvasionSkipCount = "HW_dataPlayerInvasionSkipCount";
 
+	public static String dataPlayerInvasionSkippingTooSoon = "HW_dataPlayerInvasionSkippingTooSoon";
+
 	public static String dataPlayerInvasionSkipBuff = "HW_dataPlayerInvasionSkipBuff";
 	
 	private static int tickRate = 20;
@@ -88,12 +90,12 @@ public class DynamicDifficulty {
 			}
 			
 			
-			if (ConfigCoroUtil.cleanupStrayMobs) {
+			if (ConfigCoroUtilAdvanced.cleanupStrayMobs) {
 				long dayNumber = (world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
-				if (dayNumber % ConfigCoroUtil.cleanupStrayMobsDayRate == 0) {
+				if (dayNumber % ConfigCoroUtilAdvanced.cleanupStrayMobsDayRate == 0) {
 					long timeOfDay = world.getWorldTime() % CoroUtilWorldTime.getDayLength();
 					int killTimeRange = 10;
-					if (timeOfDay >= (long) ConfigCoroUtil.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
+					if (timeOfDay >= (long) ConfigCoroUtilAdvanced.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						CULog.dbg("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof EntityZombie) {
@@ -111,7 +113,7 @@ public class DynamicDifficulty {
 		if (world.getTotalWorldTime() % tickRate == 0) {
 			
 			long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
-			ticksPlayed += 20;
+			ticksPlayed += tickRate;
 			//3 hour start debug
 			//ticksPlayed = 20*60*60*3;
 			player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
@@ -646,8 +648,17 @@ public class DynamicDifficulty {
 				}
 
 				//dont log sources from AI, this fixes things like creepers damaging zombies, wolfs attacking sheep, etc
+				//unless its a pet of a player
 				if (event.getSource().getTrueSource() instanceof EntityLiving) {
-				    return;
+					if (event.getSource().getTrueSource() instanceof IEntityOwnable) {
+						if (((IEntityOwnable) event.getSource().getTrueSource()).getOwner() instanceof EntityPlayer) {
+							//this is fine
+						} else {
+							return;
+						}
+					} else {
+						return;
+					}
                 }
 				
 				

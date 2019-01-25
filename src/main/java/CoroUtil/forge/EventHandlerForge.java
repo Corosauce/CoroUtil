@@ -39,7 +39,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.test.Headshots;
 import CoroUtil.world.WorldDirector;
@@ -122,7 +121,7 @@ public class EventHandlerForge {
 				//if (event.action == Action.RIGHT_CLICK_AIR) return;
 				if (event instanceof RightClickEmpty) return;
 				
-				if (ConfigCoroUtil.trackPlayerData) {
+				if (ConfigCoroUtilAdvanced.trackPlayerData) {
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(event.getWorld()).getChunkData(event.getPos().getX() / 16, event.getPos().getZ() / 16);
 					cdp.addToPlayerActivityInteract(event.getEntityPlayer().getGameProfile().getId(), 1);
 				}
@@ -154,7 +153,7 @@ public class EventHandlerForge {
 			}
 		}
 		
-		if (ConfigCoroUtil.desirePathDerp) {
+		if (ConfigCoroUtilAdvanced.desirePathDerp) {
 			
 			int walkOnRate = 5;
 			

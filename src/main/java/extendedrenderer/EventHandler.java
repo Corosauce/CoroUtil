@@ -1,6 +1,7 @@
 package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroUtil;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import extendedrenderer.particle.ShaderManager;
@@ -143,7 +144,7 @@ public class EventHandler {
 
         EntityRenderer er = mc.entityRenderer;
 
-        if (!ConfigCoroUtil.disableParticleRenderer) {
+        if (!ConfigCoroUtilAdvanced.disableParticleRenderer) {
 
             //Rotating particles hook, copied and adjusted code from ParticleManagers render context in EntityRenderer
 
@@ -268,7 +269,7 @@ public class EventHandler {
         mip_mag = 0;
 
         //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
-        if (!ConfigCoroUtil.disableMipmapFix) {
+        if (!ConfigCoroUtilAdvanced.disableMipmapFix) {
             mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             //                                  3553                10241
             mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
@@ -285,7 +286,7 @@ public class EventHandler {
     public static void postShaderRender(Entity entityIn, float partialTicks) {
 
         //restore original mipmap state
-        if (!ConfigCoroUtil.disableMipmapFix) {
+        if (!ConfigCoroUtilAdvanced.disableMipmapFix) {
             Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);

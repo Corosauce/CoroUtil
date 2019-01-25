@@ -1,6 +1,6 @@
 package CoroUtil.test;
 
-import CoroUtil.config.ConfigCoroUtil;
+import CoroUtil.config.ConfigCoroUtilAdvanced;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
@@ -12,7 +12,7 @@ public class Headshots {
 
 	public static void hookLivingHurt(LivingHurtEvent event) {
 		
-		if (!ConfigCoroUtil.headshots) return;
+		if (!ConfigCoroUtilAdvanced.headshots) return;
 		
 		if (event.getEntity() != null && event.getEntity() instanceof EntityLivingBase) {
 			EntityLivingBase ent = (EntityLivingBase) event.getEntity();

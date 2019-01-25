@@ -1,6 +1,6 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.difficulty.data.cmods.CmodInventoryDifficultyScaled;
@@ -12,7 +12,6 @@ import CoroUtil.difficulty.data.spawns.DataMobSpawnsTemplate;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.EnumSpawnPlacementType;
 import com.google.gson.*;
-import net.minecraft.entity.EntityLiving;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -34,8 +33,8 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         //since this class is run on multiple files, we cant just make a new instance each time, consider a refactor? loot tables arent handled in this class either
         DifficultyData data = DifficultyDataReader.getData();//new DifficultyData();
 
-        if (format.toLowerCase().equals(ConfigCoroUtilAdvanced.mobSpawnsProfile)) {
-            CULog.dbg("detected mob spawns to deserialize by detecting: " + ConfigCoroUtilAdvanced.mobSpawnsProfile);
+        if (format.toLowerCase().equals(ConfigCoroUtil.mobSpawnsProfile)) {
+            CULog.dbg("detected mob spawns to deserialize by detecting: " + ConfigCoroUtil.mobSpawnsProfile);
             JsonElement eleTemplates = obj.get("templates");
 
             JsonArray arrTemplates = eleTemplates.getAsJsonArray();

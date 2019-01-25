@@ -136,16 +136,16 @@ public class CommandModConfig extends CommandBase {
 			CoroUtilMisc.sendCommandSenderMsg(playerMP, "failed to set " + var2[field]);
 		}
 	}
-	
+
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender par1ICommandSender)
-    {
-        return par1ICommandSender.canUseCommand(this.getRequiredPermissionLevel(), this.getName());
-    }
-	
+	{
+		return true;
+	}
+
 	@Override
 	public int getRequiredPermissionLevel() {
-		return 2;
+		return 0;
 	}
 
 }

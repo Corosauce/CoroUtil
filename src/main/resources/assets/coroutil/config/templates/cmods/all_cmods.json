@@ -22,7 +22,7 @@
           "inv_legs": "minecraft:diamond_leggings",
           "inv_feet": "minecraft:diamond_boots",
 
-          "comment": "//give inventory to a mob, up to you to make sure the mob you are giving it to supports it, could crash if they dont"
+          "comment": "//give inventory to a mob, up to you to make sure the mob you are giving it to supports it, could crash if they dont, supports modded items but cant be sure how they'll work out"
         },
         {
           "cmod": "inventory_difficulty_scaled",

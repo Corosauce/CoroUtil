@@ -11,9 +11,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Corosus on 2/26/2017.
- */
 public class CmodInventoryDifficultyScaled extends DataCmod implements JsonSerializer {
     public List<CmodInventoryEntry> listInventories = new ArrayList<>();
 
@@ -39,5 +36,16 @@ public class CmodInventoryDifficultyScaled extends DataCmod implements JsonSeria
         }
         obj.add("stages", arr);
         return obj;
+    }
+
+    @Override
+    public String toString() {
+        String srcString = super.toString() + ", items: ";
+
+        for (CmodInventoryEntry entry : listInventories) {
+            srcString += entry.toString();
+        }
+
+        return srcString;
     }
 }

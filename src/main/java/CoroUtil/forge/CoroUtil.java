@@ -2,9 +2,7 @@ package CoroUtil.forge;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -173,7 +171,7 @@ public class CoroUtil {
 			}
     	}
 
-    	if (ConfigCoroUtil.fixBadBiomeEntitySpawnEntries) {
+    	if (ConfigCoroUtilAdvanced.fixBadBiomeEntitySpawnEntries) {
 
             CULog.log("fixBadBiomeEntitySpawnEntries enabled, scanning and fixing all biome entity spawn lists for potential crash risks");
 
@@ -222,7 +220,7 @@ public class CoroUtil {
     
     public static void writeOutData(boolean unloadInstances) {
     	try {
-    		if (ConfigCoroUtil.useCoroPets) {
+    		if (ConfigCoroUtilAdvanced.useCoroPets) {
 				PetsManager.instance().nbtWriteToDisk();
 				if (unloadInstances) PetsManager.instance().reset();
 			}

@@ -277,48 +277,59 @@ public class CommandCoroUtil extends CommandBase {
 						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
 					}
 				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
-					if ((var1 instanceof EntityPlayerMP)) {
-						EntityPlayerMP ent = (EntityPlayerMP) var1;
-						//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
-						net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
-						BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
-						//long dayNumber = (ent.world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
-						CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
-						CoroUtilMisc.sendCommandSenderMsg(ent, "equipment rating: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerEquipment + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) * ConfigDynamicDifficulty.weightPlayerEquipment)));
+					if ((var1 instanceof EntityPlayer)) {
+						EntityPlayer ent = (EntityPlayer) var1;
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerServerTime + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) * ConfigDynamicDifficulty.weightPlayerServerTime)));
+						if (var2.length >= 2) {
+							ent = world.getPlayerEntityByName(var2[1]);
+							if (ent == null) {
+								CoroUtilMisc.sendCommandSenderMsg(var1, "Couldnt find player by name: " + var2[1]);
+							}
+						}
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPosOccupy + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) * ConfigDynamicDifficulty.weightPosOccupy)));
+						if (ent != null) {
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDPS + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) * ConfigDynamicDifficulty.weightDPS)));
+							//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
+							net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
+							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
+							//long dayNumber = (ent.world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
+							CoroUtilMisc.sendCommandSenderMsg(ent, "Difficulties for you: ");
+							CoroUtilMisc.sendCommandSenderMsg(ent, "equipment rating: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerEquipment + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent) * ConfigDynamicDifficulty.weightPlayerEquipment)));
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForHealth(ent))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightHealth + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForHealth(ent) * ConfigDynamicDifficulty.weightHealth)));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "player server time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerServerTime + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPlayerServerTime(ent) * ConfigDynamicDifficulty.weightPlayerServerTime)));
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDistFromSpawn + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) * ConfigDynamicDifficulty.weightDistFromSpawn)));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "avg chunk time: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPosOccupy + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosOccupyTime(ent.world, pos) * ConfigDynamicDifficulty.weightPosOccupy)));
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForBuffedLocation(world, pos))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightBuffedLocation + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) * ConfigDynamicDifficulty.weightBuffedLocation)));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "best dps: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDPS + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos) * ConfigDynamicDifficulty.weightDPS)));
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos))
-								+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDebuffedLocation + TextFormatting.RESET + " = "
-								+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) * ConfigDynamicDifficulty.weightDebuffedLocation)));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "health: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForHealth(ent))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightHealth + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForHealth(ent) * ConfigDynamicDifficulty.weightHealth)));
 
-						CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getInvasionSkipBuff(ent)));
-						CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
-						CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + TextFormatting.GREEN + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "dist from spawn: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDistFromSpawn + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyScaleForDistFromSpawn(ent) * ConfigDynamicDifficulty.weightDistFromSpawn)));
+
+							CoroUtilMisc.sendCommandSenderMsg(ent, "buffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForBuffedLocation(world, pos))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightBuffedLocation + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForBuffedLocation(world, pos) * ConfigDynamicDifficulty.weightBuffedLocation)));
+
+							CoroUtilMisc.sendCommandSenderMsg(ent, "debuffed location: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos))
+									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightDebuffedLocation + TextFormatting.RESET + " = "
+									+ TextFormatting.RED + roundVal((DynamicDifficulty.getDifficultyForDebuffedLocation(world, pos) * ConfigDynamicDifficulty.weightDebuffedLocation)));
+
+							CoroUtilMisc.sendCommandSenderMsg(ent, "invasion skip buff: " + TextFormatting.GREEN + roundVal(DynamicDifficulty.getInvasionSkipBuff(ent)));
+							CoroUtilMisc.sendCommandSenderMsg(ent, "------------");
+							CoroUtilMisc.sendCommandSenderMsg(ent, "average: " + TextFormatting.GREEN + DynamicDifficulty.getDifficultyScaleAverage(ent.world, ent, pos));
+						}
 					}
 				} else if (var2[0].equalsIgnoreCase("resetdps")) {
 					DynamicDifficulty.resetDifficultyScaleForPosDPS(world, new BlockCoord(player.getPosition()));
@@ -391,12 +402,13 @@ public class CommandCoroUtil extends CommandBase {
 								var1.sendMessage(new TextComponentString(entry));
 							}*/
 						} else {
-							var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+							var1.sendMessage(new TextComponentString("Could not find template by name " + profileName));
 						}
 
 					}
-					//TODO: VALIDATE ITEMS!!!
-				} else if (var2[0].equalsIgnoreCase("tp") || var2[0].equalsIgnoreCase("testProfile")) {
+					//its actually called template, but old command was profile so ill still support it
+				} else if (var2[0].equalsIgnoreCase("tp") || var2[0].equalsIgnoreCase("testProfile") ||
+						var2[0].equalsIgnoreCase("tt") || var2[0].equalsIgnoreCase("testTemplate")) {
 					if (player != null) {
 						try {
 							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
@@ -419,7 +431,7 @@ public class CommandCoroUtil extends CommandBase {
 							}
 
 							if (profileFound != null) {
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test, difficulty: " + difficultyScale));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion template validation test, difficulty: " + difficultyScale));
 								String data = profileFound.toString();
 								String[] list = data.split(" \\| ");
 								for (String entry : list) {
@@ -428,14 +440,14 @@ public class CommandCoroUtil extends CommandBase {
 
 								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
 
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion profile validation test with templates flattened, difficulty: " + difficultyScale));
+								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion template validation test with cmod/condition templates flattened, difficulty: " + difficultyScale));
 								data = profileFound.toString();
 								list = data.split(" \\| ");
 								for (String entry : list) {
 									var1.sendMessage(new TextComponentString(entry));
 								}
 							} else {
-								var1.sendMessage(new TextComponentString("Could not find profile by name " + profileName));
+								var1.sendMessage(new TextComponentString("Could not find template by name " + profileName));
 							}
 						} finally {
 							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);

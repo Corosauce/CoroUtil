@@ -7,7 +7,7 @@
       "spawns": [
         {
           "entities": [
-            "minecraft:enderman"
+            "minecraft:zombie"
           ],
           "count": 10,
           "count_difficulty_multiplier": 0,
