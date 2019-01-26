@@ -382,8 +382,9 @@ public class EventHandlerForge {
 		}
 	}
 
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void explosionEvent(ExplosionEvent event) {
+	//use lowest to make sure FTBU claimed chunks take priority and do their work first
+	@SubscribeEvent(priority = EventPriority.LOWEST)
+	public void explosionEvent(ExplosionEvent.Detonate event) {
 
 		if (event.getWorld().isRemote) return;
 
