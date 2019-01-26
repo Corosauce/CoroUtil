@@ -31,8 +31,14 @@ public class BlockDataPoint
     public byte creationType;
     
     //static/dependant on source block type data
-    public Block blockID; //cache for quick weight type lookup
-    public int blockMeta;
+    private Block block;
+    private int blockMeta;
+
+    //flag a point that it needs a cache load once something needs to use it
+    //this fixes the performance problem of EVERY block point doing a block data lookup on load
+    //especially because we reload all block data points at the same time
+    //might need to update cache more often in some scenarios to make sure data matches, this feature isnt used atm anyways so lets not worry about it
+    private boolean needCacheUpdate = true;
 
     /*
     public float totalPathDistance;
@@ -58,7 +64,8 @@ public class BlockDataPoint
         yCoord = j;
         zCoord = k;
         hash = makeHash(i, j, k);
-        updateCache();
+        //no longer requesting world data on load
+        //updateCache();
 
         //dont waste cpu on this until its actually used
         //health = BlockStaticDataMap.getBlockMaxHealth(blockID);
@@ -69,9 +76,11 @@ public class BlockDataPoint
 
     public void updateCache()
     {
+        //yes this might force a chunk load, but now its only requested when something really needs the data, not on BlockDataPoint instantiation
     	IBlockState state = grid.world.getBlockState(new BlockPos(xCoord, yCoord, zCoord));
-    	blockID = state.getBlock();
+    	block = state.getBlock();
     	blockMeta = state.getBlock().getMetaFromState(state);
+    	needCacheUpdate = false;
     }
 
     /**
@@ -137,7 +146,7 @@ public class BlockDataPoint
     
     public void readFromNBT(NBTTagCompound nbt) {
     	
-    	blockID = Block.getBlockById(nbt.getInteger("blockID"));
+    	block = Block.getBlockById(nbt.getInteger("blockID"));
     	blockMeta = nbt.getInteger("blockMeta");
     	
     	health = nbt.getFloat("health");
@@ -154,9 +163,10 @@ public class BlockDataPoint
     public NBTTagCompound writeToNBT() {
     	NBTTagCompound nbt = new NBTTagCompound();
     	
-    	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits 
+    	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits
+        //note for extended blcok state? ^
     	
-    	nbt.setInteger("blockID", Block.getIdFromBlock(blockID));
+    	nbt.setInteger("blockID", Block.getIdFromBlock(block));
     	nbt.setInteger("blockMeta", blockMeta);
     	
     	nbt.setFloat("health", health);
@@ -183,5 +193,27 @@ public class BlockDataPoint
     
     public void cleanup() {
     	grid = null;
+    }
+
+    public Block getBlock() {
+        return getBlock(false);
+    }
+
+    public Block getBlock(boolean forceCacheUpdate) {
+        if (needCacheUpdate || forceCacheUpdate) {
+            updateCache();
+        }
+        return block;
+    }
+
+    public int getBlockMeta() {
+        return getBlockMeta(false);
+    }
+
+    public int getBlockMeta(boolean forceCacheUpdate) {
+        if (needCacheUpdate || forceCacheUpdate) {
+            updateCache();
+        }
+        return blockMeta;
     }
 }
