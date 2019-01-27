@@ -380,9 +380,7 @@ public class DynamicDifficulty {
 		return scale;
 	}
 
-	public static void resetDifficultyScaleForPosDPS(World world, BlockCoord pos) {
-		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSChunkRadius;
-		chunkRange = 50;
+	public static void setDifficultyScaleForPosDPS(World world, BlockCoord pos, float dps, int chunkRange) {
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
 		//int count = 0;
@@ -395,7 +393,7 @@ public class DynamicDifficulty {
 					if (chunk != null) {
 						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
 
-						cdp.averageDPS = 0;
+						cdp.averageDPS = dps;
 						cdp.lastDPSRecalc = 0;
 						cdp.listDPSAveragesShortTerm.clear();
 						cdp.listDPSAveragesLongTerm.clear();
