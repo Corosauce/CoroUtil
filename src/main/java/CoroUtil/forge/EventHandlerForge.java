@@ -239,37 +239,11 @@ public class EventHandlerForge {
 				}
 			}
 
-			//trying to get miners to push others out of the way
-			boolean pushMobsAwayForMiners = true;
-			if (pushMobsAwayForMiners) {
-				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
-				if (data.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
 
-					//cancel out water motion for miners
-					//copied from vec using code copied World.handleMaterialAcceleration
-					//perfectly cancels flow but only when their center is actually in the water
-					boolean waterfix = true;
-					if (waterfix) {
-						if (ent.isInWater()) {
-							//backup motion
-							double motionXOld = ent.motionX;
-							double motionYOld = ent.motionY;
-							double motionZOld = ent.motionZ;
-							//remove motion so only difference is material influenced
-							ent.motionX = 0;
-							ent.motionY = 0;
-							ent.motionZ = 0;
-							ent.world.handleMaterialAcceleration(ent.getEntityBoundingBox(), Material.WATER, ent);
-							//get changes
-							double motionXChange = ent.motionX;
-							double motionYChange = ent.motionY;
-							double motionZChange = ent.motionZ;
-							//apply old motion with inverted material influence
-							ent.motionX = motionXOld + (motionXChange * -1);
-							ent.motionY = motionYOld + (motionYChange * -1);
-							ent.motionZ = motionZOld + (motionZChange * -1);
-						}
-					}
+			if (ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
+//trying to get miners to push others out of the way
+				boolean pushMobsAwayForMiners = true;
+				if (pushMobsAwayForMiners) {
 
 					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
 
@@ -327,8 +301,53 @@ public class EventHandlerForge {
 
 						}
 					}
+
+				}
+
+				//cancel out water motion for miners
+				//copied from vec using code copied World.handleMaterialAcceleration
+				//perfectly cancels flow but only when their center is actually in the water
+				boolean waterFixCancelPush = true;
+				if (waterFixCancelPush) {
+					if (ent.isInWater()) {
+						//backup motion
+						double motionXOld = ent.motionX;
+						double motionYOld = ent.motionY;
+						double motionZOld = ent.motionZ;
+						//remove motion so only difference is material influenced
+						ent.motionX = 0;
+						ent.motionY = 0;
+						ent.motionZ = 0;
+						ent.world.handleMaterialAcceleration(ent.getEntityBoundingBox(), Material.WATER, ent);
+						//get changes
+						double motionXChange = ent.motionX;
+						double motionYChange = ent.motionY;
+						double motionZChange = ent.motionZ;
+						//apply old motion with inverted material influence
+						ent.motionX = motionXOld + (motionXChange * -1);
+						ent.motionY = motionYOld + (motionYChange * -1);
+						ent.motionZ = motionZOld + (motionZChange * -1);
+					}
+				}
+
+				boolean waterFixLeapOut = true;
+				if (waterFixLeapOut) {
+					String nbtID = "CoroUtil_wasInWater";
+					if (ent.getEntityData().getBoolean(nbtID)) {
+						if (!ent.isInWater()) {
+							if (ent.isCollidedHorizontally) {
+								ent.motionY += 0.4F;
+							}
+						}
+					}
+
+					ent.getEntityData().setBoolean(nbtID, ent.isInWater());
 				}
 			}
+
+
+
+
 
 
 

@@ -47,6 +47,8 @@ public class UtilEntityBuffs {
     //- important since we want other players to be able to opt out and be mostly safe
     public static String dataEntityBuffed_PlayerSpawnedFor = "CoroAI_HW_PlayerSpawnedFor";
 
+    public static String dataEntityBuffed_LastTimePathfindLongDist = "CoroAI_LastTimePathfindLongDist";
+
     //deprecating?
     public static String dataEntityBuffed_Tried = "CoroAI_HW_Buffed_AI_Tried";
     /**

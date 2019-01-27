@@ -3,6 +3,8 @@ package CoroUtil.util;
 import java.util.Iterator;
 import java.util.UUID;
 
+import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.difficulty.UtilEntityBuffs;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -266,5 +268,17 @@ public class CoroUtilEntity {
         }
 
         return flag;
+    }
+
+    public static boolean canPathfindLongDist(EntityCreature ent) {
+        long lastPathTime = ent.getEntityData().getLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist);
+        if (ent.world.getTotalWorldTime() > lastPathTime + ConfigCoroUtilAdvanced.worldTimeDelayBetweenLongDistancePathfindTries) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void updateLastTimeLongDistPathfinded(EntityCreature ent) {
+        ent.getEntityData().setLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist, ent.world.getTotalWorldTime() + (ent.getEntityId() % 20));
     }
 }

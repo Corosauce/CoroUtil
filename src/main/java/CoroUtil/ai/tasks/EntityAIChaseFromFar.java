@@ -4,6 +4,7 @@ import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
+import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilPath;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 /**
@@ -38,7 +40,6 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     private double targetZ;
     protected final int attackInterval = 20;
     private int failedPathFindingPenalty = 0;
-    private boolean canPenalize = false;
 
     private boolean disableAtSunrise = true;
 
@@ -68,34 +69,32 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
         }
         else
         {
-            if (canPenalize)
-            {
-                if (--this.delayCounter <= 0)
-                {
-                    //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
-                    CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
-                    this.entityPathEntity = attacker.getNavigator().getPath();
-                    this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
-                    return this.entityPathEntity != null;
+
+
+
+            //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
+            if (CoroUtilEntity.canPathfindLongDist(attacker)) {
+
+                boolean debugTPSSpike = true;
+                if (debugTPSSpike) {
+                    CULog.dbg("EntityAIChaseFromFar shouldExecute trypath: " + attacker.world.getTotalWorldTime());
                 }
-                else
+
+                CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
+                CoroUtilEntity.updateLastTimeLongDistPathfinded(attacker);
+
+                this.entityPathEntity = attacker.getNavigator().getPath();
+
+                if (this.entityPathEntity != null)
                 {
                     return true;
                 }
-            }
-            //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
-            CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
-
-            //oops, didnt set the field before...
-            this.entityPathEntity = attacker.getNavigator().getPath();
-
-            if (this.entityPathEntity != null)
-            {
-                return true;
-            }
-            else
-            {
-                return this.getAttackReachSqr(entitylivingbase) >= this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+                else
+                {
+                    return this.getAttackReachSqr(entitylivingbase) >= this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+                }
+            } else {
+                return false;
             }
         }
     }
@@ -190,36 +189,24 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             this.targetZ = entitylivingbase.posZ;
             this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
 
-            if (this.canPenalize)
-            {
-                this.delayCounter += failedPathFindingPenalty;
-                if (this.attacker.getNavigator().getPath() != null)
-                {
-                    net.minecraft.pathfinding.PathPoint finalPathPoint = this.attacker.getNavigator().getPath().getFinalPathPoint();
-                    if (finalPathPoint != null && entitylivingbase.getDistanceSq(finalPathPoint.x, finalPathPoint.y, finalPathPoint.z) < 1)
-                        failedPathFindingPenalty = 0;
-                    else
-                        failedPathFindingPenalty += 10;
-                }
-                else
-                {
-                    failedPathFindingPenalty += 10;
-                }
-            }
-
-            if (d0 > 1024.0D)
+            //this task is deigned to path from far, this shouldnt be used
+            /*if (d0 > 1024.0D)
             {
                 this.delayCounter += 10;
             }
             else if (d0 > 256.0D)
             {
                 this.delayCounter += 5;
+            }*/
+
+            if (CoroUtilEntity.canPathfindLongDist(attacker)) {
+                CoroUtilEntity.updateLastTimeLongDistPathfinded(attacker);
+                if (!CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1))
+                {
+                    this.delayCounter += 15;
+                }
             }
 
-            if (!CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1))
-            {
-                this.delayCounter += 15;
-            }
 
             /*if (!this.attacker.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.speedTowardsTarget))
             {

@@ -48,6 +48,8 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	public static boolean disableParticleRenderer = false;
 	public static boolean disableMipmapFix = false;
 
+	public static int worldTimeDelayBetweenLongDistancePathfindTries = 40;
+
 	@Override
 	public String getName() {
 		return "Advanced";
