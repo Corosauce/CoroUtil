@@ -75,7 +75,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             //this.entityPathEntity = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
             if (CoroUtilEntity.canPathfindLongDist(attacker)) {
 
-                boolean debugTPSSpike = true;
+                boolean debugTPSSpike = false;
                 if (debugTPSSpike) {
                     CULog.dbg("EntityAIChaseFromFar shouldExecute trypath: " + attacker.world.getTotalWorldTime());
                 }
