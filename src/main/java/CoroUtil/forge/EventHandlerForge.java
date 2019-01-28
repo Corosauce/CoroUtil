@@ -28,6 +28,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickEmpty;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
@@ -431,5 +432,23 @@ public class EventHandlerForge {
 
 			//event.getExplosion().clearAffectedBlockPositions();
 		}
+	}
+
+	@SubscribeEvent
+	public void playerCloneEvent(PlayerEvent.Clone event) {
+
+		NBTTagCompound nbtOld = event.getOriginal().getEntityData();
+		NBTTagCompound nbtNew = event.getEntityPlayer().getEntityData();
+
+		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestOre, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestOre));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestLog, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestLog));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestRating, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestRating));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipping, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipping));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipCount, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCount));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipBuff, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipBuff));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
+
 	}
 }
