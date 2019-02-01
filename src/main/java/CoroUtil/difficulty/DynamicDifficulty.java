@@ -374,7 +374,7 @@ public class DynamicDifficulty {
 						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
 
 						if (extraDebug) {
-							dbgHighDamage("highest dps debug output for " + x + ", " + z + ": " + cdp.highestDamage.toString());
+							dbgHighDamage("dps debug output for " + x + ", " + z + ": " + cdp.highestDamage.toString());
 						}
 
 						if (cdp.averageDPS > bestDPS) {
@@ -387,7 +387,7 @@ public class DynamicDifficulty {
 		}
 
 		if (bestSource != null && player != null) {
-			player.sendMessage(new TextComponentString("Best dps found:"));
+			player.sendMessage(new TextComponentString("Best average dps found:"));
 			player.sendMessage(new TextComponentString(bestSource.toString()));
 		}
 		
