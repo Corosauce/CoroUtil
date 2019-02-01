@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilWorldTime;
@@ -29,6 +28,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
@@ -353,29 +353,43 @@ public class DynamicDifficulty {
 		//just a guess based on me going around with a plain diamond sword, guessing with enchanted extra
 		return (float)ConfigDynamicDifficulty.difficulty_BestVanillaDPS;
 	}
-	
+
 	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos) {
+		return getDifficultyScaleForPosDPS(world, pos, false, null);
+	}
+	
+	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos, boolean extraDebug, EntityPlayer player) {
 		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSChunkRadius;
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
 		//int count = 0;
 		float bestDPS = 0;
-		for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
-			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
+		DamageSourceEntry bestSource = null;
+		for (int x = chunkX - chunkRange; x <= chunkX + chunkRange; x++) {
+			for (int z = chunkZ - chunkRange; z <= chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos.toBlockPos())) {
 					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
 
+						if (extraDebug) {
+							dbgHighDamage("highest dps debug output for " + x + ", " + z + ": " + cdp.highestDamage.toString());
+						}
+
 						if (cdp.averageDPS > bestDPS) {
 							bestDPS = cdp.averageDPS;
+							bestSource = cdp.highestDamage;
 						}
 					}
 				}
 			}
 		}
-		//long averageTime = bestTime / count;
+
+		if (bestSource != null && player != null) {
+			player.sendMessage(new TextComponentString("Best dps found:"));
+			player.sendMessage(new TextComponentString(bestSource.toString()));
+		}
 		
 		float scale = convertDPSToDifficultyScale(bestDPS);
 		return scale;
@@ -398,6 +412,8 @@ public class DynamicDifficulty {
 						cdp.lastDPSRecalc = 0;
 						cdp.listDPSAveragesShortTerm.clear();
 						cdp.listDPSAveragesLongTerm.clear();
+						cdp.highestDamage = new DamageSourceEntry();
+						cdp.highestDamage.source_type = "<COMMAND SET>";
 
 						/*if (cdp.averageDPS > bestDPS) {
 							bestDPS = cdp.averageDPS;
@@ -672,13 +688,13 @@ public class DynamicDifficulty {
 					//if it took too long for next hit, do a full reset
 					//lets also not log the damage, as it'd be logged as a sloooow attack, lets hope for better data to come
 					if (log.getLastLogTime() + lastLogTimeThreshold < world.getTotalWorldTime()) {
-						dbg("damage expired, resetting");
+						//dbgDPS("damage expired, resetting");
 						logToChunk(log);
 						log.cleanup();
 						log = new AttackData(entC);
 						lookupEntToDamageLog.put(ent.getEntityId(), log);
 					} else if (!log.isSameSource(event.getSource())) {
-						dbg("damage source mismatch, resetting");
+						dbgDPS("damage source mismatch, resetting");
 						//if a different source is damaging it, do a full reset
 						//TODO: it is possible that no dps will ever get logged if a perfect cycle of 2 alternating damage sources are hitting it
 						//a solution would be to have multiple damage source trackers per entity
@@ -726,13 +742,13 @@ public class DynamicDifficulty {
 				float damageToLog = event.getAmount();
 				float timeDiffSeconds = 0;
 				float damage = 0;
-				boolean bigDamage;
+				boolean bigDamage = false;
 				if (log.getLastDamage() > 0) {
 					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
 
 					//catch potentially game breaking fast hits, mainly to fix buggy edge cases, might not be needed with new source tracking code
 					if (timeDiff != 0 && ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable != -1 && timeDiff < ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable) {
-						dbg("DPS WARNING: detected high hit rate of " + timeDiff + ", adjusting to max allowed rate of " + ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable);
+						dbgDPS("DPS WARNING: detected high hit rate of " + timeDiff + ", adjusting to max allowed rate of " + ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable);
 						timeDiff = (long) ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable;
 					}
 
@@ -744,15 +760,16 @@ public class DynamicDifficulty {
 						
 						if (ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable != -1 && damage > ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable) {
 							damage = (float) ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable;
-							dbg("DPS WARNING: !!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
+							dbgDPS("DPS WARNING: !!!!!!!!!!!!!! we hit a max loggable damage scenario!!!!!!!!!");
 							bigDamage = true;
 						}
 
 						if (damage > ConfigDynamicDifficulty.difficulty_BestVanillaDPS) {
-							dbg("DPS WARNING: !!! damage was greater than expected vanilla capabilities!!!");
+							dbgDPS("DPS WARNING: !!! damage was greater than expected vanilla capabilities!!!");
 							bigDamage = true;
 						}
 
+						//log.setTimeAveragedDamage(damage);
 						log.getListDPSs().add(damage);
 						
 						//System.out.println("dps log: " + damage + " new Damage: " + event.ammount + " tickDiff: " + timeDiff + " source: " + event.source.damageType + " ID: " + ent.getEntityId());
@@ -764,17 +781,31 @@ public class DynamicDifficulty {
 					}
 				}
 
-				if (true || bigDamage) {
+				if (bigDamage) {
 					String source = "null";
 					if (event.getSource().getTrueSource() != null) {
 						source = event.getSource().getTrueSource().getClass().getSimpleName();
 					}
-					dbg("logging damageToLog: " + damageToLog + " damage: " + damage + ", log.getLastDamage(): " + log.getLastDamage() + " to " + entC.getClass().getSimpleName() + " by source " + source + " with " + event.getSource().damageType + " timediffinsecs: " + timeDiffSeconds);
+					dbgDPS("logging damageToLog: " + damageToLog + " damage: " + damage + ", log.getLastDamage(): " + log.getLastDamage() + " to " + entC.getClass().getSimpleName() + " by source " + source + " with " + event.getSource().damageType + " timediffinsecs: " + timeDiffSeconds);
 				}
 
 				log.trackSources(event.getSource());
 				log.setLastDamage(damageToLog);
 				log.setLastLogTime(world.getTotalWorldTime());
+				//log.setSource_pos(ent.getPosition());
+
+				//keep track of highest damage out to maybe log to chunk
+				if (damageToLog > log.highestDamage.highestDamage) {
+					log.highestDamage.highestDamage = damageToLog;
+					log.highestDamage.damageTimeAveraged = damage;
+					log.highestDamage.source_type = log.getSource_type();
+					log.highestDamage.source_entity_true = log.getSource_entityTrue() != null ? log.getSource_entityTrue().getClass().getSimpleName() : "<NULL>";
+					log.highestDamage.source_entity_immediate = log.getSource_entityImmediate() != null ? log.getSource_entityImmediate().getClass().getSimpleName() : "<NULL>";
+					log.highestDamage.target_entity = ent != null ? ent.getClass().getSimpleName() : "<NULL>";
+					log.highestDamage.lastLogTime = log.getLastLogTime();
+					log.highestDamage.timeDiffSeconds = timeDiffSeconds;
+					log.highestDamage.source_pos = ent.getPosition();
+				}
 			}
 			
 			
@@ -822,7 +853,7 @@ public class DynamicDifficulty {
 				instaKillDPSCalc = (float) ConfigCoroUtilAdvanced.difficulty_MaxDPSLoggable;
 			}
 
-			dbg("logging one time hit of: " + instaKillDPSCalc);
+			dbgDPS("logging one time hit of: " + instaKillDPSCalc);
 			log.getListDPSs().add(instaKillDPSCalc);
 		}
 		
@@ -833,8 +864,13 @@ public class DynamicDifficulty {
 			}
 			avgDPS /= log.getListDPSs().size();
 
-			dbg("logging short term average: " + avgDPS);
+			dbgDPS("logging short term average: " + avgDPS);
 			cdp.listDPSAveragesShortTerm.add(avgDPS);
+
+			if (log.getLastDamage() > cdp.highestDamage.highestDamage) {
+				cdp.highestDamage = log.highestDamage;
+				dbgHighDamage("New highest damage for chunk " + chunkX + ", " + chunkZ + ": " + log.highestDamage.toString());
+			}
 		}
 		
 		//trim list
@@ -852,7 +888,7 @@ public class DynamicDifficulty {
 				}
 				avgDPS2 /= cdp.listDPSAveragesShortTerm.size();
 
-				dbg("logging long term average: " + avgDPS2);
+				dbgDPS("logging long term average: " + avgDPS2);
 				cdp.listDPSAveragesLongTerm.add(avgDPS2);
 			}
 			if (cdp.listDPSAveragesLongTerm.size() > maxLongTermSize) {
@@ -866,7 +902,7 @@ public class DynamicDifficulty {
 				}
 				avgDPS3 /= cdp.listDPSAveragesLongTerm.size();
 
-				dbg("logging chunk dps average: " + avgDPS3);
+				dbgDPS("logging chunk dps average: " + avgDPS3);
 				cdp.averageDPS = avgDPS3;
 				
 				//System.out.println("average of the average of the average: " + avgDPS3);
@@ -922,10 +958,15 @@ public class DynamicDifficulty {
 		return bestDifficulty;
 	}
 
-	public static void dbg(String string) {
-		boolean debugDD = false;
-		if (debugDD) {
-			CULog.dbg(string);
+	public static void dbgDPS(String string) {
+		if (ConfigCoroUtilAdvanced.logging_DPS_Fine) {
+			CULog.log(string);
+		}
+	}
+
+	public static void dbgHighDamage(String string) {
+		if (ConfigCoroUtilAdvanced.logging_DPS_HighSources) {
+			CULog.log(string);
 		}
 	}
 	

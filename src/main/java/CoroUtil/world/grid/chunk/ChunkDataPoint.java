@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import CoroUtil.difficulty.DamageSourceEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -57,12 +58,17 @@ public class ChunkDataPoint
     public long lastDPSRecalc = 0;
     public float averageDPS;
 
+    boolean useSpawnableType = false;
+
+    public DamageSourceEntry highestDamage;
+
     public ChunkDataPoint(ChunkDataGrid parGrid, int i, int k)
     {
     	grid = parGrid;
         xCoord = i;
         yCoord = 0;
         zCoord = k;
+        highestDamage = new DamageSourceEntry();
         hash = makeHash(i, k);
         updateCache();
     }
@@ -72,43 +78,45 @@ public class ChunkDataPoint
 	    	updateCache();
 	    	
 	    	//if (grid.world.checkChunksExist(xCoord * 16, 0, zCoord * 16, xCoord * 16, 0, zCoord * 16)) {
-	    	if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
-		    	Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
-		    	
-		    	int countWater = 0;
-		    	int countLand = 0;
-		    	
-		    	//this should get threaded?
-		    	//just do a basic scan for majority of chunk being land (even land consider too?)
-		    	for (int x = 0; x < 16; x++) {
-		    		for (int z = 0; z < 16; z++) {
-		    			int heightVal = Math.max(0, chunk.getHeightValue(x, z)-1);
-		    			
-		    			if (heightVal >= 0) {
-		    				IBlockState state = chunk.getBlockState(new BlockPos(x, heightVal, z));
-			    			Block id = state.getBlock();
-			    			
-			    			if (id.getMaterial(state).isLiquid()) {
-		    					countWater++;
-		    				} else {
-		    					countLand++;
-		    				}
-		    			}
-		    		}
-		    	}
-	
-				//System.out.println("ChunkDataPoint, countWater: " + countWater + ", countLand: " + countLand);
-		    	
-				if (countLand > countWater) {
-					spawnableType = 0;
-					//System.out.println("set to land");
+			if (useSpawnableType) {
+				if (grid.world.isBlockLoaded(new BlockPos(xCoord * 16, 0, zCoord * 16), true)) {
+					Chunk chunk = grid.world.getChunkFromChunkCoords(xCoord, zCoord);
+
+					int countWater = 0;
+					int countLand = 0;
+
+					//this should get threaded?
+					//just do a basic scan for majority of chunk being land (even land consider too?)
+					for (int x = 0; x < 16; x++) {
+						for (int z = 0; z < 16; z++) {
+							int heightVal = Math.max(0, chunk.getHeightValue(x, z) - 1);
+
+							if (heightVal >= 0) {
+								IBlockState state = chunk.getBlockState(new BlockPos(x, heightVal, z));
+								Block id = state.getBlock();
+
+								if (id.getMaterial(state).isLiquid()) {
+									countWater++;
+								} else {
+									countLand++;
+								}
+							}
+						}
+					}
+
+					//System.out.println("ChunkDataPoint, countWater: " + countWater + ", countLand: " + countLand);
+
+					if (countLand > countWater) {
+						spawnableType = 0;
+						//System.out.println("set to land");
+					} else {
+						spawnableType = 1;
+						//System.out.println("set to water");
+					}
 				} else {
-					spawnableType = 1;
-					//System.out.println("set to water");
+					//System.out.println("chunk doesnt exist");
 				}
-	    	} else {
-	    		//System.out.println("chunk doesnt exist");
-	    	}
+			}
     	} catch (Exception ex) {
     		ex.printStackTrace();
     	}
@@ -200,6 +208,21 @@ public class ChunkDataPoint
     		
     		listDPSAveragesLongTerm.add(nbtDPSs.getFloat(entryName));
     	}
+
+    	if (nbt.hasKey("highestDamage")) {
+			NBTTagCompound highestDamageNBT = nbt.getCompoundTag("highestDamage");
+			highestDamage = new DamageSourceEntry();
+			highestDamage.source_entity_true = highestDamageNBT.getString("source_entity_true");
+			highestDamage.source_entity_immediate = highestDamageNBT.getString("source_entity_immediate");
+			highestDamage.target_entity = highestDamageNBT.getString("target_entity");
+			highestDamage.source_type = highestDamageNBT.getString("source_type");
+			highestDamage.highestDamage = highestDamageNBT.getFloat("highestDamage");
+            highestDamage.damageTimeAveraged = highestDamageNBT.getFloat("damageTimeAveraged");
+			highestDamage.lastLogTime = highestDamageNBT.getLong("lastLogTime");
+            highestDamage.timeDiffSeconds = highestDamageNBT.getFloat("timeDiffSeconds");
+			highestDamage.source_pos = new BlockPos(highestDamageNBT.getInteger("x"), highestDamageNBT.getInteger("y"), highestDamageNBT.getInteger("z"));
+		}
+
     	
     	int test = 0;
     	/*xCoord = nbt.getInteger("xCoord");
@@ -242,6 +265,21 @@ public class ChunkDataPoint
     		nbtDPSs.setFloat("entry_" + i, listDPSAveragesLongTerm.get(i));
     	}
     	nbt.setTag("listDPSAveragesLongTerm", nbtDPSs);
+
+    	NBTTagCompound highestDamageNBT = new NBTTagCompound();
+		highestDamageNBT.setString("source_entity_true", highestDamage.source_entity_true);
+		highestDamageNBT.setString("source_entity_immediate", highestDamage.source_entity_immediate);
+		highestDamageNBT.setString("target_entity", highestDamage.target_entity);
+		highestDamageNBT.setString("source_type", highestDamage.source_type);
+		highestDamageNBT.setFloat("highestDamage", highestDamage.highestDamage);
+        highestDamageNBT.setFloat("damageTimeAveraged", highestDamage.damageTimeAveraged);
+        highestDamageNBT.setFloat("timeDiffSeconds", highestDamage.timeDiffSeconds);
+		highestDamageNBT.setLong("lastLogTime", highestDamage.lastLogTime);
+		highestDamageNBT.setInteger("x", highestDamage.source_pos.getX());
+		highestDamageNBT.setInteger("y", highestDamage.source_pos.getY());
+		highestDamageNBT.setInteger("z", highestDamage.source_pos.getZ());
+
+    	nbt.setTag("highestDamage", highestDamageNBT);
     	
     	return nbt;
     }

@@ -50,6 +50,9 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
 	public static int worldTimeDelayBetweenLongDistancePathfindTries = 40;
 
+	public static boolean logging_DPS_Fine = false;
+	public static boolean logging_DPS_HighSources = false;
+
 	@Override
 	public String getName() {
 		return "Advanced";

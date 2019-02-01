@@ -3,9 +3,11 @@ package CoroUtil.entity.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import CoroUtil.difficulty.DamageSourceEntry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.BlockPos;
 
 public class AttackData extends EntityData {
 	private long lastLogTime;
@@ -16,10 +18,12 @@ public class AttackData extends EntityData {
 	private Entity source_entityTrue = null;
 	private Entity source_entityImmediate = null;
 	private String source_type = "";
-	//private
+
+	public DamageSourceEntry highestDamage;
 	
 	public AttackData(EntityCreature ent) {
 		super(ent);
+		highestDamage = new DamageSourceEntry();
 	}
 
 	public long getLastLogTime() {
@@ -49,6 +53,9 @@ public class AttackData extends EntityData {
 	public void trackSources(DamageSource source) {
 		source_entityTrue = source.getTrueSource();
 		source_type = source.getDamageType();
+		if (source_type == null) {
+			source_type = "<NULL>";
+		}
 		source_entityImmediate = source.getImmediateSource();
 	}
 
@@ -67,7 +74,31 @@ public class AttackData extends EntityData {
 
 		return true;
 	}
-	
+
+	public Entity getSource_entityTrue() {
+		return source_entityTrue;
+	}
+
+	public void setSource_entityTrue(Entity source_entityTrue) {
+		this.source_entityTrue = source_entityTrue;
+	}
+
+	public Entity getSource_entityImmediate() {
+		return source_entityImmediate;
+	}
+
+	public void setSource_entityImmediate(Entity source_entityImmediate) {
+		this.source_entityImmediate = source_entityImmediate;
+	}
+
+	public String getSource_type() {
+		return source_type;
+	}
+
+	public void setSource_type(String source_type) {
+		this.source_type = source_type;
+	}
+
 	public void cleanup() {
 		super.cleanup();
 		listDPSs.clear();

@@ -276,6 +276,24 @@ public class CommandCoroUtil extends CommandBase {
 					for (String entry : data) {
 						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
 					}
+				} else if (var2[0].equalsIgnoreCase("debugdps")) {
+					if ((var1 instanceof EntityPlayer)) {
+						EntityPlayer ent = (EntityPlayer) var1;
+
+						if (var2.length >= 2) {
+							ent = world.getPlayerEntityByName(var2[1]);
+							if (ent == null) {
+								CoroUtilMisc.sendCommandSenderMsg(var1, "Couldnt find player by name: " + var2[1]);
+							}
+						}
+
+						if (ent != null) {
+							net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
+							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
+							CoroUtilMisc.sendCommandSenderMsg(var1, "Printed extra dps debug to server console");
+							DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos, true, ent);
+						}
+					}
 				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
 					if ((var1 instanceof EntityPlayer)) {
 						EntityPlayer ent = (EntityPlayer) var1;
