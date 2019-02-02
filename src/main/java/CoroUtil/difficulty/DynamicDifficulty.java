@@ -358,7 +358,7 @@ public class DynamicDifficulty {
 		return getDifficultyScaleForPosDPS(world, pos, false, null);
 	}
 	
-	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos, boolean extraDebug, EntityPlayer player) {
+	public static float getDifficultyScaleForPosDPS(World world, BlockCoord pos, boolean extraDebug, EntityPlayer playerToMsg) {
 		int chunkRange = ConfigDynamicDifficulty.difficulty_BestDPSChunkRadius;
 		int chunkX = pos.getX() / 16;
 		int chunkZ = pos.getZ() / 16;
@@ -386,9 +386,9 @@ public class DynamicDifficulty {
 			}
 		}
 
-		if (bestSource != null && player != null) {
-			player.sendMessage(new TextComponentString("Best average dps found:"));
-			player.sendMessage(new TextComponentString(bestSource.toString()));
+		if (bestSource != null && playerToMsg != null) {
+			playerToMsg.sendMessage(new TextComponentString("Best average dps found:"));
+			playerToMsg.sendMessage(new TextComponentString(bestSource.toString()));
 		}
 		
 		float scale = convertDPSToDifficultyScale(bestDPS);

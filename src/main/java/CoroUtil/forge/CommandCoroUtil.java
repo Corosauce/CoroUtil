@@ -291,7 +291,7 @@ public class CommandCoroUtil extends CommandBase {
 							net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
 							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
 							CoroUtilMisc.sendCommandSenderMsg(var1, "Printed extra dps debug to server console");
-							DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos, true, ent);
+							DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos, true, (EntityPlayer) var1);
 						}
 					}
 				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
