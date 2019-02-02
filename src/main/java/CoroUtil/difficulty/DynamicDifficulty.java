@@ -111,14 +111,13 @@ public class DynamicDifficulty {
 	
 	public static void tickPlayer(EntityPlayer player) {
 		World world = player.world;
-		if (world.getTotalWorldTime() % tickRate == 0) {
-			
-			long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
-			ticksPlayed += tickRate;
-			//3 hour start debug
-			//ticksPlayed = 20*60*60*3;
-			player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
-			
+
+		if (!player.isSpectator() && !player.isCreative()) {
+			if (world.getTotalWorldTime() % tickRate == 0) {
+				long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
+				ticksPlayed += tickRate;
+				player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
+			}
 		}
 
 		int wallScanRange = 3;
