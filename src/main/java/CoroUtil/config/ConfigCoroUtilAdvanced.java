@@ -25,9 +25,10 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	@ConfigComment("-1 to disable. Not counting instant hits, this is a workaround for an ongoing issue where extremely high hit rates are logged causing super high dps")
 	public static double difficulty_MaxAttackSpeedLoggable = 10;
 
-	//might be conflicting with difficulty_MaxDPSLoggable
+	@ConfigComment("Makes sure the difficulty rating for dps doesnt go above this value")
 	public static double difficulty_MaxDPSRatingAllowed = 5;
 
+	@ConfigComment("-1 to disable. Limit the actual logged damage to this, but difficulty_MaxDPSRatingAllowed will still override what is used for difficulty value")
 	public static double difficulty_MaxDPSLoggable = 500;
     public static boolean chunkCacheOverworldOnly = false;
     public static boolean usePlayerRadiusChunkLoadingForFallback = true;

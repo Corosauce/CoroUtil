@@ -7,7 +7,7 @@ import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 import CoroUtil.util.DimensionChunkCacheNew;
 
-public class ConfigCoroUtil implements IConfigCategory {
+public class 	ConfigCoroUtil implements IConfigCategory {
 
 	@ConfigComment("Use a different json mob spawn template for testing different invasion setups, note this is referring to the 'format' tag in the json file, not the json file name itself, eg: mob_spawns_testing_miners from mob_spawns_testing_miners.json")
 	public static String mobSpawnsProfile = "mob_spawns";

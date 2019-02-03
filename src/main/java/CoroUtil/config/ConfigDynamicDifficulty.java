@@ -1,9 +1,11 @@
 package CoroUtil.config;
 
+import CoroUtil.difficulty.DynamicDifficulty;
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 
 import java.io.File;
+import java.util.Arrays;
 
 public class ConfigDynamicDifficulty implements IConfigCategory {
 
@@ -82,6 +84,9 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	@ConfigComment("Chests, machines, etc, arent normal blocks that we can convert to repairing blocks, so instead this setting just protects them from being harmed at all by explosions")
 	public static boolean preventExplodedTileEntitiesDuringInvasions = true;
 
+	@ConfigComment("Blacklist things like mob grinders from DPS calculation, supports damage_type or player name for fake players. See invasion customization wiki page for how to get these names")
+	public static String blacklistDamageSourcesForDPS = "mob_crusher, [Draconic-Evolution]";
+
 	@Override
 	public String getName() {
 		return "DynamicDifficulty";
@@ -104,7 +109,15 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 
 	@Override
 	public void hookUpdatedValues() {
-		
+		try {
+			String[] names = blacklistDamageSourcesForDPS.split(",");
+			for (int i = 0; i < names.length; i++) {
+				names[i] = names[i].trim();
+			}
+			DynamicDifficulty.listBlacklistedDamageSources = Arrays.asList(names);
+		} catch (Exception ex) {
+
+		}
 	}
 
 }

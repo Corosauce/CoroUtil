@@ -81,6 +81,8 @@ public class DynamicDifficulty {
 	
 	public static HashMap<Integer, AttackData> lookupEntToDamageLog = new HashMap<Integer, AttackData>();
 
+	public static List<String> listBlacklistedDamageSources = new ArrayList<>();
+
 	public static void tickServer(ServerTickEvent event) {
 		World world = DimensionManager.getWorld(0);
 		if (world != null) {
@@ -638,7 +640,7 @@ public class DynamicDifficulty {
 			
 			if (ent instanceof EntityCreature && (!ConfigDynamicDifficulty.difficulty_OnlyLogDPSToHostiles || ent instanceof IMob)) {
 				EntityCreature entC = (EntityCreature) ent;
-				
+
 				//dont log common occuring damages, sun burning, random wall glitching
 				if (ConfigDynamicDifficulty.difficulty_DontLogDPSFromEnvironment) {
 					if (event.getSource() == DamageSource.IN_WALL ||
@@ -646,6 +648,7 @@ public class DynamicDifficulty {
 							event.getSource() == DamageSource.ON_FIRE ||
 							event.getSource() == DamageSource.DROWN ||
 							event.getSource() == DamageSource.FALL) {
+						dbgDPS("bad damage type, skipping: " + event.getSource());
 						return;
 					}
 				}
@@ -674,6 +677,24 @@ public class DynamicDifficulty {
 						return;
 					}
                 }
+
+				//dont process bad sources, like mob grinders
+				if (listBlacklistedDamageSources.size() > 0) {
+					if (stringEqualsItemFromList(event.getSource().damageType, listBlacklistedDamageSources)) {
+						dbgDPS("Detected blacklisted damage type, skipping: " + event.getSource().damageType);
+						return;
+					}
+
+					if (event.getSource().getTrueSource() != null && stringEqualsItemFromList(event.getSource().getTrueSource().getName(), listBlacklistedDamageSources)) {
+						dbgDPS("Detected blacklisted entity name for true source, skipping: " + event.getSource().getTrueSource().getName());
+						return;
+					}
+
+					if (event.getSource().getImmediateSource() != null && stringEqualsItemFromList(event.getSource().getImmediateSource().getName(), listBlacklistedDamageSources)) {
+						dbgDPS("Detected blacklisted entity name immediate source, skipping: " + event.getSource().getImmediateSource().getName());
+						return;
+					}
+				}
 				
 				
 				AttackData log;
@@ -798,9 +819,11 @@ public class DynamicDifficulty {
 					log.highestDamage.highestDamage = damageToLog;
 					log.highestDamage.damageTimeAveraged = damage;
 					log.highestDamage.source_type = log.getSource_type();
-					log.highestDamage.source_entity_true = log.getSource_entityTrue() != null ? log.getSource_entityTrue().getClass().getSimpleName() : "<NULL>";
-					log.highestDamage.source_entity_immediate = log.getSource_entityImmediate() != null ? log.getSource_entityImmediate().getClass().getSimpleName() : "<NULL>";
-					log.highestDamage.target_entity = ent != null ? ent.getClass().getSimpleName() : "<NULL>";
+					log.highestDamage.source_entity_true = log.getSource_entityTrue() != null ?
+							log.getSource_entityTrue().getClass().getSimpleName() + ", entity_name: " + log.getSource_entityTrue().getName() : "<NULL>";
+					log.highestDamage.source_entity_immediate = log.getSource_entityImmediate() != null ?
+							log.getSource_entityImmediate().getClass().getSimpleName() + ", entity_name: " + log.getSource_entityImmediate().getName() : "<NULL>";
+					log.highestDamage.target_entity = ent != null ? ent.getClass().getSimpleName() + ", entity_name: " + ent.getName() : "<NULL>";
 					log.highestDamage.lastLogTime = log.getLastLogTime();
 					log.highestDamage.timeDiffSeconds = timeDiffSeconds;
 					log.highestDamage.source_pos = ent.getPosition();
@@ -956,6 +979,12 @@ public class DynamicDifficulty {
 
 		return bestDifficulty;
 	}
+
+	public static boolean stringEqualsItemFromList(String inputStr, List<String> items) {
+		return items.parallelStream().anyMatch(inputStr::equals);
+	}
+
+
 
 	public static void dbgDPS(String string) {
 		if (ConfigCoroUtilAdvanced.logging_DPS_Fine) {
