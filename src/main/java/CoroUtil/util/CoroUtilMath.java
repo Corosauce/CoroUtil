@@ -2,6 +2,8 @@ package CoroUtil.util;
 
 import org.lwjgl.util.vector.Quaternion;
 
+import java.text.DecimalFormat;
+
 /**
  * Created by corosus on 29/05/17.
  */
@@ -87,6 +89,16 @@ public class CoroUtilMath {
         z = (float)(s1*q1.z + s2*q2.z);*/
 
         return new Quaternion((float)(s1*q1.x + s2*q2.x), (float)(s1*q1.y + s2*q2.y), (float)(s1*q1.z + s2*q2.z), (float)(s1*q1.w + s2*q2.w));
+    }
+
+    public static String roundVal(float val) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(val);
+    }
+
+    public static String roundVal(double val) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(val);
     }
 
 }
