@@ -72,6 +72,7 @@ public class DynamicDifficulty {
 
 	public static String dataPlayerInvasionSkipping = "HW_dataPlayerInvasionSkipping";
 	public static String dataPlayerInvasionSkipCount = "HW_dataPlayerInvasionSkipCount";
+    public static String dataPlayerInvasionSkipCountForMultiplier = "HW_dataPlayerInvasionSkipCountForMultiplier";
 
 	public static String dataPlayerInvasionSkippingTooSoon = "HW_dataPlayerInvasionSkippingTooSoon";
 

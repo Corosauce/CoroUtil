@@ -447,6 +447,7 @@ public class EventHandlerForge {
 		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipping, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipping));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipCount, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCount));
+		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipBuff, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipBuff));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
 
