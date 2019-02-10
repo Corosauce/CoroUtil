@@ -18,6 +18,10 @@ public class UtilClasspath {
             IResource iresource = resourceManager.getResource(resourceLocation);*/
             //server side compatible way
             String str = "assets/" + resourceLocation.toString().replace(":", "/");
+
+            //better?
+            //InputStream in = ClassLoader.getSystemResourceAsStream(str);
+
             InputStream in = UtilClasspath.class.getClassLoader().getResourceAsStream(str);
             String contents = IOUtils.toString(in, StandardCharsets.UTF_8);
             return contents;
