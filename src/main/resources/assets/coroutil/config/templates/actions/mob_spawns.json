@@ -455,7 +455,7 @@
       "conditions": [
         {
           "condition": "invasion_number",
-          "min": 3
+          "min": 7
         },
         {
           "condition": "random",
@@ -493,8 +493,8 @@
           "entities": [
             "minecraft:zombie", "minecraft:skeleton"
           ],
-          "count": 5,
-          "count_max": 15,
+          "count": 3,
+          "count_max": 8,
           "count_difficulty_multiplier": 0.5,
           "cmods": [
             {
@@ -554,7 +554,7 @@
       "conditions": [
         {
           "condition": "invasion_number",
-          "min": 3
+          "min": 5
         },
         {
           "condition": "random",
@@ -570,8 +570,8 @@
           "entities": [
             "zombie_players:zombie_player"
           ],
-          "count": 10,
-          "count_max": 30,
+          "count": 5,
+          "count_max": 20,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
@@ -656,7 +656,7 @@
       "conditions": [
         {
           "condition": "invasion_number",
-          "min": 3
+          "min": 5
         },
         {
           "condition": "random",
@@ -688,10 +688,28 @@
         },
         {
           "entities": [
-            "evocation_illager", "vindication_illager", "illusion_illager"
+            "vindication_illager", "illusion_illager"
           ],
-          "count": 6,
-          "count_max": 20,
+          "count": 4,
+          "count_max": 15,
+          "count_difficulty_multiplier": 2,
+          "cmods": [
+            {
+              "cmod": "template",
+              "template": "invader_soldier"
+            },
+            {
+              "cmod": "template",
+              "template": "buffed_attributes"
+            }
+          ]
+        },
+        {
+          "entities": [
+            "evocation_illager"
+          ],
+          "count": 1,
+          "count_max": 4,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
