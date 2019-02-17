@@ -454,13 +454,4 @@ public class EventHandlerForge {
 		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
 
 	}
-
-	/*@SubscribeEvent
-	public void onEntityTargetedEvent(LivingSetAttackTargetEvent event) {
-		if (event.getEntity() instanceof EntityZombie && event.getTarget() != null) {
-			System.out.println("cancel set targets");
-			((EntityLiving)event.getEntity()).setAttackTarget(null);
-			((EntityLiving)event.getEntity()).setRevengeTarget(null);
-		}
-	}*/
 }
