@@ -34,8 +34,8 @@
       "cmods": [
         {
           "cmod": "attribute_attackdamage",
-          "base_value": 5,
-          "max_value": 10,
+          "base_value": 3,
+          "max_value": 5,
           "difficulty_multiplier": 0.5
         },
         {
