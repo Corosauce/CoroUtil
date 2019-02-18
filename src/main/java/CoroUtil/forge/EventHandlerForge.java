@@ -16,7 +16,6 @@ import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,7 +27,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -244,8 +242,8 @@ public class EventHandlerForge {
 
 
 			if (ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
-//trying to get miners to push others out of the way
-				boolean pushMobsAwayForMiners = true;
+				//trying to get miners to push others out of the way
+				boolean pushMobsAwayForMiners = ConfigCoroUtilAdvanced.minersPushAwayOtherNonMinerMobsWhileMining;
 				if (pushMobsAwayForMiners) {
 
 					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
@@ -261,8 +259,10 @@ public class EventHandlerForge {
 
 							NBTTagCompound data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 
+							//if config allows, push only buffed mobs, including wave spawned and extra enhanced ones
+							boolean canPush = !ConfigCoroUtilAdvanced.minersPushAwayOnlyOtherBuffedMobs || ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed);
 
-							if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging))
+							if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging) && canPush)
 							{
 								if (!entityIn.noClip && !ent.noClip)
 								{
