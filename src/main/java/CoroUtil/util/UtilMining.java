@@ -1,5 +1,6 @@
 package CoroUtil.util;
 
+import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CommonProxy;
 import com.mojang.authlib.GameProfile;
@@ -32,19 +33,12 @@ public class UtilMining {
     	//System.out.println("check: " + block);
     	
     	IBlockState state = world.getBlockState(pos);
-
-
-		/**TODO: check BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, entityPlayer); if is
-		 * event.setCanceled(preCancelEvent);
-		 * MinecraftForge.EVENT_BUS.post(event);
-		 * needs fakeplayer
-		 */
     	
     	//dont mine tile entities
 		if (block.isAir(state, world, pos) || block == CommonProxy.blockRepairingBlock) {
 			return false;
 		}
-    	if (world.getTileEntity(pos) != null) {
+    	if (TaskDigTowardsTarget.preventMinedTileEntitiesDuringInvasions && world.getTileEntity(pos) != null) {
     		return false;
     	}
     	/*if (block == Blocks.obsidian) {
@@ -64,6 +58,7 @@ public class UtilMining {
 		}
 
 		//should cover most all types we dont want to put into repairing state
+		//this covers too many actually, like glass
 		if (!state.isFullCube()) {
 			return false;
 		}

@@ -78,12 +78,6 @@ public class ConfigDynamicDifficulty implements IConfigCategory {
 	@ConfigComment("For entities with block mining ability, how fast they mine a block per tick, higher is faster")
 	public static double digSpeed = 0.01D;
 
-	@ConfigComment("Prevents permanent damage caused by explosions during invasions, since zombie miners will be making holes they can get in")
-	public static boolean convertExplodedBlocksToRepairingBlocksDuringInvasion = true;
-
-	@ConfigComment("Chests, machines, etc, arent normal blocks that we can convert to repairing blocks, so instead this setting just protects them from being harmed at all by explosions")
-	public static boolean preventExplodedTileEntitiesDuringInvasions = true;
-
 	@ConfigComment("Blacklist things like mob grinders from DPS calculation, supports damage_type or player name for fake players. See invasion customization wiki page for how to get these names")
 	public static String blacklistDamageSourcesForDPS = "mob_crusher, [Draconic-Evolution]";
 

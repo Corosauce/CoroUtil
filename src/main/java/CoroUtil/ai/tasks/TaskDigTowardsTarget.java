@@ -27,6 +27,11 @@ import net.minecraft.util.math.Vec3d;
 
 public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
 {
+
+	//set from ConfigInvasion
+	public static boolean convertMinedBlocksToRepairingBlocksDuringInvasions = true;
+	public static boolean preventMinedTileEntitiesDuringInvasions = true;
+
     private EntityCreature entity = null;
 	private IBlockState stateCurMining = null;
     private BlockCoord posCurMining = null;
@@ -491,7 +496,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	
     	if (bdp.digDamage > 1D) {
     		entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
-            if (UtilMining.canConvertToRepairingBlock(entity.world, state)) {
+            if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlock(entity.world, state)) {
 				if (UtilMining.canGrabEventCheck(entity.world, state, posCurMining.toBlockPos())) {
 					TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
 				}
