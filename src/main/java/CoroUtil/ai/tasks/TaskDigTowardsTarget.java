@@ -496,7 +496,9 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     	
     	if (bdp.digDamage > 1D) {
     		entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
-            if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlock(entity.world, state)) {
+    		//added tile entity check due to new config support to not use repairing block system
+			//since repairing blocks dont support tile entities, need to prevent turning them into one, and instead dropping as normal item
+            if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlock(entity.world, state) && entity.world.getTileEntity(posCurMining.toBlockPos()) == null) {
 				if (UtilMining.canGrabEventCheck(entity.world, state, posCurMining.toBlockPos())) {
 					TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
 				}
