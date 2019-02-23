@@ -150,7 +150,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         try {
         	super.drawScreen(mX, mY, f);
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            //eat error until harmless bug found
+        	//ex.printStackTrace();
         	//ConfigMod.dbg("exception drawing screen elements");
         }
     }

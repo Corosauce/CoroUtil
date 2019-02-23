@@ -2,6 +2,7 @@ package modconfig.gui;
 
 import java.util.Iterator;
 
+import CoroUtil.forge.CULog;
 import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
 import modconfig.ModConfigData;
@@ -85,7 +86,8 @@ public class GuiConfigEditor extends GuiScreen
 		    	}
 	    	}
     	} catch (Exception ex) {
-    		ex.printStackTrace();
+            //eat error until harmless bug found
+    		//ex.printStackTrace();
     	}
         super.updateScreen();
         //++this.updateCounter;
@@ -223,19 +225,15 @@ public class GuiConfigEditor extends GuiScreen
     		ConfigEntryInfo info = getData().configData.get(i);
     		
     		if (!getData().configData.get(i).editBox.text.equals(getData().configData.get(i).value.toString())/*info.markForUpdate*//*!realVal.toString().equals(info.value.toString())*/) {
-    			//HostileWorlds.dbg("difference for " + info.name);
     			
     			if (!clientMode) {
     				//this.mc.player.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
     				ConfigMod.eventChannel.sendToServer(PacketHelper.getModConfigPacketForClientToServer("set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text));
     			} else {
     				if (ConfigMod.updateField(getCategory(), getData().configData.get(i).name, getData().configData.get(i).editBox.text)) {
-    					System.out.println("Updated config settings in client mode");
+    					CULog.dbg("Updated config settings in client mode");
     				}
     			}
-    			
-    			//TEMP CLIENT SYNC!
-    			//getData().configData.get(i).value = getData().configData.get(i).editBox.text;
     		}
     	}
     }

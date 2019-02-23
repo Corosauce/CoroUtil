@@ -30,7 +30,7 @@ public class GuiBetterTextField extends Gui
 
     /** Have the current text beign edited on the textbox. */
     public String text = "";
-    public int maxStringLength = 256;
+    public int maxStringLength = 10000;
     public int cursorCounter;
     public boolean enableBackgroundDrawing = true;
 
