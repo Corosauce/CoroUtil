@@ -138,12 +138,21 @@ public class ConfigMod {
     /* Main Usage Methods Start */
     
     /* Main Inits */
+    public static void addConfigFile(IConfigCategory configCat) {
+        addConfigFile(null, configCat.getRegistryName(), configCat, true);
+    }
+
     public static void addConfigFile(FMLPreInitializationEvent event, /*String modID, */IConfigCategory configCat) {
     	addConfigFile(event, configCat.getRegistryName(), configCat, true);
     }
     
     public static void addConfigFile(FMLPreInitializationEvent event, String modID, IConfigCategory configCat, boolean liveEdit) {
     	//if (instance == null) init(event);
+
+        //prevent adding twice
+        if (configLookup.containsKey(configCat.getRegistryName())) {
+            return;
+        }
     	
     	ModConfigData configData = new ModConfigData(new File(getSaveFolderPath() + "config" + File.separator + configCat.getConfigFileName() + ".cfg"), modID, configCat.getClass(), configCat);
     	

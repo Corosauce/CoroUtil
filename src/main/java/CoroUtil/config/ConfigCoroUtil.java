@@ -3,11 +3,13 @@ package CoroUtil.config;
 import java.io.File;
 import java.util.Arrays;
 
+import CoroUtil.util.CoroUtilCompatibility;
 import modconfig.ConfigComment;
+import modconfig.ConfigMod;
 import modconfig.IConfigCategory;
 import CoroUtil.util.DimensionChunkCacheNew;
 
-public class 	ConfigCoroUtil implements IConfigCategory {
+public class ConfigCoroUtil implements IConfigCategory {
 
 	@ConfigComment("Use a different json mob spawn template for testing different invasion setups, note this is referring to the 'format' tag in the json file, not the json file name itself, eg: mob_spawns_testing_miners from mob_spawns_testing_miners.json")
 	public static String mobSpawnsProfile = "mob_spawns";
@@ -43,7 +45,7 @@ public class 	ConfigCoroUtil implements IConfigCategory {
 	@ConfigComment("For logging warnings/errors")
 	public static boolean useLoggingError = true;
 
-	@ConfigComment("Use at own risk, will not support, requires game restart on change")
+	@ConfigComment("Use at own risk, will not support")
 	public static boolean enableAdvancedDeveloperConfigFiles = false;
 
 	@Override
@@ -79,6 +81,14 @@ public class 	ConfigCoroUtil implements IConfigCategory {
 			DimensionChunkCacheNew.listBlacklistNamess = Arrays.asList(names);
 		} catch (Exception ex) {
 			//silence!
+		}
+
+		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles || CoroUtilCompatibility.isHWInvasionsInstalled() || CoroUtilCompatibility.isHWMonstersInstalled()) {
+			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configDD);
+		}
+		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
+			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configHWMonsters);
+			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configDev);
 		}
 	}
 

@@ -63,22 +63,22 @@ public class CoroUtil {
     public static String eventChannelName = "coroutil";
 	public static final FMLEventChannel eventChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(eventChannelName);
     
-    public static ConfigCoroUtil configCoroUtil = null;
+    public static ConfigCoroUtil configCoroUtil = new ConfigCoroUtil();
+    public static ConfigCoroUtilAdvanced configDev = new ConfigCoroUtilAdvanced();
+    public static ConfigDynamicDifficulty configDD = new ConfigDynamicDifficulty();
+    public static ConfigHWMonsters configHWMonsters = new ConfigHWMonsters();
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
 		migrateOldConfig();
 
-		configCoroUtil = new ConfigCoroUtil();
     	ConfigMod.addConfigFile(event, configCoroUtil);
-		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles || CoroUtilCompatibility.isHWInvasionsInstalled() || CoroUtilCompatibility.isHWMonstersInstalled()) {
-			ConfigMod.addConfigFile(event, new ConfigDynamicDifficulty());
-		}
-    	if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
-			ConfigMod.addConfigFile(event, new ConfigHWMonsters());
-			ConfigMod.addConfigFile(event, new ConfigCoroUtilAdvanced());
-		}
+
+    	//for good measure
+		configDev.hookUpdatedValues();
+		configDD.hookUpdatedValues();
+		configHWMonsters.hookUpdatedValues();
 
 		/*DifficultyDataReader reader = new DifficultyDataReader();
 		reader.loadFiles();*/
