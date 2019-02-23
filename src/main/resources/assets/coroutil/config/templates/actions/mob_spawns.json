@@ -709,7 +709,7 @@
             "evocation_illager"
           ],
           "count": 1,
-          "count_max": 4,
+          "count_max": 2,
           "count_difficulty_multiplier": 2,
           "cmods": [
             {
