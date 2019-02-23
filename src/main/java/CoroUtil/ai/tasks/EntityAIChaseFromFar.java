@@ -179,7 +179,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
         --this.delayCounter;
 
         if ((this.longMemory ||
-                this.attacker.getEntitySenses().canSee(entitylivingbase)) && this.delayCounter <= 0 &&
+                this.delayCounter <= 0 && this.attacker.getEntitySenses().canSee(entitylivingbase)) &&
                 (this.targetX == 0.0D && this.targetY == 0.0D && this.targetZ == 0.0D ||
                         entitylivingbase.getDistanceSq(this.targetX, this.targetY, this.targetZ) >= 1.0D ||
                         this.attacker.getRNG().nextFloat() < 0.05F))
@@ -189,7 +189,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             this.targetZ = entitylivingbase.posZ;
             this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
 
-            //this task is deigned to path from far, this shouldnt be used
+            //this task is designed to path from far, this shouldnt be used
             /*if (d0 > 1024.0D)
             {
                 this.delayCounter += 10;
@@ -214,20 +214,8 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
             }*/
         }
 
-        this.attackTick = Math.max(this.attackTick - 1, 0);
-        this.checkAndPerformAttack(entitylivingbase, d0);
-    }
-
-    protected void checkAndPerformAttack(EntityLivingBase p_190102_1_, double p_190102_2_)
-    {
-        double d0 = this.getAttackReachSqr(p_190102_1_);
-
-        if (p_190102_2_ <= d0 && this.attackTick <= 0)
-        {
-            this.attackTick = 20;
-            //this.attacker.swingArm(EnumHand.MAIN_HAND);
-            //this.attacker.attackEntityAsMob(p_190102_1_);
-        }
+        //this.attackTick = Math.max(this.attackTick - 1, 0);
+        //this.checkAndPerformAttack(entitylivingbase, d0);
     }
 
     protected double getAttackReachSqr(EntityLivingBase attackTarget)
