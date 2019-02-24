@@ -55,7 +55,11 @@ public class BuffHealth extends BuffBase {
                 ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.max_value);
             }
 
+            //actually update their current health
+            ent.setHealth(ent.getMaxHealth());
+
             CULog.dbg("mob health went from " + oldHealth + " to " + ent.getMaxHealth());
+            //CULog.dbg("current health: " + ent.getHealth());
         }
         /*
         double healthBoostMultiply = (difficulty * ConfigHWMonsters.scaleHealth);
