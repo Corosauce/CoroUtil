@@ -80,7 +80,8 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 	    		}
     		} catch (Exception ex) {
     			//mouseClicked NPE'd on me once, NEVER AGAIN!
-    			ex.printStackTrace();
+                //silence it
+    			//ex.printStackTrace();
     		}
     		/*if (check && !config.configData.get(i).editBox.isFocused()) {
     			String str1 = config.configData.get(i).editBox.text;
