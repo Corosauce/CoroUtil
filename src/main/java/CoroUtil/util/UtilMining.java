@@ -58,7 +58,25 @@ public class UtilMining {
 		}
 
 		//should cover most all types we dont want to put into repairing state
-		//this covers too many actually, like glass
+		//TODO: this covers too many actually, like glass, fence
+		/**
+		 * The main goal was to protect against multi block blocks i think
+		 * - door
+		 * - double plant
+		 * - tall flowers
+		 * - sugar cane
+		 * - vine?
+		 *
+		 * need a generic method for this, or a blacklist?
+		 * - implement a configurable blacklist/whitelist with the bad things already added for blacklist mode?
+		 *
+		 * - black/white list for blocks that can be damaged
+		 * - black/white list for blocks that can be converted to repairing block
+		 * - tile entity black(?)/white list: eio conduits
+		 *
+		 * - print out a list of blocks with "convertable / not convertable" result
+		 * - client side in world debug to show red/green for every block in a close range?
+		 */
 		if (!state.isFullCube()) {
 			return false;
 		}
