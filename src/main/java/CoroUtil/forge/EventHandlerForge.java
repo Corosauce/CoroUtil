@@ -2,6 +2,8 @@ package CoroUtil.forge;
 
 import CoroUtil.ai.IInvasionControlledTask;
 import CoroUtil.block.TileEntityRepairingBlock;
+import CoroUtil.client.debug.DebugRenderEntry;
+import CoroUtil.client.debug.DebugRenderer;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
@@ -23,6 +25,7 @@ import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -46,6 +49,7 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Iterator;
 import java.util.List;
@@ -153,6 +157,15 @@ public class EventHandlerForge {
 				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
 			}
 		}
+
+		/*if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
+			if (ent.world.isRemote && ent.world.getTotalWorldTime() % 40 == 0) {
+				if (ent instanceof EntityPlayer) {
+					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 50, 0x00FF00));
+				}
+			}
+
+		}*/
 		
 		if (ConfigCoroUtilAdvanced.desirePathDerp) {
 			
@@ -453,5 +466,12 @@ public class EventHandlerForge {
 		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipBuff, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipBuff));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
 
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void worldRender(RenderWorldLastEvent event)
+	{
+		DebugRenderer.renderDebug(event);
 	}
 }

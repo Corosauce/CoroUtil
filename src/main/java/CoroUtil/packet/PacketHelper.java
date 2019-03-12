@@ -1,5 +1,6 @@
 package CoroUtil.packet;
 
+import CoroUtil.config.ConfigHWMonsters;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -10,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -214,6 +216,19 @@ public class PacketHelper {
 		data.setDouble("motionY", motionY);
 		data.setDouble("motionZ", motionZ);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
+	}
+
+	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos) {
+		NBTTagCompound data = new NBTTagCompound();
+		data.setString("command", "DebugRender");
+		data.setDouble("posX", pos.getX());
+		data.setDouble("posY", pos.getY());
+		data.setDouble("posZ", pos.getZ());
+		return getNBTPacket(data, CoroUtil.eventChannelName);
+	}
+
+	public static void spawnDebugRender(int dimID, BlockPos pos) {
+		CoroUtil.eventChannel.sendToDimension(PacketHelper.getPacketForDebugRender(pos), dimID);
 	}
 	
 }

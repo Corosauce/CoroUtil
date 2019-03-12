@@ -1,10 +1,13 @@
 package CoroUtil.forge;
 
+import CoroUtil.client.debug.DebugRenderEntry;
+import CoroUtil.client.debug.DebugRenderer;
 import CoroUtil.packet.PacketHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -64,6 +67,17 @@ public class EventHandlerPacket {
 							entity.motionY += nbt.getDouble("motionY");
 							entity.motionZ += nbt.getDouble("motionZ");
 						}
+					}
+				});
+			} else if (command.equals("DebugRender")) {
+
+				Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+					@Override
+					public void run() {
+						World world = Minecraft.getMinecraft().world;
+						if (world == null) return;
+						BlockPos pos = new BlockPos(nbt.getInteger("posX"), nbt.getInteger("posY"), nbt.getInteger("posZ"));
+						DebugRenderer.addRenderable(new DebugRenderEntry(pos, world.getTotalWorldTime() + 40, 0xFF0000));
 					}
 				});
 			}

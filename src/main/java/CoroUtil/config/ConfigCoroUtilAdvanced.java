@@ -57,6 +57,8 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	public static boolean minersPushAwayOtherNonMinerMobsWhileMining = true;
 	public static boolean minersPushAwayOnlyOtherBuffedMobs = true;
 
+	public static boolean enableDebugRenderer = false;
+
 	@Override
 	public String getName() {
 		return "Advanced";

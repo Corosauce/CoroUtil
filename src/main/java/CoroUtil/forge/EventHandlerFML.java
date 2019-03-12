@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import java.util.ArrayList;
 import java.util.List;
 
+import CoroUtil.client.debug.DebugRenderer;
 import CoroUtil.difficulty.DynamicDifficulty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -114,6 +116,12 @@ public class EventHandlerFML {
 				}*/
 			}
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void tickClient(TickEvent.ClientTickEvent event) {
+		DebugRenderer.tickClient();
 	}
 	
 	@SubscribeEvent
