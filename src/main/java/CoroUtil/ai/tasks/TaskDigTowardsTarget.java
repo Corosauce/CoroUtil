@@ -7,6 +7,7 @@ import CoroUtil.block.TileEntityRepairingBlock;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.forge.CULog;
+import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.UtilMining;
 import CoroUtil.world.WorldDirectorManager;
@@ -409,6 +410,12 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
             //return false;
         }
+
+		if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
+			for (BlockPos pos : listPillarToMine) {
+				PacketHelper.spawnDebugRender(entity.world.provider.getDimension(), pos);
+			}
+		}
 
         setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
 

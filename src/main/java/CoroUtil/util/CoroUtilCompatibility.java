@@ -80,9 +80,9 @@ public class CoroUtilCompatibility {
         } else if (isSereneSeasonsInstalled()) {
             try {
                 if (method_sereneSeasons_getFloatTemperature == null) {
-                    method_sereneSeasons_getFloatTemperature = class_SereneSeasons_ASMHelper.getDeclaredMethod("getFloatTemperature", Biome.class, BlockPos.class);
+                    method_sereneSeasons_getFloatTemperature = class_SereneSeasons_ASMHelper.getDeclaredMethod("getFloatTemperature", World.class, Biome.class, BlockPos.class);
                 }
-                return (float) method_sereneSeasons_getFloatTemperature.invoke(null, biome, pos);
+                return (float) method_sereneSeasons_getFloatTemperature.invoke(null, world, biome, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 //prevent error spam
@@ -127,7 +127,7 @@ public class CoroUtilCompatibility {
         if (checksereneSeasons) {
             try {
                 checksereneSeasons = false;
-                class_SereneSeasons_ASMHelper = Class.forName("sereneseasons.season.SeasonASMHelper");
+                class_SereneSeasons_ASMHelper = Class.forName("sereneseasons.api.season.BiomeHooks");
                 if (class_SereneSeasons_ASMHelper != null) {
                     sereneSeasonsInstalled = true;
                 }
