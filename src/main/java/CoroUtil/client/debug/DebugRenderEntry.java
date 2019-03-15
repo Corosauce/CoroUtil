@@ -2,12 +2,18 @@ package CoroUtil.client.debug;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.lwjgl.opengl.GL11;
 
 public class DebugRenderEntry {
 
@@ -34,35 +40,80 @@ public class DebugRenderEntry {
 
         //TODO: broken for some unknown reason
 
-        int r = 255;
+        /*int r = 255;
         int g = 0;
-        int b = 0;
-        int a = 150;
+        int b = 0;*/
+        int a = 50;
 
-        TextureAtlasSprite tas = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.ICE.getDefaultState()).getParticleTexture();
+        int r = (color >> 16) & 0xff;
+        int g = (color >> 8) & 0xff;
+        int b = color & 0xff;
 
-        double u = tas.getMinU();
-        double v = tas.getMinV();
+        //TextureAtlasSprite tas = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.ICE.getDefaultState()).getParticleTexture();
 
-        double f = tas.getMinU();
+        double u = 0;//tas.getMinU();
+        double v = 0;//tas.getMinV();
+
+        /*double f = tas.getMinU();
         double f1 = tas.getMaxU();
         double f2 = tas.getMinV();
-        double f3 = tas.getMaxV();
+        double f3 = tas.getMaxV();*/
 
-        //buffer.setTranslation(pos.getX(), pos.getY(), pos.getZ());
+        double f = 0;
+        double f1 = 0;
+        double f2 = 0;
+        double f3 = 0;
 
-        buffer.setTranslation(2, 1, 0);
+        RenderManager rm = Minecraft.getMinecraft().getRenderManager();
 
-        //temp
-        /*buffer.pos(-1, -1, 0).color(r, g, b, a).tex(u, v).lightmap(255, 255).endVertex();
-        buffer.pos(-1, 1, 0).color(r, g, b, a).tex(u, v).lightmap(0, 0).endVertex();
-        buffer.pos(1, 1, 0).color(r, g, b, a).tex(u, v).lightmap(0, 0).endVertex();
-        buffer.pos(1, -1, 0).color(r, g, b, a).tex(u, v).lightmap(0, 0).endVertex();*/
+        buffer.setTranslation(pos.getX() + 0.5F - rm.renderPosX, pos.getY() + 0.5F - rm.renderPosY, pos.getZ() + 0.5F - rm.renderPosZ);
 
-        buffer.pos(-1, -1, 0).color(r, g, b, a).tex((double)f1, (double)f3).lightmap(255, 255).endVertex();
+        //buffer.setTranslation(-127 + 0.5F - rm.renderPosX, 64 + 0.5F - rm.renderPosY, 241 + 0.5F - rm.renderPosZ);
+
+        //buffer.setTranslation(2, 1, 0);
+
+        float sizeRadius = 0.51F;
+
+        //south face
+        buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        //north face
+        buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        //east face
+        buffer.pos(sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        //west face
+        buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        //top face
+        buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        //bottom face
+        buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+
+        /*buffer.pos(-1, -1, 0).color(r, g, b, a).tex((double)f1, (double)f3).lightmap(255, 255).endVertex();
         buffer.pos(-1, 1, 0).color(r, g, b, a).tex((double)f1, (double)f2).lightmap(0, 0).endVertex();
         buffer.pos(1, 1, 0).color(r, g, b, a).tex((double)f, (double)f2).lightmap(0, 0).endVertex();
-        buffer.pos(1, -1, 0).color(r, g, b, a).tex((double)f, (double)f3).lightmap(0, 0).endVertex();
+        buffer.pos(1, -1, 0).color(r, g, b, a).tex((double)f, (double)f3).lightmap(0, 0).endVertex();*/
 
         buffer.setTranslation(0, 0, 0);
     }

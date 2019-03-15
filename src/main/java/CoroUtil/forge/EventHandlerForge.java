@@ -22,6 +22,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
@@ -158,14 +159,14 @@ public class EventHandlerForge {
 			}
 		}
 
-		/*if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
+		if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
 			if (ent.world.isRemote && ent.world.getTotalWorldTime() % 40 == 0) {
 				if (ent instanceof EntityPlayer) {
-					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 50, 0x00FF00));
+					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 100, 0x00FF00));
 				}
 			}
 
-		}*/
+		}
 		
 		if (ConfigCoroUtilAdvanced.desirePathDerp) {
 			

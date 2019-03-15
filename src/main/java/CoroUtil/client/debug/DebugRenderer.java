@@ -4,10 +4,17 @@ import CoroUtil.forge.CULog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -42,7 +49,7 @@ public class DebugRenderer {
             while (it.hasNext()) {
                 DebugRenderEntry entry = it.next();
 
-                entry.tick();
+                //entry.tick();
             }
         }
     }
@@ -59,7 +66,8 @@ public class DebugRenderer {
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder bufferBuilder = tessellator.getBuffer();
-            bufferBuilder.begin(org.lwjgl.opengl.GL11.GL_QUADS, net.minecraft.client.renderer.vertex.DefaultVertexFormats.BLOCK);
+
+            bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
             Iterator<DebugRenderEntry> it = listRenderables.listIterator();
             while (it.hasNext()) {
@@ -69,19 +77,29 @@ public class DebugRenderer {
             }
 
             renderBatch(tessellator, bufferBuilder);
+
+            it = listRenderables.listIterator();
+            while (it.hasNext()) {
+                DebugRenderEntry entry = it.next();
+
+                //for testing
+                //entry.renderImmediate();
+            }
         }
     }
 
     public static void renderBatch(Tessellator tessellator, BufferBuilder bufferBuilder) {
 
         //Minecraft.getMinecraft().renderEngine.bindTexture(net.minecraft.client.renderer.texture.TextureMap.LOCATION_BLOCKS_TEXTURE);
-        Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("textures/particle/particles.png"));
-        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        //Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("textures/particle/particles.png"));
+        RenderHelper.disableStandardItemLighting();
         GlStateManager.blendFunc(org.lwjgl.opengl.GL11.GL_SRC_ALPHA, org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA);
         GlStateManager.enableBlend();
         GlStateManager.disableCull();
+        GlStateManager.disableTexture2D();
+        //GlStateManager.disableDepth();
 
-        if (net.minecraft.client.Minecraft.isAmbientOcclusionEnabled())
+        if (Minecraft.isAmbientOcclusionEnabled())
         {
             GlStateManager.shadeModel(org.lwjgl.opengl.GL11.GL_SMOOTH);
         }
@@ -94,10 +112,27 @@ public class DebugRenderer {
         {
             tessellator.getBuffer().sortVertexData(0, 0, 0);
         }*/
+        RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+        tessellator.getBuffer().sortVertexData((float) rm.renderPosX, (float) rm.renderPosY, (float) rm.renderPosZ);
         tessellator.draw();
 
-        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+        //GlStateManager.enableDepth();
+        GlStateManager.enableTexture2D();
+        RenderHelper.enableStandardItemLighting();
         //drawingBatch = false;
+    }
+
+    public static void debugPathfinding(EntityCreature ent) {
+        if (!ent.world.isRemote) {
+            if (!ent.getNavigator().noPath()) {
+                for (int k = 0; k < ent.getNavigator().getPath().getCurrentPathLength(); ++k)
+                {
+                    PathPoint pathpoint2 = ent.getNavigator().getPath().getPathPointFromIndex(k);
+
+                    CoroUtil.client.debug.DebugRenderer.addRenderable(new DebugRenderEntry(new BlockPos(pathpoint2.x, pathpoint2.y, pathpoint2.z), ent.world.getTotalWorldTime() + 100, 0x00FF00));
+                }
+            }
+        }
     }
 
 }
