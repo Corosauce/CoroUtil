@@ -93,9 +93,19 @@ public class DebugRenderer {
         //Minecraft.getMinecraft().renderEngine.bindTexture(net.minecraft.client.renderer.texture.TextureMap.LOCATION_BLOCKS_TEXTURE);
         //Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("textures/particle/particles.png"));
         RenderHelper.disableStandardItemLighting();
-        GlStateManager.blendFunc(org.lwjgl.opengl.GL11.GL_SRC_ALPHA, org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.enableBlend();
-        GlStateManager.disableCull();
+
+        boolean translucency = true;
+        if (translucency) {
+            //GlStateManager.disableDepth();
+            GlStateManager.blendFunc(org.lwjgl.opengl.GL11.GL_SRC_ALPHA, org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.enableBlend();
+        } else {
+            GlStateManager.disableBlend();
+            //GlStateManager.enableDepth();
+            GlStateManager.depthMask(false);
+        }
+
+        //GlStateManager.disableCull();
         GlStateManager.disableTexture2D();
         //GlStateManager.disableDepth();
 
@@ -113,10 +123,19 @@ public class DebugRenderer {
             tessellator.getBuffer().sortVertexData(0, 0, 0);
         }*/
         RenderManager rm = Minecraft.getMinecraft().getRenderManager();
-        tessellator.getBuffer().sortVertexData((float) rm.renderPosX, (float) rm.renderPosY, (float) rm.renderPosZ);
+        //tessellator.getBuffer().sortVertexData((float) rm.renderPosX, (float) rm.renderPosY, (float) rm.renderPosZ);
         tessellator.draw();
 
         //GlStateManager.enableDepth();
+        if (translucency) {
+
+        } else {
+            GlStateManager.enableBlend();
+            //GlStateManager.disableDepth();
+        }
+
+        GlStateManager.enableDepth();
+
         GlStateManager.enableTexture2D();
         RenderHelper.enableStandardItemLighting();
         //drawingBatch = false;
@@ -133,6 +152,10 @@ public class DebugRenderer {
                 }
             }
         }
+    }
+
+    public static void clearRenderables() {
+        listRenderables.clear();
     }
 
 }

@@ -9,6 +9,7 @@ import CoroUtil.config.ConfigHWMonsters;
 import CoroUtil.difficulty.DynamicDifficulty;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.BuffBase;
+import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -160,9 +161,27 @@ public class EventHandlerForge {
 		}
 
 		if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
-			if (ent.world.isRemote && ent.world.getTotalWorldTime() % 40 == 0) {
+			if (!ent.world.isRemote && ent.world.getTotalWorldTime() % 40 == 0) {
+				//DebugRenderer.clearRenderables();
+				PacketHelper.clearDebugRender(ent.world.provider.getDimension());
 				if (ent instanceof EntityPlayer) {
-					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 100, 0x00FF00));
+					int range = 5;
+					for (int x = -range; x <= range; x++) {
+						for (int y = -range; y <= range; y++) {
+							for (int z = -range; z <= range; z++) {
+								BlockPos pos = ent.getPosition().add(x, y, z);
+								if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
+									//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0x00FF00));
+									PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 35, 0x00FF00, 0);
+								} else if (!ent.world.isAirBlock(pos)) {
+									//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0xFF0000));
+									PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 35, 0xFF0000, 0);
+								}
+							}
+						}
+					}
+					/*DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 70, 0x00FF00));
+					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition().add(1, 0, 0), ent.world.getTotalWorldTime() + 70, 0x00FF00));*/
 				}
 			}
 

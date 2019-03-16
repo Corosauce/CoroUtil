@@ -218,17 +218,30 @@ public class PacketHelper {
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
-	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos) {
+	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos, int time, int color, int type) {
 		NBTTagCompound data = new NBTTagCompound();
 		data.setString("command", "DebugRender");
 		data.setDouble("posX", pos.getX());
 		data.setDouble("posY", pos.getY());
 		data.setDouble("posZ", pos.getZ());
+		data.setInteger("color", color);
+        data.setInteger("type", type);
+        data.setInteger("time", time);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
-	public static void spawnDebugRender(int dimID, BlockPos pos) {
-		CoroUtil.eventChannel.sendToDimension(PacketHelper.getPacketForDebugRender(pos), dimID);
+    public static FMLProxyPacket getPacketForDebugRenderClear() {
+        NBTTagCompound data = new NBTTagCompound();
+        data.setString("command", "DebugRenderClear");
+        return getNBTPacket(data, CoroUtil.eventChannelName);
+    }
+
+	public static void spawnDebugRender(int dimID, BlockPos pos, int time, int color, int type) {
+		CoroUtil.eventChannel.sendToDimension(PacketHelper.getPacketForDebugRender(pos, time, color, type), dimID);
 	}
+
+    public static void clearDebugRender(int dimID) {
+        CoroUtil.eventChannel.sendToDimension(PacketHelper.getPacketForDebugRenderClear(), dimID);
+    }
 	
 }

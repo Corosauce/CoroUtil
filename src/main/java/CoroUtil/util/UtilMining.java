@@ -29,27 +29,30 @@ public class UtilMining {
 	}
 
     public static boolean canMineBlock(World world, BlockPos pos, Block block) {
-    	
-    	//System.out.println("check: " + block);
-    	
-    	IBlockState state = world.getBlockState(pos);
-    	
-    	//dont mine tile entities
-		if (block.isAir(state, world, pos) || block == CommonProxy.blockRepairingBlock) {
+		return canMineBlock(world, pos);
+    }
+
+	public static boolean canMineBlock(World world, BlockPos pos) {
+		//System.out.println("check: " + block);
+
+		IBlockState state = world.getBlockState(pos);
+
+		//dont mine tile entities
+		if (state.getBlock().isAir(state, world, pos) || state.getBlock() == CommonProxy.blockRepairingBlock) {
 			return false;
 		}
-    	if (TaskDigTowardsTarget.preventMinedTileEntitiesDuringInvasions && world.getTileEntity(pos) != null) {
-    		return false;
-    	}
+		if (TaskDigTowardsTarget.preventMinedTileEntitiesDuringInvasions && world.getTileEntity(pos) != null) {
+			return false;
+		}
     	/*if (block == Blocks.obsidian) {
     		return false;
     	}*/
-    	if (state.getMaterial().isLiquid()) {
-    		return false;
-    	}
-    	
-    	return true;
-    }
+		if (state.getMaterial().isLiquid()) {
+			return false;
+		}
+
+		return true;
+	}
 
     public static boolean canConvertToRepairingBlock(World world, IBlockState state) {
 

@@ -58,28 +58,27 @@ public class EventHandlerPacket {
 
 				final int entID = nbt.getInteger("entityID");
 
-				Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-					@Override
-					public void run() {
-						Entity entity = getClientWorld().getEntityByID(entID);
-						if (entity != null) {
-							entity.motionX += nbt.getDouble("motionX");
-							entity.motionY += nbt.getDouble("motionY");
-							entity.motionZ += nbt.getDouble("motionZ");
-						}
+				Minecraft.getMinecraft().addScheduledTask(() -> {
+
+					Entity entity = getClientWorld().getEntityByID(entID);
+					if (entity != null) {
+						entity.motionX += nbt.getDouble("motionX");
+						entity.motionY += nbt.getDouble("motionY");
+						entity.motionZ += nbt.getDouble("motionZ");
 					}
+
 				});
 			} else if (command.equals("DebugRender")) {
 
-				Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-					@Override
-					public void run() {
-						World world = Minecraft.getMinecraft().world;
-						if (world == null) return;
-						BlockPos pos = new BlockPos(nbt.getInteger("posX"), nbt.getInteger("posY"), nbt.getInteger("posZ"));
-						DebugRenderer.addRenderable(new DebugRenderEntry(pos, world.getTotalWorldTime() + 40, 0xFF0000));
-					}
+				Minecraft.getMinecraft().addScheduledTask(() -> {
+					World world = Minecraft.getMinecraft().world;
+					if (world == null) return;
+					BlockPos pos = new BlockPos(nbt.getInteger("posX"), nbt.getInteger("posY"), nbt.getInteger("posZ"));
+					DebugRenderEntry entry = new DebugRenderEntry(pos, world.getTotalWorldTime() + nbt.getInteger("time"), nbt.getInteger("color"));
+					DebugRenderer.addRenderable(entry);
 				});
+			} else if (command.equals("DebugRenderClear")) {
+				Minecraft.getMinecraft().addScheduledTask(() -> DebugRenderer.clearRenderables());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

@@ -413,7 +413,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 		if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
 			for (BlockPos pos : listPillarToMine) {
-				PacketHelper.spawnDebugRender(entity.world.provider.getDimension(), pos);
+				PacketHelper.spawnDebugRender(entity.world.provider.getDimension(), pos, 40, 0x0000FF, 0);
 			}
 		}
 

@@ -38,8 +38,6 @@ public class DebugRenderEntry {
          * BLOCK.addElement(TEX_2S); - lightmap
          */
 
-        //TODO: broken for some unknown reason
-
         /*int r = 255;
         int g = 0;
         int b = 0;*/
@@ -72,13 +70,21 @@ public class DebugRenderEntry {
 
         //buffer.setTranslation(2, 1, 0);
 
-        float sizeRadius = 0.51F;
+        float sizeRadius = 0.501F;
+
+        /**
+         * render order for front facing quads (working north used with face culling on):
+         * B----C
+         * |    |
+         * A    D
+         *
+         */
 
         //south face
-        buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
-        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
 
         //north face
         buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
@@ -93,16 +99,16 @@ public class DebugRenderEntry {
         buffer.pos(sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
 
         //west face
-        buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
-        buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(-sizeRadius, -sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
 
         //top face
-        buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f2).lightmap(0, 0).endVertex();
-        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
+        buffer.pos(-sizeRadius, sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
         buffer.pos(-sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f3).lightmap(0, 0).endVertex();
+        buffer.pos(sizeRadius, sizeRadius, sizeRadius).color(r, g, b, a).tex(f, f2).lightmap(0, 0).endVertex();
 
         //bottom face
         buffer.pos(-sizeRadius, -sizeRadius, -sizeRadius).color(r, g, b, a).tex(f1, f3).lightmap(0, 0).endVertex();
