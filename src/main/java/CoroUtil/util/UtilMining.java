@@ -3,26 +3,108 @@ package CoroUtil.util;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CommonProxy;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.InvalidBlockStateException;
+import net.minecraft.command.NumberInvalidException;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
-import java.util.UUID;
+import java.util.*;
 
 public class UtilMining {
 
+	public static List<IBlockState> listBlocksBlacklisted = new ArrayList<>();
+
 	public static GameProfile fakePlayerProfile = null;
+
+	public static boolean blockHasCollision(World world, BlockPos pos) {
+		return world.getBlockState(pos).getCollisionBoundingBox(world, pos) != Block.NULL_AABB;
+	}
+
+	public static boolean isBlockBlacklistedNonTileEntity(World world, BlockPos pos) {
+		//using getActualState here fixes things like upper half of double_plant returning the incorrect runtime value
+		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
+
+		return CoroUtilBlockState.partialStateInListMatchesFullState(state, listBlocksBlacklisted);
+	}
+
+	public static boolean testing(World world, BlockPos pos) {
+		IBlockState state = world.getBlockState(pos);
+
+		HashSet<IBlockState> listBlocksBlacklisted = new HashSet<>();
+		List<IBlockState> listBlocksBlacklisted2 = new ArrayList<>();
+
+
+		IBlockState state1 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
+				.withProperty(BlockDoublePlant.HALF, BlockDoublePlant.EnumBlockHalf.UPPER);
+
+		IBlockState state2 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
+				.withProperty(BlockDoublePlant.HALF, BlockDoublePlant.EnumBlockHalf.UPPER);
+
+		IBlockState state3 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
+
+				;
+
+		//setblock ~ ~ ~ minecraft:double_plant variant=sunflower
+		String str = "variant=sunflower,half=upper";
+		IBlockState state5 = null;
+
+		try {
+			state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.DOUBLE_PLANT, str);
+			//state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.GRASS, str);
+		} catch (NumberInvalidException e) {
+			e.printStackTrace();
+		} catch (InvalidBlockStateException e) {
+			e.printStackTrace();
+		}
+
+		IBlockState state4 = Blocks.DOUBLE_PLANT.getStateFromMeta(Blocks.DOUBLE_PLANT.getMetaFromState(state1));
+
+		listBlocksBlacklisted.add(state2);
+		if (state5 != null) listBlocksBlacklisted2.add(state5);
+
+		if (listBlocksBlacklisted2.contains(state1)/*state1.equals(state2)*/) {
+			System.out.println("within list state match");
+		} else {
+			System.out.println("within list state mismatch");
+		}
+
+		if (state5 != null && CoroUtilBlockState.partialStateMatchesFullState(state5, state1)) {
+			System.out.println("partial state match");
+		} else {
+			System.out.println("partial state mismatch");
+		}
+
+		return false;
+	}
+
+	public static boolean isBlockWhitelistedTileEntity(World world, BlockPos pos) {
+		//TODO: all of it
+		return false;
+	}
 
 	public static boolean canMineBlock(World world, BlockCoord pos, Block block) {
 		return canMineBlock(world, pos.toBlockPos(), block);
@@ -135,5 +217,5 @@ public class UtilMining {
 			return false;
 		}
 	}
-	
+
 }

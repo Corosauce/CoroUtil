@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import CoroUtil.config.ConfigCoroUtilAdvanced;
-import CoroUtil.config.ConfigHWMonsters;
+import CoroUtil.config.*;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.util.CoroUtilCompatibility;
 import CoroUtil.util.CoroUtilMisc;
@@ -29,8 +28,6 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
-import CoroUtil.config.ConfigCoroUtil;
-import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.diplomacy.TeamTypes;
 import CoroUtil.pets.PetsManager;
 import CoroUtil.quest.PlayerQuestManager;
@@ -67,6 +64,7 @@ public class CoroUtil {
     public static ConfigCoroUtilAdvanced configDev = new ConfigCoroUtilAdvanced();
     public static ConfigDynamicDifficulty configDD = new ConfigDynamicDifficulty();
     public static ConfigHWMonsters configHWMonsters = new ConfigHWMonsters();
+    public static ConfigBlockDestruction configBlockDestruction = new ConfigBlockDestruction();
     
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
@@ -74,6 +72,7 @@ public class CoroUtil {
 		migrateOldConfig();
 
     	ConfigMod.addConfigFile(event, configCoroUtil);
+        ConfigMod.addConfigFile(event, configBlockDestruction);
 
     	//for good measure
 		configDev.hookUpdatedValues();

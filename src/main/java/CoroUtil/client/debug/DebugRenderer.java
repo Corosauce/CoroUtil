@@ -26,7 +26,7 @@ public class DebugRenderer {
 
     public static void addRenderable(DebugRenderEntry entry) {
         listRenderables.add(entry);
-        CULog.dbg("add renderable, new size: " + listRenderables.size());
+        //CULog.dbg("add renderable, new size: " + listRenderables.size());
     }
 
     public static void tickClient() {
@@ -39,7 +39,7 @@ public class DebugRenderer {
         while (it.hasNext()) {
             DebugRenderEntry entry = it.next();
             if (entry.isExpired(world)) {
-                CULog.dbg("remove expired renderable");
+                //CULog.dbg("remove expired renderable");
                 it.remove();
             }
         }
