@@ -1,7 +1,9 @@
 package CoroUtil.util;
 
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.config.ConfigBlockDestruction;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
@@ -37,15 +39,19 @@ public class UtilMining {
 
 	public static GameProfile fakePlayerProfile = null;
 
+	public static class ClientData {
+		public static List<IBlockState> listBlocksBlacklisted = new ArrayList<>();
+	}
+
 	public static boolean blockHasCollision(World world, BlockPos pos) {
 		return world.getBlockState(pos).getCollisionBoundingBox(world, pos) != Block.NULL_AABB;
 	}
 
-	public static boolean isBlockBlacklistedNonTileEntity(World world, BlockPos pos) {
+	public static boolean isBlockBlacklistedNonTileEntity(World world, BlockPos pos, boolean client) {
 		//using getActualState here fixes things like upper half of double_plant returning the incorrect runtime value
 		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
 
-		return CoroUtilBlockState.partialStateInListMatchesFullState(state, listBlocksBlacklisted);
+		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listBlocksBlacklisted : listBlocksBlacklisted);
 	}
 
 	public static boolean testing(World world, BlockPos pos) {
@@ -215,6 +221,77 @@ public class UtilMining {
 			return !event.isCanceled();
 		} else {
 			return false;
+		}
+	}
+
+	public static void processBlockBlacklist(String config, List<IBlockState> list) {
+		try {
+			String[] names = config.split(" ");
+			for (int i = 0; i < names.length; i++) {
+				names[i] = names[i].trim();
+
+				String name = "";
+				String metaOrState = "";
+				//int meta = 0;
+
+				if (names[i].contains("[")) {
+					name = names[i].split("\\[")[0];
+					try {
+						metaOrState = names[i].split("\\[")[1];
+						metaOrState = metaOrState.substring(0, metaOrState.length()-1);
+						//meta = Integer.valueOf(names[i].split(":")[1]);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				} else {
+					name = names[i];
+				}
+
+				Block block = Block.getBlockFromName(name);
+				if (block != null) {
+					IBlockState state = null;
+					try {
+						if (metaOrState.equals("")) {
+							state = CoroUtilBlockState.getStatelessBlock(block);
+						} else {
+							state = CoroUtilBlockState.convertArgToPartialBlockState(block, metaOrState);
+						}
+
+						//state = block.getStateFromMeta(meta);
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+					if (state != null) {
+						CULog.dbg("Adding: " + state);
+						list.add(state);
+					}
+
+				}
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static void processBlockLists() {
+		try {
+
+			CULog.dbg("Processing destructable blocks for CoroUtil");
+			UtilMining.listBlocksBlacklisted.clear();
+
+			processBlockBlacklist(ConfigBlockDestruction.blacklistMineable_RegularBlocks, UtilMining.listBlocksBlacklisted);
+
+			//List<String> list = new ArrayList<>();
+			//Matcher m = Pattern.compile(",(?![^()]*\\))").matcher(blacklistMineable_RegularBlocks);
+			//Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(blacklistMineable_RegularBlocks);
+			//while (m.find()) {
+			//System.out.println(m.group(1));
+			//String entry = m.group(1);
+			//}
+
+			//eg: double_plant variant=sunflower,half=upper;grass;double_plant variant=double_rose;desirepaths:grass_worn_2
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 

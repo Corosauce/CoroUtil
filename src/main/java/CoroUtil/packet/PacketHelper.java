@@ -1,5 +1,6 @@
 package CoroUtil.packet;
 
+import CoroUtil.config.ConfigBlockDestruction;
 import CoroUtil.config.ConfigHWMonsters;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -218,6 +219,13 @@ public class PacketHelper {
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
+	public static FMLProxyPacket getPacketForUpdateBlockList() {
+		NBTTagCompound data = new NBTTagCompound();
+		data.setString("command", "UpdateBlockList");
+		data.setString("blacklistMineable_RegularBlocks", ConfigBlockDestruction.blacklistMineable_RegularBlocks);
+		return getNBTPacket(data, CoroUtil.eventChannelName);
+	}
+
 	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos, int time, int color, int type) {
 		NBTTagCompound data = new NBTTagCompound();
 		data.setString("command", "DebugRender");
@@ -225,8 +233,8 @@ public class PacketHelper {
 		data.setDouble("posY", pos.getY());
 		data.setDouble("posZ", pos.getZ());
 		data.setInteger("color", color);
-        data.setInteger("type", type);
-        data.setInteger("time", time);
+		data.setInteger("type", type);
+		data.setInteger("time", time);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
@@ -243,5 +251,9 @@ public class PacketHelper {
     public static void clearDebugRender(int dimID) {
         CoroUtil.eventChannel.sendToDimension(PacketHelper.getPacketForDebugRenderClear(), dimID);
     }
+
+	public static void syncBlockLists() {
+		CoroUtil.eventChannel.sendToAll(PacketHelper.getPacketForUpdateBlockList());
+	}
 	
 }

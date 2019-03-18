@@ -3,6 +3,7 @@ package CoroUtil.forge;
 import CoroUtil.client.debug.DebugRenderEntry;
 import CoroUtil.client.debug.DebugRenderer;
 import CoroUtil.packet.PacketHelper;
+import CoroUtil.util.UtilMining;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,6 +69,15 @@ public class EventHandlerPacket {
 					}
 
 				});
+
+			} else if (command.equals("UpdateBlockList")) {
+				Minecraft.getMinecraft().addScheduledTask(() -> {
+					World world = Minecraft.getMinecraft().world;
+					if (world == null) return;
+					String blacklistMineable_RegularBlocks = nbt.getString("blacklistMineable_RegularBlocks");
+					UtilMining.ClientData.listBlocksBlacklisted.clear();
+					UtilMining.processBlockBlacklist(blacklistMineable_RegularBlocks, UtilMining.ClientData.listBlocksBlacklisted);
+				});
 			} else if (command.equals("DebugRender")) {
 
 				Minecraft.getMinecraft().addScheduledTask(() -> {
@@ -77,6 +87,7 @@ public class EventHandlerPacket {
 					DebugRenderEntry entry = new DebugRenderEntry(pos, world.getTotalWorldTime() + nbt.getInteger("time"), nbt.getInteger("color"));
 					DebugRenderer.addRenderable(entry);
 				});
+
 			} else if (command.equals("DebugRenderClear")) {
 				Minecraft.getMinecraft().addScheduledTask(() -> DebugRenderer.clearRenderables());
 			}

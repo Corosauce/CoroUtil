@@ -161,11 +161,12 @@ public class EventHandlerForge {
 		}
 
 		if (ConfigCoroUtilAdvanced.enableDebugRenderer) {
-			if (!ent.world.isRemote && ent.world.getTotalWorldTime() % 40 == 0) {
-				//DebugRenderer.clearRenderables();
-				PacketHelper.clearDebugRender(ent.world.provider.getDimension());
+
+			int rate = 10;
+			int range = 10;
+
+			if (ent.world.isRemote && ent.world.getTotalWorldTime() % rate == 0) {
 				if (ent instanceof EntityPlayer) {
-					int range = 0;
 					for (int x = -range; x <= range; x++) {
 						for (int y = -range; y <= range; y++) {
 							for (int z = -range; z <= range; z++) {
@@ -173,15 +174,15 @@ public class EventHandlerForge {
 
 								if (!ent.world.isAirBlock(pos)) {
 
-									boolean cantMine = !UtilMining.blockHasCollision(ent.world, pos) || ent.world.getTileEntity(pos) != null || UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos);
+									boolean cantMine = !UtilMining.blockHasCollision(ent.world, pos) || ent.world.getTileEntity(pos) != null || UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos, true);
 
 									//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
 									if (cantMine/*UtilMining.blockHasCollision(ent.world, pos) && *//*UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos)*/) {
-										//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0x00FF00));
-										PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
+										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
+										//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
 									} else if (!ent.world.isAirBlock(pos)) {
-										//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0xFF0000));
-										PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
+										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
+										//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
 									}
 								}
 							}
@@ -500,5 +501,10 @@ public class EventHandlerForge {
 	public void worldRender(RenderWorldLastEvent event)
 	{
 		DebugRenderer.renderDebug(event);
+	}
+
+	@SubscribeEvent
+	public void playerLoggedIn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
+		PacketHelper.syncBlockLists();
 	}
 }

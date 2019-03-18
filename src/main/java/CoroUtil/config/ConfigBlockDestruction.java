@@ -1,6 +1,7 @@
 package CoroUtil.config;
 
 import CoroUtil.forge.CULog;
+import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.CoroUtilBlockState;
 import CoroUtil.util.UtilMining;
 import modconfig.ConfigComment;
@@ -43,66 +44,10 @@ public class ConfigBlockDestruction implements IConfigCategory {
 
 	@Override
 	public void hookUpdatedValues() {
-		try {
+        UtilMining.processBlockLists();
 
-			CULog.dbg("Processing destructable blocks for CoroUtil");
-			UtilMining.listBlocksBlacklisted.clear();
-
-			//List<String> list = new ArrayList<>();
-			//Matcher m = Pattern.compile(",(?![^()]*\\))").matcher(blacklistMineable_RegularBlocks);
-			//Matcher m = Pattern.compile("([^\"]\\S*|\".+?\")\\s*").matcher(blacklistMineable_RegularBlocks);
-			//while (m.find()) {
-				//System.out.println(m.group(1));
-				//String entry = m.group(1);
-			//}
-
-			//eg: double_plant variant=sunflower,half=upper;grass;double_plant variant=double_rose;desirepaths:grass_worn_2
-
-			String[] names = blacklistMineable_RegularBlocks.split(" ");
-			for (int i = 0; i < names.length; i++) {
-				names[i] = names[i].trim();
-
-				String name = "";
-				String metaOrState = "";
-				//int meta = 0;
-
-				if (names[i].contains("[")) {
-					name = names[i].split("\\[")[0];
-					try {
-						metaOrState = names[i].split("\\[")[1];
-						metaOrState = metaOrState.substring(0, metaOrState.length()-1);
-						//meta = Integer.valueOf(names[i].split(":")[1]);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				} else {
-					name = names[i];
-				}
-
-				Block block = Block.getBlockFromName(name);
-				if (block != null) {
-					IBlockState state = null;
-					try {
-						if (metaOrState.equals("")) {
-							state = CoroUtilBlockState.getStatelessBlock(block);
-						} else {
-							state = CoroUtilBlockState.convertArgToPartialBlockState(block, metaOrState);
-						}
-
-						//state = block.getStateFromMeta(meta);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-					if (state != null) {
-						CULog.dbg("Adding: " + state);
-						UtilMining.listBlocksBlacklisted.add(state);
-					}
-
-				}
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+        //TODO: sync on connect too
+        PacketHelper.syncBlockLists();
 	}
 
 }
