@@ -58,7 +58,7 @@ public class ConfigBlockDestruction implements IConfigCategory {
 
 			//eg: double_plant variant=sunflower,half=upper;grass;double_plant variant=double_rose;desirepaths:grass_worn_2
 
-			String[] names = blacklistMineable_RegularBlocks.split(";");
+			String[] names = blacklistMineable_RegularBlocks.split(" ");
 			for (int i = 0; i < names.length; i++) {
 				names[i] = names[i].trim();
 
@@ -66,10 +66,11 @@ public class ConfigBlockDestruction implements IConfigCategory {
 				String metaOrState = "";
 				//int meta = 0;
 
-				if (names[i].contains(" ")) {
-					name = names[i].split(" ")[0];
+				if (names[i].contains("[")) {
+					name = names[i].split("\\[")[0];
 					try {
-						metaOrState = names[i].split(" ")[1];
+						metaOrState = names[i].split("\\[")[1];
+						metaOrState = metaOrState.substring(0, metaOrState.length()-1);
 						//meta = Integer.valueOf(names[i].split(":")[1]);
 					} catch (Exception ex) {
 						ex.printStackTrace();

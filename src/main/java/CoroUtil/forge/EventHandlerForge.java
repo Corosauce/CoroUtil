@@ -165,19 +165,24 @@ public class EventHandlerForge {
 				//DebugRenderer.clearRenderables();
 				PacketHelper.clearDebugRender(ent.world.provider.getDimension());
 				if (ent instanceof EntityPlayer) {
-					int range = 5;
+					int range = 0;
 					for (int x = -range; x <= range; x++) {
 						for (int y = -range; y <= range; y++) {
 							for (int z = -range; z <= range; z++) {
 								BlockPos pos = ent.getPosition().add(x, y - 1, z);
 
-								//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
-								if (/*UtilMining.blockHasCollision(ent.world, pos) && */UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos)) {
-									//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0x00FF00));
-									PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
-								} else if (!ent.world.isAirBlock(pos)) {
-									//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0xFF0000));
-									PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
+								if (!ent.world.isAirBlock(pos)) {
+
+									boolean cantMine = !UtilMining.blockHasCollision(ent.world, pos) || ent.world.getTileEntity(pos) != null || UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos);
+
+									//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
+									if (cantMine/*UtilMining.blockHasCollision(ent.world, pos) && *//*UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos)*/) {
+										//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0x00FF00));
+										PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
+									} else if (!ent.world.isAirBlock(pos)) {
+										//DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + 35, 0xFF0000));
+										PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
+									}
 								}
 							}
 						}
