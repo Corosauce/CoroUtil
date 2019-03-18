@@ -207,6 +207,14 @@ public class ConfigMod {
             data.writeConfigFile(true);
         }
     }
+
+    public static void forceLoadRuntimeSettingsFromFile() {
+        CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
+        for (ModConfigData data : configLookup.values()) {
+            //data.reloadRuntimeFromFile();
+            data.writeConfigFile(false);
+        }
+    }
     
     /* Sync the HashMap data if an outside source modified one of the config fields */
     public static void updateHashMaps() {

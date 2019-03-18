@@ -93,6 +93,9 @@ public class CommandModConfig extends CommandBase {
 						} else {
 							CoroUtilMisc.sendCommandSenderMsg(var1, "set requires 3+ parameters");
 						}
+					} else if (var2[cmd].equalsIgnoreCase("reload") && player != null) {
+						ConfigMod.forceLoadRuntimeSettingsFromFile();
+						player.sendMessage(new TextComponentString("Reloaded all runtime configurations from file"));
 					} else if (var2[cmd].equalsIgnoreCase("update") && player != null) {
 						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), (EntityPlayerMP)player);
 						//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
