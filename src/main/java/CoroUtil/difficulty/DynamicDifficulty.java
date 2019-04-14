@@ -633,6 +633,27 @@ public class DynamicDifficulty {
 	}
 	
 	public static void logDamage(LivingHurtEvent event) {
+
+		boolean tempLog = ConfigCoroUtilAdvanced.logging_DPS_All;
+		if (tempLog) {
+			try {
+				System.out.println("LivingHurtEvent: ");
+				System.out.println("type: " + event.getSource().damageType);
+				if (event.getSource().getImmediateSource() != null)
+					System.out.println("source immediate: " + event.getSource().getImmediateSource().getName());
+				if (event.getSource().getTrueSource() != null)
+					System.out.println("source true: " + event.getSource().getTrueSource().getName());
+				System.out.println("amount: " + event.getAmount());
+
+
+				Throwable t = new Throwable();
+				t.printStackTrace();
+
+			} catch (Exception ex) {
+				//no
+			}
+		}
+
 		if (event.getEntity().world.isRemote) return;
 		if (ConfigCoroUtilAdvanced.trackChunkData) {
 			

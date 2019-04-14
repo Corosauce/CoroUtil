@@ -5,28 +5,20 @@ import CoroUtil.config.ConfigBlockDestruction;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
-import com.google.common.collect.ImmutableMap;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.InvalidBlockStateException;
 import net.minecraft.command.NumberInvalidException;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.world.BlockEvent;
@@ -35,23 +27,126 @@ import java.util.*;
 
 public class UtilMining {
 
-	public static List<IBlockState> listBlocksBlacklisted = new ArrayList<>();
+	/**
+	 *
+	 * needs to be mined:
+	 * - if collision
+	 *
+	 * regular blocks:
+	 * - always breaks unless in blacklist
+	 * - list decides:
+	 * -- actual break?
+	 * -- or repairing block
+	 *
+	 * tile entities:
+	 * - we cant use repairing block on this (for now)
+	 * - list decides:
+	 * -- can be mined
+	 * -- cant be mined
+	 *
+	 * - if we readd simudigging, use these rules to work around unmineable things
+	 */
+
+	public static List<IBlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
+	public static List<IBlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
 
 	public static GameProfile fakePlayerProfile = null;
 
 	public static class ClientData {
-		public static List<IBlockState> listBlocksBlacklisted = new ArrayList<>();
+		public static List<IBlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
+		public static List<IBlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
+	}
+
+	/**
+	 * Basically check if theres collision
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static boolean needsToMineBlock(World world, BlockPos pos) {
+
+		//optimizations to avoid doing full collision check where possible
+		if (world.isAirBlock(pos)) return false;
+		if (world.getBlockState(pos).getBlock() == CommonProxy.blockRepairingBlock) return false;
+
+		return blockHasCollision(world, pos);
+	}
+
+	/**
+	 * Server side only
+	 *
+	 * Returns false if its a block without collision
+	 * Then checks if its a tile entity that is whitelisted or other config allows all tile entities
+	 *
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static boolean canMineBlockNew(World world, BlockPos pos) {
+		if (!needsToMineBlock(world, pos)) return false;
+		if (!canBreakBlockOrTileEntity(world, pos, false)) return false;
+		return true;
 	}
 
 	public static boolean blockHasCollision(World world, BlockPos pos) {
 		return world.getBlockState(pos).getCollisionBoundingBox(world, pos) != Block.NULL_AABB;
 	}
 
-	public static boolean isBlockBlacklistedNonTileEntity(World world, BlockPos pos, boolean client) {
+	/**
+	 * Server side only
+	 *
+	 * for now all regular blocks can be mined until we implement a 3rd list that blacklists that
+	 *
+	 * Can break as in break or convert to repairing block, do anything with really
+	 *
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static boolean canBreakBlockOrTileEntity(World world, BlockPos pos, boolean isClient) {
+		boolean isTileEntity = world.getTileEntity(pos) != null;
+
+		//THIS IS FOR choosing break / repair mode, not if it can be mined, dont use here
+		//boolean cantMineRegularBlock = !isTileEntity && UtilMining.isBlockBlacklistedNonTileEntity(world, pos, false);
+
+		boolean cantMineTileEntity = isTileEntity && !UtilMining.isBlockWhitelistedToBreakTileEntity(world, pos, isClient);
+
+		//TODO: using an invasion context specific config here, if we use this method elsewhere this is a problem
+		return /*!cantMineRegularBlock || */!cantMineTileEntity || !TaskDigTowardsTarget.preventMinedTileEntitiesDuringInvasions;
+	}
+
+	/**
+	 *
+	 * @param world
+	 * @param pos
+	 * @return
+	 */
+	public static boolean canConvertToRepairingBlockNew(World world, BlockPos pos, boolean isClient) {
+		boolean isTileEntity = world.getTileEntity(pos) != null;
+
+		//boolean isClient = false;
+
+		if (!isTileEntity) {
+			return !isBlockBlacklistedFromRepairingBlockNonTileEntity(world, pos, isClient);
+		}
+
+		return false;
+	}
+
+	public static boolean isBlockBlacklistedFromRepairingBlockNonTileEntity(World world, BlockPos pos, boolean client) {
 		//using getActualState here fixes things like upper half of double_plant returning the incorrect runtime value
 		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
 
-		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listBlocksBlacklisted : listBlocksBlacklisted);
+		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listBlocksBlacklistedRepairing : listBlocksBlacklistedRepairing);
+	}
+
+	public static boolean isBlockWhitelistedToBreakTileEntity(World world, BlockPos pos, boolean client) {
+
+		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
+
+		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listTileEntitiesWhitelistedBreakable : listTileEntitiesWhitelistedBreakable);
+
+		//return false;
 	}
 
 	public static boolean testing(World world, BlockPos pos) {
@@ -107,19 +202,17 @@ public class UtilMining {
 		return false;
 	}
 
-	public static boolean isBlockWhitelistedTileEntity(World world, BlockPos pos) {
-		//TODO: all of it
-		return false;
-	}
-
+	@Deprecated
 	public static boolean canMineBlock(World world, BlockCoord pos, Block block) {
 		return canMineBlock(world, pos.toBlockPos(), block);
 	}
 
+	@Deprecated
     public static boolean canMineBlock(World world, BlockPos pos, Block block) {
 		return canMineBlock(world, pos);
     }
 
+	@Deprecated
 	public static boolean canMineBlock(World world, BlockPos pos) {
 		//System.out.println("check: " + block);
 
@@ -142,6 +235,7 @@ public class UtilMining {
 		return true;
 	}
 
+	@Deprecated
     public static boolean canConvertToRepairingBlock(World world, IBlockState state) {
 
 		if (state.getMaterial() == Material.GLASS) {
@@ -277,9 +371,11 @@ public class UtilMining {
 		try {
 
 			CULog.dbg("Processing destructable blocks for CoroUtil");
-			UtilMining.listBlocksBlacklisted.clear();
+			UtilMining.listBlocksBlacklistedRepairing.clear();
+			UtilMining.listTileEntitiesWhitelistedBreakable.clear();
 
-			processBlockBlacklist(ConfigBlockDestruction.blacklistMineable_RegularBlocks, UtilMining.listBlocksBlacklisted);
+			processBlockBlacklist(ConfigBlockDestruction.blacklistRepairable_RegularBlocks, UtilMining.listBlocksBlacklistedRepairing);
+			processBlockBlacklist(ConfigBlockDestruction.whitelistMineable_TileEntities, UtilMining.listTileEntitiesWhitelistedBreakable);
 
 			//List<String> list = new ArrayList<>();
 			//Matcher m = Pattern.compile(",(?![^()]*\\))").matcher(blacklistMineable_RegularBlocks);

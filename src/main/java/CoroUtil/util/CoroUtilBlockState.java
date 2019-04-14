@@ -49,7 +49,7 @@ public class CoroUtilBlockState {
 
 	public static boolean partialStateMatchesFullState(IBlockState partialState, IBlockState fullState) {
 		if (partialState.getBlock() != fullState.getBlock()) return false;
-		ImmutableSet<IProperty<?>> temp = partialState.getProperties().keySet();
+		//ImmutableSet<IProperty<?>> temp = partialState.getProperties().keySet();
 		for (IProperty<?> prop : partialState.getProperties().keySet()) {
 			if (partialState.getValue(prop) != fullState.getValue(prop)) {
 				return false;

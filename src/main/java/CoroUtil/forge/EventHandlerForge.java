@@ -23,7 +23,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.WorldServer;
@@ -173,16 +172,50 @@ public class EventHandlerForge {
 								BlockPos pos = ent.getPosition().add(x, y - 1, z);
 
 								if (!ent.world.isAirBlock(pos)) {
+									boolean collision = UtilMining.blockHasCollision(ent.world, pos);
 
-									boolean cantMine = !UtilMining.blockHasCollision(ent.world, pos) || ent.world.getTileEntity(pos) != null || UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos, true);
+									//boolean cantMine = ent.world.getTileEntity(pos) != null || UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos, true);
+									//boolean cantMine = !UtilMining.canBreakBlockOrTileEntity(ent.world, pos);
 
-									//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
-									if (cantMine/*UtilMining.blockHasCollision(ent.world, pos) && *//*UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos)*/) {
-										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
-										//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
+									boolean isTileEntity = ent.world.getTileEntity(pos) != null;
+
+									//incorrect, no such feature for all out blacklist exists yet
+									//boolean cantMineRegularBlock = !isTileEntity && UtilMining.isBlockBlacklistedNonTileEntity(ent.world, pos, true);
+
+									boolean cantConvertToRepairing_RegularBlock = !isTileEntity && !UtilMining.canConvertToRepairingBlockNew(ent.world, pos, true);
+
+									boolean cantMineTileEntity = isTileEntity && !UtilMining.canBreakBlockOrTileEntity(ent.world, pos, true);
+
+									if (collision) {
+
+										if (isTileEntity) {
+											if (cantMineTileEntity) {
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xAA0000));
+											} else {
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x0000FF));
+											}
+										} else {
+											//use this code when it becomes a thing
+											/*if (cantBreakAtAllEver) {
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
+											}*/
+											if (cantConvertToRepairing_RegularBlock) {
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFFFF00));
+											} else {
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
+											}
+										}
+
+										//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
+										/*if (cantMineRegularBlock) {
+											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
+											//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
+										} else if (!ent.world.isAirBlock(pos)) {
+											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
+											//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
+										}*/
 									} else if (!ent.world.isAirBlock(pos)) {
-										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
-										//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
+										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFFFFFF));
 									}
 								}
 							}

@@ -33,7 +33,13 @@ public class BlockRepairingBlock extends BlockContainer
 	
     public BlockRepairingBlock()
     {
-        super(Material.PLANTS);
+        super(Material.GROUND);
+
+        /**
+         * To make water not flow into the block, a material with blocksMovement being true is required, its the only option in BlockDynamicLiquid.isBlocked(...)
+         * - to make sure pathing still works, we override isPassable and return true
+         */
+
         //stone, fallback default
         setHardness(1.5F);
         //this.setTickRandomly(true);
@@ -93,6 +99,11 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Override
+    public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
+        return true;
+    }
+
+    @Override
     public TileEntity createNewTileEntity(World var1, int meta)
     {
         return new TileEntityRepairingBlock();
@@ -141,9 +152,27 @@ public class BlockRepairingBlock extends BlockContainer
         //super.onBlockExploded(world, pos, explosion);
     }
 
+    /**
+     * Called when a block (not water) wants to be placed into it ???
+     *
+     * @param worldIn
+     * @param pos
+     * @return
+     */
     @Override
     public boolean isReplaceable(IBlockAccess worldIn, BlockPos pos) {
+        //System.out.println("isReplaceable called - " + worldIn.getBlockState(pos));
         return true;
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        //System.out.println("canPlaceBlockAt called - " + worldIn.getBlockState(pos));
+        /*if (worldIn.getBlockState(pos).getMaterial().isLiquid()) {
+            return false;
+        }*/
+        //return false;
+        return super.canPlaceBlockAt(worldIn, pos);
     }
 
     @Override

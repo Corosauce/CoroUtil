@@ -74,9 +74,12 @@ public class EventHandlerPacket {
 				Minecraft.getMinecraft().addScheduledTask(() -> {
 					World world = Minecraft.getMinecraft().world;
 					if (world == null) return;
-					String blacklistMineable_RegularBlocks = nbt.getString("blacklistMineable_RegularBlocks");
-					UtilMining.ClientData.listBlocksBlacklisted.clear();
-					UtilMining.processBlockBlacklist(blacklistMineable_RegularBlocks, UtilMining.ClientData.listBlocksBlacklisted);
+					String blacklistMineable_RegularBlocks = nbt.getString("blacklistRepairable_RegularBlocks");
+					String whitelistMineable_TileEntities = nbt.getString("whitelistMineable_TileEntities");
+					UtilMining.ClientData.listBlocksBlacklistedRepairing.clear();
+					UtilMining.ClientData.listTileEntitiesWhitelistedBreakable.clear();
+					UtilMining.processBlockBlacklist(blacklistMineable_RegularBlocks, UtilMining.ClientData.listBlocksBlacklistedRepairing);
+					UtilMining.processBlockBlacklist(whitelistMineable_TileEntities, UtilMining.ClientData.listTileEntitiesWhitelistedBreakable);
 				});
 			} else if (command.equals("DebugRender")) {
 

@@ -54,6 +54,8 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	public static boolean logging_DPS_Fine = false;
 	public static boolean logging_DPS_HighSources = false;
 
+	public static boolean logging_DPS_All = false;
+
 	public static boolean minersPushAwayOtherNonMinerMobsWhileMining = true;
 	public static boolean minersPushAwayOnlyOtherBuffedMobs = true;
 

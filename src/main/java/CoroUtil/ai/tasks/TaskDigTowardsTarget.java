@@ -165,7 +165,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		}
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
         //IBlockState state = entity.world.getBlockState(pos);
-    	if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+    	if (UtilMining.canMineBlockNew(entity.world, pos)/*!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())*/) {
     		return true;
     	} else {
 			setMiningBlock(null, null);
@@ -314,7 +314,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
         } else if (factor >= 0.1F) {
 
-            if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+            //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+			if (UtilMining.canMineBlockNew(entity.world, posFeetCheck.up(2))) {
                 dbg("Detected block above head, dig it out");
                 listPillarToMine.add(posFeetCheck.up(2));
             } else {
@@ -346,7 +347,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
         for (BlockPos pos : listPillarToMine) {
             //allow for air for now
-            if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+            if (UtilMining.canMineBlockNew(entity.world, pos)) {
                 oneMinable = true;
                 break;
             }
@@ -370,7 +371,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
                     listPillarToMine.add(posFeetCheck);
                     listPillarToMine.add(posFeetCheck.down(1));
                 } else if (factor >= 0F) {
-                    if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+                    //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+					if (UtilMining.canMineBlockNew(entity.world, posFeetCheck.up(2))) {
                         IBlockState check = entity.world.getBlockState(posFeetCheck.up(2));
                         dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
                         listPillarToMine.add(posFeetCheck.up(2));
@@ -396,7 +398,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
             for (BlockPos pos : listPillarToMine) {
                 //allow for air for now
-                if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+                //if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+				if (UtilMining.canMineBlockNew(entity.world, pos)) {
                     oneMinable = true;
                     break;
                 }
@@ -435,7 +438,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 		IBlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
 		Block block = state.getBlock();
 
-		while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getBlock())) {
+		//while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getBlock())) {
+		while (!UtilMining.canMineBlockNew(entity.world, posCurMining.toBlockPos())) {
 			dbg("Detected air or unmineable block, moving to next block in list, cur size: " + listPillarToMine.size());
 			if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
@@ -505,7 +509,8 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     		entity.world.sendBlockBreakProgress(Integer.MAX_VALUE - 50, posCurMining.toBlockPos(), 0);
     		//added tile entity check due to new config support to not use repairing block system
 			//since repairing blocks dont support tile entities, need to prevent turning them into one, and instead dropping as normal item
-            if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlock(entity.world, state) && entity.world.getTileEntity(posCurMining.toBlockPos()) == null) {
+            //if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlock(entity.world, state) && entity.world.getTileEntity(posCurMining.toBlockPos()) == null) {
+			if (convertMinedBlocksToRepairingBlocksDuringInvasions && UtilMining.canConvertToRepairingBlockNew(entity.world, posCurMining.toBlockPos(), false)) {
 				if (UtilMining.canGrabEventCheck(entity.world, state, posCurMining.toBlockPos())) {
 					TileEntityRepairingBlock.replaceBlockAndBackup(entity.world, posCurMining.toBlockPos());
 				}

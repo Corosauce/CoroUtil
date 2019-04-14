@@ -1,7 +1,6 @@
 package CoroUtil.packet;
 
 import CoroUtil.config.ConfigBlockDestruction;
-import CoroUtil.config.ConfigHWMonsters;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -222,7 +221,8 @@ public class PacketHelper {
 	public static FMLProxyPacket getPacketForUpdateBlockList() {
 		NBTTagCompound data = new NBTTagCompound();
 		data.setString("command", "UpdateBlockList");
-		data.setString("blacklistMineable_RegularBlocks", ConfigBlockDestruction.blacklistMineable_RegularBlocks);
+		data.setString("blacklistRepairable_RegularBlocks", ConfigBlockDestruction.blacklistRepairable_RegularBlocks);
+		data.setString("whitelistMineable_TileEntities", ConfigBlockDestruction.whitelistMineable_TileEntities);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
