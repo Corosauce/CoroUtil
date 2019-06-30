@@ -148,6 +148,13 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
         double counterAttackLeapSpeed = ConfigHWMonsters.counterAttackLeapSpeed;
         
         EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
+
+        //fix for stealth mods that null out target entity in weird spots even after shouldExecute and shouldContinueExecuting is called
+        if (entitylivingbase == null) {
+            resetTask();
+            return;
+        }
+
         this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
         double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
         double d1 = (double)(/*Math.sqrt(*/this.entity.width * 2.0F * this.entity.width * 2.0F/*)*/ + entitylivingbase.width);

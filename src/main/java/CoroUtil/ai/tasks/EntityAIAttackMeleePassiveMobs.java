@@ -142,7 +142,7 @@ public class EntityAIAttackMeleePassiveMobs extends EntityAIBase implements ITas
     {
         EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
 
-        //patch for a problem i hope wont happen else where, might be because im doing this on passive mobs
+        //fix for stealth mods that null out target entity in weird spots even after shouldExecute and shouldContinueExecuting is called
         if (entitylivingbase == null) {
             resetTask();
             return;

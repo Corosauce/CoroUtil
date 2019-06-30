@@ -70,6 +70,13 @@ public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
      */
     public void updateTask()
     {
+
+        //fix for stealth mods that null out target entity in weird spots even after shouldExecute and shouldContinueExecuting is called
+        if (entity.getAttackTarget() == null) {
+            resetTask();
+            return;
+        }
+
     	//System.out.println("calling for help!");
     	int callRange = 150;
     	AxisAlignedBB aabb = new AxisAlignedBB(entity.posX, entity.posY, entity.posZ, entity.posX, entity.posY, entity.posZ);
