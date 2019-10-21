@@ -36,3 +36,4 @@ public class DifficultyQueryContext {
         this.difficulty = difficulty;
     }
 }
+

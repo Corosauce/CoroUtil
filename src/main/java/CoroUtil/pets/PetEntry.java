@@ -47,18 +47,19 @@ public class PetEntry {
 		long UUIDMost = parNBT.getLong("UUIDMost");
 		long UUIDLeast = parNBT.getLong("UUIDLeast");
 		entUUID = new UUID(UUIDMost, UUIDLeast);
-		ordersMode = parNBT.getInteger("ordersMode");
+		ordersMode = parNBT.getInt("ordersMode");
 	}
 	
 	public CompoundNBT nbtWrite() {
 		CompoundNBT nbt = new CompoundNBT();
-		//nbt.setString("ownerName", ownerName);
-		nbt.setLong("ownerUUIDMost", ownerUUID.getMostSignificantBits());
-		nbt.setLong("ownerUUIDLeast", ownerUUID.getLeastSignificantBits());
-		nbt.setLong("UUIDMost", entUUID.getMostSignificantBits());
-		nbt.setLong("UUIDLeast", entUUID.getLeastSignificantBits());
-		nbt.setInteger("ordersMode", ordersMode);
+		//nbt.putString("ownerName", ownerName);
+		nbt.putLong("ownerUUIDMost", ownerUUID.getMostSignificantBits());
+		nbt.putLong("ownerUUIDLeast", ownerUUID.getLeastSignificantBits());
+		nbt.putLong("UUIDMost", entUUID.getMostSignificantBits());
+		nbt.putLong("UUIDLeast", entUUID.getLeastSignificantBits());
+		nbt.putInt("ordersMode", ordersMode);
 		return nbt;
 	}
 	
 }
+

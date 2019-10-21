@@ -31,3 +31,4 @@ public class CmodTemplateReference extends DataCmod {
         return super.toString() + " { " + code + template + " } [ flat: " + flattened + " ] ";
     }
 }
+

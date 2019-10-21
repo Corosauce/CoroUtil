@@ -7,3 +7,4 @@ public interface IWindHandler {
 	int getParticleDecayExtra();
 
 }
+

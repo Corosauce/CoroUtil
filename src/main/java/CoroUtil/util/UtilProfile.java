@@ -110,11 +110,11 @@ public class UtilProfile implements Runnable {
 
     public void setupProfileData(GameProfile profile) {
         try {
-            //TileEntitySkull.updateGameprofile can change name to correct casing, this would break lookup
+            //TileEntitySkull.updateGameProfile can change name to correct casing, this would break lookup
             String originalLookupName = profile.getName();
 
             //this does more than just get uuid, needs to run every time
-            profile = SkullTileEntity.updateGameprofile(profile);
+            profile = SkullTileEntity.updateGameProfile(profile);
             CULog.dbg("got updated profile for " + originalLookupName + " (" + profile.getName() + ")" + ", uuid: " + profile.getId());
 
             //make sure network or cache got what it needed
@@ -122,7 +122,7 @@ public class UtilProfile implements Runnable {
 
                 CachedPlayerData data = new CachedPlayerData(profile);
 
-                Minecraft minecraft = Minecraft.getMinecraft();
+                Minecraft minecraft = Minecraft.getInstance();
                 Map<MinecraftProfileTexture.Type, MinecraftProfileTexture> map = minecraft.getSkinManager().loadSkinFromCache(profile);
                 MinecraftProfileTexture.Type type = MinecraftProfileTexture.Type.SKIN;
                 if (map.containsKey(type)){
@@ -142,3 +142,4 @@ public class UtilProfile implements Runnable {
         }
     }
 }
+

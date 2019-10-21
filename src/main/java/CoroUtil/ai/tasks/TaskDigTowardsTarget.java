@@ -169,7 +169,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 		}
         BlockPos pos = new BlockPos(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
         //IBlockState state = entity.world.getBlockState(pos);
-    	if (UtilMining.canMineBlockNew(entity.world, pos)/*!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())*/) {
+    	if (UtilMining.canMineBlockNew(entity.world, pos)/*!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getOwner())*/) {
     		return true;
     	} else {
 			setMiningBlock(null, null);
@@ -196,7 +196,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     public void resetTask()
     {
     	//System.out.println("reset!");
-		//Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+		//Minecraft.getInstance().mouseHelper.ungrabMouseCursor();
     	digTimeCur = 0;
     	//curBlockDamage = 0;
     	listPillarToMine.clear();
@@ -208,7 +208,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
      */
 
     @Override
-    public void updateTask()
+    public void tick()
     {
     	//System.out.println("running!");
 		entity.idleTime = 0;
@@ -243,7 +243,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	
     	double vecX = entity.getAttackTarget().posX - entPosX;
     	//feet
-    	double vecY = entity.getAttackTarget().getEntityBoundingBox().minY - entity.getEntityBoundingBox().minY;
+    	double vecY = entity.getAttackTarget().getBoundingBox().minY - entity.getBoundingBox().minY;
     	double vecZ = entity.getAttackTarget().posZ - entPosZ;
 
     	//get angle, snap it to 90, then reconvert back to scalar which is now locked to best 90 degree option
@@ -295,10 +295,10 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
         //i think the y is the block under feet, not where feet occupy
         //actually, must be where feet occupy...
-        BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
+        BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getBoundingBox().minY), MathHelper.floor(scanZ));
 
 
-        BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(entPosZ));
+        BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getBoundingBox().minY), MathHelper.floor(entPosZ));
 
         /**
          * when digging up, or down, need to make sure theres space above to jump up to next pillar
@@ -318,7 +318,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
         } else if (factor >= 0.1F) {
 
-            //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+            //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getOwner())) {
 			if (UtilMining.canMineBlockNew(entity.world, posFeetCheck.up(2))) {
                 dbg("Detected block above head, dig it out");
                 listPillarToMine.add(posFeetCheck.up(2));
@@ -346,7 +346,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
         for (BlockPos pos : listPillarToMine) {
             BlockState state = entity.world.getBlockState(pos);
-            dbg("set: " + pos + " - " + state.getBlock());
+            dbg("set: " + pos + " - " + state.getOwner());
         }
 
         for (BlockPos pos : listPillarToMine) {
@@ -375,7 +375,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
                     listPillarToMine.add(posFeetCheck);
                     listPillarToMine.add(posFeetCheck.down(1));
                 } else if (factor >= 0F) {
-                    //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
+                    //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getOwner())) {
 					if (UtilMining.canMineBlockNew(entity.world, posFeetCheck.up(2))) {
                         BlockState check = entity.world.getBlockState(posFeetCheck.up(2));
                         dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
@@ -397,12 +397,12 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
             for (BlockPos pos : listPillarToMine) {
                 BlockState state = entity.world.getBlockState(pos);
-                dbg("set try2: " + pos + " - " + state.getBlock());
+                dbg("set try2: " + pos + " - " + state.getOwner());
             }
 
             for (BlockPos pos : listPillarToMine) {
                 //allow for air for now
-                //if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getBlock())) {
+                //if (!entity.world.isAirBlock(pos) && UtilMining.canMineBlock(entity.world, pos, entity.world.getBlockState(pos).getOwner())) {
 				if (UtilMining.canMineBlockNew(entity.world, pos)) {
                     oneMinable = true;
                     break;
@@ -424,14 +424,14 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 			}
 		}
 
-        setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
+        setMiningBlock(entity.world.getBlockState(listPillarToMine.getA()), new BlockCoord(listPillarToMine.getA()));
 
         return true;
 
     }
 
     public void setMiningBlock(BlockState state, BlockCoord pos) {
-		dbg("setMiningBlock: " + pos + (state != null ? " - " + state.getBlock() : ""));
+		dbg("setMiningBlock: " + pos + (state != null ? " - " + state.getOwner() : ""));
 		this.posCurMining = pos;
 		this.stateCurMining = state;
 	}
@@ -440,14 +440,14 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	if (posCurMining == null) return;
 
 		BlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
-		Block block = state.getBlock();
+		Block block = state.getOwner();
 
-		//while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getBlock())) {
+		//while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getOwner())) {
 		while (!UtilMining.canMineBlockNew(entity.world, posCurMining.toBlockPos())) {
 			dbg("Detected air or unmineable block, moving to next block in list, cur size: " + listPillarToMine.size());
 			if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
-				BlockPos pos = listPillarToMine.getFirst();
+				BlockPos pos = listPillarToMine.getA();
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 				//return;
 			} else {
@@ -459,7 +459,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 			}
 
 			state = entity.world.getBlockState(posCurMining.toBlockPos());
-			block = state.getBlock();
+			block = state.getOwner();
 		}
     	
     	//force stop mining if pushed away, or if block changed
@@ -473,9 +473,9 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	
     	//entity.getNavigator().clearPathEntity();
     	
-    	//Block block = entity.world.getBlock(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
+    	//Block block = entity.world.getOwner(posCurMining.posX, posCurMining.posY, posCurMining.posZ);
     	//double blockStrength = block.getBlockHardness(entity.world, posCurMining.posX, posCurMining.posY, posCurMining.posZ);
-    	//Block block = state.getBlock();
+    	//Block block = state.getOwner();
 
     	
     	double blockStrength = state.getBlockHardness(entity.world, posCurMining.toBlockPos());
@@ -486,7 +486,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	}
 
 
-		if (entity.world.getTotalWorldTime() % 10 == 0) {
+		if (entity.world.getGameTime() % 10 == 0) {
 			//entity.swingItem();
 			entity.swingArm(Hand.MAIN_HAND);
 			//System.out.println("swing!");
@@ -499,13 +499,13 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 		BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(entity.world).getBlockData(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ());// ServerTickHandler.wd.getBlockDataGrid(world).getBlockData(newX, newY, newZ);
 		//only allow continual progress if was dug at within last 30 seconds
 		int maxTimeBetweenDigProgress = 20*30;
-		if (bdp.lastTickTimeDig + maxTimeBetweenDigProgress > entity.world.getTotalWorldTime()) {
+		if (bdp.lastTickTimeDig + maxTimeBetweenDigProgress > entity.world.getGameTime()) {
 			//do nothing?
 		} else {
 			//reset it
 			bdp.digDamage = 0;
 		}
-		bdp.lastTickTimeDig = entity.world.getTotalWorldTime();
+		bdp.lastTickTimeDig = entity.world.getGameTime();
 		double digSpeed = ConfigDynamicDifficulty.digSpeed;
 		bdp.digDamage += digSpeed / blockStrength;
     	
@@ -524,14 +524,14 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
             		UtilMining.tryRemoveBlockWithFakePlayer(entity.world, posCurMining.toBlockPos());
 				} else {
             		//this method has issues and shouldnt be used without more care, eg itemizing things that shouldnt exist like top/bottom piece of double grass, causes missing tex items
-					Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getBlock(), 1, state.getBlock().getMetaFromState(state)));
+					Block.spawnAsEntity(entity.world, posCurMining.toBlockPos(), new ItemStack(state.getOwner(), 1, state.getOwner().getMetaFromState(state)));
 					entity.world.setBlockToAir(posCurMining.toBlockPos());
 				}
             }
 
             if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
-            	BlockPos pos = listPillarToMine.getFirst();
+            	BlockPos pos = listPillarToMine.getA();
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 			} else {
             	listPillarToMine.clear();
@@ -572,3 +572,4 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 		}
 	}
 }
+

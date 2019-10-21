@@ -12,3 +12,4 @@ public enum EnumInfo
     static { for(EnumInfo e : EnumSet.allOf(EnumInfo.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumInfo get(int intValue) { return lookup.get(intValue); }
 }
+

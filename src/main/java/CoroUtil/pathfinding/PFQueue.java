@@ -181,7 +181,7 @@ public class PFQueue implements Runnable {
 			//return tryPath(var1, MathHelper.floor(var2.posX-0.5F), (int)(var2.boundingBox.minY), (int)(var2.posZ-1.5F), var3, priority, parCallback);
 			
 			//ok, we're adding 0.5 here to try to fix an issue when target ent is standing on half slab, might fix stairs issues too?
-			return tryPath(var1, (int)Math.floor(var2.posX), (int)Math.floor(var2.getEntityBoundingBox().minY + 0.5), (int)Math.floor(var2.posZ), var3, priority, parCallback);
+			return tryPath(var1, (int)Math.floor(var2.posX), (int)Math.floor(var2.getBoundingBox().minY + 0.5), (int)Math.floor(var2.posZ), var3, priority, parCallback);
 			
 		} else {
 			return false;
@@ -315,8 +315,8 @@ public class PFQueue implements Runnable {
     public static boolean tryPath(Entity var1, int x, int y, int z, float var2, int priority, IPFCallback parCallback, ChunkCoordinatesSize parCoordSize) {
     	
     	//DESTINATION - Adjust if in air, assumes they are gravity bound
-    	if (var1 != null && CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, y-1, z)).getBlock())) {
-    		while (CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, --y, z)).getBlock()) && y > 0) { y--; }    				
+    	if (var1 != null && CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, y-1, z)).getOwner())) {
+    		while (CoroUtilBlock.isAir(var1.world.getBlockState(new BlockPos(x, --y, z)).getOwner()) && y > 0) { y--; }    				
     	}
     	
     	//SOURCE - might not work right - fix fence horror, find the near air block
@@ -486,3 +486,4 @@ public class PFQueue implements Runnable {
     	return block == Blocks.ENCHANTING_TABLE/* || block == Blocks.flowing_water*/;
     }
 }
+

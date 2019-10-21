@@ -63,7 +63,7 @@ public class SelectorMoveToCoords extends Selector {
 				
 				//for 5th gen AI, removed nopath check, path timeouts managed internally now
 				
-				//if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).world.getWorldTime() % 20 == 0) {
+				//if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).world.getDayTime() % 20 == 0) {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
 					//ent.getAIBTAgent().moveTo(coordsRef[0]);
@@ -105,3 +105,4 @@ public class SelectorMoveToCoords extends Selector {
     }
 	
 }
+

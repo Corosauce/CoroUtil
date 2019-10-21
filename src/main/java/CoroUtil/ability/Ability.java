@@ -17,9 +17,9 @@ public class Ability {
 	//Times to send nbt to client:
 	//- Initial (full disk sync)
 	//- New Ability add (full disk sync)
-	//- runtime state update (new tick state)
+	//- runtime state tick (new tick state)
 	
-	//If ability gets interrupted for state, or goes to next tick, send an update, that tells client its on the next stage at the right time
+	//If ability gets interrupted for state, or goes to next tick, send an tick, that tells client its on the next stage at the right time
 	
 	//New cooldown design intention: 
 	//Cooldown shouldnt be factored into isActive, setFinishedEntirely should be used as a cooldown starter
@@ -208,15 +208,15 @@ public class Ability {
 	
 	public void nbtLoad(CompoundNBT nbt) {
 		name = nbt.getString("name");
-		type = nbt.getInteger("type");
+		type = nbt.getInt("type");
 	}
 	
 	public CompoundNBT nbtSave() {
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.setString("name", name);
-		nbt.setString("classname", this.getClass().getCanonicalName());
-		nbt.setInteger("type", type);
-		nbt.setBoolean("fullSave", true); //lets client side know if it can try to do a full load (more of a safety)
+		nbt.putString("name", name);
+		nbt.putString("classname", this.getClass().getCanonicalName());
+		nbt.putInt("type", type);
+		nbt.putBoolean("fullSave", true); //lets client side know if it can try to do a full load (more of a safety)
 		return nbt;
 	}
 	
@@ -224,26 +224,27 @@ public class Ability {
 	
 	public void nbtSyncRead(CompoundNBT nbt) {
 		name = nbt.getString("name");
-		usageCount = nbt.getInteger("usageCount");
+		usageCount = nbt.getInt("usageCount");
 		boolean wasActive = isActive;
 		isActive = nbt.getBoolean("isActive");
 		isCoolingDown = nbt.getBoolean("isCoolingDown");
 		if (!isActive && wasActive) setFinishedEntirely();
-		curTickCharge = nbt.getInteger("curTickCharge");
-		curTickPerform = nbt.getInteger("curTickPerform");
-		curTickCooldown = nbt.getInteger("curTickCooldown");
+		curTickCharge = nbt.getInt("curTickCharge");
+		curTickPerform = nbt.getInt("curTickPerform");
+		curTickCooldown = nbt.getInt("curTickCooldown");
 	}
 	
 	public CompoundNBT nbtSyncWrite() {
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.setString("name", name);
-		nbt.setString("classname", this.getClass().getCanonicalName());
-		nbt.setInteger("usageCount", usageCount);
-		nbt.setBoolean("isActive", isActive);
-		nbt.setBoolean("isCoolingDown", isCoolingDown);
-		nbt.setInteger("curTickCharge", curTickCharge);
-		nbt.setInteger("curTickPerform", curTickPerform);
-		nbt.setInteger("curTickCooldown", curTickCooldown);
+		nbt.putString("name", name);
+		nbt.putString("classname", this.getClass().getCanonicalName());
+		nbt.putInt("usageCount", usageCount);
+		nbt.putBoolean("isActive", isActive);
+		nbt.putBoolean("isCoolingDown", isCoolingDown);
+		nbt.putInt("curTickCharge", curTickCharge);
+		nbt.putInt("curTickPerform", curTickPerform);
+		nbt.putInt("curTickCooldown", curTickCooldown);
 		return nbt;
 	}
 }
+

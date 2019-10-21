@@ -6,3 +6,4 @@ public class AbilityAnimationTags {
 	public static String armRight = "armRight";
 	
 }
+

@@ -47,25 +47,25 @@ public class Resources {
 	}
 	
 	//fed its own component
-	public void readFromNBT(CompoundNBT data) {
-		resWood.setValue(data.getInteger("resWood"));
-		resStone.setValue(data.getInteger("resStone"));
-		resFood.setValue(data.getInteger("resFood"));
+	public void read(CompoundNBT data) {
+		resWood.setValue(data.getInt("resWood"));
+		resStone.setValue(data.getInt("resStone"));
+		resFood.setValue(data.getInt("resFood"));
 	}
 	
 	//write its own component
-	public CompoundNBT writeToNBT() {
+	public CompoundNBT write() {
 		CompoundNBT data = new CompoundNBT();
-		data.setInteger("resWood", resWood.getValue());
-		data.setInteger("resStone", resStone.getValue());
-		data.setInteger("resFood", resFood.getValue());
+		data.putInt("resWood", resWood.get());
+		data.putInt("resStone", resStone.get());
+		data.putInt("resFood", resFood.get());
 		return data;
 	}
 	
 	public int getTotalResourceCount() {
 		int val = 0;
 		for (int i = 0; i < listResources.size(); i++) {
-			val += listResources.get(i).getValue();
+			val += listResources.get(i).get();
 		}
 		return val;
 	}
@@ -76,28 +76,29 @@ public class Resources {
 	
 	public void transferResourcesFrom(Resources source, boolean drainSourceOnly) {
 		for (int i = 0; i < listResources.size(); i++) {
-			if (!drainSourceOnly) listResources.get(i).add(source.listResources.get(i).getValue());
+			if (!drainSourceOnly) listResources.get(i).add(source.listResources.get(i).get());
 			source.listResources.get(i).setValue(0);
 		}
 	}
 	
 	public void sub(Resources source) {
 		for (int i = 0; i < listResources.size(); i++) {
-			listResources.get(i).setValue(listResources.get(i).getValue() - source.listResources.get(i).getValue());
+			listResources.get(i).setValue(listResources.get(i).get() - source.listResources.get(i).get());
 		}
 	}
 	
 	public void mul(float mul) {
 		for (int i = 0; i < listResources.size(); i++) {
-			listResources.get(i).setValue(listResources.get(i).getValue() * mul);
+			listResources.get(i).setValue(listResources.get(i).get() * mul);
 		}
 	}
 	
 	public boolean canAfford(Resources source) {
 		for (int i = 0; i < listResources.size(); i++) {
-			if (listResources.get(i).getValue() < source.listResources.get(i).getValue()) return false;
+			if (listResources.get(i).get() < source.listResources.get(i).get()) return false;
 		}
 		return true;
 	}
 	
 }
+

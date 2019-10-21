@@ -57,7 +57,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> 
     protected boolean isPlayerItSpawnedForOrBlank(@Nullable LivingEntity target)
     {
         if (target instanceof PlayerEntity) {
-            if (this.taskOwner.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
+            if (this.taskOwner.getEntityData().contains(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
                 String spawnName = this.taskOwner.getEntityData().getString(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor);
                 if (spawnName != null && target.getName().equals(spawnName)) {
                     return true;

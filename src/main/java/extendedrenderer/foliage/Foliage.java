@@ -73,7 +73,7 @@ public class Foliage implements IShaderRenderedEntity {
         prevPosZ = posZ;
     }
 
-    public BlockPos getBlockPosition() {
+    public BlockPos getPos() {
         return new BlockPos(posX, posY, posZ);
     }
 
@@ -129,10 +129,10 @@ public class Foliage implements IShaderRenderedEntity {
         mesh.instanceDataBufferVBO1.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPosVBO1), particleAlpha);
 
         //TEMP
-        //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getMinecraft().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
+        //mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos), (float)Minecraft.getInstance().player.getDistance(this.posX, this.posY, this.posZ) - 2.5F);
 
         float brightness;
-        brightness = CoroUtilBlockLightCache.getBrightnessCached(Minecraft.getMinecraft().world, (float)this.posX, (float)this.posY, (float)this.posZ);
+        brightness = CoroUtilBlockLightCache.getBrightnessCached(Minecraft.getInstance().world, (float)this.posX, (float)this.posY, (float)this.posZ);
         //brightness = brightnessCache;
         //brightness = CoroUtilBlockLightCache.brightnessPlayer;
 
@@ -159,7 +159,7 @@ public class Foliage implements IShaderRenderedEntity {
         boolean autoGrowBuffer = false;
         if (mesh.curBufferPosVBO2 >= mesh.numInstances) {
 
-            //cant quite get this to work correctly without lots of missing renders ingame until next thread update, why?
+            //cant quite get this to work correctly without lots of missing renders ingame until next thread tick, why?
 
             if (autoGrowBuffer) {
                 mesh.numInstances *= 2;
@@ -221,7 +221,7 @@ public class Foliage implements IShaderRenderedEntity {
         /*mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
                 + (rgbaIndex++), (((MathHelper.floor(this.posX) * 15)+(MathHelper.floor(this.posX) * 15))));*/
         mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
-                + (floatIndex++), (float)delayNoise.getValue(this.posX, this.posZ));
+                + (floatIndex++), (float)delayNoise.get(this.posX, this.posZ));
 
 
         mesh.instanceDataBufferVBO2.put(mesh.INSTANCE_SIZE_FLOATS_SELDOM * (mesh.curBufferPosVBO2) + mesh.MATRIX_SIZE_FLOATS
@@ -236,3 +236,4 @@ public class Foliage implements IShaderRenderedEntity {
         mesh.curBufferPosVBO2++;
     }
 }
+

@@ -96,15 +96,15 @@ public class PersonalityProfile {
 		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT) {
 			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
 			
-			EntityRenderer renderObj = (EntityRenderer) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
+			EntityRenderer renderObj = (EntityRenderer) Minecraft.getInstance().getRenderManager().entityRenderMap.get(agent.ent.getClass());
 			//TODO: readd 1.8.8
 			/*if (renderObj instanceof RenderEntityCoroAI) {
 				
 				for (Map.Entry<String, ModelRendererBones> entry : ((RenderEntityCoroAI) renderObj).modelTechne.partsAllChildren.entrySet()) {
 					AnimationStateObject obj = new AnimationStateObject(entry.getKey());
-					obj.rotateAngleXDesired = entry.getValue().rotateAngleX;
-					obj.rotateAngleYDesired = entry.getValue().rotateAngleY;
-					obj.rotateAngleZDesired = entry.getValue().rotateAngleZ;
+					obj.rotateAngleXDesired = entry.get().rotateAngleX;
+					obj.rotateAngleYDesired = entry.get().rotateAngleY;
+					obj.rotateAngleZDesired = entry.get().rotateAngleZ;
 					animationData.put(entry.getKey(), obj);
 					
 					//we might need to feed it the techne rotations that we commented out in TechneModelEpochs import
@@ -177,10 +177,10 @@ public class PersonalityProfile {
 		listAbilitiesRanged.clear();
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			if (entry.getValue().type == Ability.TYPE_MELEE) {
-				listAbilitiesMelee.add(entry.getValue());
-			} else if (entry.getValue().type == Ability.TYPE_RANGED) {
-				listAbilitiesRanged.add(entry.getValue());
+			if (entry.get().type == Ability.TYPE_MELEE) {
+				listAbilitiesMelee.add(entry.get());
+			} else if (entry.get().type == Ability.TYPE_RANGED) {
+				listAbilitiesRanged.add(entry.get());
 			}
 		}
 	}
@@ -190,7 +190,7 @@ public class PersonalityProfile {
 		cacheFurthestMeleeUsable = 0;
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			Ability ability = entry.getValue(); 
+			Ability ability = entry.get(); 
 			if (ability.type == Ability.TYPE_MELEE) {
 				if (ability.bestDist + ability.bestDistRange/2 > cacheFurthestMeleeUsable) {
 					cacheFurthestMeleeUsable = ability.bestDist + ability.bestDistRange/2;
@@ -206,7 +206,7 @@ public class PersonalityProfile {
 		//Persistant animation stuff - needs better consideration
 		//Make these movement methods event based not time loop based, reduces packet load of updating their states when not needed (in theory)
 		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
-			if (agent.blackboard.isMoving.getValue()) {
+			if (agent.blackboard.isMoving.get()) {
 				Ability ability = abilities.get("Walk");
 				if (ability != null) {
 					if (ability.canActivate()) {
@@ -237,8 +237,8 @@ public class PersonalityProfile {
 		
 		try {
 			for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-				if (entry.getValue().isActiveOrCoolingDown()) {
-					entry.getValue().tick();
+				if (entry.get().isActiveOrCoolingDown()) {
+					entry.get().tick();
 				}
 			}
 		} catch (Exception ex) {
@@ -250,9 +250,9 @@ public class PersonalityProfile {
 	public void tickAbilitiesRender(EntityRenderer parRender) {
 		//System.out.println("abilities count: " + abilities.size());
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			//System.out.println("render active? " + entry.getValue().isActive());
-			if (entry.getValue().isActiveOrCoolingDown()) {
-				entry.getValue().tickRender(parRender);
+			//System.out.println("render active? " + entry.get().isActive());
+			if (entry.get().isActiveOrCoolingDown()) {
+				entry.get().tickRender(parRender);
 			}
 		}
 	}
@@ -260,9 +260,9 @@ public class PersonalityProfile {
 	@OnlyIn(Dist.CLIENT)
 	public void tickAbilitiesRenderModel(ModelBase parModel) {
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
-			//System.out.println("render active? " + entry.getValue().isActive());
-			if (entry.getValue().isActiveOrCoolingDown()) {
-				entry.getValue().tickRenderModel(parModel);
+			//System.out.println("render active? " + entry.get().isActive());
+			if (entry.get().isActiveOrCoolingDown()) {
+				entry.get().tickRenderModel(parModel);
 			}
 		}
 	}
@@ -301,8 +301,8 @@ public class PersonalityProfile {
 	public void syncAbilitiesFull(boolean rangeOverride) {
 		System.out.println("full sync abilities - " + agent.ent);
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.setString("command", "CoroAI_Ent");
-		nbt.setInteger("entityID", agent.ent.getEntityId());
+		nbt.putString("command", "CoroAI_Ent");
+		nbt.putInt("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);//PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		if (rangeOverride) {
@@ -316,8 +316,8 @@ public class PersonalityProfile {
 	
 	public void syncAbility(Ability ability) {
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.setString("command", "CoroAI_Ent");
-		nbt.setInteger("entityID", agent.ent.getEntityId());
+		nbt.putString("command", "CoroAI_Ent");
+		nbt.putInt("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
 		//Packet packet = PacketHelper.createPacketForNBTHandler("CoroAI_Ent", nbt);
 		FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
@@ -326,11 +326,11 @@ public class PersonalityProfile {
 	}
 	
 	public void nbtSyncRead(CompoundNBT par1nbtTagCompound) {
-		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent, true);
+		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompound("abilities"), abilities, agent.ent, true);
 	}
 	
 	public void nbtRead(CompoundNBT par1nbtTagCompound) {
-		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent);
+		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompound("abilities"), abilities, agent.ent);
 	}
 	
     public void nbtWrite(CompoundNBT par1nbtTagCompound) {
@@ -426,8 +426,8 @@ public class PersonalityProfile {
 				}
 	
 				for (Map.Entry<String, Ability> entry : agent.profile.abilities.entrySet()) {
-					if (entry.getValue().isActive() && entry.getValue().canHitCancel(par1DamageSource)) {
-						entry.getValue().setFinishedPerform();
+					if (entry.get().isActive() && entry.get().canHitCancel(par1DamageSource)) {
+						entry.get().setFinishedPerform();
 					}
 				}
 				agent.profile.syncAbilitiesFull(false);
@@ -458,3 +458,4 @@ public class PersonalityProfile {
 		agent.ent.swingItem();
 	}*/
 }
+

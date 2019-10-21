@@ -33,3 +33,4 @@ public class CmodAIInfernal extends DataCmod {
         return super.toString() + " randomly_choose_count: " + randomly_choose_count + " randomly_choose_count_max: " + randomly_choose_count_max + ", difficulty_multiplier: " + difficulty_multiplier + ", mods: " + mods;
     }
 }
+

@@ -8,3 +8,4 @@ public interface IBTAgent {
 	public LivingEntity getEntityLiving();
 	public void cleanup();
 }
+

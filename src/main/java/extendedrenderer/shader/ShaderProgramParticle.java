@@ -29,3 +29,4 @@ public class ShaderProgramParticle extends ShaderProgram {
         ShaderManager.glBindAttribLocation(getProgramId(), vertexShaderAttributeRGBATest+offset, "rgba");
     }
 }
+

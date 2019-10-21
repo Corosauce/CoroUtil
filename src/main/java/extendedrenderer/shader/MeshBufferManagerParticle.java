@@ -52,7 +52,7 @@ public class MeshBufferManagerParticle {
 
     public static void cleanup() {
         for (Map.Entry<TextureAtlasSprite, InstancedMeshParticle> entry : lookupParticleToMesh.entrySet()) {
-            entry.getValue().cleanup();
+            entry.get().cleanup();
         }
         lookupParticleToMesh.clear();
     }
@@ -68,3 +68,4 @@ public class MeshBufferManagerParticle {
         }
     }
 }
+

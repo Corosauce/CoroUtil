@@ -27,10 +27,10 @@ public class BlockStaticDataMap {
         /*for (int i = 0; i < Block.blocksList.length; i++) {
         	Block block = Block.blocksList[i];
         	if (block != null) {
-        		String hash;// = block.getClass().toString() + "|" + block.getUnlocalizedName() + "|" + Block.lightValue[i];
-        		hash = block.getUnlocalizedName();
+        		String hash;// = block.getClass().toString() + "|" + block.getTranslationKey() + "|" + Block.lightValue[i];
+        		hash = block.getTranslationKey();
         		//System.out.println("ID: " + i + " - " + hash);
-        		if (mapBlockHashNameToID.containsKey(hash) && !block.getUnlocalizedName().equals("tile.ForgeFiller")) {
+        		if (mapBlockHashNameToID.containsKey(hash) && !block.getTranslationKey().equals("tile.ForgeFiller")) {
         			fails.add("ID: " + i + " vs " + mapBlockHashNameToID.get(hash) + " - " + hash);
         		}
         		mapBlockHashNameToID.put(hash, i);
@@ -38,18 +38,18 @@ public class BlockStaticDataMap {
         	}
         }*/
         
-        Iterator it = Block.REGISTRY.getKeys().iterator();
+        Iterator it = Block.REGISTRY.keySet().iterator();
         
         int i = 0;
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	Block block = (Block) Block.REGISTRY.getObject(new ResourceLocation(tagName));
+        	Block block = (Block) Block.REGISTRY.getOrDefault(new ResourceLocation(tagName));
         	
         	if (block != null) {
-        		String hash;// = block.getClass().toString() + "|" + block.getUnlocalizedName() + "|" + Block.lightValue[i];
+        		String hash;// = block.getClass().toString() + "|" + block.getTranslationKey() + "|" + Block.lightValue[i];
         		hash = CoroUtilBlock.getNameByBlock(block);
         		//System.out.println("ID: " + i + " - " + hash);
-        		if (mapBlockHashNameToID.containsKey(hash)/* && !block.getUnlocalizedName().equals("tile.ForgeFiller")*/) {
+        		if (mapBlockHashNameToID.containsKey(hash)/* && !block.getTranslationKey().equals("tile.ForgeFiller")*/) {
         			fails.add("ID: " + i + " vs " + mapBlockHashNameToID.get(hash) + " - " + hash);
         		}
         		mapBlockHashNameToID.put(hash, i);
@@ -162,13 +162,13 @@ public class BlockStaticDataMap {
 	}
 	
 	public static void addToMap(Block block, float strength) {
-		/*if (mapBlockWeight.containsKey(block.getUnlocalizedName())) {
-			System.out.println("EPOCH DATA MAP WARNING, adding existing unlocalizedname to map: " + block.getUnlocalizedName());
+		/*if (mapBlockWeight.containsKey(block.getTranslationKey())) {
+			System.out.println("EPOCH DATA MAP WARNING, adding existing unlocalizedname to map: " + block.getTranslationKey());
 		}
-		mapBlockWeight.put(block.getUnlocalizedName(), strength);*/
+		mapBlockWeight.put(block.getTranslationKey(), strength);*/
 		
 		if (mapBlockWeight.containsKey(CoroUtilBlock.getNameByBlock(block))) {
-			System.out.println("EPOCH DATA MAP WARNING, adding existing unlocalizedname to map: " + block.getUnlocalizedName());
+			System.out.println("EPOCH DATA MAP WARNING, adding existing unlocalizedname to map: " + block.getTranslationKey());
 		}
 		mapBlockWeight.put(CoroUtilBlock.getNameByBlock(block), strength);
 	}
@@ -201,3 +201,4 @@ public class BlockStaticDataMap {
 		return 10F * getBlockStength(id);
 	}
 }
+

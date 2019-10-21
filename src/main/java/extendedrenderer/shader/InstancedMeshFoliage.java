@@ -64,7 +64,7 @@ public class InstancedMeshFoliage extends Mesh {
 
         /** VBO 1 START **/
 
-        //Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+        //Minecraft.getInstance().mouseHelper.ungrabMouseCursor();
         instanceDataVBO1 = GL15.glGenBuffers();
         vboIdList.add(instanceDataVBO1);
         instanceDataBufferVBO1 = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
@@ -197,3 +197,4 @@ public class InstancedMeshFoliage extends Mesh {
         }
     }
 }
+

@@ -10,3 +10,4 @@ public class ConfigComparatorName implements Comparator<ConfigEntryInfo> {
 	}
 
 }
+

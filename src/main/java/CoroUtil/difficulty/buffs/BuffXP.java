@@ -46,3 +46,4 @@ public class BuffXP extends BuffBase {
         applyBuff(ent, difficulty);
     }
 }
+

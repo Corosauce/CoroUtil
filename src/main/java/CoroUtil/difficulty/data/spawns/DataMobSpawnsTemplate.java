@@ -36,3 +36,4 @@ public class DataMobSpawnsTemplate {
         return str;
     }
 }
+

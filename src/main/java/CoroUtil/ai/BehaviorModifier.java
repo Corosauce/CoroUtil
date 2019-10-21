@@ -45,13 +45,13 @@ public class BehaviorModifier {
         			
         			enhanceCountTry++;
 
-        			ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityBuffed_Tried, true);
+        			ent.getEntityData().putBoolean(UtilEntityBuffs.dataEntityBuffed_Tried, true);
         			
         			//if (parWorld.rand.nextFloat() < chanceToEnhance) {
         			
 	        			if (!ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap)) {
 	            			for (Class clazz : taskToInject) {
-	    		        		addTask(ent, clazz, priorityOfTask, false);
+	    		        		addGoal(ent, clazz, priorityOfTask, false);
 	            			}
 	            			
 	            			enhanceCount++;
@@ -85,7 +85,7 @@ public class BehaviorModifier {
 		if (!foundTask) {
 			//System.out.println("HW-M: Detected entity was recreated and missing tasks, readding tasks and changes");
 			for (Class clazz : taskToInject) {
-				addTask(ent, clazz, priorityOfTask, isTargetTask);
+				addGoal(ent, clazz, priorityOfTask, isTargetTask);
 			}
 		} else {
 			//temp output to make sure detection works
@@ -115,7 +115,7 @@ public class BehaviorModifier {
 		if (foundTask != null) {
 			tasks.taskEntries.remove(foundTask);
 
-			addTask(ent, tasksToReplaceWith, priorityOfTask, isTargetTask);
+			addGoal(ent, tasksToReplaceWith, priorityOfTask, isTargetTask);
 		}
 
 		return foundTask != null;
@@ -142,7 +142,7 @@ public class BehaviorModifier {
 			tasks.taskEntries.remove(foundTask);
 			
 			for (int i = 0; i < tasksToReplaceWith.length; i++) {
-				addTask(ent, tasksToReplaceWith[i], priorityOfTask[i], isTargetTask);
+				addGoal(ent, tasksToReplaceWith[i], priorityOfTask[i], isTargetTask);
 			}
 		}
 		
@@ -150,7 +150,7 @@ public class BehaviorModifier {
 		
 	}
 	
-	public static boolean addTask(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
+	public static boolean addGoal(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
 		try {
 
 			GoalSelector tasks = ent.tasks;
@@ -164,7 +164,7 @@ public class BehaviorModifier {
 				ITaskInitializer task = (ITaskInitializer) obj;
 				task.setEntity(ent);
 				//System.out.println("adding task into zombie: " + taskToInject);
-				tasks.addTask(priorityOfTask, (Goal) task);
+				tasks.addGoal(priorityOfTask, (Goal) task);
 				//aiEnhanced.put(ent.getEntityId(), true);
 				
 				
@@ -177,3 +177,4 @@ public class BehaviorModifier {
 	}
 	
 }
+

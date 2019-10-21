@@ -12,3 +12,4 @@ public enum EnumQuestState {
     static { for(EnumQuestState e : EnumSet.allOf(EnumQuestState.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumQuestState get(int intValue) { return lookup.get(intValue); }
 }
+

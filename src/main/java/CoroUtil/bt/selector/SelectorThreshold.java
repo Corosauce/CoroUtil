@@ -26,7 +26,7 @@ public class SelectorThreshold extends Selector {
 	}
 	
 	public int getVal() {
-		return valRef.getValue();
+		return valRef.get();
 	}
 	
 	public void setVal(int inc) {
@@ -39,7 +39,7 @@ public class SelectorThreshold extends Selector {
 		//threshold code change from sequence
 		if (activeBehaviorIndex == -1) {
 			setState(EnumBehaviorState.RUNNING);
-			if (valRef.getValue() < threshold) {
+			if (valRef.get() < threshold) {
 				activeBehaviorIndex = 0;
 			} else {
 				activeBehaviorIndex = 1;
@@ -89,3 +89,4 @@ public class SelectorThreshold extends Selector {
 		return this.state;*/
 	}
 }
+

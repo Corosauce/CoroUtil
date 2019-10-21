@@ -9,3 +9,4 @@ public interface IChunkLoader {
 	public void forceChunkLoading(int chunkX, int chunkZ);
 
 }
+

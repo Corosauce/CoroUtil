@@ -27,7 +27,7 @@ public class WatchableObject
         this.watchedObject = par1Obj;
     }
 
-    public Object getObject()
+    public Object getOrDefault()
     {
         return this.watchedObject;
     }
@@ -55,3 +55,4 @@ public class WatchableObject
         return par0WatchableObject.watched = par1;
     }
 }
+

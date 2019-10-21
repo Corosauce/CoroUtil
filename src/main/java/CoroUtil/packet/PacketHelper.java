@@ -50,10 +50,10 @@ public class PacketHelper {
 
 	public static void writeTEntToPacket(TileEntity tEnt, CompoundNBT nbt) {
 		try {
-			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimension());
-			nbt.setInteger("x", tEnt.getPos().getX());
-			nbt.setInteger("y", tEnt.getPos().getY());
-			nbt.setInteger("z", tEnt.getPos().getZ());
+			nbt.putInt("dimID", tEnt.getWorld().provider.getDimension());
+			nbt.putInt("x", tEnt.getPos().getX());
+			nbt.putInt("y", tEnt.getPos().getY());
+			nbt.putInt("z", tEnt.getPos().getZ());
 			/*buff.writeInt(tEnt.getWorldObj().provider.dimensionId);
 			buff.writeInt(tEnt.xCoord);
 	    	buff.writeInt(tEnt.yCoord);
@@ -149,11 +149,11 @@ public class PacketHelper {
         
         try
         {
-        	nbtSendData.setString("command", "CoroAI_TEntCmd");
-        	nbtSendData.setInteger("dimID", tEnt.getWorld().provider.getDimension());
-        	nbtSendData.setInteger("x", tEnt.getPos().getX());
-        	nbtSendData.setInteger("y", tEnt.getPos().getY());
-        	nbtSendData.setInteger("z", tEnt.getPos().getZ());
+        	nbtSendData.putString("command", "CoroAI_TEntCmd");
+        	nbtSendData.putInt("dimID", tEnt.getWorld().provider.getDimension());
+        	nbtSendData.putInt("x", tEnt.getPos().getX());
+        	nbtSendData.putInt("y", tEnt.getPos().getY());
+        	nbtSendData.putInt("z", tEnt.getPos().getZ());
         	nbtSendData.setTag("data", data);
         	//ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntCmd");
         	/*byteBuf.writeInt(tEnt.getWorldObj().provider.dimensionId);
@@ -210,37 +210,37 @@ public class PacketHelper {
 	
 	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {
 		CompoundNBT data = new CompoundNBT();
-		data.setString("command", "Ent_Motion");
-		data.setInteger("entityID", ent.getEntityId());
-		data.setDouble("motionX", motionX);
-		data.setDouble("motionY", motionY);
-		data.setDouble("motionZ", motionZ);
+		data.putString("command", "Ent_Motion");
+		data.putInt("entityID", ent.getEntityId());
+		data.putDouble("motionX", motionX);
+		data.putDouble("motionY", motionY);
+		data.putDouble("motionZ", motionZ);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
 	public static FMLProxyPacket getPacketForUpdateBlockList() {
 		CompoundNBT data = new CompoundNBT();
-		data.setString("command", "UpdateBlockList");
-		data.setString("blacklistRepairable_RegularBlocks", ConfigBlockDestruction.blacklistRepairable_RegularBlocks);
-		data.setString("whitelistMineable_TileEntities", ConfigBlockDestruction.whitelistMineable_TileEntities);
+		data.putString("command", "UpdateBlockList");
+		data.putString("blacklistRepairable_RegularBlocks", ConfigBlockDestruction.blacklistRepairable_RegularBlocks);
+		data.putString("whitelistMineable_TileEntities", ConfigBlockDestruction.whitelistMineable_TileEntities);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
 	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos, int time, int color, int type) {
 		CompoundNBT data = new CompoundNBT();
-		data.setString("command", "DebugRender");
-		data.setDouble("posX", pos.getX());
-		data.setDouble("posY", pos.getY());
-		data.setDouble("posZ", pos.getZ());
-		data.setInteger("color", color);
-		data.setInteger("type", type);
-		data.setInteger("time", time);
+		data.putString("command", "DebugRender");
+		data.putDouble("posX", pos.getX());
+		data.putDouble("posY", pos.getY());
+		data.putDouble("posZ", pos.getZ());
+		data.putInt("color", color);
+		data.putInt("type", type);
+		data.putInt("time", time);
 		return getNBTPacket(data, CoroUtil.eventChannelName);
 	}
 
     public static FMLProxyPacket getPacketForDebugRenderClear() {
         CompoundNBT data = new CompoundNBT();
-        data.setString("command", "DebugRenderClear");
+        data.putString("command", "DebugRenderClear");
         return getNBTPacket(data, CoroUtil.eventChannelName);
     }
 
@@ -257,3 +257,4 @@ public class PacketHelper {
 	}
 	
 }
+

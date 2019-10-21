@@ -26,3 +26,4 @@ public class CmodInventoryEntry {
         return str;
     }
 }
+

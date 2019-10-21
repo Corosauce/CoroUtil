@@ -108,7 +108,7 @@ public class FoliageRenderer {
 
         if (RotatingParticleManager.useShaders) {
 
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             EntityRenderer er = mc.entityRenderer;
             World world = mc.world;
 
@@ -127,7 +127,7 @@ public class FoliageRenderer {
     public void renderJustShaders(Entity entityIn, float partialTicks)
     {
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         EntityRenderer er = mc.entityRenderer;
         World world = mc.world;
 
@@ -166,7 +166,7 @@ public class FoliageRenderer {
         /**
          * new problem, accuracy diminishes the more you are from 0 0 0 causing vertex flicker
          * idea:
-         * - set a new point of reference each time you have to do a full vbo update
+         * - set a new point of reference each time you have to do a full vbo tick
          * -- if it works, it maintains speed and precision
          * procedure:
          * - on vbo refresh, set new "0 0 0" point
@@ -240,8 +240,8 @@ public class FoliageRenderer {
         shaderProgram.setUniform("windSpeed", windSpeedSmooth);
 
         try {
-            //windTime += world.getTotalWorldTime() * windSpeedSmooth;
-            //shaderProgram.setUniform("time", (int) world.getTotalWorldTime());
+            //windTime += world.getGameTime() * windSpeedSmooth;
+            //shaderProgram.setUniform("time", (int) world.getGameTime());
             shaderProgram.setUniform("time", (int) windTime);
         } catch (Exception ex) {
             //ignore optimization in testing
@@ -263,7 +263,7 @@ public class FoliageRenderer {
 
         int meshCount = 0;
 
-        /*TextureMap map = Minecraft.getMinecraft().getTextureMapBlocks();
+        /*TextureMap map = Minecraft.getInstance().getTextureMap();
         TextureAtlasSprite sprite = map.getAtlasSprite("minecraft:blocks/wheat_stage_7");*/
 
         for (Map.Entry<TextureAtlasSprite, List<Foliage>> entry : foliage.entrySet()) {
@@ -308,12 +308,12 @@ public class FoliageRenderer {
 
                     if (updateVBO1) {
 
-                        List<Foliage> listFoliage = entry.getValue();
+                        List<Foliage> listFoliage = entry.get();
 
                         mesh.instanceDataBufferVBO1.clear();
                         mesh.curBufferPosVBO1 = 0;
 
-                        //System.out.println("vbo 1 update");
+                        //System.out.println("vbo 1 tick");
 
                         //for (Foliage foliage : listFoliage) {
                         //int size = listFoliage.size();
@@ -343,7 +343,7 @@ public class FoliageRenderer {
 
                                 foliage.brightnessCache = CoroUtilBlockLightCache.brightnessPlayer + 0.0F;
 
-                                //update vbo1
+                                //tick vbo1
                                 foliage.renderForShaderVBO1(mesh, transformation, viewMatrix, entityIn, partialTicks);
                             }
                         } catch (Exception ex) {
@@ -416,3 +416,4 @@ public class FoliageRenderer {
     }
 
 }
+

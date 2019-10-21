@@ -36,7 +36,7 @@ public class CoroUtilBlock {
 	
 	public static Block getBlockByName(String name) {
 		try {
-			return (Block) Block.REGISTRY.getObject(new ResourceLocation(name));
+			return (Block) Block.REGISTRY.getOrDefault(new ResourceLocation(name));
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -44,11 +44,12 @@ public class CoroUtilBlock {
 	}
 	
 	/*public static String getNameByItem(Item item) {
-		return Block.blockRegistry.getNameForObject(item);
+		return Block.blockRegistry.getKey(item);
 	}*/
 	
 	public static String getNameByBlock(Block item) {
-		return Block.REGISTRY.getNameForObject(item).toString();
+		return Block.REGISTRY.getKey(item).toString();
 	}
 	
 }
+

@@ -39,7 +39,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
     }
 
     @Override
-    protected int getSize()
+    protected int size()
     {
     	ModConfigData data = config.getData();
         return data.configData.size();
@@ -176,7 +176,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 
         if (data.get(index) == null || data.get(index).editBox == null) return;
 
-        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(data.get(index).name);
+        int stringWidth = Minecraft.getInstance().fontRenderer.getStringWidth(data.get(index).name);
         config.drawString(mc.fontRenderer, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
@@ -191,9 +191,9 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         
         String value = data.get(index).value.toString();
         int maxWidth = (config.xSize / 2) - 45;
-        //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
+        //int valWidth = Minecraft.getInstance().fontRenderer.getStringWidth(value);
         
-        value = Minecraft.getMinecraft().fontRenderer.trimStringToWidth(value, maxWidth);
+        value = Minecraft.getInstance().fontRenderer.trimStringToWidth(value, maxWidth);
 
         String str = (conflict ? TextFormatting.RED : "") + value;//options.getOptionDisplayString(index);
         str = (index == selected ? TextFormatting.WHITE + "> " + TextFormatting.YELLOW + "??? " + TextFormatting.WHITE + "<" : str);
@@ -218,11 +218,11 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-            int l2 = Minecraft.getMinecraft().fontRenderer.getStringWidth(s);
+            int l2 = Minecraft.getInstance().fontRenderer.getStringWidth(s);
             int i2 = hover_x_min;
             int k2 = hover_y_min - 10;
             drawGradientRect(i2 - 3, k2 - 3, i2 + l2 + 3, k2 + 8 + 3, 0xc0000000, 0xc0000000);
-            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
     }
@@ -291,3 +291,4 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         return true;
     }
 }
+

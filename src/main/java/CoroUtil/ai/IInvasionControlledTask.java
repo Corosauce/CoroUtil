@@ -5,3 +5,4 @@ public interface IInvasionControlledTask {
     boolean shouldBeRemoved();
 
 }
+

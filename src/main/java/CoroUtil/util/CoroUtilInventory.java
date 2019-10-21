@@ -48,7 +48,7 @@ public class CoroUtilInventory {
 	
 	//TODO: 1.8 redesign to pass along entity reference
 	public static void chestStateSend(World world, int x, int y, int z, boolean close) {
-		/*if (isChest(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+		/*if (isChest(world.getBlockState(new BlockPos(x, y, z)).getOwner())) {
 			TileEntity chest = (TileEntity)world.getTileEntity(new BlockPos(x, y, z));
 			if (chest instanceof TileEntityChest) {
 				if (close) {
@@ -73,3 +73,4 @@ public class CoroUtilInventory {
     }*/
 	
 }
+

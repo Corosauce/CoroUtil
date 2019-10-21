@@ -21,14 +21,14 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 		//particle.rotationPitch = rand.nextInt(360);
 		particle.setMaxAge(5+rand.nextInt(10));
 		particle.setGravity(0F);
-		particle.setRBGColorF(72F/255F, 239F/255F, 8F/255F);
+		particle.setColor(72F/255F, 239F/255F, 8F/255F);
 		//red
-		particle.setRBGColorF(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
+		particle.setColor(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
 		//green
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
 		//tealy blue
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
-		//particle.setRBGColorF(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
 		particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
 		particle.setScale(0.1F + rand.nextFloat() * 0.9F);
@@ -56,7 +56,7 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			Vec3 vec = new Vec3(vecX, vecY, vecZ);
 			
 			double radius = 1.6D;
-			double amp = 0.005D * Math.max(1, (vec.lengthVector() * 0.01D))/* / (particle.getAge())*/;
+			double amp = 0.005D * Math.max(1, (vec.length() * 0.01D))/* / (particle.getAge())*/;
 			
 			double rotSpeed = (particle.getAge()) * amp;
 			
@@ -104,9 +104,9 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 			rotRoll -= rot;
 			
 			amp = 0.01D;
-			double ampYaw = amp + amp * Math.sin(Math.toRadians(90+((particle.getWorld().getTotalWorldTime() * 5) % 180)));
-			double ampPitch = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//Math.cos(Math.toRadians(90+((particle.world.getTotalWorldTime() * 5) % 180)));
-			double ampRoll = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//amp + amp * Math.sin(Math.toRadians(((particle.world.getTotalWorldTime() * 15F) % 180)));
+			double ampYaw = amp + amp * Math.sin(Math.toRadians(90+((particle.getWorld().getGameTime() * 5) % 180)));
+			double ampPitch = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//Math.cos(Math.toRadians(90+((particle.world.getGameTime() * 5) % 180)));
+			double ampRoll = 0.1D * amp * Math.min(10, particle.getAge() * 0.1D);//amp + amp * Math.sin(Math.toRadians(((particle.world.getGameTime() * 15F) % 180)));
 			
 			/*particle.motionX += Math.cos(rotYaw * 0.017453D) * ampYaw;
 			particle.motionZ += Math.sin(rotYaw * 0.017453D) * ampYaw;
@@ -130,3 +130,4 @@ public class ParticleBehaviorTrail extends ParticleBehaviors {
 		}
 	}
 }
+

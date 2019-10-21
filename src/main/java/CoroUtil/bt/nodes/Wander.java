@@ -36,7 +36,7 @@ public class Wander extends Selector {
 	@Override
 	public EnumBehaviorState tick() {
 		
-		if (!blackboard.shouldWander.getValue()) return EnumBehaviorState.SUCCESS;
+		if (!blackboard.shouldWander.get()) return EnumBehaviorState.SUCCESS;
 		
 		wanderRange = 4;
 		
@@ -118,3 +118,4 @@ public class Wander extends Selector {
 	}
 	
 }
+

@@ -214,16 +214,16 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     }
     
     @Override
-    public void onUpdate() {
-    	super.onUpdate();
+    public void tick() {
+    	super.tick();
 
-        Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+        Entity ent = Minecraft.getInstance().getRenderViewEntity();
 
-        //if (this.entityID % 400 == 0) System.out.println("onUpdate time: " + this.worldObj.getTotalWorldTime());
+        //if (this.entityID % 400 == 0) System.out.println("tick time: " + this.worldObj.getGameTime());
     	
     	if (!isVanillaMotionDampen()) {
     		//cancel motion dampening (which is basically air resistance)
-    		//keep this up to date with the inverse of whatever Particle.onUpdate uses
+    		//keep this up to date with the inverse of whatever Particle.tick uses
         	this.motionX /= 0.9800000190734863D;
             this.motionY /= 0.9800000190734863D;
             this.motionZ /= 0.9800000190734863D;
@@ -300,7 +300,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             this.setAlphaF(val);
         }
 
-        if (world.getTotalWorldTime() % 5 == 0) {
+        if (world.getGameTime() % 5 == 0) {
             brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
         }
 
@@ -322,7 +322,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         if (!quatControl) {
             rotationPrev = new Quaternion(rotation);
-            Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+            Entity ent = Minecraft.getInstance().getRenderViewEntity();
             updateQuaternion(ent);
         }
     }
@@ -529,7 +529,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 		}
 		
 		/*IBlockState state = this.getWorld().getBlockState(new BlockPos(posX, posY, posZ));
-		if (state.getBlock() != Blocks.AIR) {
+		if (state.getOwner() != Blocks.AIR) {
 			System.out.println("particle in: " + state);
 		}*/
 		
@@ -718,8 +718,8 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     }
 
     @Override
-    public void setRBGColorF(float particleRedIn, float particleGreenIn, float particleBlueIn) {
-        super.setRBGColorF(particleRedIn, particleGreenIn, particleBlueIn);
+    public void setColor(float particleRedIn, float particleGreenIn, float particleBlueIn) {
+        super.setColor(particleRedIn, particleGreenIn, particleBlueIn);
         RotatingParticleManager.markDirtyVBO2();
     }
 
@@ -741,3 +741,4 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 	    return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
     }
 }
+

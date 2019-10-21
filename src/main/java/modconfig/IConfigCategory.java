@@ -9,3 +9,4 @@ public interface IConfigCategory {
 	public String getRegistryName();
 	
 }
+

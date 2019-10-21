@@ -58,7 +58,7 @@ public class ActionMoveToCoords extends LeafAction {
 				//((EntityLivingBase)ent).getNavigator().clearPathEntity();
 				return EnumBehaviorState.SUCCESS;
 			} else {
-				if (((MobEntity)ent).getNavigator().noPath() && ((MobEntity)ent).world.getWorldTime() % 20 == 0) {
+				if (((MobEntity)ent).getNavigator().noPath() && ((MobEntity)ent).world.getDayTime() % 20 == 0) {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
 					//TODO: 1.10 fix, used to use ICoroAI for some reason despite being a BT class
@@ -94,3 +94,4 @@ public class ActionMoveToCoords extends LeafAction {
 	}
 
 }
+

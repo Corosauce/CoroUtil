@@ -28,7 +28,7 @@ public class DebugRenderer {
     }
 
     public static void tickClient() {
-        World world = Minecraft.getMinecraft().world;
+        World world = Minecraft.getInstance().world;
 
         if (world == null) return;
 
@@ -54,7 +54,7 @@ public class DebugRenderer {
 
     public static void renderDebug(RenderWorldLastEvent event) {
 
-        World world = Minecraft.getMinecraft().world;
+        World world = Minecraft.getInstance().world;
 
         if (world == null) return;
 
@@ -88,8 +88,8 @@ public class DebugRenderer {
 
     public static void renderBatch(Tessellator tessellator, BufferBuilder bufferBuilder) {
 
-        //Minecraft.getMinecraft().renderEngine.bindTexture(net.minecraft.client.renderer.texture.TextureMap.LOCATION_BLOCKS_TEXTURE);
-        //Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation("textures/particle/particles.png"));
+        //Minecraft.getInstance().renderEngine.bindTexture(net.minecraft.client.renderer.texture.TextureMap.LOCATION_BLOCKS_TEXTURE);
+        //Minecraft.getInstance().renderEngine.bindTexture(new ResourceLocation("textures/particle/particles.png"));
         RenderHelper.disableStandardItemLighting();
 
         boolean translucency = true;
@@ -120,7 +120,7 @@ public class DebugRenderer {
         {
             tessellator.getBuffer().sortVertexData(0, 0, 0);
         }*/
-        EntityRendererManager rm = Minecraft.getMinecraft().getRenderManager();
+        EntityRendererManager rm = Minecraft.getInstance().getRenderManager();
         //tessellator.getBuffer().sortVertexData((float) rm.renderPosX, (float) rm.renderPosY, (float) rm.renderPosZ);
         tessellator.draw();
 
@@ -146,7 +146,7 @@ public class DebugRenderer {
                 {
                     PathPoint pathpoint2 = ent.getNavigator().getPath().getPathPointFromIndex(k);
 
-                    CoroUtil.client.debug.DebugRenderer.addRenderable(new DebugRenderEntry(new BlockPos(pathpoint2.x, pathpoint2.y, pathpoint2.z), ent.world.getTotalWorldTime() + 100, 0x00FF00));
+                    CoroUtil.client.debug.DebugRenderer.addRenderable(new DebugRenderEntry(new BlockPos(pathpoint2.x, pathpoint2.y, pathpoint2.z), ent.world.getGameTime() + 100, 0x00FF00));
                 }
             }
         }
@@ -157,3 +157,4 @@ public class DebugRenderer {
     }
 
 }
+

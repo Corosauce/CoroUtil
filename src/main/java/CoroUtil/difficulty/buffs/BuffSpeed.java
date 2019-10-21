@@ -57,38 +57,38 @@ public class BuffSpeed extends BuffBase {
             double extraMultiplier = (difficulty * cmod.difficulty_multiplier);
 
             if (flying) {
-                if (ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED) != null) {
-                    double oldValFlying = ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue();
-                    ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.base_value);
-                    ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "flying speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+                if (ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED) != null) {
+                    double oldValFlying = ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).get();
+                    ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.base_value);
+                    ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "flying speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
                     //cap
-                    if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue() > cmod.max_value) {
-                        CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED));
-                        ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.max_value);
+                    if (cmod.max_value != -1 && ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).get() > cmod.max_value) {
+                        CoroUtilMisc.removeAllModifiers(ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED));
+                        ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(cmod.max_value);
                     }
 
-                    CULog.dbg("mob flying speed went from " + oldValFlying + " to " + ent.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).getAttributeValue());
+                    CULog.dbg("mob flying speed went from " + oldValFlying + " to " + ent.getAttribute(SharedMonsterAttributes.FLYING_SPEED).get());
                 } else {
                     //TODO: probably correct, maybe edge case where we should register it?
                     CULog.dbg("mob flying cmod used on a mob that doesnt have a flying attribute registered");
                 }
             } else {
-                double oldVal = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+                double oldVal = ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get();
 
                 //set base value if we need to
                 if (cmod.base_value != -1) {
-                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
+                    ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.base_value);
                 }
-                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+                ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", extraMultiplier, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
                 //a bit of a hack, but will do until we encounter cross mod issues
-                if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue() > cmod.max_value) {
-                    CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED));
-                    ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.max_value);
+                if (cmod.max_value != -1 && ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get() > cmod.max_value) {
+                    CoroUtilMisc.removeAllModifiers(ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED));
+                    ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(cmod.max_value);
                 }
 
-                CULog.dbg("mob speed went from " + oldVal + " to " + ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
+                CULog.dbg("mob speed went from " + oldVal + " to " + ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get());
             }
 
 
@@ -96,17 +96,18 @@ public class BuffSpeed extends BuffBase {
 
         }
 
-        /*double curSpeed = ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+        /*double curSpeed = ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get();
         //avoid retardedly fast speeds
         if (curSpeed < UtilEntityBuffs.speedCap) {
             double speedBoost = (Math.min(ConfigHWMonsters.scaleSpeedCap, difficulty * ConfigHWMonsters.scaleSpeed));
             //debug += "speed % " + speedBoost;
             AttributeModifier speedBoostModifier = new AttributeModifier(CoroUtilAttributes.SPEED_BOOST_UUID, "speed multiplier boost", speedBoost, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal());
-            if (!ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(speedBoostModifier)) {
-                ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(speedBoostModifier);
+            if (!ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).hasModifier(speedBoostModifier)) {
+                ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(speedBoostModifier);
             }
         }*/
 
         return super.applyBuff(ent, difficulty);
     }
 }
+

@@ -75,14 +75,14 @@ public class ItemQuest extends ActiveQuest {
 	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
 		neededItemID = parNBT.getString("neededItemID");
-		neededItemCount = parNBT.getInteger("neededItemCount");
+		neededItemCount = parNBT.getInt("neededItemCount");
 	}
 	
 	@Override
 	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
-		parNBT.setString("neededItemID", neededItemID);
-		parNBT.setInteger("neededItemCount", neededItemCount);
+		parNBT.putString("neededItemID", neededItemID);
+		parNBT.putInt("neededItemCount", neededItemCount);
 	}
 	
 	@Override
@@ -112,3 +112,4 @@ public class ItemQuest extends ActiveQuest {
 		return parList;
 	}
 }
+

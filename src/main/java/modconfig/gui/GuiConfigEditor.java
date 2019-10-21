@@ -52,7 +52,7 @@ public class GuiConfigEditor extends Screen
     
     public GuiConfigEditor() {
     	super();
-    	mc = Minecraft.getMinecraft();
+    	mc = Minecraft.getInstance();
     }
     
     //Change this to using client synced data when that part is done
@@ -81,7 +81,7 @@ public class GuiConfigEditor extends Screen
 	    	if (ConfigMod.liveEditConfigs.size() > 0) {
 		    	for (int i = 0; i < getData().configData.size(); i++) {
 		    		if (getData().configData.get(i).editBox != null && getData().configData.get(i).editBox.isFocused()) {
-		    			getData().configData.get(i).editBox.updateCursorCounter();
+		    			getData().configData.get(i).editBox.tick();
 		    		}
 		    	}
 	    	}
@@ -200,7 +200,7 @@ public class GuiConfigEditor extends Screen
     	    while (it.hasNext()) {
     	        Map.Entry pairs = (Map.Entry)it.next();
     	        String name = (String)pairs.getKey();
-    	        Object val = pairs.getValue();
+    	        Object val = pairs.get();
     	        int wat = this.fontRenderer.getStringWidth(name);
     	        this.drawString(this.fontRenderer, name, startX + 10, startY + 10 + (pos * 12), 16777215);
     	        this.drawString(this.fontRenderer, val.toString(), startX + 10 + xSize / 2, startY + 10 + (pos * 12), 16777215);
@@ -254,7 +254,7 @@ public class GuiConfigEditor extends Screen
     	scrollPane.registerScrollButtons(null, 7, 8);
     	
     	if (!clientMode) {
-    		this.mc.player.sendChatMessage("/config update " + getCategory());
+    		this.mc.player.sendChatMessage("/config tick " + getCategory());
     	} else {
     		ConfigMod.populateData(getCategory());
     	}
@@ -307,7 +307,7 @@ public class GuiConfigEditor extends Screen
         //int startY2 = (this.height - this.ySize) / 2 + 23;
         
         //this.textboxWorldName = new GuiTextField(this.fontRenderer, startX + xSize - buttonWidth - paddingSize, startY + 10 + paddingSize, buttonWidth, buttonHeight);
-        //this.textboxWorldName.setFocused(true);
+        //this.textboxWorldName.setFocused2(true);
         //this.textboxWorldName.setText("derp");
         
     }
@@ -421,3 +421,4 @@ public class GuiConfigEditor extends Screen
         tessellator.draw();
     }
 }
+

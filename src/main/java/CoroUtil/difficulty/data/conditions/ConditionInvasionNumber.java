@@ -14,3 +14,4 @@ public class ConditionInvasionNumber extends DataCondition {
         return "wave range: " + min + " to " + max;
     }
 }
+

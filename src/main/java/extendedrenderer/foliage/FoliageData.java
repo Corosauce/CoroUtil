@@ -11,3 +11,4 @@ public class FoliageData {
     public static ConcurrentHashMap<BlockState, IBakedModel> backupBakedModelStore = new ConcurrentHashMap<>();
 
 }
+

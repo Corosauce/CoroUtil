@@ -58,7 +58,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     	if (entity.getAttackTarget() != null || autoAttackTest) {
     		targetLastTracked = getFlyingPlayerNear();
     		return targetLastTracked != null;
-    		/*if (entity.worldObj.getTotalWorldTime() % 60 == 0) {
+    		/*if (entity.worldObj.getGameTime() % 60 == 0) {
     			return true;
     		}*/
     		
@@ -104,7 +104,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     			//entity.dismountEntity(entityIn);
     			//since removePassenger is private i guess just remove all...
     			//oh wait
-    			ent.dismountRidingEntity();
+    			ent.stopRiding();
     			//entity.removePassengers();
     			//break;
     		}
@@ -119,7 +119,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
      * Updates the task
      */
     @Override
-	public void updateTask()
+	public void tick()
     {
     	
     	entity.fallDistance = 0;
@@ -199,8 +199,8 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 			    		if (targetLastTracked instanceof ServerPlayerEntity) {
 			    			ServerPlayerEntity entMP = (ServerPlayerEntity) targetLastTracked;
 			    			long lastPullTime = targetLastTracked.getEntityData().getLong(dataPlayerLastPullDownTick);
-			    			if (entMP.world.getTotalWorldTime() != lastPullTime) {
-			    				targetLastTracked.getEntityData().setLong(dataPlayerLastPullDownTick, entMP.world.getTotalWorldTime());
+			    			if (entMP.world.getGameTime() != lastPullTime) {
+			    				targetLastTracked.getEntityData().putLong(dataPlayerLastPullDownTick, entMP.world.getGameTime());
 			    				if (ConfigHWMonsters.antiAirUseRelativeMotion) {
 			    					CoroUtil.eventChannel.sendTo(PacketHelper.getPacketForRelativeMotion(entMP, 0, ConfigHWMonsters.antiAirPullDownRate, 0), entMP);
 			    				} else {
@@ -221,7 +221,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 	    		grabLock = false;
 	    		for (Entity ent : entity.getRecursivePassengers()) {
 	        		if (ent instanceof PlayerEntity) {
-	        			ent.dismountRidingEntity();
+	        			ent.stopRiding();
 	        		}
 	        	}
 		    	/*if (entity.riddenByEntity instanceof EntityPlayer) {
@@ -262,3 +262,4 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     	return player.getEntityData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime) > 0;
     }
 }
+

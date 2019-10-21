@@ -66,3 +66,4 @@ public class PathPointEx
         return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
     }
 }
+

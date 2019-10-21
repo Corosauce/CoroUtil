@@ -146,3 +146,4 @@ public class CommonProxy implements IGuiHandler
         EntityRegistry.registerModEntity(new ResourceLocation(CoroUtil.modID, par1Str), par0Class, par1Str, entityId, CoroUtil.instance, distSync, tickRateSync, syncMotion);
     }
 }
+

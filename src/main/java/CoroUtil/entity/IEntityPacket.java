@@ -11,3 +11,4 @@ public interface IEntityPacket {
 	public void handleNBTFromServer(CompoundNBT par1NBTTagCompound);
 	
 }
+

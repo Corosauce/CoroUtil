@@ -47,10 +47,10 @@ public class SenseEnvironment extends LeafAction {
 			
 			boolean canSeeCoord = this.blackboard.agent.ent.world.rayTraceBlocks(new Vec3d(this.blackboard.agent.ent.posX, this.blackboard.agent.ent.posY + (double)this.blackboard.agent.ent.getEyeHeight(), this.blackboard.agent.ent.posZ), new Vec3d(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord+1.5, blackboard.posMoveTo.zCoord)) == null;
 			
-			if (!canSeeCoord || (target != null && !this.blackboard.agent.ent.canEntityBeSeen(target)) || distToPos > blackboard.distMed.getValue()) {
+			if (!canSeeCoord || (target != null && !this.blackboard.agent.ent.canEntityBeSeen(target)) || distToPos > blackboard.distMed.get()) {
 				distLevel = 2;
 			} else {
-				if (distToPos < blackboard.distClose.getValue()) {
+				if (distToPos < blackboard.distClose.get()) {
 					distLevel = 0;
 				} else {
 					distLevel = 1;
@@ -66,12 +66,12 @@ public class SenseEnvironment extends LeafAction {
 			
 			//track closest threat, maybe move to survival leaf in template
 			float huntRange = 32F;
-			if (blackboard.agent.ent.world.getTotalWorldTime() % 10 == 0) {
+			if (blackboard.agent.ent.world.getGameTime() % 10 == 0) {
 				boolean found = false;
 				//boolean sanityAborted = false;
 				Entity clEnt = null;
 				float closest = 9999F;
-		    	List list = blackboard.agent.ent.world.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.getEntityBoundingBox().grow(huntRange, huntRange/2, huntRange));
+		    	List list = blackboard.agent.ent.world.getEntitiesWithinAABBExcludingEntity(blackboard.agent.ent, blackboard.agent.ent.getBoundingBox().grow(huntRange, huntRange/2, huntRange));
 		        for(int j = 0; j < list.size(); j++)
 		        {
 		            Entity entity1 = (Entity)list.get(j);
@@ -112,7 +112,7 @@ public class SenseEnvironment extends LeafAction {
 		blackboard.isSafeOrClosePath.setValue(isSafe || distLevel == 0);
 		
 		//flying overrides
-		if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+		if (blackboard.canFlyPath.get() || blackboard.canSwimPath.get()) {
 			if (blackboard.posMoveTo != null) {
 				if (canPosBeSeen(blackboard.posMoveTo)) {
 					blackboard.isLongPath.setValue(false);
@@ -127,9 +127,9 @@ public class SenseEnvironment extends LeafAction {
 		}
 		
 		blackboard.moveCondition.setValue(distLevel);
-		blackboard.isFighting.setValue(/*blackboard.shouldFollowOrders.getValue() && */!blackboard.shouldTrySurvival.getValue() && blackboard.getTarget() != null);
+		blackboard.isFighting.setValue(/*blackboard.shouldFollowOrders.get() && */!blackboard.shouldTrySurvival.get() && blackboard.getTarget() != null);
 		
-		if (blackboard.isFighting.getValue()) {
+		if (blackboard.isFighting.get()) {
 			//System.out.println("4234");
 		}
 		
@@ -176,3 +176,4 @@ public class SenseEnvironment extends LeafAction {
     }
 
 }
+

@@ -6,3 +6,4 @@ public interface IShaderListener {
     void reset();
 
 }
+

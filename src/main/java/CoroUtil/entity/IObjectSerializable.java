@@ -11,3 +11,4 @@ public interface IObjectSerializable {
 	public void readFromNBTDisk(CompoundNBT parData);
 	
 }
+

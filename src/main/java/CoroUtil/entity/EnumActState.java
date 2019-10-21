@@ -12,3 +12,4 @@ public enum EnumActState
     static { for(EnumActState e : EnumSet.allOf(EnumActState.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumActState get(int intValue) { return lookup.get(intValue); }
 }
+

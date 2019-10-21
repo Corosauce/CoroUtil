@@ -41,7 +41,7 @@ public class DebugRenderEntry {
         int g = (color >> 8) & 0xff;
         int b = color & 0xff;
 
-        //TextureAtlasSprite tas = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(Blocks.ICE.getDefaultState()).getParticleTexture();
+        //TextureAtlasSprite tas = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(Blocks.ICE.getDefaultState()).getParticleTexture();
 
         double u = 0;//tas.getMinU();
         double v = 0;//tas.getMinV();
@@ -56,7 +56,7 @@ public class DebugRenderEntry {
         double f2 = 0;
         double f3 = 0;
 
-        EntityRendererManager rm = Minecraft.getMinecraft().getRenderManager();
+        EntityRendererManager rm = Minecraft.getInstance().getRenderManager();
 
         buffer.setTranslation(pos.getX() + 0.5F - rm.renderPosX, pos.getY() + 0.5F - rm.renderPosY, pos.getZ() + 0.5F - rm.renderPosZ);
 
@@ -119,16 +119,17 @@ public class DebugRenderEntry {
     }
 
     public void tick() {
-        World world = Minecraft.getMinecraft().world;
+        World world = Minecraft.getInstance().world;
 
         if (world == null) return;
 
-        if (world.getTotalWorldTime() % 10 == 0) {
+        if (world.getGameTime() % 10 == 0) {
             world.spawnParticle(ParticleTypes.REDSTONE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0D, 0.0D, 0.0D);
         }
     }
 
     public boolean isExpired(World world) {
-        return renderUntilTime < world.getTotalWorldTime();
+        return renderUntilTime < world.getGameTime();
     }
 }
+

@@ -11,3 +11,4 @@ public class ConditionFilterMobs extends DataCondition {
     public String mode;
     public List<String> entities;
 }
+

@@ -9,3 +9,4 @@ public interface IAbilityUser {
 	//public List<String> getAssignedAbilities();
 	
 }
+

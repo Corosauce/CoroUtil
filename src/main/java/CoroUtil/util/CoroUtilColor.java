@@ -24,12 +24,12 @@ public class CoroUtilColor {
         if (FoliageData.backupBakedModelStore.containsKey(state)) {
             model = FoliageData.backupBakedModelStore.get(state);
         } else {
-            model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(state);
+            model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(state);
         }
 
         if (model != null && !model.isBuiltInRenderer()) {
             TextureAtlasSprite sprite = model.getParticleTexture();
-            if (sprite != null && sprite != Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite()) {
+            if (sprite != null && sprite != Minecraft.getInstance().getTextureMap().getMissingSprite()) {
                 return getColors(model.getParticleTexture());
             }
         }
@@ -37,8 +37,8 @@ public class CoroUtilColor {
     }
 
     public static int[] getColors(TextureAtlasSprite sprite) {
-        int width = sprite.getIconWidth();
-        int height = sprite.getIconHeight();
+        int width = sprite.getWidth();
+        int height = sprite.getHeight();
         int frames = sprite.getFrameCount();
         
         BufferedImage img = new BufferedImage(width, height * frames, BufferedImage.TYPE_4BYTE_ABGR);
@@ -66,3 +66,4 @@ public class CoroUtilColor {
     }
 
 }
+

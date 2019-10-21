@@ -97,15 +97,15 @@ public class DynamicDifficulty {
 			
 			
 			if (ConfigCoroUtilAdvanced.cleanupStrayMobs) {
-				long dayNumber = (world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
+				long dayNumber = (world.getDayTime() / CoroUtilWorldTime.getDayLength()) + 1;
 				if (dayNumber % ConfigCoroUtilAdvanced.cleanupStrayMobsDayRate == 0) {
-					long timeOfDay = world.getWorldTime() % CoroUtilWorldTime.getDayLength();
+					long timeOfDay = world.getDayTime() % CoroUtilWorldTime.getDayLength();
 					int killTimeRange = 10;
 					if (timeOfDay >= (long) ConfigCoroUtilAdvanced.cleanupStrayMobsTimeOfDay && timeOfDay < (long)(2000+killTimeRange)) {
 						CULog.dbg("KILLING ALL ZOMBIES!");
 						for (Object obj : world.loadedEntityList) {
 							if (obj instanceof ZombieEntity) {
-								((ZombieEntity) obj).setDead();
+								((ZombieEntity) obj).remove();
 							}
 						}
 					}
@@ -118,10 +118,10 @@ public class DynamicDifficulty {
 		World world = player.world;
 
 		if (!player.isSpectator() && !player.isCreative()) {
-			if (world.getTotalWorldTime() % tickRate == 0) {
+			if (world.getGameTime() % tickRate == 0) {
 				long ticksPlayed = player.getEntityData().getLong(dataPlayerServerTicks);
 				ticksPlayed += tickRate;
-				player.getEntityData().setLong(dataPlayerServerTicks, ticksPlayed);
+				player.getEntityData().putLong(dataPlayerServerTicks, ticksPlayed);
 			}
 		}
 
@@ -142,7 +142,7 @@ public class DynamicDifficulty {
     				if (dbg) System.out.println("3");
     				Block block = null;
     				int pX = MathHelper.floor(player.posX);
-    				int pY = MathHelper.floor(player.getEntityBoundingBox().minY);
+    				int pY = MathHelper.floor(player.getBoundingBox().minY);
     				int pZ = MathHelper.floor(player.posZ);
     				boolean foundWall = false;
     				for (int x = -wallScanRange; !foundWall && x <= wallScanRange; x++) {
@@ -150,10 +150,10 @@ public class DynamicDifficulty {
     						for (int y = -wallScanRange; !foundWall && y <= wallScanRange; y++) {
 								BlockPos pos = new BlockPos(pX+x, pY+y, pZ+z);
     							BlockState state = world.getBlockState(pos);
-    							block = state.getBlock();
+    							block = state.getOwner();
     							if (!block.isAir(state, world, pos)) {
     								List<AxisAlignedBB> list = new ArrayList<AxisAlignedBB>();
-    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getEntityBoundingBox(), list, player, true);
+    								block.addCollisionBoxToList(state, world, new BlockPos(pX+x, pY+y, pZ+z), player.getBoundingBox(), list, player, true);
     								if (list.size() > 0) {
     									if (dbg) System.out.println("wall found - " + block + " - " + (pX+x) + ", " + (pY+y) + ", " + (pZ+z));
         								foundWall = true;
@@ -177,10 +177,10 @@ public class DynamicDifficulty {
 		if (isInAir) {
 			if (dbg) System.out.println("in air");
 			long airTime = player.getEntityData().getLong(dataPlayerDetectInAirTime);
-			player.getEntityData().setLong(dataPlayerDetectInAirTime, airTime+1);
+			player.getEntityData().putLong(dataPlayerDetectInAirTime, airTime+1);
 		} else {
 			if (dbg) System.out.println("not in air");
-			player.getEntityData().setLong(dataPlayerDetectInAirTime, 0);
+			player.getEntityData().putLong(dataPlayerDetectInAirTime, 0);
 		}
 		
 	}
@@ -296,16 +296,16 @@ public class DynamicDifficulty {
 	public static float getDifficultyScaleForPlayerEquipment(PlayerEntity player) {
 		boolean calcWeapon = false;
 		int curRating = 0;
-		if (player.getEntityData().hasKey(dataPlayerLastCacheEquipmentRating)) {
-			if (player.world.getTotalWorldTime() % 200 == 0) {
+		if (player.getEntityData().contains(dataPlayerLastCacheEquipmentRating)) {
+			if (player.world.getGameTime() % 200 == 0) {
 				curRating = UtilPlayer.getPlayerRating(player, calcWeapon);
-				player.getEntityData().setInteger(dataPlayerLastCacheEquipmentRating, curRating);
+				player.getEntityData().putInt(dataPlayerLastCacheEquipmentRating, curRating);
 			} else {
-				curRating = player.getEntityData().getInteger(dataPlayerLastCacheEquipmentRating);
+				curRating = player.getEntityData().getInt(dataPlayerLastCacheEquipmentRating);
 			}
 		} else {
 			curRating = UtilPlayer.getPlayerRating(player, calcWeapon);
-			player.getEntityData().setInteger(dataPlayerLastCacheEquipmentRating, curRating);
+			player.getEntityData().putInt(dataPlayerLastCacheEquipmentRating, curRating);
 		}
 		
 		int bestRating = getBestPlayerRatingPossibleVanilla(calcWeapon);
@@ -373,7 +373,7 @@ public class DynamicDifficulty {
 			for (int z = chunkZ - chunkRange; z <= chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos.toBlockPos())) {
-					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					Chunk chunk = world.getChunkAt(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
 
@@ -408,7 +408,7 @@ public class DynamicDifficulty {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos.toBlockPos())) {
-					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					Chunk chunk = world.getChunkAt(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(x, z);
 
@@ -443,7 +443,7 @@ public class DynamicDifficulty {
 		/**
 		 * 1 chunk calc
 		 */
-		/*Chunk chunk = world.getChunkFromBlockCoords(pos);
+		/*Chunk chunk = world.getChunkAt(pos);
 		if (chunk != null) {
 			long inhabTime = chunk.getInhabitedTime();
 			float scale = convertInhabTimeToDifficultyScale(inhabTime);
@@ -464,7 +464,7 @@ public class DynamicDifficulty {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos.toBlockPos())) {
-					Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
+					Chunk chunk = world.getChunkAt(new BlockPos(checkPos.posX, checkPos.posY, checkPos.posZ));
 					if (chunk != null) {
 						totalTime += chunk.getInhabitedTime();
 						count++;
@@ -492,7 +492,7 @@ public class DynamicDifficulty {
 			for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
 				BlockCoord checkPos = new BlockCoord(x * 16 + 8, 128, z * 16 + 8);
 				if (world.isBlockLoaded(checkPos)) {
-					Chunk chunk = world.getChunkFromBlockCoords(checkPos);
+					Chunk chunk = world.getChunkAt(checkPos);
 					if (chunk != null) {
 						if (chunk.getInhabitedTime() > bestTime) {
 							bestTime = chunk.getInhabitedTime();
@@ -510,13 +510,13 @@ public class DynamicDifficulty {
 	public static float getInvasionSkipBuff(PlayerEntity player) {
 		return player.getEntityData().getFloat(dataPlayerInvasionSkipBuff);
 		/*float buffBase = 0.5F;
-		float skipCount = player.getEntityData().getInteger(dataPlayerInvasionSkipCount);
+		float skipCount = player.getEntityData().getInt(dataPlayerInvasionSkipCount);
 		float val = buffBase * skipCount;
 		return val;*/
 	}
 
 	public static void setInvasionSkipBuff(PlayerEntity player, float buff) {
-		player.getEntityData().setFloat(dataPlayerInvasionSkipBuff, buff);
+		player.getEntityData().putFloat(dataPlayerInvasionSkipBuff, buff);
 	}
 	
 	/**
@@ -536,21 +536,21 @@ public class DynamicDifficulty {
 			if (event.getWorld().playerEntities.contains(event.getHarvester())) {
 				
 				CompoundNBT nbt = event.getHarvester().getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(event.harvester));
-				if (event.getState() != null && event.getState().getBlock() instanceof OreBlock) {
-					int curVal = nbt.getInteger(dataPlayerHarvestOre);
+				if (event.getState() != null && event.getState().getOwner() instanceof OreBlock) {
+					int curVal = nbt.getInt(dataPlayerHarvestOre);
 					curVal++;
-					nbt.setInteger(dataPlayerHarvestOre, curVal);
+					nbt.putInt(dataPlayerHarvestOre, curVal);
 					//System.out.println("increment!");
-				} else if (event.getState() != null && event.getState().getBlock() instanceof LogBlock) {
-					int curVal = nbt.getInteger(dataPlayerHarvestLog);
+				} else if (event.getState() != null && event.getState().getOwner() instanceof LogBlock) {
+					int curVal = nbt.getInt(dataPlayerHarvestLog);
 					curVal++;
-					nbt.setInteger(dataPlayerHarvestLog, curVal);
+					nbt.putInt(dataPlayerHarvestLog, curVal);
 				}
 				
 				/*float curVal = nbt.getFloat(dataPlayerHarvestRating);
 				curVal += getBlockImportanceValue(event.block);
-				nbt.setFloat(dataPlayerHarvestRating, curVal);*/
-				increaseInvadeRating(event.getHarvester(), getBlockImportanceValue(event.getState().getBlock()));
+				nbt.putFloat(dataPlayerHarvestRating, curVal);*/
+				increaseInvadeRating(event.getHarvester(), getBlockImportanceValue(event.getState().getOwner()));
 				
 				//System.out.println("harvested block for " + event.harvester.username + " - " + event.block);
 			}
@@ -561,7 +561,7 @@ public class DynamicDifficulty {
 		CompoundNBT nbt = parPlayer.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(parPlayer));
 		float curVal = nbt.getFloat(dataPlayerHarvestRating);
 		curVal += parVal;
-		nbt.setFloat(dataPlayerHarvestRating, curVal);
+		nbt.putFloat(dataPlayerHarvestRating, curVal);
 		
 		//System.out.println("curVal: " + curVal);
 	}
@@ -570,7 +570,7 @@ public class DynamicDifficulty {
 		CompoundNBT nbt = parPlayer.getEntityData();//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(parPlayer));
 		float curVal = nbt.getFloat(dataPlayerHarvestRating);
 		curVal -= parVal;
-		nbt.setFloat(dataPlayerHarvestRating, curVal);
+		nbt.putFloat(dataPlayerHarvestRating, curVal);
 	}
 	
 	public static float getHarvestRatingInvadeThreshold() {
@@ -616,7 +616,7 @@ public class DynamicDifficulty {
 					return defaultIron;
 				}
 				//TODO: possibly risky use of oredict, see issue #267, NPE at CoroUtil.difficulty.DynamicDifficulty.getBlockImportanceValue(DynamicDifficulty.java:569)
-			} else if (OreDictionary.getOres(Block.REGISTRY.getNameForObject(block).toString()).size() > 0) {
+			} else if (OreDictionary.getOres(Block.REGISTRY.getKey(block).toString()).size() > 0) {
 				return defaultIron;
 			} else {
 				return 0;
@@ -731,7 +731,7 @@ public class DynamicDifficulty {
 
 					//if it took too long for next hit, do a full reset
 					//lets also not log the damage, as it'd be logged as a sloooow attack, lets hope for better data to come
-					if (log.getLastLogTime() + lastLogTimeThreshold < world.getTotalWorldTime()) {
+					if (log.getLastLogTime() + lastLogTimeThreshold < world.getGameTime()) {
 						//dbgDPS("damage expired, resetting");
 						logToChunk(log);
 						log.cleanup();
@@ -788,7 +788,7 @@ public class DynamicDifficulty {
 				float damage = 0;
 				boolean bigDamage = false;
 				if (log.getLastDamage() > 0) {
-					long timeDiff = world.getTotalWorldTime() - log.getLastLogTime();
+					long timeDiff = world.getGameTime() - log.getLastLogTime();
 
 					//catch potentially game breaking fast hits, mainly to fix buggy edge cases, might not be needed with new source tracking code
 					if (timeDiff != 0 && ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable != -1 && timeDiff < ConfigCoroUtilAdvanced.difficulty_MaxAttackSpeedLoggable) {
@@ -835,7 +835,7 @@ public class DynamicDifficulty {
 
 				log.trackSources(event.getSource());
 				log.setLastDamage(damageToLog);
-				log.setLastLogTime(world.getTotalWorldTime());
+				log.setLastLogTime(world.getGameTime());
 				//log.setSource_pos(ent.getPosition());
 
 				//keep track of highest damage out to maybe log to chunk
@@ -925,7 +925,7 @@ public class DynamicDifficulty {
 		}
 		
 		//if time to do a full recalc
-		if (cdp.lastDPSRecalc + recalcRate < world.getTotalWorldTime()) {
+		if (cdp.lastDPSRecalc + recalcRate < world.getGameTime()) {
 			
 			if (cdp.listDPSAveragesShortTerm.size() > 0) {
 				float avgDPS2 = 0;
@@ -954,7 +954,7 @@ public class DynamicDifficulty {
 				//System.out.println("average of the average of the average: " + avgDPS3);
 			}
 			
-			cdp.lastDPSRecalc = world.getTotalWorldTime();
+			cdp.lastDPSRecalc = world.getGameTime();
 		}
 	}
 
@@ -1025,3 +1025,4 @@ public class DynamicDifficulty {
 	
 	
 }
+

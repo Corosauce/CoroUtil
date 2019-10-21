@@ -42,10 +42,11 @@ public class TeamTypes {
 		typesLookup.put(parType, new TeamInstance(parType, enemies, threats, allies));
 	}
 	
-	public static TeamInstance getType(String parType) {
+	public static TeamInstance getMinecartType(String parType) {
 		TeamInstance ti = TeamTypes.typesLookup.get(parType);
 		if (ti == null) System.out.println("CoroAI WARNING: null team instance for type " + parType);
 		return ti;
 	}
 	
 }
+

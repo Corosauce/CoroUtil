@@ -6,3 +6,4 @@ package CoroUtil.difficulty.data.cmods;
 public class CmodAttributeAttackDamage extends CmodAttributeBaseSimple {
 
 }
+

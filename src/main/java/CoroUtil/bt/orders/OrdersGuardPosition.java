@@ -39,10 +39,10 @@ public class OrdersGuardPosition extends OrdersData {
 	}
 	
 	@Override
-	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
-		parentCompound.setFloat("guardRadius", guardRadius);
+	public CompoundNBT write(CompoundNBT parentCompound) {
+		parentCompound.putFloat("guardRadius", guardRadius);
 		if (coordsGuard != null) CoroUtilNBT.writeCoords("coordsGuard", coordsGuard, parentCompound);
-		return super.writeToNBT(parentCompound);
+		return super.write(parentCompound);
 	}
 	
 	@Override
@@ -63,3 +63,4 @@ public class OrdersGuardPosition extends OrdersData {
 	}
 
 }
+

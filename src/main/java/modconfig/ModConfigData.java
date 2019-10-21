@@ -94,7 +94,7 @@ public class ModConfigData {
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
 	        String name = (String)pairs.getKey();
-	        Object val = pairs.getValue();
+	        Object val = pairs.get();
 	    }
     }*/
     
@@ -110,7 +110,7 @@ public class ModConfigData {
 	    	} else if (obj instanceof Boolean) {
 	    		valsBoolean.put(fieldName, (Boolean)obj);
 	    	} else {
-	    		//dbg("unhandled datatype, update initField");
+	    		//dbg("unhandled datatype, tick initField");
 	    	}
     	} catch (Exception ex) { ex.printStackTrace(); }
     }
@@ -174,8 +174,9 @@ public class ModConfigData {
         } else if (obj instanceof Boolean) {
             obj = preInitConfig.get(configInstance.getCategory(), name, (Boolean)obj, comment).getBoolean((Boolean)obj);
         } else {
-            //dbg("unhandled datatype, update initField");
+            //dbg("unhandled datatype, tick initField");
         }
         setFieldBasedOnType(name, obj);
     }
 }
+

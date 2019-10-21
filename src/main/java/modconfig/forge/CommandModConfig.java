@@ -98,12 +98,12 @@ public class CommandModConfig extends CommandBase {
 					} else if (var2[cmd].equalsIgnoreCase("reload") && player != null) {
 						ConfigMod.forceLoadRuntimeSettingsFromFile();
 						player.sendMessage(new StringTextComponent("Reloaded all runtime configurations from file"));
-					} else if (var2[cmd].equalsIgnoreCase("update") && player != null) {
+					} else if (var2[cmd].equalsIgnoreCase("tick") && player != null) {
 						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), (ServerPlayerEntity)player);
 						//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
 					} else if ((var2[cmd].equalsIgnoreCase("menu") || var2[cmd].equalsIgnoreCase("gui")) && player != null) {
 						CompoundNBT nbt = new CompoundNBT();
-						nbt.setString("command", "openGUI");
+						nbt.putString("command", "openGUI");
 						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacketMenu(), (ServerPlayerEntity)player);
 					}
 					
@@ -154,3 +154,4 @@ public class CommandModConfig extends CommandBase {
 	}
 
 }
+

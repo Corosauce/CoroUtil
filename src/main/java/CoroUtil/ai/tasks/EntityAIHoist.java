@@ -91,7 +91,7 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
      * Keep ticking a continuous task that has already been started
      */
     @Override
-    public void updateTask()
+    public void tick()
     {
         //CULog.dbg("running hoist");
         //if (true) return;
@@ -174,9 +174,9 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
         double rangeShiftAdjFromTarget = 0.3D;
         double rangeNeededToShiftToTarget = 1.4D;
 
-        /* || isNearWall(getEntityBoundingBox()) || isOnLadder()*/
+        /* || isNearWall(getBoundingBox()) || isOnLadder()*/
         if (!entity.world.isRemote && stackMode) {
-            List<LivingEntity> var2 = entity.world.getEntitiesWithinAABB(LivingEntity.class, entity.getEntityBoundingBox().expand(rangeBox, 2D, rangeBox));
+            List<LivingEntity> var2 = entity.world.getEntitiesWithinAABB(LivingEntity.class, entity.getBoundingBox().expand(rangeBox, 2D, rangeBox));
 
             Random rand = new Random();
             Entity ent = null;
@@ -185,16 +185,16 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
                 for (int i = 0; i < var2.size(); i++) {
                     if (var2.get(i) != entity && var2.get(i) instanceof ZombieEntity &&
                             entity.getEntityId() > var2.get(i).getEntityId() &&
-                            entity.getEntityBoundingBox().minY+1.5D > var2.get(i).getEntityBoundingBox().minY &&
-                            entity.getEntityBoundingBox().minY < var2.get(i).getEntityBoundingBox().maxY) {
+                            entity.getBoundingBox().minY+1.5D > var2.get(i).getBoundingBox().minY &&
+                            entity.getBoundingBox().minY < var2.get(i).getBoundingBox().maxY) {
                         ent = var2.get(i);
                         break;
                     }
                 }
             }
-            //entity.getEntityBoundingBox().minY+0.001D > var2.get(i).getEntityBoundingBox().minY && entity.getEntityBoundingBox().minY < var2.get(i).getEntityBoundingBox().maxY
+            //entity.getBoundingBox().minY+0.001D > var2.get(i).getBoundingBox().minY && entity.getBoundingBox().minY < var2.get(i).getBoundingBox().maxY
             if (tryHoist > 0) {
-                if (target.getDistanceToEntity(entity) < 3F || (tryHoist == 1 && target.getEntityBoundingBox().minY < entity.getEntityBoundingBox().minY - 1)) {
+                if (target.getDistanceToEntity(entity) < 3F || (tryHoist == 1 && target.getBoundingBox().minY < entity.getBoundingBox().minY - 1)) {
                     double vecX = target.posX - entity.posX;
                     double vecY = target.posY - entity.posY;
                     double vecZ = target.posZ - entity.posZ;
@@ -216,9 +216,9 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
             //if (onGround) tryHoist = 0;
 
             if (ent != null) {
-                if (target.getEntityBoundingBox().minY > entity.getEntityBoundingBox().minY + 2/* && entity.getNavigator().noPath()*/) {
+                if (target.getBoundingBox().minY > entity.getBoundingBox().minY + 2/* && entity.getNavigator().noPath()*/) {
                     tryHoist = 40;
-                } else if (target.getEntityBoundingBox().minY < entity.getEntityBoundingBox().minY - 1 || !isNearWall(entity.getEntityBoundingBox())) {
+                } else if (target.getBoundingBox().minY < entity.getBoundingBox().minY - 1 || !isNearWall(entity.getBoundingBox())) {
 
                     //tryHoist = 0;
                 }
@@ -234,8 +234,8 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
                         double tryZ = entity.posZ-0.8D+rand.nextFloat();
                         BlockPos pos = new BlockPos(tryX, tryY, tryZ);
                         BlockState state = entity.world.getBlockState(pos);
-                        //Block id = entity.world.getBlock((int)(tryX), (int)(tryY), (int)(tryZ));
-                        if (!CoroUtilBlock.isAir(state.getBlock()) && (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) && !(state.getBlock() instanceof BlockRepairingBlock)) {
+                        //Block id = entity.world.getOwner((int)(tryX), (int)(tryY), (int)(tryZ));
+                        if (!CoroUtilBlock.isAir(state.getOwner()) && (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) && !(state.getOwner() instanceof BlockRepairingBlock)) {
                             //System.out.println("remove leafs!");
                             entity.world.setBlockToAir(pos);
                         }
@@ -355,7 +355,7 @@ public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionCo
             {
                 for (int var11 = var7-1; var11 < var8+1; ++var11)
                 {
-                    Block var12 = entity.world.getBlockState(new BlockPos(var9, var10, var11)).getBlock();
+                    Block var12 = entity.world.getBlockState(new BlockPos(var9, var10, var11)).getOwner();
 
                     if (!CoroUtilBlock.isAir(var12)/* && var12.blockMaterial == par2Material*/)
                     {

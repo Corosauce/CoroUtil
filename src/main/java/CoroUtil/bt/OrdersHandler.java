@@ -18,12 +18,12 @@ public class OrdersHandler {
 		activeOrders = parNewOrders;
 	}
 	
-	/*public void readFromNBT(NBTTagCompound parNBT, TownObject team) {
+	/*public void read(NBTTagCompound parNBT, TownObject team) {
 		String activeOrdersName = parNBT.getString("activeOrdersName");
 		if (!activeOrdersName.equals("")) {
 
 			OrdersData orders = null;
-			NBTTagCompound activeOrdersNBT = parNBT.getCompoundTag("activeOrdersNBT");
+			NBTTagCompound activeOrdersNBT = parNBT.getCompound("activeOrdersNBT");
 			
 			//needs to be moved to some sort of nbt serialization mapping
 			//orders name -> class, new instance with basic constructor, call its read with nbt data
@@ -42,14 +42,15 @@ public class OrdersHandler {
 		}
 	}*/
 	
-	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
+	public CompoundNBT write(CompoundNBT parentCompound) {
 		if (activeOrders != null) {
-			parentCompound.setString("activeOrdersName", activeOrders.activeOrdersName);
+			parentCompound.putString("activeOrdersName", activeOrders.activeOrdersName);
 			
 			CompoundNBT activeOrdersNBT = new CompoundNBT();
-			activeOrdersNBT = activeOrders.writeToNBT(activeOrdersNBT);
+			activeOrdersNBT = activeOrders.write(activeOrdersNBT);
 			parentCompound.setTag("activeOrdersNBT", activeOrdersNBT);
 		}
 		return parentCompound;
 	}
 }
+

@@ -52,7 +52,7 @@ public class UtilPlayer {
 		//initial removal of current weap attrib
 		if (calculateWeapon) {
 			ItemStack itemstack = entP.inventory.getCurrentItem();
-			if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributes().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 			
 			for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.size(); slotIndex++) {
 				if (!entP.inventory.mainInventory.get(slotIndex).isEmpty()) {
@@ -63,7 +63,7 @@ public class UtilPlayer {
 	                if (!itemstack.isEmpty())
 	                {
 	                	//add attrib
-	                	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+	                	entP.getAttributes().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                	
 	                	//temp enchant test
 	                	/*if (itemstack.getItem() instanceof ItemSword) {
@@ -74,7 +74,7 @@ public class UtilPlayer {
 					}
 	                
 	                //get val
-	                float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+	                float f = (float)entP.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).get();
 	                float f1 = 0.0F;
 	
 	                if (entP instanceof LivingEntity)
@@ -91,7 +91,7 @@ public class UtilPlayer {
 					if (!itemstack.isEmpty())
 	                {
 						//remove attrib
-						entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+						entP.getAttributes().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                }
 					
 	                if (dmg > bestWeaponValue) {
@@ -102,13 +102,14 @@ public class UtilPlayer {
 			
 			//readd of current weapon attrib
 			itemstack = entP.inventory.getCurrentItem();
-			if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributes().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 		}
 		
 		//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);
-		//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(entP)).setInteger("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));
+		//WorldDirectorMultiDim.getPlayerNBT(CoroUtilEntity.getName(entP)).putInt("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));
 		
 		return (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0));
 	}
 	
 }
+

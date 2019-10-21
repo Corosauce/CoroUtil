@@ -13,3 +13,4 @@ public class DataCondition {
         return TextFormatting.GREEN + condition + TextFormatting.RESET;
     }
 }
+

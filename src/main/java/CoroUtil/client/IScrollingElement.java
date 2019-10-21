@@ -9,3 +9,4 @@ public interface IScrollingElement {
 	public List<String> getExtraInfo2();
 	
 }
+

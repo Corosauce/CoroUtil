@@ -15,3 +15,4 @@ public class InfoArea
 		this.blockID = id;
 	}
 }
+

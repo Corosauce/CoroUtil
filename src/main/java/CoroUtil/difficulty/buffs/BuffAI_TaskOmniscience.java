@@ -32,13 +32,14 @@ public class BuffAI_TaskOmniscience extends BuffAI_TaskBase {
         CULog.dbg("trying to enhance with omniscience: " + ent.getName());
 
         //already confirmed we dont have via usual routes
-        UtilEntityBuffs.addTask(ent, EntityAIChaseFromFar.class, 4, false);
+        UtilEntityBuffs.addGoal(ent, EntityAIChaseFromFar.class, 4, false);
 
         if (!UtilEntityBuffs.hasTask(ent, EntityAINearestAttackablePlayerOmniscience.class, true)) {
 
-            UtilEntityBuffs.addTask(ent, EntityAINearestAttackablePlayerOmniscience.class, 10, true);
+            UtilEntityBuffs.addGoal(ent, EntityAINearestAttackablePlayerOmniscience.class, 10, true);
         }
 
         return true;
     }
 }
+

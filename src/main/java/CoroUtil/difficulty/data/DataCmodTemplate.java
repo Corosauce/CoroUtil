@@ -12,3 +12,4 @@ public class DataCmodTemplate {
     public List<DataCmod> cmods = new ArrayList<>();
 
 }
+

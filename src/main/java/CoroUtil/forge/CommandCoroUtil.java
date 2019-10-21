@@ -173,7 +173,7 @@ public class CommandCoroUtil extends CommandBase {
 										boolean livingOnly = true;
 										if (ent2 != null && (!livingOnly || ent2 instanceof LivingEntity)) {
 											CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
-											spawnEntity(player, ent2);
+											addEntity0(player, ent2);
 										}
 									}
 								} else {
@@ -183,7 +183,7 @@ public class CommandCoroUtil extends CommandBase {
 								if (ent != null) {
 
 									CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
-									spawnEntity(player, ent);
+									addEntity0(player, ent);
 
 								}
 							}
@@ -245,15 +245,15 @@ public class CommandCoroUtil extends CommandBase {
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    CoroUtilMisc.sendCommandSenderMsg(var1, pairs.getKey() + " = " + pairs.getValue());
-	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
+	                    CoroUtilMisc.sendCommandSenderMsg(var1, pairs.getKey() + " = " + pairs.get());
+	                    //System.out.println(pairs.getKey() + " = " + pairs.get());
 	                    it.remove();
 	                }
 				} else if (var2[0].equalsIgnoreCase("printEntities")) {
 					player.sendMessage(new StringTextComponent("Printing all entities names that might be usable in HW-Invasions, use these names in the mob_spawns json, copy these from forge logs for easier use"));
 					for (Map.Entry<ResourceLocation, EntityEntry> entry : ForgeRegistries.ENTITIES.getEntries()) {
-						if (CreatureEntity.class.isAssignableFrom(entry.getValue().getEntityClass())) {
-							player.sendMessage(new StringTextComponent(entry.getValue().getRegistryName().toString()));
+						if (CreatureEntity.class.isAssignableFrom(entry.get().getEntityClass())) {
+							player.sendMessage(new StringTextComponent(entry.get().getRegistryName().toString()));
 						}
 					}
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
@@ -313,7 +313,7 @@ public class CommandCoroUtil extends CommandBase {
 							//net.minecraft.util.Vec3 posVec = ent.getPosition(1F);
 							net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
 							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
-							//long dayNumber = (ent.world.getWorldTime() / CoroUtilWorldTime.getDayLength()) + 1;
+							//long dayNumber = (ent.world.getDayTime() / CoroUtilWorldTime.getDayLength()) + 1;
 							CoroUtilMisc.sendCommandSenderMsg(var1, "Difficulties for player: ");
 							CoroUtilMisc.sendCommandSenderMsg(var1, "equipment rating: " + TextFormatting.GREEN + CoroUtilMath.roundVal(DynamicDifficulty.getDifficultyScaleForPlayerEquipment(ent))
 									+ TextFormatting.RESET + " weight: " + TextFormatting.YELLOW + ConfigDynamicDifficulty.weightPlayerEquipment + TextFormatting.RESET + " = "
@@ -365,7 +365,7 @@ public class CommandCoroUtil extends CommandBase {
 				} else if (var2[0].equalsIgnoreCase("testitem")) {
 					/**
 					 * ResourceLocation resourcelocation = new ResourceLocation(id);
-					 Item item = (Item)Item.REGISTRY.getObject(resourcelocation);
+					 Item item = (Item)Item.REGISTRY.getOrDefault(resourcelocation);
 					 */
 					Item item = Item.getByNameOrId("particleman:particleglove");
 					if (item != null) {
@@ -535,7 +535,7 @@ public class CommandCoroUtil extends CommandBase {
 						}*/
 					} else {
 						var1.sendMessage(new StringTextComponent("Coordinate does not support repairing block, block was: " + state));
-						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
+						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getOwner(), 1));
 						world.setBlockToAir(pos);*/
 					}
 				} else if (var2[0].equalsIgnoreCase("testPower")) {
@@ -568,7 +568,7 @@ public class CommandCoroUtil extends CommandBase {
 								var1.sendMessage(new StringTextComponent("Processing entries for EnumCreatureType: " + type.name()));
 							}
 
-							List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
+							List<Biome.SpawnListEntry> list = biome.getSpawns(type);
 							boolean found = false;
 							int totalWeight = 0;
 
@@ -608,7 +608,7 @@ public class CommandCoroUtil extends CommandBase {
 		
 	}
 	
-	public void spawnEntity(PlayerEntity player, Entity ent) {
+	public void addEntity0(PlayerEntity player, Entity ent) {
 		double dist = 1D;
 		
 		double finalX = player.posX - (Math.sin(player.rotationYaw * 0.01745329F) * dist);
@@ -621,7 +621,7 @@ public class CommandCoroUtil extends CommandBase {
 		//OLD COMMENT: moved to after spawn, so client has an entity at least before syncs fire
 		//new comment: vanilla sets onInitialSpawn before spawning, so do it that way, need for better syncing
 		if (ent instanceof MobEntity) ((MobEntity)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
-		player.world.spawnEntity(ent);
+		player.world.addEntity0(ent);
 	}
 	
 	public List<String> listEntitiesSpawnable(String entName) {
@@ -725,7 +725,7 @@ public class CommandCoroUtil extends CommandBase {
             	count++;
             	if (killEntities) {
             		//ent.attackEntityFrom(DamageSource.generic, 60);
-            		ent.setDead();
+            		ent.remove();
             	}
             }
         }
@@ -750,12 +750,12 @@ public class CommandCoroUtil extends CommandBase {
 				BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
 				float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
 
-				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
+				ent.getEntityData().putBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
 				UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
 
-				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
-				spawnEntity(player, ent);
-				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, false);
+				ent.getEntityData().putBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
+				addEntity0(player, ent);
+				ent.getEntityData().putBoolean(UtilEntityBuffs.dataEntityInitialSpawn, false);
 
 				//add a bit of random to space multi spawns out
 				ent.setPosition(ent.posX + world.rand.nextDouble(), ent.posY, ent.posZ + world.rand.nextDouble());
@@ -786,3 +786,4 @@ public class CommandCoroUtil extends CommandBase {
 	}
 
 }
+

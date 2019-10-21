@@ -37,3 +37,4 @@ public class GroupInfo
 		return null;
 	}
 }
+

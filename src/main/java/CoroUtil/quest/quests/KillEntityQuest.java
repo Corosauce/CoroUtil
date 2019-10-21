@@ -64,13 +64,14 @@ public class KillEntityQuest extends ActiveQuest {
 	
 	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
-		curKillCount = parNBT.getInteger("curKillCount");
-		neededKillCount = parNBT.getInteger("neededKillCount");
+		curKillCount = parNBT.getInt("curKillCount");
+		neededKillCount = parNBT.getInt("neededKillCount");
 	}
 	
 	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
-		parNBT.setInteger("curKillCount", curKillCount);
-		parNBT.setInteger("neededKillCount", neededKillCount);
+		parNBT.putInt("curKillCount", curKillCount);
+		parNBT.putInt("neededKillCount", neededKillCount);
 	}
 }
+

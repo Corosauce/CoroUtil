@@ -106,3 +106,4 @@ public class AbilityAttackMelee extends Ability {
 	}
 
 }
+

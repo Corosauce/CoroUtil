@@ -18,3 +18,4 @@ public class ConditionContext extends DataCondition {
         return super.toString() + " { " + type + " } ";
     }
 }
+

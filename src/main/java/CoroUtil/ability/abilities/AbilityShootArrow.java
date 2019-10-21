@@ -40,13 +40,13 @@ public class AbilityShootArrow extends Ability {
 	@Override
 	public void nbtLoad(CompoundNBT nbt) {
 		super.nbtLoad(nbt);
-		projectileType = nbt.getInteger("projectileType");
+		projectileType = nbt.getInt("projectileType");
 	}
 	
 	@Override
 	public CompoundNBT nbtSave() {
 		CompoundNBT nbt = super.nbtSave();
-		nbt.setInteger("projectileType", projectileType);
+		nbt.putInt("projectileType", projectileType);
 		return nbt;
 	}
 	
@@ -98,7 +98,7 @@ public class AbilityShootArrow extends Ability {
 			//curTickCharge = 0;
 
 			if (curTickCharge > 0) {
-				int amount = 1 + (int)(10D * ((double)curTickCharge / (double)ticksToCharge) / (Minecraft.getMinecraft().gameSettings.particleSetting+1));
+				int amount = 1 + (int)(10D * ((double)curTickCharge / (double)ticksToCharge) / (Minecraft.getInstance().gameSettings.particleSetting+1));
 				
 				//System.out.println(amount);
 				
@@ -107,11 +107,11 @@ public class AbilityShootArrow extends Ability {
 		        	double speed = 0.15D;
 		        	double speedInheritFactor = 0.5D;
 		        	
-		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getMinecraft().world, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
-		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getMinecraft().world, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.getEntityBoundingBox().minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
+		        	//EntityRotFX entityfx = new EntityIconFX(Minecraft.getInstance().world, owner.posX + rand.nextDouble(), owner.boundingBox.minY+0.2, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed, ParticleRegistry.squareGrey);
+		        	EntityRotFX entityfx = particleBehavior.spawnNewParticleIconFX(Minecraft.getInstance().world, ParticleRegistry.squareGrey, owner.posX + rand.nextDouble(), owner.getBoundingBox().minY+0.8, owner.posZ + rand.nextDouble(), (rand.nextDouble() - rand.nextDouble()) * speed, 0.03D/*(rand.nextDouble() - rand.nextDouble()) * speed*/, (rand.nextDouble() - rand.nextDouble()) * speed);
 		        	particleBehavior.initParticle(entityfx);
 		        	float f = 0.0F + (rand.nextFloat() * 0.4F);
-		        	entityfx.setRBGColorF(f, f, f);
+		        	entityfx.setColor(f, f, f);
 		        	entityfx.callUpdatePB = false;
 					ExtendedRenderer.rotEffRenderer.addEffect(entityfx);
 					particleBehavior.particles.add(entityfx);
@@ -177,7 +177,7 @@ public class AbilityShootArrow extends Ability {
 				        }
 						
 						if (prj != null) {
-							owner.world.spawnEntity(prj);
+							owner.world.addEntity0(prj);
 						}
 					}
 				}
@@ -189,3 +189,4 @@ public class AbilityShootArrow extends Ability {
 	}
 
 }
+

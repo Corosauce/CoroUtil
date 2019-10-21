@@ -34,7 +34,7 @@ public class CoroUtilEntity {
     
     public static boolean canCoordBeSeenFromFeet(LivingEntity ent, int x, int y, int z)
     {
-        return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
+        return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
     public static double getDistance(Entity ent, BlockCoord coords)
@@ -112,7 +112,7 @@ public class CoroUtilEntity {
         {
             PlayerEntity entityplayer1 = (PlayerEntity)world.playerEntities.get(i);
 
-            if (!entityplayer1.capabilities.disableDamage && entityplayer1.isEntityAlive())
+            if (!entityplayer1.capabilities.disableDamage && entityplayer1.isAlive())
             {
                 double d5 = entityplayer1.getDistanceSq(p_72846_1_, p_72846_3_, p_72846_5_);
                 double d6 = p_72846_7_;
@@ -182,7 +182,7 @@ public class CoroUtilEntity {
     public static boolean canSpawnMobOnGround(World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         BlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
+        Block block = state.getOwner();
         if (CoroUtilBlock.isAir(block) || !block.canCreatureSpawn(state, world, pos, MobEntity.SpawnPlacementType.ON_GROUND)) {
             return false;
         }
@@ -193,7 +193,7 @@ public class CoroUtilEntity {
         BlockPos pos = new BlockPos(x, y, z);
         BlockPos posAir = new BlockPos(x, y + 1, z);
         BlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
+        Block block = state.getOwner();
         if (!world.canSeeSky(posAir) && (skipLightCheck || world.getLightFromNeighbors(posAir) < 5)) {
             if (!CoroUtilBlock.isAir(block) && state.getMaterial() == Material.ROCK/*(block != Blocks.grass || block.getMaterial() != Material.grass)*/) {
 
@@ -214,8 +214,8 @@ public class CoroUtilEntity {
     {
 
         float f;
-        if (source.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE) != null) {
-            f = (float)source.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+        if (source.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE) != null) {
+            f = (float)source.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).get();
         } else {
             //use default zombie damage of 3
             f = 3;
@@ -274,13 +274,14 @@ public class CoroUtilEntity {
 
     public static boolean canPathfindLongDist(CreatureEntity ent) {
         long lastPathTime = ent.getEntityData().getLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist);
-        if (ent.world.getTotalWorldTime() > lastPathTime + ConfigCoroUtilAdvanced.worldTimeDelayBetweenLongDistancePathfindTries) {
+        if (ent.world.getGameTime() > lastPathTime + ConfigCoroUtilAdvanced.worldTimeDelayBetweenLongDistancePathfindTries) {
             return true;
         }
         return false;
     }
 
     public static void updateLastTimeLongDistPathfinded(CreatureEntity ent) {
-        ent.getEntityData().setLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist, ent.world.getTotalWorldTime() + (ent.getEntityId() % 20));
+        ent.getEntityData().putLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist, ent.world.getGameTime() + (ent.getEntityId() % 20));
     }
 }
+

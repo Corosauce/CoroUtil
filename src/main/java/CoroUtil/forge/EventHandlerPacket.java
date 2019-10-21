@@ -31,18 +31,18 @@ public class EventHandlerPacket {
 
 	@OnlyIn(Dist.CLIENT)
 	public World getClientWorld() {
-		return Minecraft.getMinecraft().world;
+		return Minecraft.getInstance().world;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public PlayerEntity getClientPlayer() {
-		return Minecraft.getMinecraft().player;
+		return Minecraft.getInstance().player;
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public INBTPacketHandler getClientDataInterface() {
-		if (Minecraft.getMinecraft().currentScreen instanceof INBTPacketHandler) {
-			return (INBTPacketHandler)Minecraft.getMinecraft().currentScreen;
+		if (Minecraft.getInstance().currentScreen instanceof INBTPacketHandler) {
+			return (INBTPacketHandler)Minecraft.getInstance().currentScreen;
 		}
 		return null;
 	}
@@ -57,9 +57,9 @@ public class EventHandlerPacket {
 
 			if (command.equals("Ent_Motion")) {
 
-				final int entID = nbt.getInteger("entityID");
+				final int entID = nbt.getInt("entityID");
 
-				Minecraft.getMinecraft().addScheduledTask(() -> {
+				Minecraft.getInstance().addScheduledTask(() -> {
 
 					Entity entity = getClientWorld().getEntityByID(entID);
 					if (entity != null) {
@@ -71,8 +71,8 @@ public class EventHandlerPacket {
 				});
 
 			} else if (command.equals("UpdateBlockList")) {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					World world = Minecraft.getMinecraft().world;
+				Minecraft.getInstance().addScheduledTask(() -> {
+					World world = Minecraft.getInstance().world;
 					if (world == null) return;
 					String blacklistMineable_RegularBlocks = nbt.getString("blacklistRepairable_RegularBlocks");
 					String whitelistMineable_TileEntities = nbt.getString("whitelistMineable_TileEntities");
@@ -83,16 +83,16 @@ public class EventHandlerPacket {
 				});
 			} else if (command.equals("DebugRender")) {
 
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					World world = Minecraft.getMinecraft().world;
+				Minecraft.getInstance().addScheduledTask(() -> {
+					World world = Minecraft.getInstance().world;
 					if (world == null) return;
-					BlockPos pos = new BlockPos(nbt.getInteger("posX"), nbt.getInteger("posY"), nbt.getInteger("posZ"));
-					DebugRenderEntry entry = new DebugRenderEntry(pos, world.getTotalWorldTime() + nbt.getInteger("time"), nbt.getInteger("color"));
+					BlockPos pos = new BlockPos(nbt.getInt("posX"), nbt.getInt("posY"), nbt.getInt("posZ"));
+					DebugRenderEntry entry = new DebugRenderEntry(pos, world.getGameTime() + nbt.getInt("time"), nbt.getInt("color"));
 					DebugRenderer.addRenderable(entry);
 				});
 
 			} else if (command.equals("DebugRenderClear")) {
-				Minecraft.getMinecraft().addScheduledTask(() -> DebugRenderer.clearRenderables());
+				Minecraft.getInstance().addScheduledTask(() -> DebugRenderer.clearRenderables());
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -111,8 +111,8 @@ public class EventHandlerPacket {
 			//System.out.println("CoroUtil packet command from server: " + command);
 			
 			if (command.equals("CoroAI_Inv")) {
-				int entID = nbt.getInteger("entID");
-				ItemStack is = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("itemstack"));
+				int entID = nbt.getInt("entID");
+				ItemStack is = ItemStack.loadItemStackFromNBT(nbt.getCompound("itemstack"));
 				
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity instanceof ICoroAI) {
@@ -132,22 +132,22 @@ public class EventHandlerPacket {
 				
 			} else if (command.equals("CoroAI_Ent")) {
 				
-				int entID = nbt.getInteger("entityID");
+				int entID = nbt.getInt("entityID");
 				
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity instanceof IEntityPacket) {
-					((IEntityPacket) entity).handleNBTFromServer(nbt.getCompoundTag("abilities"));
+					((IEntityPacket) entity).handleNBTFromServer(nbt.getCompound("abilities"));
 				}
 				
-				NBTTagCompound abilities = nbt.getCompoundTag("abilities");
+				NBTTagCompound abilities = nbt.getCompound("abilities");
 				Iterator it = abilities.func_150296_c().iterator();
                 while (it.hasNext()) {
                 	String tagName = (String) it.next();
-                	NBTTagCompound entry = abilities.getCompoundTag(tagName);
+                	NBTTagCompound entry = abilities.getCompound(tagName);
                 }
 			} else if (command.equals("QuestData")) {
 				//receiving quest data for a specific player
-				NBTTagCompound data = nbt.getCompoundTag("data");
+				NBTTagCompound data = nbt.getCompound("data");
 				
 				PlayerQuests quests = PlayerQuestManager.i().getPlayerQuests(getClientPlayer());
 				
@@ -156,7 +156,7 @@ public class EventHandlerPacket {
 				quests.nbtLoad(data);
 			} else if (command.equals("Ent_Motion")) {
 				
-				int entID = nbt.getInteger("entityID");
+				int entID = nbt.getInt("entityID");
 				
 				Entity entity = getClientWorld().getEntityByID(entID);
 				if (entity != null) {
@@ -184,11 +184,11 @@ public class EventHandlerPacket {
 			//System.out.println("CoroUtil packet command from client: " + command);
 			
 			if (command.equals("CoroAI_TEntCmd")) {
-				int dimID = nbt.getInteger("dimID");
-				int x = nbt.getInteger("x");
-				int y = nbt.getInteger("y");
-				int z = nbt.getInteger("z");
-				NBTTagCompound nbtData = nbt.getCompoundTag("data");
+				int dimID = nbt.getInt("dimID");
+				int x = nbt.getInt("x");
+				int y = nbt.getInt("y");
+				int z = nbt.getInt("z");
+				NBTTagCompound nbtData = nbt.getCompound("data");
 				
 				World world = DimensionManager.getWorld(dimID);
 				if (world != null) {
@@ -211,3 +211,4 @@ public class EventHandlerPacket {
 	}*/
 	
 }
+

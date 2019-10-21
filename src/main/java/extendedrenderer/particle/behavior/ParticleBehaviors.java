@@ -106,9 +106,9 @@ public class ParticleBehaviors {
 		
 		if (particle.getAge() < stateChangeTick) {
 			particle.setGravity(-0.2F);
-			particle.setRBGColorF(particle.getRedColorF() - brightnessShiftRate, particle.getGreenColorF() - brightnessShiftRate, particle.getBlueColorF() - brightnessShiftRate);
+			particle.setColor(particle.getRedColorF() - brightnessShiftRate, particle.getGreenColorF() - brightnessShiftRate, particle.getBlueColorF() - brightnessShiftRate);
 		} else if (particle.getAge() == stateChangeTick) {
-			particle.setRBGColorF(0,0,0);
+			particle.setColor(0,0,0);
 		} else {
 			brightnessShiftRate = rateBrighten;
 			particle.setGravity(-0.05F);
@@ -119,7 +119,7 @@ public class ParticleBehaviors {
 				brightnessShiftRate = rateBrightenSlower;
 			}
 			
-			particle.setRBGColorF(particle.getRedColorF() + brightnessShiftRate, particle.getGreenColorF() + brightnessShiftRate, particle.getBlueColorF() + brightnessShiftRate);
+			particle.setColor(particle.getRedColorF() + brightnessShiftRate, particle.getGreenColorF() + brightnessShiftRate, particle.getBlueColorF() + brightnessShiftRate);
 			
 			if (particle.getAlphaF() > 0) {
 				particle.setAlphaF(particle.getAlphaF() - rateAlpha);
@@ -191,7 +191,7 @@ public class ParticleBehaviors {
 	
 	public static EntityRotFX setParticleFire(EntityRotFX particle) {
 		Random rand = new Random();
-		particle.setRBGColorF(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.2F), 0);
+		particle.setColor(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.2F), 0);
 		particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
 		particle.setSize(0.1F, 0.1F);
@@ -212,7 +212,7 @@ public class ParticleBehaviors {
         particle.callUpdateSuper = false;
         particle.callUpdatePB = false;
         particle.setMaxAge(500);
-        particle.setRBGColorF(1F, 1F, 1F);
+        particle.setColor(1F, 1F, 1F);
         particle.brightness = 0.3F;//- ((200F - particle.spawnY) * 0.05F);
         particle.renderRange = 999F;
         particle.setAlphaF(0F);
@@ -224,3 +224,4 @@ public class ParticleBehaviors {
 	}
 	
 }
+

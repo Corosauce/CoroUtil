@@ -16,3 +16,4 @@ public class DataLatcher {
 		values.put(DataTypes.shouldDespawn, true);
 	}
 }
+

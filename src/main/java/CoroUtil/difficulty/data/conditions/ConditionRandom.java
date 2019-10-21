@@ -13,3 +13,4 @@ public class ConditionRandom extends DataCondition {
         return super.toString() + " { " + "weight: " + weight + " }";
     }
 }
+

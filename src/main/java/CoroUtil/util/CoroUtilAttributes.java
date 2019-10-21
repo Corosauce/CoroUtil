@@ -14,3 +14,4 @@ public class CoroUtilAttributes {
     //public static AttributeModifier speedModifier = new AttributeModifier("speed multiplier boost", speedBoost, EnumAttribModifierType.MULTIPLY_ALL.ordinal());
 
 }
+

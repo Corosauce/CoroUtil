@@ -43,11 +43,11 @@ public class PlayerDataObject {
 			Map.Entry pairs = (Map.Entry)it.next();
 			
 			String entryModule = (String)pairs.getKey();
-			IPlayerData pdo = (IPlayerData)pairs.getValue();
+			IPlayerData pdo = (IPlayerData)pairs.get();
 
 			pdo.init(username);
 			
-			CompoundNBT nbt = parNBT.getCompoundTag(entryModule);
+			CompoundNBT nbt = parNBT.getCompound(entryModule);
 			if (nbt != null) {
 				pdo.nbtLoad(nbt);
 			} else {
@@ -64,9 +64,9 @@ public class PlayerDataObject {
 			Map.Entry pairs = (Map.Entry)it.next();
 			
 			String entryModule = (String)pairs.getKey();
-			IPlayerData pdo = (IPlayerData)pairs.getValue();
+			IPlayerData pdo = (IPlayerData)pairs.get();
 			
-			CompoundNBT nbt = data.getCompoundTag(entryModule);
+			CompoundNBT nbt = data.getCompound(entryModule);
 			if (nbt != null) {
 				pdo.nbtSyncFromServer(nbt);
 			}
@@ -74,3 +74,4 @@ public class PlayerDataObject {
 	}
 	
 }
+

@@ -27,3 +27,4 @@ public class AnimationStateObject {
     	name = parName;
     }
 }
+

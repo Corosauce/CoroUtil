@@ -24,3 +24,4 @@ public class DamageSourceEntry {
                 ", timeDiffSeconds: " + timeDiffSeconds + ", lastLogTime: " + lastLogTime + ", source_pos: " + source_pos.toString();
     }
 }
+

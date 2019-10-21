@@ -138,7 +138,7 @@ public class CoroUtilBlockLightCache {
         int i = world.getLightFromNeighborsFor(LightType.SKY, pos);
         int j = world.getLightFromNeighborsFor(LightType.BLOCK, pos);
 
-        int[] texData = Minecraft.getMinecraft().entityRenderer.lightmapTexture.getTextureData();
+        int[] texData = Minecraft.getInstance().entityRenderer.lightmapTexture.getTextureData();
 
         int color = texData[(i * 16) + j];
 
@@ -147,3 +147,4 @@ public class CoroUtilBlockLightCache {
     }
 
 }
+

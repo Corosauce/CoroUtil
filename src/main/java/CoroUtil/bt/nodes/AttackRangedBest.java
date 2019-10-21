@@ -123,7 +123,7 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 	}
 	
 	public boolean comboActive() {
-		return !isReady.getValue();
+		return !isReady.get();
 	}
 	
 	public void abilityStart(Ability ability, Entity parTarget) {
@@ -160,3 +160,4 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 	}
 	
 }
+

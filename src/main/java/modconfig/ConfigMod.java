@@ -98,7 +98,7 @@ public class ConfigMod {
 	    while (it.hasNext()) {
 	        Map.Entry pairs = (Map.Entry)it.next();
 	        String name = (String)pairs.getKey();
-	        Object val = pairs.getValue();
+	        Object val = pairs.get();
 	        String comment = getComment(modid, name);
 	        ConfigEntryInfo info = new ConfigEntryInfo(configLookup.get(modid).configData.size(), name, val, comment);
 	        configLookup.get(modid).configData.add(info);
@@ -228,3 +228,4 @@ public class ConfigMod {
     
     /* Main Usage Methods End */
 }
+

@@ -163,7 +163,7 @@ public class CoroUtil {
 	    		while (it2.hasNext()) {
 	    			Entry<String, Class<? extends Entity>> entReg = it2.next();
 	    			
-	    			System.out.println(entReg.getKey() + " - " + entReg.getValue());
+	    			System.out.println(entReg.getKey() + " - " + entReg.get());
 	    		}*/
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -234,3 +234,4 @@ public class CoroUtil {
     	CULog.dbg(obj);
 	}
 }
+

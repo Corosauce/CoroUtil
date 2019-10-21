@@ -11,8 +11,8 @@ public interface ISimulationTickable {
 	public void initPost();
 	public void tickUpdate();
 	public void tickUpdateThreaded();
-	public void readFromNBT(CompoundNBT parData);
-	public CompoundNBT writeToNBT(CompoundNBT parData);
+	public void read(CompoundNBT parData);
+	public CompoundNBT write(CompoundNBT parData);
 	public void cleanup();
 	public void setWorldID(int ID);
 	public World getWorld();
@@ -21,3 +21,4 @@ public interface ISimulationTickable {
 	public boolean isThreaded();
 	public String getSharedSimulationName();
 }
+

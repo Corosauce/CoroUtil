@@ -74,7 +74,7 @@ public class GuiBetterTextField extends AbstractGui
     /**
      * Increments the cursor counter
      */
-    public void updateCursorCounter()
+    public void tick()
     {
         ++this.cursorCounter;
     }
@@ -455,7 +455,7 @@ public class GuiBetterTextField extends AbstractGui
 
         if (this.canLoseFocus)
         {
-            this.setFocused(this.isEnabled && flag);
+            this.setFocused2(this.isEnabled && flag);
         }
 
         if (this.isFocused && eventButton == 0)
@@ -467,7 +467,7 @@ public class GuiBetterTextField extends AbstractGui
                 l -= 4;
             }
 
-            String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
+            String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getAdjustedWidth());
             this.setCursorPosition(this.fontRenderer.trimStringToWidth(s, l).length() + this.lineScrollOffset);
 
             if (flag && (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
@@ -498,7 +498,7 @@ public class GuiBetterTextField extends AbstractGui
             int i = this.isEnabled ? this.enabledColor : this.disabledColor;
             int j = this.cursorPosition - this.lineScrollOffset;
             int k = this.selectionEnd - this.lineScrollOffset;
-            String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getWidth());
+            String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), this.getAdjustedWidth());
             boolean flag = j >= 0 && j <= s.length();
             boolean flag1 = this.isFocused && this.cursorCounter / 6 % 2 == 0 && flag;
             int l = this.enableBackgroundDrawing ? this.xPos + 4 : this.xPos;
@@ -649,7 +649,7 @@ public class GuiBetterTextField extends AbstractGui
     /**
      * setter for the focused field
      */
-    public void setFocused(boolean par1)
+    public void setFocused2(boolean par1)
     {
         if (par1 && !this.isFocused)
         {
@@ -683,7 +683,7 @@ public class GuiBetterTextField extends AbstractGui
     /**
      * returns the width of the textbox depending on if the the box is enabled
      */
-    public int getWidth()
+    public int getAdjustedWidth()
     {
         return this.getEnableBackgroundDrawing() ? this.width - 8 : this.width;
     }
@@ -714,7 +714,7 @@ public class GuiBetterTextField extends AbstractGui
                 this.lineScrollOffset = j;
             }
 
-            int k = this.getWidth();
+            int k = this.getAdjustedWidth();
             String s = this.fontRenderer.trimStringToWidth(this.text.substring(this.lineScrollOffset), k);
             int l = s.length() + this.lineScrollOffset;
 
@@ -768,3 +768,4 @@ public class GuiBetterTextField extends AbstractGui
         this.visible = par1;
     }
 }
+

@@ -14,3 +14,4 @@ public class NoteHelper {
 	public static int NOTES_IN_OCTIVE = 12;
 	
 }
+

@@ -128,3 +128,4 @@ public class AIBTTamable {
 		ownerCachedInstance = null;
 	}
 }
+

@@ -13,3 +13,4 @@ public class CmodMobDrops extends DataCmod {
         return super.toString() + ": " + loot_table;
     }
 }
+

@@ -79,7 +79,7 @@ public class PathNavigateCustom
     {
         this.theEntity = par1EntityLiving;
         this.world = par2World;
-        this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+        this.pathSearchRange = par1EntityLiving.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
         this.pathFinder = getPathFinder();
     }
     
@@ -150,7 +150,7 @@ public class PathNavigateCustom
      */
     public float getPathSearchRange()
     {
-        return (float)this.pathSearchRange.getAttributeValue();
+        return (float)this.pathSearchRange.get();
     }
 
     /**
@@ -243,7 +243,7 @@ public class PathNavigateCustom
 
             if (this.noSunPathfind)
             {
-                this.removeSunnyPath();
+                this.trimPath();
             }
 
             if (this.currentPath.getCurrentPathLength() == 0)
@@ -269,7 +269,7 @@ public class PathNavigateCustom
         return this.currentPath;
     }
 
-    public void onUpdateNavigation()
+    public void tick()
     {
         ++this.totalTicks;
 
@@ -311,7 +311,7 @@ public class PathNavigateCustom
         	//System.out.println(this.getEntityPosition() + " - " + this.currentPath.getCurrentPathIndex() + " / " + i);
         	
         	PathPoint pp = this.currentPath.getPathPointFromIndex(this.currentPath.getCurrentPathIndex());
-        	Block block = this.theEntity.world.getBlockState(new BlockPos(pp.x, pp.y, pp.z)).getBlock();
+        	Block block = this.theEntity.world.getBlockState(new BlockPos(pp.x, pp.y, pp.z)).getOwner();
         	//System.out.println("block type for next node: " + block);
         	
         	if (block.getMaterial(block.getDefaultState()) == Material.WATER || block.getMaterial(block.getDefaultState()) == Material.LAVA) {
@@ -410,8 +410,8 @@ public class PathNavigateCustom
     {
         if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
-            int i = (int)this.theEntity.getEntityBoundingBox().minY;
-            Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
+            int i = (int)this.theEntity.getBoundingBox().minY;
+            Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getOwner();
             int k = 0;
 
             do
@@ -422,16 +422,16 @@ public class PathNavigateCustom
                 }
 
                 ++i;
-                block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
+                block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getOwner();
                 ++k;
             }
             while (k <= 16);
 
-            return (int)this.theEntity.getEntityBoundingBox().minY;
+            return (int)this.theEntity.getBoundingBox().minY;
         }
         else
         {
-            return (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D);
+            return (int)(this.theEntity.getBoundingBox().minY + 0.5D);
         }
     }
 
@@ -455,9 +455,9 @@ public class PathNavigateCustom
     /**
      * Trims path data from the end to the first sun covered block
      */
-    private void removeSunnyPath()
+    private void trimPath()
     {
-        if (!this.world.canBlockSeeSky(new BlockPos(MathHelper.floor(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor(this.theEntity.posZ))))
+        if (!this.world.canBlockSeeSky(new BlockPos(MathHelper.floor(this.theEntity.posX), (int)(this.theEntity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.theEntity.posZ))))
         {
             for (int i = 0; i < this.currentPath.getCurrentPathLength(); ++i)
             {
@@ -579,7 +579,7 @@ public class PathNavigateCustom
 
                     if (d2 * par8 + d3 * par10 >= 0.0D)
                     {
-                    	Block block = this.world.getBlockState(new BlockPos(i2, par2 - 1, j2)).getBlock();
+                    	Block block = this.world.getBlockState(new BlockPos(i2, par2 - 1, j2)).getOwner();
                         Material material = block.getMaterial(block.getDefaultState());
 
                         if (material == Material.AIR)
@@ -616,7 +616,7 @@ public class PathNavigateCustom
 
             if (d0 * p_179692_8_ + d1 * p_179692_10_ >= 0.0D)
             {
-                Block block = this.world.getBlockState(blockpos).getBlock();
+                Block block = this.world.getBlockState(blockpos).getOwner();
 
                 if (!block.isPassable(this.world, blockpos))
                 {
@@ -628,3 +628,4 @@ public class PathNavigateCustom
         return true;
     }
 }
+

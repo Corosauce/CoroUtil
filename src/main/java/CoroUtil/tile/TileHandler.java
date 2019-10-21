@@ -89,8 +89,8 @@ public class TileHandler {
 		tileDataWatcher.updateObject(mapNameToID.get(name), newValue);
 	}
 	
-	public Object getObject(String name) {
-		return tileDataWatcher.getWatchedObject(mapNameToID.get(name)).getObject();
+	public Object getOrDefault(String name) {
+		return tileDataWatcher.getWatchedObject(mapNameToID.get(name)).getOrDefault();
 	}
 	
 	public void handleServerSentDataWatcherList(List parList) {
@@ -98,3 +98,4 @@ public class TileHandler {
 		tileDataWatcher.updateWatchedObjectsFromList(parList);
 	}*/
 }
+

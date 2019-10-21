@@ -63,3 +63,4 @@ public class ConfigBlockDestruction implements IConfigCategory {
 	}
 
 }
+

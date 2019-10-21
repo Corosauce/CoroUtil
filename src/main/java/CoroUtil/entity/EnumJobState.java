@@ -12,3 +12,4 @@ public enum EnumJobState {
 	static { for(EnumJobState e : EnumSet.allOf(EnumJobState.class)) { lookup.put(e.ordinal(), e); } }
 	public static EnumJobState get(int intValue) { return lookup.get(intValue); }
 }
+

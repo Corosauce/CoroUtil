@@ -27,3 +27,4 @@ public @interface ConfigComment {
      */
     String[] value() default "";
 }
+

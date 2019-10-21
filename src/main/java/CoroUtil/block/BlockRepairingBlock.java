@@ -68,9 +68,9 @@ public class BlockRepairingBlock extends ContainerBlock
 
         //special behavior to let block only be selectable to repair if correct context
 
-        if (Minecraft.getMinecraft().player != null &&
-                (/*!Minecraft.getMinecraft().player.isSneaking() &&*/
-                        Minecraft.getMinecraft().player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
+        if (Minecraft.getInstance().player != null &&
+                (/*!Minecraft.getInstance().player.isSneaking() &&*/
+                        Minecraft.getInstance().player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
             return AABB;
         } else {
             return NO_COLLIDE_AABB;
@@ -117,7 +117,7 @@ public class BlockRepairingBlock extends ContainerBlock
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public BlockRenderLayer getBlockLayer()
+    public BlockRenderLayer getRenderLayer()
     {
         return BlockRenderLayer.CUTOUT;
     }
@@ -184,7 +184,7 @@ public class BlockRepairingBlock extends ContainerBlock
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, BlockState state, Random rand)
+    public void tick(World world, BlockPos pos, BlockState state, Random rand)
     {
         if (world.isRemote) return;
 
@@ -206,3 +206,4 @@ public class BlockRepairingBlock extends ContainerBlock
         return Items.AIR;
     }
 }
+

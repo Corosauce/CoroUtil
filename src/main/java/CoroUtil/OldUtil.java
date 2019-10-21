@@ -423,9 +423,9 @@ public class OldUtil {
     
     //public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
     //public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
-    //public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
-    public static float getMoveSpeed(LivingEntity ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue(); }
-    //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
+    //public static void checkDespawn(EntityLiving ent) { ent.checkDespawn(); }
+    public static float getMoveSpeed(LivingEntity ent) { return (float) ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get(); }
+    //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
     public static void jump(LivingEntity ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
     public static boolean chunkExists(World world, int x, int z) { return world.isBlockLoaded(new BlockPos(x * 16, 128, z * 16)); } //fixed for 1.5
@@ -435,7 +435,8 @@ public class OldUtil {
     public static double getDistanceXZ(Entity ent, BlockCoord coords) { return ent.getDistance(coords.posX, ent.posY, coords.posZ); }
     public static double getDistanceXZ(BlockCoord coords, BlockCoord coords2) { return Math.sqrt(coords.distanceSq(coords2.posX, coords.posY, coords2.posZ)); }
     public static boolean canVecSeeCoords (World parWorld, Vec3 parVec, double posX, double posY, double posZ) {	return parWorld.rayTraceBlocks(new Vec3d(parVec.xCoord, parVec.yCoord, parVec.zCoord), new Vec3d(posX, posY, posZ)) == null; }
-    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(posX, posY, posZ)) == null; }
+    public static boolean canEntSeeCoords (Entity ent, double posX, double posY, double posZ) {	return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getBoundingBox().minY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(posX, posY, posZ)) == null; }
     public static boolean canCoordsSeeCoords (World world, double posX, double posY, double posZ, double posX2, double posY2, double posZ2) {	return world.rayTraceBlocks(new Vec3d(posX, posY, posZ), new Vec3d(posX2, posY2, posZ2)) == null; }
     //public static void dropItems(EntityLivingBase ent, boolean what, int what2) { ent.dropFewItems(what, what2); }
 }
+

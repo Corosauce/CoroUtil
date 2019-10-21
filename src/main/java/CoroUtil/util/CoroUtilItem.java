@@ -25,7 +25,7 @@ public class CoroUtilItem {
 	
 	public static Item getItemByName(String name) {
 		try {
-			Object obj = Item.REGISTRY.getObject(new ResourceLocation(name));
+			Object obj = Item.REGISTRY.getOrDefault(new ResourceLocation(name));
 			if (obj != null) {
 				return (Item) obj;
 			} else {
@@ -38,7 +38,7 @@ public class CoroUtilItem {
 	}
 	
 	public static String getNameByItem(Item item) {
-		return Item.REGISTRY.getNameForObject(item).toString();
+		return Item.REGISTRY.getKey(item).toString();
 	}
 	
 	public static float getLeftClickDamage(ItemStack is) {
@@ -48,7 +48,7 @@ public class CoroUtilItem {
 		Multimap map = is.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND, is);
 		attributes.applyAttributeModifiers(map);
 		try {
-			return (float)attributes.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+			return (float)attributes.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).get();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return 1;
@@ -105,7 +105,7 @@ public class CoroUtilItem {
                 entityitem.motionZ += Math.sin((double)f1) * (double)f;
             }
 
-            parEnt.world.spawnEntity(entityitem);
+            parEnt.world.addEntity0(entityitem);
             //this.addStat(StatList.dropStat, 1);
             return entityitem;
         }
@@ -114,3 +114,4 @@ public class CoroUtilItem {
 	
 	
 }
+

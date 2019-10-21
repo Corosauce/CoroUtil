@@ -21,16 +21,16 @@ public class ParticleBehaviorMiniTornado extends ParticleBehaviors {
 		//particle.rotationPitch = rand.nextInt(360);
 		particle.setMaxAge(1+rand.nextInt(10));
 		particle.setGravity(0F);
-		particle.setRBGColorF(72F/255F, 239F/255F, 8F/255F);
+		particle.setColor(72F/255F, 239F/255F, 8F/255F);
 		//red
-		particle.setRBGColorF(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
+		particle.setColor(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
 		//green
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
 		//tealy blue
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
-		//particle.setRBGColorF(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
 		float greyScale = 0.5F + (rand.nextFloat() * 0.3F);
-		particle.setRBGColorF(greyScale, greyScale, greyScale);
+		particle.setColor(greyScale, greyScale, greyScale);
 		
 		particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
@@ -92,7 +92,7 @@ public class ParticleBehaviorMiniTornado extends ParticleBehaviors {
 				
 				//System.out.println(ageScale);
 				
-				double timeAdj = Math.toRadians(particle.getWorld().getTotalWorldTime() % 360);
+				double timeAdj = Math.toRadians(particle.getWorld().getGameTime() % 360);
 				
 				double twistScale = 0.035D * Math.sin(timeAdj);
 				
@@ -114,3 +114,4 @@ public class ParticleBehaviorMiniTornado extends ParticleBehaviors {
 		//}
 	}
 }
+

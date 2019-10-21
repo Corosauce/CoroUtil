@@ -32,7 +32,7 @@ public class ClientProxy extends CommonProxy
         
         ClientCommandHandler.instance.registerCommand(new CommandCoroUtilClient());
 
-        addMapping(EntityBatSmart.class, new RenderBatSmart(Minecraft.getMinecraft().getRenderManager()));
+        addMapping(EntityBatSmart.class, new RenderBatSmart(Minecraft.getInstance().getRenderManager()));
     }
 
     @Override
@@ -62,3 +62,4 @@ public class ClientProxy extends CommonProxy
         RenderingRegistry.registerEntityRenderingHandler(entityClass, render);
     }
 }
+

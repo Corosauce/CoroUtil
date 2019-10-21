@@ -58,7 +58,7 @@ public class BuffInventoryDifficultyScaled extends BuffBase {
                     }
                 }
 
-                //update skeleton AI for melee/bow
+                //tick skeleton AI for melee/bow
                 if (ent instanceof AbstractSkeletonEntity) {
                     ((AbstractSkeletonEntity) ent).setCombatTask();
                 }
@@ -74,3 +74,4 @@ public class BuffInventoryDifficultyScaled extends BuffBase {
         return super.applyBuff(ent, difficulty);
     }
 }
+

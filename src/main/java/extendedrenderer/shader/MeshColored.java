@@ -159,3 +159,4 @@ public class MeshColored {
         glDeleteVertexArrays(vaoId);
     }
 }
+

@@ -49,3 +49,4 @@ public class CmodInventory extends DataCmod {
         return code + registryName + TextFormatting.RESET + ", ";
     }
 }
+

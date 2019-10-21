@@ -115,7 +115,7 @@ public class AIInventory {
 
             if (inventory.invList[i] != null)
             {
-            	inventory.invList[i].writeToNBT(nbttagcompound1);
+            	inventory.invList[i].write(nbttagcompound1);
             }
 
             nbttaglist.appendTag(nbttagcompound1);
@@ -130,13 +130,13 @@ public class AIInventory {
 		ListNBT nbttaglist;
         int i;
 
-        if (parNBT.hasKey("listInv", 9))
+        if (parNBT.contains("listInv", 9))
         {
-            nbttaglist = parNBT.getTagList("listInv", 10);
+            nbttaglist = parNBT.getList("listInv", 10);
 
             for (i = 0; i < inventory.invList.length; ++i)
             {
-            	inventory.invList[i] = new ItemStack(nbttaglist.getCompoundTagAt(i));
+            	inventory.invList[i] = new ItemStack(nbttaglist.write(i));
             }
         }
 	}/*
@@ -188,7 +188,7 @@ public class AIInventory {
 	}
 	
 	public void tickItemPickupScan() {
-    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().grow(2.0D, 1.0D, 2.0D));
+    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getBoundingBox().grow(2.0D, 1.0D, 2.0D));
     	
         if(var3 != null) {
             for(int var4 = 0; var4 < var3.size(); ++var4) {
@@ -208,7 +208,7 @@ public class AIInventory {
 		inventory.addItemStackToInventory(is);
 		if (is.getCount() <= 0)
         {
-			parItem.setDead();
+			parItem.remove();
         }
 	}
 	
@@ -221,3 +221,4 @@ public class AIInventory {
     	//fakePlayer = null;
     }
 }
+

@@ -60,3 +60,4 @@ public class ExtendedRenderer {
 		if (true) System.out.println(obj);
 	}
 }
+

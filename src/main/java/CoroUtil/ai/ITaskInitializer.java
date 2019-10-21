@@ -8,3 +8,4 @@ public interface ITaskInitializer {
 	public void setEntity(CreatureEntity creature);
 	
 }
+

@@ -7,7 +7,7 @@ import java.io.File;
 
 public class ConfigCoroUtilAdvanced implements IConfigCategory {
 
-	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the update, which is 30 seconds")
+	@ConfigComment("max repair speed will be whatever scheduleBlockUpdate set the tick, which is 30 seconds")
 	public static boolean repairBlockNextRandomTick = false;
 
 	@ConfigComment("Probably usefull if you want zombie miners get stopped by FTBU claimed chunks for example, but i dont want this behavior by default")
@@ -87,3 +87,4 @@ public class ConfigCoroUtilAdvanced implements IConfigCategory {
 	}
 
 }
+

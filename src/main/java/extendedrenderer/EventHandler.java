@@ -67,21 +67,21 @@ public class EventHandler {
     public void tickClient(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
 
-            Minecraft mc = Minecraft.getMinecraft();
+            Minecraft mc = Minecraft.getInstance();
             if (mc.world != null) {
                 if (!isPaused()) {
-                    ExtendedRenderer.rotEffRenderer.updateEffects();
+                    ExtendedRenderer.rotEffRenderer.tick();
 
                     boolean lightningActive = mc.world.getLastLightningBolt() > 0;
 
-                    if (mc.world.getTotalWorldTime() % 2 == 0 || lightningActive != lastLightningBoltLightState) {
+                    if (mc.world.getGameTime() % 2 == 0 || lightningActive != lastLightningBoltLightState) {
                         CoroUtilBlockLightCache.clear();
                     }
 
                     lastLightningBoltLightState = lightningActive;
                 }
-                //if (mc.theWorld.getTotalWorldTime() != lastWorldTime) {
-                    //lastWorldTime = mc.theWorld.getTotalWorldTime();
+                //if (mc.theWorld.getGameTime() != lastWorldTime) {
+                    //lastWorldTime = mc.theWorld.getGameTime();
 
 
                 //}
@@ -95,7 +95,7 @@ public class EventHandler {
             if (flagFoliageUpdate) {
                 CULog.dbg("CoroUtil detected a need to reload resource packs, initiating");
                 flagFoliageUpdate = false;
-                Minecraft.getMinecraft().refreshResources();
+                Minecraft.getInstance().refreshResources();
             }
         }
     }
@@ -131,11 +131,11 @@ public class EventHandler {
 
     @OnlyIn(Dist.CLIENT)
     public static void hookRenderShaders(float partialTicks) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         if (mc.world == null || mc.player == null) return;
 
-        //update world reference and clear old effects on world change or on no world
+        //tick world reference and clear old effects on world change or on no world
         if (lastWorld != mc.world) {
             CULog.log("CoroUtil: resetting rotating particle renderer");
             ExtendedRenderer.rotEffRenderer.clearEffects(mc.world);
@@ -216,7 +216,7 @@ public class EventHandler {
     @OnlyIn(Dist.CLIENT)
     public static void preShaderRender(Entity entityIn, float partialTicks) {
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         EntityRenderer er = mc.entityRenderer;
 
         GlStateManager.enableBlend();
@@ -287,7 +287,7 @@ public class EventHandler {
 
         //restore original mipmap state
         if (!ConfigCoroUtilAdvanced.disableMipmapFix) {
-            Minecraft.getMinecraft().renderEngine.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+            Minecraft.getInstance().renderEngine.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
         }
@@ -330,20 +330,20 @@ public class EventHandler {
         if (true) return;
 
         /*Map<ModelResourceLocation, IModel> stateModels = ReflectionHelper.getPrivateValue(ModelLoader.class, event.getModelLoader(), "stateModels");
-        for (ModelResourceLocation mrl : event.getModelRegistry().getKeys()) {
+        for (ModelResourceLocation mrl : event.getModelRegistry().keySet()) {
             IModel model = stateModels.get(mrl);
         }*/
 
-        IBakedModel blank = event.getModelRegistry().getObject(new ModelResourceLocation("coroutil:blank", "normal"));
+        IBakedModel blank = event.getModelRegistry().getOrDefault(new ModelResourceLocation("coroutil:blank", "normal"));
 
-        for (ModelResourceLocation res : event.getModelRegistry().getKeys()) {
+        for (ModelResourceLocation res : event.getModelRegistry().keySet()) {
 
             System.out.println(res.toString());
 
-            IBakedModel model = event.getModelRegistry().getObject(res);
+            IBakedModel model = event.getModelRegistry().getOrDefault(res);
 
-            String domain = res.getResourceDomain();
-            String blockName = res.getResourcePath();
+            String domain = res.getNamespace();
+            String blockName = res.getPath();
             String variant = res.getVariant();
 
             if (blockName.equals("wheat")) {
@@ -377,3 +377,4 @@ public class EventHandler {
         }
     }
 }
+

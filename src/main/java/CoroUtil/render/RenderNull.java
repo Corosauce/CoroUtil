@@ -26,3 +26,4 @@ public class RenderNull extends EntityRenderer
 		return null;
 	}
 }
+

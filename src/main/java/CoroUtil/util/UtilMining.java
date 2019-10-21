@@ -68,7 +68,7 @@ public class UtilMining {
 
 		//optimizations to avoid doing full collision check where possible
 		if (world.isAirBlock(pos)) return false;
-		if (world.getBlockState(pos).getBlock() == CommonProxy.blockRepairingBlock) return false;
+		if (world.getBlockState(pos).getOwner() == CommonProxy.blockRepairingBlock) return false;
 
 		return blockHasCollision(world, pos);
 	}
@@ -220,7 +220,7 @@ public class UtilMining {
 		BlockState state = world.getBlockState(pos);
 
 		//dont mine tile entities
-		if (state.getBlock().isAir(state, world, pos) || state.getBlock() == CommonProxy.blockRepairingBlock) {
+		if (state.getOwner().isAir(state, world, pos) || state.getOwner() == CommonProxy.blockRepairingBlock) {
 			return false;
 		}
 		if (TaskDigTowardsTarget.preventMinedTileEntitiesDuringInvasions && world.getTileEntity(pos) != null) {
@@ -284,8 +284,8 @@ public class UtilMining {
 			player.setPosition(pos.getX(), pos.getY(), pos.getZ());
 
 			//this is the general structure used by player removal, we will follow but also make sure blocks actually always removed, not live by exact rules
-			boolean actuallyRemoved = stateRemove.getBlock().removedByPlayer(stateRemove, world, pos, player, true);
-			boolean canHarvest = stateRemove.getBlock().canHarvestBlock(world, pos, player);
+			boolean actuallyRemoved = stateRemove.getOwner().removedByPlayer(stateRemove, world, pos, player, true);
+			boolean canHarvest = stateRemove.getOwner().canHarvestBlock(world, pos, player);
 
 			//if block wont play nice, force it now, youre not stopping my zombie miners
 			if (!actuallyRemoved && forceRemoveIfNeeded) {
@@ -294,10 +294,10 @@ public class UtilMining {
 			}
 
 			if (actuallyRemoved) {
-				stateRemove.getBlock().onBlockDestroyedByPlayer(world, pos, stateRemove);
+				stateRemove.getOwner().onPlayerDestroy(world, pos, stateRemove);
 				if (canHarvest) {
 					ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
-					stateRemove.getBlock().harvestBlock(world, player, pos, stateRemove, world.getTileEntity(pos), stack);
+					stateRemove.getOwner().harvestBlock(world, player, pos, stateRemove, world.getTileEntity(pos), stack);
 				}
 			}
 		}
@@ -393,3 +393,4 @@ public class UtilMining {
 	}
 
 }
+

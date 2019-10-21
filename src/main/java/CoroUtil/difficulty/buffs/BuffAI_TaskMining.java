@@ -34,8 +34,8 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
         /**
          * These 2 might be redundantly applied during deserialization
          */
-        ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityEnhanced, true);
-        ent.getEntityData().setBoolean("CoroAI_HW_GravelDeath", true);
+        ent.getEntityData().putBoolean(UtilEntityBuffs.dataEntityEnhanced, true);
+        ent.getEntityData().putBoolean("CoroAI_HW_GravelDeath", true);
 
         ItemStack is = ent.getItemStackFromSlot(EquipmentSlotType.MAINHAND);
         if (is == null) {
@@ -55,3 +55,4 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
         super.applyBuffPost(ent, difficulty);
     }
 }
+

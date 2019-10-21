@@ -100,7 +100,7 @@ public class UtilEntityBuffs {
         List<DataCmod> cmodsFlat = DeserializerAllJson.getCmodsFlattened(cmods);
 
         //now lets process inventory_difficulty_scaled into just inventory
-        //update: this was a good idea and saved me having to write a serializer for it, but i forgot i still need to serialize the full thing for world reloading
+        //tick: this was a good idea and saved me having to write a serializer for it, but i forgot i still need to serialize the full thing for world reloading
         //might be worth keeping for the entity nbt to keep it slimmer, technically saves disk space
         boolean flattenConditionalInventory = false;
         if (flattenConditionalInventory) {
@@ -122,14 +122,14 @@ public class UtilEntityBuffs {
             }
         }
 
-        if (!ent.getEntityData().hasKey(dataEntityBuffed_Data)) {
+        if (!ent.getEntityData().contains(dataEntityBuffed_Data)) {
             ent.getEntityData().setTag(dataEntityBuffed_Data, new CompoundNBT());
         }
-        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompound(dataEntityBuffed_Data);
 
         //add the json that holds config data for cmods
         JsonArray array = DeserializerAllJson.serializeCmods(cmodsFlat);
-        data.setString(dataEntityCmodJson, array.toString());
+        data.putString(dataEntityCmodJson, array.toString());
 
         //apply the cmods via actual appliers, which also marks entity with easy to check cmod names
         for (DataCmod cmod : cmodsFlat) {
@@ -146,13 +146,13 @@ public class UtilEntityBuffs {
     }
 
     public static List<DataCmod> getAllCmodData(CreatureEntity ent) {
-        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompound(dataEntityBuffed_Data);
         String json = data.getString(dataEntityCmodJson);
         return DeserializerAllJson.deserializeCmods(json);
     }
 
     public static DataCmod getCmodData(CreatureEntity ent, String cmodName) {
-        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompound(dataEntityBuffed_Data);
         String json = data.getString(dataEntityCmodJson);
         List<DataCmod> cmods = DeserializerAllJson.deserializeCmods(json);
         for (DataCmod cmod : cmods) {
@@ -173,7 +173,7 @@ public class UtilEntityBuffs {
     }
 
     public static boolean hasBuff(CreatureEntity ent, String buff) {
-        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompound(dataEntityBuffed_Data);
         return data.getBoolean(buff);
     }
 
@@ -189,11 +189,11 @@ public class UtilEntityBuffs {
         if (lookupBuffs.containsKey(buffName)) {
 
             //mark entity is buffed
-            ent.getEntityData().setBoolean(dataEntityBuffed, true);
+            ent.getEntityData().putBoolean(dataEntityBuffed, true);
 
             //store difficulty for reloading buffs later
-            if (!ent.getEntityData().hasKey(dataEntityBuffed_Difficulty)) {
-                ent.getEntityData().setFloat(dataEntityBuffed_Difficulty, difficulty);
+            if (!ent.getEntityData().contains(dataEntityBuffed_Difficulty)) {
+                ent.getEntityData().putFloat(dataEntityBuffed_Difficulty, difficulty);
             }
 
 
@@ -224,7 +224,7 @@ public class UtilEntityBuffs {
 
     public static void applyBuffPostAll(CreatureEntity ent, float difficulty) {
         List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-        CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data);
         for (String buff : buffs) {
             if (data.getBoolean(buff)) {
                 BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
@@ -278,7 +278,7 @@ public class UtilEntityBuffs {
         List<String> listBuffs = UtilEntityBuffs.getAllBuffNames();
         Collections.shuffle(listBuffs);
 
-        ent.getEntityData().setBoolean(dataEntityBuffDiceRolled, true);
+        ent.getEntityData().putBoolean(dataEntityBuffDiceRolled, true);
 
         boolean testSpecific = true;
 
@@ -340,7 +340,7 @@ public class UtilEntityBuffs {
         return entity.tasks.taskEntries.stream().anyMatch(task -> clazz.isAssignableFrom(task.action.getClass()));
     }
 
-    public static boolean addTask(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
+    public static boolean addGoal(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
         GoalSelector tasks = ent.tasks;
         if (isTargetTask) {
             tasks = ent.targetTasks;
@@ -352,7 +352,7 @@ public class UtilEntityBuffs {
                 ITaskInitializer task = (ITaskInitializer) obj;
                 task.setEntity(ent);
                 //System.out.println("adding task into zombie: " + taskToInject);
-                tasks.addTask(priorityOfTask, (Goal) task);
+                tasks.addGoal(priorityOfTask, (Goal) task);
                 //aiEnhanced.put(ent.getEntityId(), true);
 
 
@@ -466,7 +466,7 @@ public class UtilEntityBuffs {
 
                 if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
                     float difficultySpawnedIn = 0;
-                    if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
+                    if (ent.getEntityData().contains(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
                         difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
                     } else {
                         //safely get difficulty for area
@@ -476,7 +476,7 @@ public class UtilEntityBuffs {
                     }
 
                     List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-                    CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+                    CompoundNBT data = ent.getEntityData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data);
                     for (String buff : buffs) {
                         if (data.getBoolean(buff)) {
                             BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
@@ -494,3 +494,4 @@ public class UtilEntityBuffs {
 
     }
 }
+

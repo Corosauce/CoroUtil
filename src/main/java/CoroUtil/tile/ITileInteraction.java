@@ -14,3 +14,4 @@ public interface ITileInteraction {
 	public void clickedRight(PlayerEntity player, int face, float localVecX, float localVecY, float localVecZ);
 	
 }
+

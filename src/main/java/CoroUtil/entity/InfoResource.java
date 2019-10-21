@@ -17,3 +17,4 @@ public class InfoResource extends InfoArea
 	}
 	
 }
+

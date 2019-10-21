@@ -68,7 +68,7 @@ public class WorldDirector implements Runnable {
 	public boolean threadServerSideOnly = true;
 	
 	/**
-	 * For sharing and maintaining an update queue limiter between simulations that do the same thing
+	 * For sharing and maintaining an tick queue limiter between simulations that do the same thing
 	 * eg: 2 trees that need lots of updates, between both of them they can only do a max of x amount of block updates
 	 * 
 	 * for future consider an elegant way to spread out these updates between all that need updates, factoring in a few weighted priorities like proximity to player
@@ -226,9 +226,9 @@ public class WorldDirector implements Runnable {
 		
 		World world = getWorld();
 		
-		//update occupance chunk data for each player
+		//tick occupance chunk data for each player
 		if (ConfigCoroUtilAdvanced.trackPlayerData) {
-			if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
+			if (world.getGameTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
 				for (int i = 0; i < world.playerEntities.size(); i++) {
 					PlayerEntity entP = world.playerEntities.get(i);
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor(entP.posX) / 16, MathHelper.floor(entP.posZ) / 16);
@@ -239,11 +239,11 @@ public class WorldDirector implements Runnable {
 	}
 	
 	public boolean isCoordAndNearAreaNaturalBlocks(World parWorld, int x, int y, int z, int range) {
-		if (isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z)).getBlock()) && 
-				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x+range, y, z)).getBlock()) && 
-				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x-range, y, z)).getBlock()) &&
-				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z+range)).getBlock()) &&
-				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z-range)).getBlock())) {
+		if (isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z)).getOwner()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x+range, y, z)).getOwner()) && 
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x-range, y, z)).getOwner()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z+range)).getOwner()) &&
+				isNaturalSurfaceBlock(parWorld.getBlockState(new BlockPos(x, y, z-range)).getOwner())) {
 			return true;
 		}
 		return false;
@@ -271,7 +271,7 @@ public class WorldDirector implements Runnable {
 		int curY = startY;
 		int safetyCount = 0;
 		while (curY > 0 && safetyCount++ < 300) {
-			Block id = world.getBlockState(new BlockPos(x, curY, z)).getBlock();
+			Block id = world.getBlockState(new BlockPos(x, curY, z)).getOwner();
 			
 			if (isNaturalSurfaceBlock(id)) {
 				return curY;
@@ -294,7 +294,7 @@ public class WorldDirector implements Runnable {
 			String fullPath = saveFolder + "WorldData_" + modID + "_" + dimID + "_" + type + ".dat";
 			
 			if ((new File(fullPath)).exists()) {
-				readFromNBT(CompressedStreamTools.readCompressed(new FileInputStream(fullPath)));
+				read(CompressedStreamTools.readCompressed(new FileInputStream(fullPath)));
 			}
 			
 		} catch (Exception ex) {
@@ -318,8 +318,8 @@ public class WorldDirector implements Runnable {
     		if (extraData != null) bool = extraData.getBoolean("generatedTown");
     		//System.out.println("writing nbt, generatedTown: " + bool);
     		
-    		//update runtime data to nbt
-    		writeToNBT(nbt);
+    		//tick runtime data to nbt
+    		write(nbt);
     		//if (extraData == null) extraData = new NBTTagCompound();
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
@@ -337,22 +337,22 @@ public class WorldDirector implements Runnable {
 		}
 	}
 	
-	public void readFromNBT(CompoundNBT parData) {
-		extraData = parData.getCompoundTag("extraData");
+	public void read(CompoundNBT parData) {
+		extraData = parData.getCompound("extraData");
 		
 		//these are mandatory fields set during registration, and would lose their values if read in here
 		/*modID = parData.getString("modID");
 		type = parData.getString("type");
-		dimID = parData.getInteger("dimID");*/
+		dimID = parData.getInt("dimID");*/
 		
-		CompoundNBT tickingLocations = parData.getCompoundTag("tickingLocations");
+		CompoundNBT tickingLocations = parData.getCompound("tickingLocations");
 		
-		Iterator it = tickingLocations.getKeySet().iterator();
+		Iterator it = tickingLocations.keySet().iterator();
 		
 		
 		while (it.hasNext()) {
 			String keyName = (String)it.next();
-			CompoundNBT nbt = tickingLocations.getCompoundTag(keyName);
+			CompoundNBT nbt = tickingLocations.getCompound(keyName);
 			
 			String classname = nbt.getString("classname");
 			
@@ -377,7 +377,7 @@ public class WorldDirector implements Runnable {
 		    }
 		    if (locationObj != null) {
 		    	locationObj.init();
-				locationObj.readFromNBT(nbt);
+				locationObj.read(nbt);
 				locationObj.initPost();
 				addTickingLocation(locationObj);
 				
@@ -386,28 +386,28 @@ public class WorldDirector implements Runnable {
 		}
 	}
 	
-	public void writeToNBT(CompoundNBT parData) {
+	public void write(CompoundNBT parData) {
 		CompoundNBT nbtSet = new CompoundNBT();
 		
 		int index = 0;
 		/*for (Map.Entry<Integer, ISimulationTickable> entry : lookupTickingManagedLocations.entrySet()) {
 			NBTTagCompound nbt = new NBTTagCompound();
-			entry.getValue().writeToNBT(nbt);
+			entry.get().write(nbt);
 			nbtSet.setTag("" + index++, nbt);
 		}*/
 		for (ISimulationTickable entry : listTickingLocations) {
 			CompoundNBT nbt = new CompoundNBT();
-			entry.writeToNBT(nbt);
+			entry.write(nbt);
 			nbtSet.setTag("" + index++, nbt);
 		}
 		parData.setTag("tickingLocations", nbtSet);
 		
-		parData.setString("classname", this.getClass().getCanonicalName());
+		parData.putString("classname", this.getClass().getCanonicalName());
 		
 		//these are mandatory fields set during registration
-		//parData.setString("modID", modID);
-		//parData.setString("type", type);
-		//parData.setInteger("dimID", dimID);
+		//parData.putString("modID", modID);
+		//parData.putString("type", type);
+		//parData.putInt("dimID", dimID);
 		
 		parData.setTag("extraData", extraData);
 	}
@@ -458,3 +458,4 @@ public class WorldDirector implements Runnable {
 		
 	}*/
 }
+

@@ -46,7 +46,7 @@ public class EncounterHelper {
 		String strVal = "attack-value-" + target.getName() + "-" + source.getName();
 		String strCount = "attack-count-" + target.getName() + "-" + source.getName();
 		float val = data.getFloat(strVal);
-		int count = data.getInteger(strCount);
+		int count = data.getInt(strCount);
 		
 		float weight = val / count;
 		
@@ -58,7 +58,7 @@ public class EncounterHelper {
 		String strVal = "attack-value-" + target.getName() + "-" + source.getName();
 		String strCount = "attack-count-" + target.getName() + "-" + source.getName();
 		float val = data.getFloat(strVal);
-		int count = data.getInteger(strCount);
+		int count = data.getInt(strCount);
 		
 		float weight = 1F - (val / count);
 		
@@ -71,12 +71,12 @@ public class EncounterHelper {
 		String strVal = "attack-value-" + source.getName() + "-" + target.getName();
 		String strCount = "attack-count-" + source.getName() + "-" + target.getName();
 		float val = data.getFloat(strVal);
-		int count = data.getInteger(strCount)+1;
+		int count = data.getInt(strCount)+1;
 		
 		float newVal = parDamage / source.getMaxHealth(); //damage is partially bad!
 		
-		data.setInteger(strCount, count);
-		data.setFloat(strVal, val+newVal);
+		data.putInt(strCount, count);
+		data.putFloat(strVal, val+newVal);
 	}
 	
 	public static void logDeathFrom(Entity source, Entity target) {
@@ -84,12 +84,13 @@ public class EncounterHelper {
 		String strVal = "attack-value-" + source.getName() + "-" + target.getName();
 		String strCount = "attack-count-" + source.getName() + "-" + target.getName();
 		float val = data.getFloat(strVal);
-		int count = data.getInteger(strCount)+1;
+		int count = data.getInt(strCount)+1;
 		
 		float newVal = 1F; //death is fully bad!
 		
-		data.setInteger(strCount, count);
-		data.setFloat(strVal, val+newVal);
+		data.putInt(strCount, count);
+		data.putFloat(strVal, val+newVal);
 	}
 	
 }
+

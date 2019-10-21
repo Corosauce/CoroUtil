@@ -36,7 +36,7 @@ public class ItemRepairingGel extends Item
             if (!worldIn.isRemote) {
                 if (player.isCreative() && player.isSneaking()) {
                     BlockState state = worldIn.getBlockState(pos);
-                    if (UtilMining.canMineBlock(worldIn, pos, state.getBlock())/* &&
+                    if (UtilMining.canMineBlock(worldIn, pos, state.getOwner())/* &&
                             UtilMining.canConvertToRepairingBlock(worldIn, state)*/) {
                         TileEntityRepairingBlock.replaceBlockAndBackup(worldIn, pos);
                     }

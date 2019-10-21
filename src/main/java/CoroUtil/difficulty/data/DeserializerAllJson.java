@@ -367,3 +367,4 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         return list;
     }
 }
+

@@ -24,3 +24,4 @@ public interface IPlayerData {
 	public void tick();
 	
 }
+

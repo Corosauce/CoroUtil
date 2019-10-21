@@ -47,3 +47,4 @@ public class DifficultyData {
         listMobSpawnTemplates.add(profile);
     }
 }
+

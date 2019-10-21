@@ -47,9 +47,9 @@ public class CoroUtilAbility {
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			if (syncOnly) {
-				nbt.setTag(entry.getValue().name, entry.getValue().nbtSyncWrite());
+				nbt.setTag(entry.get().name, entry.get().nbtSyncWrite());
 			} else {
-				nbt.setTag(entry.getValue().name, entry.getValue().nbtSave());
+				nbt.setTag(entry.get().name, entry.get().nbtSave());
 			}
 		}
 		return nbt;
@@ -62,11 +62,11 @@ public class CoroUtilAbility {
 	/* It will try a full nbt load if it detected the skill wasnt there, but this requires the server to have predicted this and actually sent a full nbtLoad() package */
 	public static void nbtLoadSkills(CompoundNBT nbt, ConcurrentHashMap<String, Ability> abilities, LivingEntity owner, boolean syncOnly) {
 
-		Iterator it = nbt.getKeySet().iterator();
+		Iterator it = nbt.keySet().iterator();
 		
 		while (it.hasNext()) {
 			String tagName = (String) it.next();
-			CompoundNBT data = (CompoundNBT)nbt.getTag(tagName);
+			CompoundNBT data = (CompoundNBT)nbt.get(tagName);
 			
 			String abilityName = data.getString("name");
 			Ability ability = null;
@@ -135,3 +135,4 @@ public class CoroUtilAbility {
 	}
 	
 }
+

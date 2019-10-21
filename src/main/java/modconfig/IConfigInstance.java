@@ -8,3 +8,4 @@ public interface IConfigInstance {
 	public void writeData();
 	
 }
+

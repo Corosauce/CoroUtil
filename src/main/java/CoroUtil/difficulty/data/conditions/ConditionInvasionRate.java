@@ -13,3 +13,4 @@ public class ConditionInvasionRate extends DataCondition {
         return "wave rate: " + rate;
     }
 }
+

@@ -76,3 +76,4 @@ public class BuffAI_Infernal extends BuffBase {
         return (int)(difficulty * 10D);
     }
 }
+

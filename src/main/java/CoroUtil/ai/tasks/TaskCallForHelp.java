@@ -34,7 +34,7 @@ public class TaskCallForHelp extends Goal implements ITaskInitializer
     	//System.out.println("should call for help?");
     	//return true if not pathing, has target
     	if (entity.getAttackTarget() != null) {
-    		if (entity.world.getTotalWorldTime() % 60 == 0) {
+    		if (entity.world.getGameTime() % 60 == 0) {
     			return true;
     		}
     		
@@ -70,7 +70,7 @@ public class TaskCallForHelp extends Goal implements ITaskInitializer
     /**
      * Updates the task
      */
-    public void updateTask()
+    public void tick()
     {
 
         //fix for stealth mods that null out target entity in weird spots even after shouldExecute and shouldContinueExecuting is called
@@ -105,3 +105,4 @@ public class TaskCallForHelp extends Goal implements ITaskInitializer
         }
     }
 }
+

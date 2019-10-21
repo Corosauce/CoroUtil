@@ -61,7 +61,7 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 	}
 	
 	@Override
-	public void onUpdate() {
+	public void tick() {
 		
 		if (tickParticleBehaviorList) {
 			if (particleBehavior != null) {
@@ -69,15 +69,16 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 			}
 		}
 		
-		super.onUpdate();
+		super.tick();
 	}
 	
 	@Override
-	public void readEntityFromNBT(CompoundNBT par1nbtTagCompound) {
-		super.readEntityFromNBT(par1nbtTagCompound);
+	public void readAdditional(CompoundNBT par1nbtTagCompound) {
+		super.readAdditional(par1nbtTagCompound);
 		
 		//kill on reload
-		setDead();
+		remove();
 	}
 
 }
+

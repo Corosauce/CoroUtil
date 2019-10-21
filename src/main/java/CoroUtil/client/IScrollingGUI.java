@@ -11,3 +11,4 @@ public interface IScrollingGUI {
 	public void drawBackground();
 	
 }
+

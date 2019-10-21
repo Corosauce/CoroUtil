@@ -33,3 +33,4 @@ public class ConditionTemplateReference extends DataCondition {
         return super.toString() + " { " + code + template + TextFormatting.RESET + " } [ flat: " + flattened + " ] ";
     }
 }
+

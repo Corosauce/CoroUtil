@@ -18,3 +18,4 @@ public enum EnumJob {
     static { for(EnumJob e : EnumSet.allOf(EnumJob.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumJob get(int intValue) { return lookup.get(intValue); }
 }
+

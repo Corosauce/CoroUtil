@@ -63,3 +63,4 @@ public class EquipmentForDifficulty {
     }
 
 }
+

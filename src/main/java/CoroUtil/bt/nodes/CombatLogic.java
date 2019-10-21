@@ -38,9 +38,9 @@ public class CombatLogic extends Selector {
 		if (target != null) {
 			float dist = ent.getDistanceToEntity(target);
 
-			//System.out.println(blackboard.isUsingMelee.getValue() + " - " + ent);
+			//System.out.println(blackboard.isUsingMelee.get() + " - " + ent);
 			
-			if (!blackboard.isUsingMelee.getValue() && !blackboard.isUsingRanged.getValue()) {
+			if (!blackboard.isUsingMelee.get() && !blackboard.isUsingRanged.get()) {
 				if (profile.shouldMelee(dist)) {
 					
 					//child 0 tick
@@ -54,9 +54,9 @@ public class CombatLogic extends Selector {
 				}
 			} else {
 				//let active usage finish
-				if (blackboard.isUsingMelee.getValue()) {
+				if (blackboard.isUsingMelee.get()) {
 					return children.get(0).tick();
-				} else if (blackboard.isUsingRanged.getValue()) {
+				} else if (blackboard.isUsingRanged.get()) {
 					return children.get(1).tick();
 				}
 			}
@@ -69,3 +69,4 @@ public class CombatLogic extends Selector {
 	}
 	
 }
+

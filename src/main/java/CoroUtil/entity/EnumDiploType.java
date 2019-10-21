@@ -12,3 +12,4 @@ public enum EnumDiploType
     static { for(EnumDiploType e : EnumSet.allOf(EnumDiploType.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumDiploType get(int intValue) { return lookup.get(intValue); }
 }
+

@@ -20,3 +20,4 @@ public class ShaderProgramFoliage extends ShaderProgram {
         ShaderManager.glBindAttribLocation(getProgramId(), index++, "meta");
     }
 }
+

@@ -30,3 +30,4 @@ public class ConditionModLoaded extends DataCondition {
         return mode_boolean.equals("invert");
     }
 }
+

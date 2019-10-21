@@ -20,3 +20,4 @@ public enum EnumAttribModifierType {
     static { for(EnumAttribModifierType e : EnumSet.allOf(EnumAttribModifierType.class)) { lookup.put(e.ordinal(), e); } }
     public static EnumAttribModifierType get(int intValue) { return lookup.get(intValue); }
 }
+

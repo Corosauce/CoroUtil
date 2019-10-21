@@ -12,3 +12,4 @@ public class DataConditionTemplate {
     public List<DataCondition> conditions = new ArrayList<>();
 
 }
+

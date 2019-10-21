@@ -49,3 +49,4 @@ public class CmodInventoryDifficultyScaled extends DataCmod implements JsonSeria
         return srcString;
     }
 }
+

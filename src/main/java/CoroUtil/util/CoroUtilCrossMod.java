@@ -186,13 +186,14 @@ public class CoroUtilCrossMod {
             /**
              * Aggressively remove infernal modifiers and nbt data for it, unless we added them ourselves
              */
-            if (ent.getEntityData().hasKey(infernalNBTString)) {
-                if (!ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
+            if (ent.getEntityData().contains(infernalNBTString)) {
+                if (!ent.getEntityData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
                     CULog.dbg("detected infernal mob, overriding its attributes for " + event.getEntity().getName());
                     infernalMobs_RemoveAllModifiers(ent);
-                    ent.getEntityData().removeTag(infernalNBTString);
+                    ent.getEntityData().remove(infernalNBTString);
                 }
             }
         }
     }
 }
+

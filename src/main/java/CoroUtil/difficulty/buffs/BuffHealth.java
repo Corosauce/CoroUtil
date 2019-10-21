@@ -43,19 +43,19 @@ public class BuffHealth extends BuffBase {
 
             //set base value if we need to
             if (cmod.base_value != -1) {
-                ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.base_value);
+                ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.base_value);
             }
 
             double healthBoostMultiply = (/*1F + */difficulty * cmod.difficulty_multiplier);
-            ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
+            ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.INCREMENT_MULTIPLY_BASE.ordinal()));
 
             //cap
-            if (cmod.max_value != -1 && ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getAttributeValue() > cmod.max_value) {
-                CoroUtilMisc.removeAllModifiers(ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH));
-                ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.max_value);
+            if (cmod.max_value != -1 && ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH).get() > cmod.max_value) {
+                CoroUtilMisc.removeAllModifiers(ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH));
+                ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(cmod.max_value);
             }
 
-            //actually update their current health
+            //actually tick their current health
             ent.setHealth(ent.getMaxHealth());
 
             CULog.dbg("mob health went from " + oldHealth + " to " + ent.getMaxHealth());
@@ -66,12 +66,13 @@ public class BuffHealth extends BuffBase {
         if (healthBoostMultiply > ConfigHWMonsters.scaleHealthMax) {
             healthBoostMultiply = ConfigHWMonsters.scaleHealthMax;
         }
-        ent.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.MULTIPLY_ALL.ordinal()));
+        ent.getAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("health multiplier boost", healthBoostMultiply, EnumAttribModifierType.MULTIPLY_ALL.ordinal()));
         */
 
         //group with health buff for now...
-        //ent.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(difficulty * ConfigHWMonsters.scaleKnockbackResistance);
+        //ent.getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(difficulty * ConfigHWMonsters.scaleKnockbackResistance);
 
         return super.applyBuff(ent, difficulty);
     }
 }
+

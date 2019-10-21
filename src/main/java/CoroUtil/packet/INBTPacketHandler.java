@@ -8,3 +8,4 @@ public interface INBTPacketHandler {
 	public void nbtDataFromClient(String parUser, CompoundNBT nbt);
 	
 }
+

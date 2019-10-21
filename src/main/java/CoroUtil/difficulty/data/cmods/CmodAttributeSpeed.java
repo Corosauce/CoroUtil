@@ -8,3 +8,4 @@ import CoroUtil.difficulty.data.DataCmod;
 public class CmodAttributeSpeed extends CmodAttributeBaseSimple {
 
 }
+

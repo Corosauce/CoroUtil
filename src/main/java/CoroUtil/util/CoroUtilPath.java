@@ -27,7 +27,7 @@ public class CoroUtilPath {
 	}
 	
 	public static boolean tryMoveToEntityLivingLongDist(MobEntity entSource, Entity entityTo, double moveSpeedAmp) {
-		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
+		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class CoroUtilPath {
 
 				double distToPlayer = ent.getDistance(x, y, z);//ent.getDistanceToEntity(player);
 
-				double followDist = ent.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).getAttributeValue();
+				double followDist = ent.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).get();
 
 				if (distToPlayer <= followDist) {
 					//boolean success = ent.getNavigator().tryMoveToEntityLiving(player, moveSpeedAmp);
@@ -90,13 +90,13 @@ public class CoroUtilPath {
 					if (!world.isBlockLoaded(pos)) return false;
 
 					BlockState state = world.getBlockState(pos);
-					//Block block = state.getBlock();
+					//Block block = state.getOwner();
 					int tries = 0;
-					if (!CoroUtilBlock.isAir(state.getBlock())) {
+					if (!CoroUtilBlock.isAir(state.getOwner())) {
 						int offset = -5;
 
 						while (tries < 30) {
-							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isSideSolid(world, pos, Direction.UP)) {
+							if (CoroUtilBlock.isAir(state.getOwner()) || !state.isSideSolid(world, pos, Direction.UP)) {
 								break;
 							}
 							gatherY += offset++;
@@ -107,7 +107,7 @@ public class CoroUtilPath {
 					} else {
 						//int offset = 0;
 						while (tries < 30) {
-							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isSideSolid(world, pos, Direction.UP)) {
+							if (!CoroUtilBlock.isAir(state.getOwner()) && state.isSideSolid(world, pos, Direction.UP)) {
 								break;
 							}
 							gatherY -= 1;//offset++;
@@ -148,3 +148,4 @@ public class CoroUtilPath {
 	}
 	
 }
+

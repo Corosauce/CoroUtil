@@ -36,7 +36,7 @@ public class BlockDataGrid
     }
     
     public float getBlockStrength(int x, int y, int z) {
-    	Block blockID = world.getBlockState(new BlockPos(x, y, z)).getBlock();
+    	Block blockID = world.getBlockState(new BlockPos(x, y, z)).getOwner();
     	//int blockMeta = world.getBlockMetadata(x, y, z);
     	
     	//use block id to weight lookup map
@@ -71,7 +71,7 @@ public class BlockDataGrid
         {
         	if (!onlyIfExists) {
         		//this was invoking the chunkgenerator, thats bad, switching to using internally stored blockID
-	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(nbt != null ? Block.getBlockById(nbt.getInteger("blockID")) : this.world.getBlockState(new BlockPos(i, j, k)).getBlock())) {
+	        	if (skipAirCheckOnCreate || !CoroUtilBlock.isAir(nbt != null ? Block.getBlockById(nbt.getInt("blockID")) : this.world.getBlockState(new BlockPos(i, j, k)).getOwner())) {
 	        		BlockDataPoint newVec = new BlockDataPoint(this, i, j, k);
 	                grid.put(newVec.hash, newVec);
 	                return newVec;
@@ -135,15 +135,15 @@ public class BlockDataGrid
 				CompoundNBT data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "BlockDataDim_" + world.provider.getDimension() + ".dat"));
 				
 				//Collection playerDataCl = data.getTags();
-				Iterator it = data.getKeySet().iterator();//playerDataCl.iterator();
+				Iterator it = data.keySet().iterator();//playerDataCl.iterator();
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
-					CompoundNBT nbt = data.getCompoundTag(keyName);
+					CompoundNBT nbt = data.getCompound(keyName);
 					
-					BlockDataPoint bdp = this.getBlockDataFromNBT(nbt.getInteger("xCoord"), nbt.getInteger("yCoord"), nbt.getInteger("zCoord"), nbt);
+					BlockDataPoint bdp = this.getBlockDataFromNBT(nbt.getInt("xCoord"), nbt.getInt("yCoord"), nbt.getInt("zCoord"), nbt);
 					if (bdp != null) {
-						bdp.readFromNBT(nbt);
+						bdp.read(nbt);
 					} else {
 						//must have been set to air at some point...
 					}
@@ -166,7 +166,7 @@ public class BlockDataGrid
 			
 			while (it.hasNext()) {
 				BlockDataPoint bdp = (BlockDataPoint)it.next();
-				data.setTag(""+bdp.hash, bdp.writeToNBT());
+				data.setTag(""+bdp.hash, bdp.write());
 			}
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator;
@@ -187,3 +187,4 @@ public class BlockDataGrid
     	
     }
 }
+

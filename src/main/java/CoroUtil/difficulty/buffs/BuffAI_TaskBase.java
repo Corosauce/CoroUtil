@@ -92,7 +92,7 @@ public class BuffAI_TaskBase extends BuffBase {
         } else {
             //added since addition of allowRedundantAttempts feature
             if (!UtilEntityBuffs.hasTask(ent, task, isTargetTask)) {
-                return UtilEntityBuffs.addTask(ent, task, taskPriority, isTargetTask);
+                return UtilEntityBuffs.addGoal(ent, task, taskPriority, isTargetTask);
             } else {
                 return false;
             }
@@ -107,3 +107,4 @@ public class BuffAI_TaskBase extends BuffBase {
         isTargetTask = targetTask;
     }
 }
+

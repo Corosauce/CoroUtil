@@ -104,13 +104,13 @@ public class Behaviors {
 			Goal newTargetTask = new NearestAttackableTargetGoal(ent, targetClass, true);
 			if (ent instanceof IRangedAttackMob && ent instanceof SkeletonEntity) newTask = new RangedBowAttackGoal((SkeletonEntity)ent, 0.25F, /*20, */60, 15.0F);
 			
-			ent.tasks.addTask(3, newTask);
+			ent.tasks.addGoal(3, newTask);
 			GoalSelector targetTasks = (GoalSelector)OldUtil.getPrivateValueSRGMCP(MobEntity.class, ent, "field_70715_bh", "targetTasks");
 			if (targetTasks != null) {
-				targetTasks.addTask(2, newTargetTask);
+				targetTasks.addGoal(2, newTargetTask);
 				//System.out.println("Adding targetting!");
 			} else {
-				System.out.println("update targetTasks reflection");
+				System.out.println("tick targetTasks reflection");
 			}
 			aiEnhanced.put(ent, true);
 		}
@@ -134,7 +134,7 @@ public class Behaviors {
 		boolean found = false;
 		//followTriggerDist = 32F;
 		//if (me.getEntityToAttack() == null) {
-			List ents = me.world.getEntitiesWithinAABB(PlayerEntity.class, me.getEntityBoundingBox().grow((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
+			List ents = me.world.getEntitiesWithinAABB(PlayerEntity.class, me.getBoundingBox().grow((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
 	           PlayerEntity var5 = (PlayerEntity)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {

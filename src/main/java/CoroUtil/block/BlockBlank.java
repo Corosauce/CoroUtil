@@ -9,3 +9,4 @@ public class BlockBlank extends Block {
         super(materialIn);
     }
 }
+

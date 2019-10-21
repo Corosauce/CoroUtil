@@ -14,3 +14,4 @@ public class ConditionDifficulty extends DataCondition {
         return super.toString() + " { " + "range: " + min + " to " + max + " }";
     }
 }
+

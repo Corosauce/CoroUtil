@@ -155,13 +155,13 @@ public class BlackboardBase implements IPFCallback {
 	}
 	
 	public void requestPathFar(Vec3 parPos, int pathRange) {
-		if (canFlyPath.getValue() || canSwimPath.getValue()) {
+		if (canFlyPath.get() || canSwimPath.get()) {
 			//System.out.println("request TEST FLYING/SWIMMING PATH pf set: " + parPos);
 			PFJobData job = new PFJobData(agent.ent, MathHelper.floor(parPos.xCoord), MathHelper.floor(parPos.yCoord), MathHelper.floor(parPos.zCoord), pathRange);
 			job.callback = this;
 			job.canUseLadder = true;
-			job.useFlyPathfinding = canFlyPath.getValue();
-			job.useSwimPathfinding = canSwimPath.getValue();
+			job.useFlyPathfinding = canFlyPath.get();
+			job.useSwimPathfinding = canSwimPath.get();
 			PFQueue.tryPath(job);
 		} else {
 			//System.out.println("request pf set: " + parPos);
@@ -208,3 +208,4 @@ public class BlackboardBase implements IPFCallback {
 		return listCallbackPaths;
 	}
 }
+

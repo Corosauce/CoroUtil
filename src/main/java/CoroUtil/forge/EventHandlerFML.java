@@ -63,7 +63,7 @@ public class EventHandlerFML {
 				PlayerQuestManager.i().tick(worlds[i]);
 			}
 			
-			WorldDirectorManager.instance().onTick();
+			WorldDirectorManager.instance().tick();
 			
 			boolean debugIMC = false;
 	        if (debugIMC) {
@@ -83,10 +83,10 @@ public class EventHandlerFML {
 			if (testSendRequestIMC) {
 				
 				CompoundNBT nbt = new CompoundNBT();
-				nbt.setInteger("x", 1);
-				nbt.setInteger("y", 2);
-				nbt.setInteger("z", 3);
-				nbt.setString("replymod", "CoroAI");
+				nbt.putInt("x", 1);
+				nbt.putInt("y", 2);
+				nbt.putInt("z", 3);
+				nbt.putString("replymod", "CoroAI");
 				
 				FMLInterModComms.sendRuntimeMessage("weather2", "weather2", "weather.raining", nbt);
 				
@@ -108,8 +108,8 @@ public class EventHandlerFML {
 				//quests.renderQuestOverlay();
 				/*if (soundTest == null) soundTest = new SoundTest();
 				
-				if (timeLast != FMLClientHandler.instance().getClient().world.getTotalWorldTime()) {
-					timeLast = FMLClientHandler.instance().getClient().world.getTotalWorldTime();
+				if (timeLast != FMLClientHandler.instance().getClient().world.getGameTime()) {
+					timeLast = FMLClientHandler.instance().getClient().world.getGameTime();
 					if (soundTest.active) {
 						soundTest.tick();
 					}
@@ -130,3 +130,4 @@ public class EventHandlerFML {
 		quests.sync();
 	}
 }
+

@@ -93,3 +93,4 @@ public class ConfigCoroUtil implements IConfigCategory {
 	}
 
 }
+

@@ -22,7 +22,7 @@ public class CoroUtilWorldTime {
      * @return
      */
     public static boolean isNight(World world) {
-        long timeMod = world.getWorldTime() % getDayLength();
+        long timeMod = world.getDayTime() % getDayLength();
         return timeMod >= getNightFirstTick() && timeMod <= getDayFirstTick();
     }
 
@@ -31,7 +31,7 @@ public class CoroUtilWorldTime {
     }
 
     public static boolean isNightPadded(World world, int padding) {
-        long timeMod = world.getWorldTime() % getDayLength();
+        long timeMod = world.getDayTime() % getDayLength();
         return timeMod >= getNightFirstTick() + padding && timeMod <= getDayFirstTick() - padding;
     }
 
@@ -44,3 +44,4 @@ public class CoroUtilWorldTime {
     }
 
 }
+

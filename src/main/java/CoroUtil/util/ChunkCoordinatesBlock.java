@@ -37,3 +37,4 @@ public class ChunkCoordinatesBlock extends BlockCoord {
     }
 	
 }
+

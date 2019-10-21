@@ -38,7 +38,7 @@ public class BlockDataPoint
     //flag a point that it needs a cache load once something needs to use it
     //this fixes the performance problem of EVERY block point doing a block data lookup on load
     //especially because we reload all block data points at the same time
-    //might need to update cache more often in some scenarios to make sure data matches, this feature isnt used atm anyways so lets not worry about it
+    //might need to tick cache more often in some scenarios to make sure data matches, this feature isnt used atm anyways so lets not worry about it
     private boolean needCacheUpdate = true;
 
     /*
@@ -79,8 +79,8 @@ public class BlockDataPoint
     {
         //yes this might force a chunk load, but now its only requested when something really needs the data, not on BlockDataPoint instantiation
     	BlockState state = grid.world.getBlockState(new BlockPos(xCoord, yCoord, zCoord));
-    	block = state.getBlock();
-    	blockMeta = state.getBlock().getMetaFromState(state);
+    	block = state.getOwner();
+    	blockMeta = state.getOwner().getMetaFromState(state);
     	needCacheUpdate = false;
     }
 
@@ -145,10 +145,10 @@ public class BlockDataPoint
         return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
     }
     
-    public void readFromNBT(CompoundNBT nbt) {
+    public void read(CompoundNBT nbt) {
     	
-    	block = Block.getBlockById(nbt.getInteger("blockID"));
-    	blockMeta = nbt.getInteger("blockMeta");
+    	block = Block.getBlockById(nbt.getInt("blockID"));
+    	blockMeta = nbt.getInt("blockMeta");
     	
     	health = nbt.getFloat("health");
         digDamage = nbt.getFloat("digDamage");
@@ -156,35 +156,35 @@ public class BlockDataPoint
         lastTickTimeDig = nbt.getLong("lastTickTimeDig");
     	creationType = nbt.getByte("creationType");
     	walkedOnAmount = nbt.getFloat("walkedOnAmount");
-    	/*xCoord = nbt.getInteger("xCoord");
-    	yCoord = nbt.getInteger("yCoord");  -- read in from init
-    	zCoord = nbt.getInteger("zCoord");*/
+    	/*xCoord = nbt.getInt("xCoord");
+    	yCoord = nbt.getInt("yCoord");  -- read in from init
+    	zCoord = nbt.getInt("zCoord");*/
     }
     
-    public CompoundNBT writeToNBT() {
+    public CompoundNBT write() {
     	CompoundNBT nbt = new CompoundNBT();
     	
     	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits
         //note for extended blcok state? ^
     	
-    	nbt.setInteger("blockID", Block.getIdFromBlock(block));
-    	nbt.setInteger("blockMeta", blockMeta);
+    	nbt.putInt("blockID", Block.getIdFromBlock(block));
+    	nbt.putInt("blockMeta", blockMeta);
     	
-    	nbt.setFloat("health", health);
-        nbt.setFloat("digDamage", digDamage);
-    	nbt.setLong("lastTickTimeGrass", lastTickTimeGrass);
-        nbt.setLong("lastTickTimeDig", lastTickTimeDig);
-    	nbt.setByte("creationType", creationType);
-    	nbt.setFloat("walkedOnAmount", walkedOnAmount);
-    	nbt.setInteger("xCoord", xCoord);
-    	nbt.setInteger("yCoord", yCoord);
-    	nbt.setInteger("zCoord", zCoord);
+    	nbt.putFloat("health", health);
+        nbt.putFloat("digDamage", digDamage);
+    	nbt.putLong("lastTickTimeGrass", lastTickTimeGrass);
+        nbt.putLong("lastTickTimeDig", lastTickTimeDig);
+    	nbt.putByte("creationType", creationType);
+    	nbt.putFloat("walkedOnAmount", walkedOnAmount);
+    	nbt.putInt("xCoord", xCoord);
+    	nbt.putInt("yCoord", yCoord);
+    	nbt.putInt("zCoord", zCoord);
     	
     	return nbt;
     }
     
     public void tickUpdate() {
-    	long curTickTime = grid.world.getTotalWorldTime();
+    	long curTickTime = grid.world.getGameTime();
     	
     	//code that scales based on ticktime diff goes here
 
@@ -196,11 +196,11 @@ public class BlockDataPoint
     	grid = null;
     }
 
-    public Block getBlock() {
-        return getBlock(false);
+    public Block getOwner() {
+        return getOwner(false);
     }
 
-    public Block getBlock(boolean forceCacheUpdate) {
+    public Block getOwner(boolean forceCacheUpdate) {
         if (needCacheUpdate || forceCacheUpdate) {
             updateCache();
         }
@@ -218,3 +218,4 @@ public class BlockDataPoint
         return blockMeta;
     }
 }
+
