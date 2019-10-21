@@ -2,9 +2,9 @@ package modconfig;
 
 import modconfig.gui.GuiBetterTextField;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ConfigEntryInfo {
 	public int index;
@@ -16,7 +16,7 @@ public class ConfigEntryInfo {
 	
 	public boolean markForUpdate = false;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public GuiBetterTextField editBox;
 	
 	public ConfigEntryInfo(int parIndex, String parName, Object parVal, String parComment) {
@@ -25,10 +25,10 @@ public class ConfigEntryInfo {
 		value = parVal;
 		comment = parComment;
 		
-        if (getEffectiveSide() == Side.CLIENT) initButton();
+        if (getEffectiveSide() == Dist.CLIENT) initButton();
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void initButton() {
 		int buttonWidth = 130;
         int buttonHeight = 16;
@@ -37,10 +37,10 @@ public class ConfigEntryInfo {
 	}
 
 	//fix for missing side check, forge fixed for 1.11.2 but not for 1.10.2, this lets me avoid reworking 5 methods to pass the world object for a more proper check
-	public static Side getEffectiveSide() {
+	public static Dist getEffectiveSide() {
 		Thread thr = Thread.currentThread();
 		if (thr.getName().contains("Netty Epoll Server IO")) {
-			return Side.SERVER;
+			return Dist.SERVER;
 		} else {
 			return FMLCommonHandler.instance().getEffectiveSide();
 		}

@@ -1,7 +1,8 @@
 package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.EntityDamageSource;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -18,7 +19,7 @@ public class AttackMeleeBestCombo extends Selector {
 	//- this class might become what combo controller is, ActionUseSkill should be able to stay intact for skill/ability usage
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	public float attackRange = 16;
@@ -30,7 +31,7 @@ public class AttackMeleeBestCombo extends Selector {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		attackRange = parRange;
 		attackRate = parRate;
 	}

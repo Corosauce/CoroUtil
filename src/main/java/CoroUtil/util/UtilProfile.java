@@ -4,7 +4,7 @@ import CoroUtil.forge.CULog;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTexture;
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Map;
@@ -114,7 +114,7 @@ public class UtilProfile implements Runnable {
             String originalLookupName = profile.getName();
 
             //this does more than just get uuid, needs to run every time
-            profile = TileEntitySkull.updateGameprofile(profile);
+            profile = SkullTileEntity.updateGameprofile(profile);
             CULog.dbg("got updated profile for " + originalLookupName + " (" + profile.getName() + ")" + ", uuid: " + profile.getId());
 
             //make sure network or cache got what it needed

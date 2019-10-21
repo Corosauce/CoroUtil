@@ -5,8 +5,9 @@ import java.util.Random;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeMap;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -44,7 +45,7 @@ public class CoroUtilItem {
 		if (is.getItem() == null) return 0;
 		AttributeMap attributes = new AttributeMap();
 		attributes.registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1.0D);
-		Multimap map = is.getItem().getAttributeModifiers(EntityEquipmentSlot.MAINHAND, is);
+		Multimap map = is.getItem().getAttributeModifiers(EquipmentSlotType.MAINHAND, is);
 		attributes.applyAttributeModifiers(map);
 		try {
 			return (float)attributes.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
@@ -54,7 +55,7 @@ public class CoroUtilItem {
 		}
 	}
 	
-	public static EntityItem tossItemFromEntity(Entity parEnt, ItemStack p_146097_1_, boolean p_146097_2_, boolean p_146097_3_)
+	public static ItemEntity tossItemFromEntity(Entity parEnt, ItemStack p_146097_1_, boolean p_146097_2_, boolean p_146097_3_)
     {
 		
 		Random rand = new Random();
@@ -69,7 +70,7 @@ public class CoroUtilItem {
         }
         else
         {
-            EntityItem entityitem = new EntityItem(parEnt.world, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
+            ItemEntity entityitem = new ItemEntity(parEnt.world, parEnt.posX, parEnt.posY - 0.30000001192092896D + (double)parEnt.getEyeHeight(), parEnt.posZ, p_146097_1_);
             //TODO: 1.8 fix if method is still used
             System.out.println("TODO: missing added delay before pickup");
             //entityitem.delayBeforeCanPickup = 40;

@@ -1,13 +1,13 @@
 package CoroUtil.render;
 
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
-public class RenderNull extends Render
+public class RenderNull extends EntityRenderer
 {
-    public RenderNull(RenderManager renderManager) {
+    public RenderNull(EntityRendererManager renderManager) {
 		super(renderManager);
 	}
 

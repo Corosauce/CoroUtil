@@ -6,13 +6,15 @@ import java.util.List;
 import modconfig.ConfigMod;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilMisc;
 
@@ -40,9 +42,9 @@ public class CommandModConfig extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
-		EntityPlayer player = null;
-		if (var1 instanceof EntityPlayer) {
-			player = (EntityPlayer) var1;
+		PlayerEntity player = null;
+		if (var1 instanceof PlayerEntity) {
+			player = (PlayerEntity) var1;
 		}
 		World world = var1.getEntityWorld();
 		int dimension = world.provider.getDimension();
@@ -63,7 +65,7 @@ public class CommandModConfig extends CommandBase {
 						if (var2.length > 2) {
 							Object obj = ConfigMod.getField(var2[modid], var2[field]);
 							if (obj != null) {
-								var1.sendMessage(new TextComponentString(var2[field] + " = " + obj));
+								var1.sendMessage(new StringTextComponent(var2[field] + " = " + obj));
 							} else {
 								CoroUtilMisc.sendCommandSenderMsg(var1, "failed to get " + var2[field]);
 							}
@@ -73,7 +75,7 @@ public class CommandModConfig extends CommandBase {
 					} else if (var2[cmd].equalsIgnoreCase("set")) {
 						if (var2.length > 2) {
 							
-							parseSetCommand((EntityPlayerMP) var1, var2);
+							parseSetCommand((ServerPlayerEntity) var1, var2);
 							
 							/*String val = "";
 							for (int i = vall; i < var2.length; i++) val += var2[i] + (i != var2.length-1 ? " " : "");
@@ -95,19 +97,19 @@ public class CommandModConfig extends CommandBase {
 						}
 					} else if (var2[cmd].equalsIgnoreCase("reload") && player != null) {
 						ConfigMod.forceLoadRuntimeSettingsFromFile();
-						player.sendMessage(new TextComponentString("Reloaded all runtime configurations from file"));
+						player.sendMessage(new StringTextComponent("Reloaded all runtime configurations from file"));
 					} else if (var2[cmd].equalsIgnoreCase("update") && player != null) {
-						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), (EntityPlayerMP)player);
+						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacket(var2[modid]), (ServerPlayerEntity)player);
 						//MinecraftServer.getServer().getConfigurationManager().sendPacketToAllPlayers(PacketHelper.getModConfigPacket(var2[modid]));
 					} else if ((var2[cmd].equalsIgnoreCase("menu") || var2[cmd].equalsIgnoreCase("gui")) && player != null) {
-						NBTTagCompound nbt = new NBTTagCompound();
+						CompoundNBT nbt = new CompoundNBT();
 						nbt.setString("command", "openGUI");
-						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacketMenu(), (EntityPlayerMP)player);
+						ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacketMenu(), (ServerPlayerEntity)player);
 					}
 					
 				} else if (player != null) {
 					//((EntityPlayerMP)player).playerNetServerHandler.sendPacketToPlayer(PacketHelper.getModConfigPacketMenu());
-					ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacketMenu(), (EntityPlayerMP)player);
+					ConfigMod.eventChannel.sendTo(PacketHelper.getModConfigPacketMenu(), (ServerPlayerEntity)player);
 				}
 			/*}*/
 		} catch (Exception ex) {
@@ -117,7 +119,7 @@ public class CommandModConfig extends CommandBase {
 		
 	}
 	
-	public static void parseSetCommand(EntityPlayerMP playerMP, String[] var2) {
+	public static void parseSetCommand(ServerPlayerEntity playerMP, String[] var2) {
 		int cmd = 0;
 		int modid = 1;
 		int field = 2;

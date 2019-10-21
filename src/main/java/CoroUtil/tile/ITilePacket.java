@@ -2,7 +2,8 @@ package CoroUtil.tile;
 
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 /* Handles advanced packet systems for tile entities, tile entity is responsible for initing/ticking the tilehandler */
 /* PKT - SRV->CL: onDataPacket - Forge packet method, can send NBT, uses getDescriptionPacket override to create the packet
@@ -19,7 +20,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public interface ITilePacket {
 
 	public TileHandler getTileHandler();
-	public void handleClientSentNBT(String parUsername, NBTTagCompound par1NBTTagCompound);
+	public void handleClientSentNBT(String parUsername, CompoundNBT par1NBTTagCompound);
     public void handleServerSentDataWatcherList(List parList);
     public void handleClientSentDataWatcherList(String parUsername, List parList);
 	

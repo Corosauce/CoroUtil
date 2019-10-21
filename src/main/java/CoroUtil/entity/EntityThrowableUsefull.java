@@ -3,22 +3,20 @@ package CoroUtil.entity;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.MoverType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.Vec3;
 
@@ -34,8 +32,8 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     /**
      * Is the entity that throws this 'thing' (snowball, ender pearl, eye of ender or potion)
      */
-    public EntityLivingBase thrower;
-    public EntityLivingBase target;
+    public LivingEntity thrower;
+    public LivingEntity target;
     
     //adding in this feature failed horribly, retry next time when this class is recoded to base motions off of rotations and force isntead of its current opposite
     public boolean targetSeeking = false;
@@ -55,7 +53,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
     protected void entityInit() {}
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
 
     /**
      * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
@@ -68,7 +66,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         return par1 < d1 * d1;
     }
 
-    public EntityThrowableUsefull(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase parTarget, double parSpeed)
+    public EntityThrowableUsefull(World par1World, LivingEntity par2EntityLivingBase, LivingEntity parTarget, double parSpeed)
     {
     	super(par1World);
     	this.thrower = par2EntityLivingBase;
@@ -91,12 +89,12 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.setPosition(this.posX, this.posY, this.posZ);
     }
     
-    public EntityThrowableUsefull(World par1World, EntityLivingBase par2EntityLivingBase)
+    public EntityThrowableUsefull(World par1World, LivingEntity par2EntityLivingBase)
     {
     	this(par1World, par2EntityLivingBase, 1);
     }
     
-    public EntityThrowableUsefull(World par1World, EntityLivingBase par2EntityLivingBase, double parSpeed)
+    public EntityThrowableUsefull(World par1World, LivingEntity par2EntityLivingBase, double parSpeed)
     {
         super(par1World);
         this.thrower = par2EntityLivingBase;
@@ -130,7 +128,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         //this.yOffset = 0.0F;
     }
     
-    public Vec3 getTargetVector(EntityLivingBase target) {
+    public Vec3 getTargetVector(LivingEntity target) {
     	double vecX = target.posX - thrower.posX;
     	double vecY = target.posY - thrower.posY;
     	double vecZ = target.posZ - thrower.posZ;
@@ -168,7 +166,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.ticksInGround = 0;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
 
     /**
      * Sets the velocity to the args. Args: x, y, z
@@ -304,7 +302,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             for (int k = 0; k < 4; ++k)
             {
                 float f4 = 0.25F;
-                this.world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
+                this.world.spawnParticle(ParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
             }
 
             f2 = 0.8F;
@@ -368,9 +366,9 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         double d2 = p_70625_1_.posZ - this.posZ;
         double d1;
 
-        if (p_70625_1_ instanceof EntityLivingBase)
+        if (p_70625_1_ instanceof LivingEntity)
         {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)p_70625_1_;
+            LivingEntity entitylivingbase = (LivingEntity)p_70625_1_;
             d1 = entitylivingbase.posY + (double)entitylivingbase.getEyeHeight() - (this.posY + (double)this.getEyeHeight());
         }
         else
@@ -409,7 +407,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     	Entity entity = null;
         List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
-        EntityLivingBase entityliving = this.getThrower();
+        LivingEntity entityliving = this.getThrower();
 
         for (int j = 0; j < list.size(); ++j)
         {
@@ -459,7 +457,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+    public void writeEntityToNBT(CompoundNBT par1NBTTagCompound)
     {
         par1NBTTagCompound.setShort("xTile", (short)this.xTile);
         par1NBTTagCompound.setShort("yTile", (short)this.yTile);
@@ -468,7 +466,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         par1NBTTagCompound.setByte("shake", (byte)this.throwableShake);
         par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
 
-        if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower != null && this.thrower instanceof EntityPlayer)
+        if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower != null && this.thrower instanceof PlayerEntity)
         {
             this.throwerName = CoroUtilEntity.getName(thrower);
         }
@@ -479,7 +477,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+    public void readEntityFromNBT(CompoundNBT par1NBTTagCompound)
     {
         this.xTile = par1NBTTagCompound.getShort("xTile");
         this.yTile = par1NBTTagCompound.getShort("yTile");
@@ -495,13 +493,13 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public float getShadowSize()
     {
         return 0.0F;
     }
 
-    public EntityLivingBase getThrower()
+    public LivingEntity getThrower()
     {
         if (this.thrower == null && this.throwerName != null && this.throwerName.length() > 0)
         {

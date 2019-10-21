@@ -19,8 +19,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 import org.lwjgl.util.vector.Quaternion;
@@ -28,7 +28,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class EntityRotFX extends Particle implements IWindHandler, IShaderRenderedEntity
 {
     public boolean weatherEffect = false;

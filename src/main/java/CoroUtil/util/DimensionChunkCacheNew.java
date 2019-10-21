@@ -7,23 +7,23 @@ import java.util.List;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import com.google.common.collect.Lists;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.chunk.ServerChunkProvider;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.OldUtil;
 import CoroUtil.pathfinding.PFQueue;
 
@@ -49,10 +49,10 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     
     public static void updateAllWorldCache() {
     	//System.out.println("Updating PFCache");
-    	WorldServer[] worlds = DimensionManager.getWorlds();
+    	ServerWorld[] worlds = DimensionManager.getWorlds();
     	
     	for (int i = 0; i < worlds.length; i++) {
-    		WorldServer world = worlds[i];
+    		ServerWorld world = worlds[i];
     		
     		boolean skip = false;
     		
@@ -92,11 +92,11 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	    	int maxX = 0;
 	    	int maxZ = 0;
 	    	
-	    	List chunks = Lists.newArrayList(((ChunkProviderServer)world.getChunkProvider()).getLoadedChunks());
+	    	List chunks = Lists.newArrayList(((ServerChunkProvider)world.getChunkProvider()).getLoadedChunks());
     		
 	    	if (chunks == null) {
 	    		try {
-    				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ChunkProviderServer.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
+    				chunks = (ArrayList)OldUtil.getPrivateValueSRGMCP(ServerChunkProvider.class, world.getChunkProvider(), OldUtil.refl_loadedChunks_obf, OldUtil.refl_loadedChunks_mcp);
     			} catch (Exception ex2) {
     				System.out.println("SERIOUS REFLECTION FAIL IN DimensionChunkCache");
     			}
@@ -160,7 +160,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		    	
 		    	for (int i = 0; i < world.playerEntities.size(); ++i)
 		        {
-		            EntityPlayer var5 = (EntityPlayer)world.playerEntities.get(i);
+		            PlayerEntity var5 = (PlayerEntity)world.playerEntities.get(i);
 		            
 		            if ((int)var5.posX < minX) minX = (int)var5.posX;
 		            if ((int)var5.posZ < minZ) minZ = (int)var5.posZ;
@@ -186,7 +186,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 		        for (int i = 0; i < world.playerEntities.size(); ++i)
 		        {
 		        	
-		            EntityPlayer var5 = (EntityPlayer)world.playerEntities.get(i);
+		            PlayerEntity var5 = (PlayerEntity)world.playerEntities.get(i);
 		            
 		            int pChunkX = MathHelper.floor(var5.posX / 16.0D);
 		            int pChunkZ = MathHelper.floor(var5.posZ / 16.0D);
@@ -236,7 +236,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	}
 
 	@Override
-	public IBlockState getBlockState(BlockPos pos) {
+	public BlockState getBlockState(BlockPos pos) {
 		if (pos.getY() >= 0 && pos.getY() < 256)
         {
             int i = (pos.getX() >> 4) - this.chunkX;
@@ -261,11 +261,11 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 
 	@Override
 	public boolean isAirBlock(BlockPos pos) {
-		IBlockState state = getBlockState(pos);
+		BlockState state = getBlockState(pos);
 		return state.getBlock().isAir(state, this, pos);
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public Biome getBiome(BlockPos pos) {
 		return this.worldObj.getBiome(pos);
@@ -278,25 +278,25 @@ public class DimensionChunkCacheNew implements IBlockAccess {
 	}*/
 
 	@Override
-	public int getStrongPower(BlockPos pos, EnumFacing direction) {
-		IBlockState iblockstate = this.getBlockState(pos);
+	public int getStrongPower(BlockPos pos, Direction direction) {
+		BlockState iblockstate = this.getBlockState(pos);
         return iblockstate.getBlock().getStrongPower(iblockstate, this, pos, direction);
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public WorldType getWorldType() {
 		return this.worldObj.getWorldType();
 	}
 
 	@Override
-	public boolean isSideSolid(BlockPos pos, EnumFacing side, boolean _default) {
+	public boolean isSideSolid(BlockPos pos, Direction side, boolean _default) {
 		int x = (pos.getX() >> 4) - this.chunkX;
         int z = (pos.getZ() >> 4) - this.chunkZ;
         if (pos.getY() >= 0 && pos.getY() < 256) return _default;
         if (x < 0 || x >= chunkArray.length || z < 0 || x >= chunkArray[x].length) return _default;
 
-        IBlockState state = getBlockState(pos);
+        BlockState state = getBlockState(pos);
         return state.getBlock().isSideSolid(state, this, pos, side);
 	}
 

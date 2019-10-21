@@ -1,7 +1,7 @@
 package CoroUtil.bt;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 
 public class AIEventHandler {
@@ -20,7 +20,7 @@ public class AIEventHandler {
 	
 	//External Events
 	
-	public boolean interact(EntityPlayer par1EntityPlayer) {
+	public boolean interact(PlayerEntity par1EntityPlayer) {
 		return false;
 	}
 	

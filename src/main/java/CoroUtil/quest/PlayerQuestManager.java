@@ -3,11 +3,11 @@ package CoroUtil.quest;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
-import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.quest.quests.ActiveQuest;
 import CoroUtil.util.CoroUtilEntity;
 
@@ -20,7 +20,7 @@ public class PlayerQuestManager {
 	private static PlayerQuestManager clientManager;
 	
 	public static PlayerQuestManager i() {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
 			if (serverManager == null) {
 				serverManager = new PlayerQuestManager();
 			}
@@ -43,7 +43,7 @@ public class PlayerQuestManager {
 		if (!playerQuests.containsKey(username)) {
 			PlayerQuests quests = new PlayerQuests(this, username);
 			playerQuests.put(username, quests);
-			if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+			if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
 				quests.diskLoadFromFile();
 			}
 		}
@@ -55,7 +55,7 @@ public class PlayerQuestManager {
 		return playerQuests.get(username);
 	}
 	
-	public PlayerQuests getPlayerQuests(EntityPlayer entP) {
+	public PlayerQuests getPlayerQuests(PlayerEntity entP) {
 		check(CoroUtilEntity.getName(entP));
 		return playerQuests.get(CoroUtilEntity.getName(entP));
 	}
@@ -64,7 +64,7 @@ public class PlayerQuestManager {
 	public void tick(World parWorld) {
 		//tick style that auto creates quest object for every player and ticks it
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
-			EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
+			PlayerEntity entP = (PlayerEntity)parWorld.playerEntities.get(i);
 			check(CoroUtilEntity.getName(entP));
 			playerQuests.get(CoroUtilEntity.getName(entP)).tick(parWorld);
 		}
@@ -92,7 +92,7 @@ public class PlayerQuestManager {
 	public void clearQuests(World parWorld, boolean save, String username) {
 		if (username == null || username.equals("")) {
 			for (int i = 0; i < parWorld.playerEntities.size(); i++) {
-				EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
+				PlayerEntity entP = (PlayerEntity)parWorld.playerEntities.get(i);
 				if (playerQuests.containsKey(CoroUtilEntity.getName(entP))) {
 					playerQuests.get(CoroUtilEntity.getName(entP)).questsClearAll();
 				}
@@ -110,7 +110,7 @@ public class PlayerQuestManager {
 	//marks for all in current world
 	public void markQuestCompleteForAll(World parWorld, ActiveQuest quest) {
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
-			EntityPlayer entP = (EntityPlayer)parWorld.playerEntities.get(i);
+			PlayerEntity entP = (PlayerEntity)parWorld.playerEntities.get(i);
 			check(CoroUtilEntity.getName(entP));
 			playerQuests.get(CoroUtilEntity.getName(entP)).questRemove(quest);
 		}

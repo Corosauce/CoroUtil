@@ -1,12 +1,13 @@
 package CoroUtil.entity.data;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
 
 public class EntityData {
 
-	private EntityCreature ent;
+	private CreatureEntity ent;
 	
-	public EntityData(EntityCreature ent) {
+	public EntityData(CreatureEntity ent) {
 		this.ent = ent;
 	}
 	
@@ -15,11 +16,11 @@ public class EntityData {
 		return ent.getEntityId();
 	}
 
-	public EntityCreature getEnt() {
+	public CreatureEntity getEnt() {
 		return ent;
 	}
 
-	public void setEnt(EntityCreature ent) {
+	public void setEnt(CreatureEntity ent) {
 		this.ent = ent;
 	}
 	

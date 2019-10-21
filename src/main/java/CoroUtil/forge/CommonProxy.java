@@ -7,12 +7,12 @@ import CoroUtil.entity.EntityBatSmart;
 import CoroUtil.item.ItemRepairingGel;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.event.RegistryEvent;
@@ -54,14 +54,14 @@ public class CommonProxy implements IGuiHandler
     }
 
 	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
+	public Object getServerGuiElement(int ID, PlayerEntity player, World world,
+                                      int x, int y, int z) {
 		return null;
 	}
 
 	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world,
-			int x, int y, int z) {
+	public Object getClientGuiElement(int ID, PlayerEntity player, World world,
+                                      int x, int y, int z) {
 		return null;
 	}
 
@@ -75,7 +75,7 @@ public class CommonProxy implements IGuiHandler
 
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
-        CoroUtil.proxy.addItemBlock(event, new ItemBlock(blockRepairingBlock).setRegistryName(blockRepairingBlock.getRegistryName()));
+        CoroUtil.proxy.addItemBlock(event, new BlockItem(blockRepairingBlock).setRegistryName(blockRepairingBlock.getRegistryName()));
         CoroUtil.proxy.addItem(event, new ItemRepairingGel(), item_repairing_gel_name);
     }
 
@@ -105,7 +105,7 @@ public class CommonProxy implements IGuiHandler
         parBlock.setUnlocalizedName(getNameUnlocalized(unlocalizedName));
         parBlock.setRegistryName(getNameDomained(unlocalizedName));
 
-        parBlock.setCreativeTab(CreativeTabs.MISC);
+        parBlock.setCreativeTab(ItemGroup.MISC);
 
         if (event != null) {
             event.getRegistry().register(parBlock);
@@ -121,7 +121,7 @@ public class CommonProxy implements IGuiHandler
         //item.setRegistryName(new ResourceLocation(Weather.modID, name));
         item.setRegistryName(getNameDomained(name));
 
-        item.setCreativeTab(CreativeTabs.MISC);
+        item.setCreativeTab(ItemGroup.MISC);
 
         if (event != null) {
             event.getRegistry().register(item);

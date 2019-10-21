@@ -1,24 +1,25 @@
 package CoroUtil.util;
 
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
 public class UtilPlayer {
 
-	public static int getPlayerRating(EntityPlayer player, boolean calculateWeapon) {
+	public static int getPlayerRating(PlayerEntity player, boolean calculateWeapon) {
     	
 		float armorValue = 0;
 		float bestWeaponValue = 0;
 		boolean hasGlove = false;
 		
-		EntityPlayer entP = player;//tryGetCursedPlayer(cursedPlayers.get(i));
+		PlayerEntity entP = player;//tryGetCursedPlayer(cursedPlayers.get(i));
 		
 		for (int armorIndex = 0; armorIndex < 4; armorIndex++) {
 			ItemStack stack = entP.inventory.armorInventory.get(armorIndex);
@@ -29,8 +30,8 @@ public class UtilPlayer {
 					stack.addEnchantment(Enchantment.protection, 5);
 				}*/
 				
-				if (stack.getItem() instanceof ItemArmor) {
-					armorValue += ((ItemArmor)stack.getItem()).damageReduceAmount;
+				if (stack.getItem() instanceof ArmorItem) {
+					armorValue += ((ArmorItem)stack.getItem()).damageReduceAmount;
 					
 				}
 			}
@@ -51,7 +52,7 @@ public class UtilPlayer {
 		//initial removal of current weap attrib
 		if (calculateWeapon) {
 			ItemStack itemstack = entP.inventory.getCurrentItem();
-			if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 			
 			for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.size(); slotIndex++) {
 				if (!entP.inventory.mainInventory.get(slotIndex).isEmpty()) {
@@ -62,7 +63,7 @@ public class UtilPlayer {
 	                if (!itemstack.isEmpty())
 	                {
 	                	//add attrib
-	                	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+	                	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                	
 	                	//temp enchant test
 	                	/*if (itemstack.getItem() instanceof ItemSword) {
@@ -76,7 +77,7 @@ public class UtilPlayer {
 	                float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 	                float f1 = 0.0F;
 	
-	                if (entP instanceof EntityLivingBase)
+	                if (entP instanceof LivingEntity)
 	                {
 	                	if (!itemstack.isEmpty()) {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
@@ -90,7 +91,7 @@ public class UtilPlayer {
 					if (!itemstack.isEmpty())
 	                {
 						//remove attrib
-						entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+						entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                }
 					
 	                if (dmg > bestWeaponValue) {
@@ -101,7 +102,7 @@ public class UtilPlayer {
 			
 			//readd of current weapon attrib
 			itemstack = entP.inventory.getCurrentItem();
-			if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+			if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 		}
 		
 		//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);

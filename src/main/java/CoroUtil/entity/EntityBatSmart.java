@@ -2,33 +2,38 @@ package CoroUtil.entity;
 
 import java.util.Calendar;
 import javax.annotation.Nullable;
-import net.minecraft.block.state.IBlockState;
+
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWanderAvoidWaterFlying;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.ai.EntityFlyHelper;
-import net.minecraft.entity.passive.EntityAmbientCreature;
-import net.minecraft.entity.passive.EntityFlying;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomFlyingGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.controller.FlyingMovementController;
+import net.minecraft.entity.passive.AmbientEntity;
+import net.minecraft.entity.passive.IFlyingAnimal;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.pathfinding.PathNavigate;
-import net.minecraft.pathfinding.PathNavigateFlying;
+import net.minecraft.pathfinding.PathNavigator;
+import net.minecraft.pathfinding.FlyingPathNavigator;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraft.world.storage.loot.LootTables;
+import net.minecraft.world.storage.loot.LootTables;
 
-public class EntityBatSmart extends EntityCreature implements EntityFlying
+public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
 {
     private static final DataParameter<Byte> HANGING = EntityDataManager.<Byte>createKey(EntityBatSmart.class, DataSerializers.BYTE);
     /** Coordinates of where the bat spawned. */
@@ -43,7 +48,7 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
         this.setIsBatHanging(true);
         //TEMP
         this.setIsBatHanging(false);
-        this.moveHelper = new EntityFlyHelper(this);
+        this.moveHelper = new FlyingMovementController(this);
     }
 
     protected void entityInit()
@@ -53,9 +58,9 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     }
 
     @Override
-    protected PathNavigate createNavigator(World worldIn)
+    protected PathNavigator createNavigator(World worldIn)
     {
-        PathNavigateFlying pathnavigateflying = new PathNavigateFlying(this, worldIn);
+        FlyingPathNavigator pathnavigateflying = new FlyingPathNavigator(this, worldIn);
         pathnavigateflying.setCanOpenDoors(false);
         pathnavigateflying.setCanFloat(true);
         pathnavigateflying.setCanEnterDoors(true);
@@ -67,11 +72,11 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     {
         //this.aiSit = new EntityAISit(this);
         //this.tasks.addTask(0, new EntityAIPanic(this, 1.25D));
-        this.tasks.addTask(0, new EntityAISwimming(this));
-        this.tasks.addTask(1, new EntityAIWatchClosest(this, EntityPlayer.class, 8.0F));
+        this.tasks.addTask(0, new SwimGoal(this));
+        this.tasks.addTask(1, new LookAtGoal(this, PlayerEntity.class, 8.0F));
         //this.tasks.addTask(2, this.aiSit);
         //this.tasks.addTask(2, new EntityAIFollowOwnerFlying(this, 1.0D, 5.0F, 1.0F));
-        this.tasks.addTask(2, new EntityAIWanderAvoidWaterFlying(this, 1.0D));
+        this.tasks.addTask(2, new WaterAvoidingRandomFlyingGoal(this, 1.0D));
         //this.tasks.addTask(3, new EntityAILandOnOwnersShoulder(this));
         //this.tasks.addTask(3, new EntityAIFollow(this, 1.0D, 3.0F, 7.0F));
     }
@@ -187,11 +192,11 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
 
                     if (this.world.getNearestPlayerNotCreative(this, 4.0D) != null) {
                         this.setIsBatHanging(false);
-                        this.world.playEvent((EntityPlayer) null, 1025, blockpos, 0);
+                        this.world.playEvent((PlayerEntity) null, 1025, blockpos, 0);
                     }
                 } else {
                     this.setIsBatHanging(false);
-                    this.world.playEvent((EntityPlayer) null, 1025, blockpos, 0);
+                    this.world.playEvent((PlayerEntity) null, 1025, blockpos, 0);
                 }
             } else {
                 if (this.currentFlightTarget != null && (!this.world.isAirBlock(this.currentFlightTarget) || this.currentFlightTarget.getY() < 1)) {
@@ -233,7 +238,7 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     {
     }
 
-    protected void updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos)
+    protected void updateFallState(double y, boolean onGroundIn, BlockState state, BlockPos pos)
     {
     }
 
@@ -268,7 +273,7 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(NBTTagCompound compound)
+    public void readEntityFromNBT(CompoundNBT compound)
     {
         super.readEntityFromNBT(compound);
         this.dataManager.set(HANGING, Byte.valueOf(compound.getByte("BatFlags")));
@@ -277,7 +282,7 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(NBTTagCompound compound)
+    public void writeEntityToNBT(CompoundNBT compound)
     {
         super.writeEntityToNBT(compound);
         compound.setByte("BatFlags", ((Byte)this.dataManager.get(HANGING)).byteValue());
@@ -325,6 +330,6 @@ public class EntityBatSmart extends EntityCreature implements EntityFlying
     @Nullable
     protected ResourceLocation getLootTable()
     {
-        return LootTableList.ENTITIES_BAT;
+        return LootTables.ENTITIES_BAT;
     }
 }

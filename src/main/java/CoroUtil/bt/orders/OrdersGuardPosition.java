@@ -1,7 +1,8 @@
 package CoroUtil.bt.orders;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.OrdersData;
 import CoroUtil.bt.actions.Delay;
@@ -14,20 +15,20 @@ import CoroUtil.util.CoroUtilNBT;
 public class OrdersGuardPosition extends OrdersData {
 
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public final BlockCoord coordsGuard; //shouldnt need to do reference magic...
 	public float guardRadius = 8;
 	
 	public OrdersGuardPosition(IBTAgent parEnt, BlockCoord parCoords, float parRadius) {
 		super();
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		guardRadius = parRadius;
 		coordsGuard = parCoords;
 		activeOrdersName = "guard_position";
 	}
 	
-	public static OrdersGuardPosition newFromNBT(IBTAgent parEnt, NBTTagCompound nbt) {
+	public static OrdersGuardPosition newFromNBT(IBTAgent parEnt, CompoundNBT nbt) {
 		try {
 			OrdersGuardPosition orders = new OrdersGuardPosition(parEnt, CoroUtilNBT.readCoords("coordsGuard", nbt), nbt.getFloat("guardRadius"));
 			return orders;
@@ -38,7 +39,7 @@ public class OrdersGuardPosition extends OrdersData {
 	}
 	
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound parentCompound) {
+	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
 		parentCompound.setFloat("guardRadius", guardRadius);
 		if (coordsGuard != null) CoroUtilNBT.writeCoords("coordsGuard", coordsGuard, parentCompound);
 		return super.writeToNBT(parentCompound);

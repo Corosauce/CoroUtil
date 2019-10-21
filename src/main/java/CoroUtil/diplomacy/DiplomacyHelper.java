@@ -1,13 +1,15 @@
 package CoroUtil.diplomacy;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.monster.*;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.EndermanEntity;
+import net.minecraft.entity.monster.SlimeEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import CoroUtil.bt.IBTAgent;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class DiplomacyHelper {
 
@@ -45,16 +47,16 @@ public class DiplomacyHelper {
 				tiTarget = ((ICoroAI)target).getAIAgent().dipl_info;
 			} else */if (target instanceof IBTAgent) {
 				tiTarget = ((IBTAgent)target).getAIBTAgent().dipl_info;
-			} else if (target instanceof EntityPlayer) {
-				if (!((EntityPlayer)target).capabilities.isCreativeMode) {
+			} else if (target instanceof PlayerEntity) {
+				if (!((PlayerEntity)target).capabilities.isCreativeMode) {
 					tiTarget = TeamTypes.getType("player");//if (tiSource.listEnemies.contains("player")) return true;
 				}
 			} else {
 				//custom rule to avoid vanilla threats that wont attack us if left alone
 				if (!isThreat(target)) {
-					if ((target instanceof EntityMob || target instanceof EntitySlime)) {
+					if ((target instanceof MonsterEntity || target instanceof SlimeEntity)) {
 						tiTarget = TeamTypes.getType("undead");
-					} else if (target instanceof EntityAnimal) {
+					} else if (target instanceof AnimalEntity) {
 						tiTarget = TeamTypes.getType("animal");
 					} else {
 						tiTarget = TeamTypes.getType("neutral");
@@ -72,7 +74,7 @@ public class DiplomacyHelper {
 	}
 	
 	public static boolean isThreat(Entity ent) {
-		if (ent instanceof EntityCreeper || ent instanceof EntityEnderman) {
+		if (ent instanceof CreeperEntity || ent instanceof EndermanEntity) {
 			return true;
 		}
 		return false;

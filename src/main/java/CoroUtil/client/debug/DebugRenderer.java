@@ -1,16 +1,14 @@
 package CoroUtil.client.debug;
 
-import CoroUtil.forge.CULog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.pathfinding.PathPoint;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -122,7 +120,7 @@ public class DebugRenderer {
         {
             tessellator.getBuffer().sortVertexData(0, 0, 0);
         }*/
-        RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+        EntityRendererManager rm = Minecraft.getMinecraft().getRenderManager();
         //tessellator.getBuffer().sortVertexData((float) rm.renderPosX, (float) rm.renderPosY, (float) rm.renderPosZ);
         tessellator.draw();
 
@@ -141,7 +139,7 @@ public class DebugRenderer {
         //drawingBatch = false;
     }
 
-    public static void debugPathfinding(EntityCreature ent) {
+    public static void debugPathfinding(CreatureEntity ent) {
         if (!ent.world.isRemote) {
             if (!ent.getNavigator().noPath()) {
                 for (int k = 0; k < ent.getNavigator().getPath().getCurrentPathLength(); ++k)

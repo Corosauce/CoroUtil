@@ -1,7 +1,7 @@
 package CoroUtil.quest.quests;
 
 import net.minecraft.block.Block;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -90,7 +90,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		return (Block)Block.REGISTRY.getObject(new ResourceLocation(blockType));
 	}
 	
-	public void load(NBTTagCompound parNBT) {
+	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
 		blockCountNeeded = parNBT.getInteger("blockCountNeeded");
 		blockCountCurrent = parNBT.getInteger("blockCountCurrent");
@@ -98,7 +98,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		blockType = parNBT.getString("blockType");
 	}
 	
-	public void save(NBTTagCompound parNBT) {
+	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
 		parNBT.setInteger("blockCountNeeded", blockCountNeeded);
 		parNBT.setInteger("blockCountCurrent", blockCountCurrent);

@@ -9,14 +9,15 @@ import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilPath;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -30,9 +31,9 @@ import java.util.Random;
 /**
  * Hastily converted code from old hostile worlds, seems to work well enough to start
  */
-public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
+public class EntityAIHoist extends Goal implements ITaskInitializer, IInvasionControlledTask
 {
-    protected EntityCreature entity;
+    protected CreatureEntity entity;
     /** The speed with which the mob will approach the target */
     double speedTowardsTarget;
 
@@ -95,7 +96,7 @@ public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IIn
         //CULog.dbg("running hoist");
         //if (true) return;
 
-        EntityLivingBase target = this.entity.getAttackTarget();
+        LivingEntity target = this.entity.getAttackTarget();
 
         if (entity.onGround) {
             entity.entityCollisionReduction = 0.4F;
@@ -175,14 +176,14 @@ public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IIn
 
         /* || isNearWall(getEntityBoundingBox()) || isOnLadder()*/
         if (!entity.world.isRemote && stackMode) {
-            List<EntityLivingBase> var2 = entity.world.getEntitiesWithinAABB(EntityLivingBase.class, entity.getEntityBoundingBox().expand(rangeBox, 2D, rangeBox));
+            List<LivingEntity> var2 = entity.world.getEntitiesWithinAABB(LivingEntity.class, entity.getEntityBoundingBox().expand(rangeBox, 2D, rangeBox));
 
             Random rand = new Random();
             Entity ent = null;
 
             if (var2.size() > 1) {
                 for (int i = 0; i < var2.size(); i++) {
-                    if (var2.get(i) != entity && var2.get(i) instanceof EntityZombie &&
+                    if (var2.get(i) != entity && var2.get(i) instanceof ZombieEntity &&
                             entity.getEntityId() > var2.get(i).getEntityId() &&
                             entity.getEntityBoundingBox().minY+1.5D > var2.get(i).getEntityBoundingBox().minY &&
                             entity.getEntityBoundingBox().minY < var2.get(i).getEntityBoundingBox().maxY) {
@@ -232,7 +233,7 @@ public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IIn
                         double tryY = entity.posY+0.5D+(rand.nextFloat() * 2D);
                         double tryZ = entity.posZ-0.8D+rand.nextFloat();
                         BlockPos pos = new BlockPos(tryX, tryY, tryZ);
-                        IBlockState state = entity.world.getBlockState(pos);
+                        BlockState state = entity.world.getBlockState(pos);
                         //Block id = entity.world.getBlock((int)(tryX), (int)(tryY), (int)(tryZ));
                         if (!CoroUtilBlock.isAir(state.getBlock()) && (state.getMaterial() == Material.LEAVES || state.getMaterial() == Material.PLANTS) && !(state.getBlock() instanceof BlockRepairingBlock)) {
                             //System.out.println("remove leafs!");
@@ -315,13 +316,13 @@ public class EntityAIHoist extends EntityAIBase implements ITaskInitializer, IIn
 
     }
 
-    protected double getAttackReachSqr(EntityLivingBase attackTarget)
+    protected double getAttackReachSqr(LivingEntity attackTarget)
     {
         return (double)(this.entity.width * 2.0F * this.entity.width * 2.0F + attackTarget.width);
     }
 
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
         this.entity = creature;
     }
 

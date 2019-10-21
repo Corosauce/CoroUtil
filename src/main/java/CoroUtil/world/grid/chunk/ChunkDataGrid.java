@@ -7,8 +7,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilFile;
 
@@ -88,7 +89,7 @@ public class ChunkDataGrid
 			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
 			
 			if ((new File(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat"));
+				CompoundNBT data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat"));
 				
 				/*Collection playerDataCl = data.getTags();
 				Iterator it = playerDataCl.iterator();*/
@@ -97,7 +98,7 @@ public class ChunkDataGrid
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
-					NBTTagCompound nbt = data.getCompoundTag(keyName);
+					CompoundNBT nbt = data.getCompoundTag(keyName);
 					
 					ChunkDataPoint bdp = this.getChunkData(nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
 					if (bdp != null) {
@@ -117,7 +118,7 @@ public class ChunkDataGrid
 	public void writeToFile(boolean unloadInstances) {
     	try {
     		
-    		NBTTagCompound data = new NBTTagCompound();
+    		CompoundNBT data = new CompoundNBT();
     		
     		Collection playerDataCl = grid.values();
 			Iterator it = playerDataCl.iterator();

@@ -1,14 +1,16 @@
 package CoroUtil.bt;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.math.MathHelper;
 
 public class EntityMoveHelperCustom
 {
     /** The EntityLiving that is being moved */
-    private EntityLivingBase entity;
+    private LivingEntity entity;
     private double posX;
     private double posY;
     private double posZ;
@@ -20,7 +22,7 @@ public class EntityMoveHelperCustom
     public boolean canSwimInWater; //used for navigating under the water without strait up float forcing (float code is elsewhere usually)
     public boolean canFly; //used for navigating flying paths
 
-    public EntityMoveHelperCustom(EntityLivingBase par1EntityLiving)
+    public EntityMoveHelperCustom(LivingEntity par1EntityLiving)
     {
         this.entity = par1EntityLiving;
         this.posX = par1EntityLiving.posX;
@@ -55,8 +57,8 @@ public class EntityMoveHelperCustom
     	
     	//System.out.println("custom mover updating");
     	
-    	if (entity instanceof EntityLiving) {
-    		((EntityLiving)this.entity).setMoveForward(0.0F);
+    	if (entity instanceof MobEntity) {
+    		((MobEntity)this.entity).setMoveForward(0.0F);
     	} else {
     		System.out.println("EntityMoveHelperCustom being used on non EntityLiving entity, needs code patch");
     	}
@@ -96,7 +98,7 @@ public class EntityMoveHelperCustom
 
                 if (d2 > 0.0D/* && d0 * d0 + d1 * d1 < 1.0D*/)
                 {
-                	if (entity instanceof EntityLiving) {
+                	if (entity instanceof MobEntity) {
                 		if (canFly || canSwimInWater) {
                 			//System.out.println("fly up test");
                 			
@@ -108,7 +110,7 @@ public class EntityMoveHelperCustom
                 			
                 			entity.motionY = 1F * this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
                 		} else {
-                			((EntityLiving)this.entity).getJumpHelper().setJumping();
+                			((MobEntity)this.entity).getJumpHelper().setJumping();
                 		}
                 	} else {
                 		System.out.println("EntityMoveHelperCustom being used on non EntityLiving entity, needs code patch");

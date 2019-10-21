@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import CoroUtil.repack.de.androidpit.colorthief.ColorThief;
 import extendedrenderer.foliage.FoliageData;
 import it.unimi.dsi.fastutil.ints.IntArrays;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -14,7 +14,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 public class CoroUtilColor {
     
     @SuppressWarnings("null")
-    public static int[] getColors(IBlockState state) {
+    public static int[] getColors(BlockState state) {
         if (state instanceof IExtendedBlockState) {
             state = ((IExtendedBlockState) state).getClean();
         }

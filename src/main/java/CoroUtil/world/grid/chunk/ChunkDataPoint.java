@@ -9,10 +9,11 @@ import java.util.UUID;
 
 import CoroUtil.difficulty.DamageSourceEntry;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
@@ -50,7 +51,7 @@ public class ChunkDataPoint
     public PlayerDataGrid playerDataForAll = new PlayerDataGrid();
     //public long playerActivityTotal = 0;
     
-    public Class enemyClass = EntityMob.class;
+    public Class enemyClass = MonsterEntity.class;
     
     //dynamic difficulty code
     public List<Float> listDPSAveragesShortTerm = new ArrayList<Float>();
@@ -92,7 +93,7 @@ public class ChunkDataPoint
 							int heightVal = Math.max(0, chunk.getHeightValue(x, z) - 1);
 
 							if (heightVal >= 0) {
-								IBlockState state = chunk.getBlockState(new BlockPos(x, heightVal, z));
+								BlockState state = chunk.getBlockState(new BlockPos(x, heightVal, z));
 								Block id = state.getBlock();
 
 								if (id.getMaterial(state).isLiquid()) {
@@ -178,15 +179,15 @@ public class ChunkDataPoint
         return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
     }
     
-    public void readFromNBT(NBTTagCompound nbt) {
+    public void readFromNBT(CompoundNBT nbt) {
     	lastTickTime = nbt.getLong("lastTickTime");
     	spawnableType = nbt.getInteger("spawnableType");
     	countEntitiesEnemy = nbt.getInteger("countEntitiesEnemy");
-    	NBTTagCompound nbtListPlayers = nbt.getCompoundTag("listPlayers");
+    	CompoundNBT nbtListPlayers = nbt.getCompoundTag("listPlayers");
     	Iterator it = nbtListPlayers.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
-    		NBTTagCompound entry = nbtListPlayers.getCompoundTag(entryName);
+    		CompoundNBT entry = nbtListPlayers.getCompoundTag(entryName);
     		UUID uuid = UUID.fromString(entry.getString("UUID"));
     		PlayerDataGrid playerData = new PlayerDataGrid();
     		playerData.nbtRead(entry.getCompoundTag("playerData"));
@@ -201,7 +202,7 @@ public class ChunkDataPoint
     	averageDPS = nbt.getFloat("averageDPS");
     	
     	
-    	NBTTagCompound nbtDPSs = nbt.getCompoundTag("listDPSAveragesLongTerm");
+    	CompoundNBT nbtDPSs = nbt.getCompoundTag("listDPSAveragesLongTerm");
     	it = nbtDPSs.getKeySet().iterator();
     	while (it.hasNext()) {
     		String entryName = (String) it.next();
@@ -210,7 +211,7 @@ public class ChunkDataPoint
     	}
 
     	if (nbt.hasKey("highestDamage")) {
-			NBTTagCompound highestDamageNBT = nbt.getCompoundTag("highestDamage");
+			CompoundNBT highestDamageNBT = nbt.getCompoundTag("highestDamage");
 			highestDamage = new DamageSourceEntry();
 			highestDamage.source_entity_true = highestDamageNBT.getString("source_entity_true");
 			highestDamage.source_entity_immediate = highestDamageNBT.getString("source_entity_immediate");
@@ -230,17 +231,17 @@ public class ChunkDataPoint
     	zCoord = nbt.getInteger("zCoord");*/
     }
     
-    public NBTTagCompound writeToNBT() {
-    	NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT writeToNBT() {
+    	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.setLong("lastTickTime", lastTickTime);
     	nbt.setInteger("spawnableType", spawnableType);
     	nbt.setInteger("countEntitiesEnemy", countEntitiesEnemy);
     	
-    	NBTTagCompound nbtListPlayers = new NBTTagCompound();
+    	CompoundNBT nbtListPlayers = new CompoundNBT();
     	int count = 0;
     	for (Map.Entry<UUID, PlayerDataGrid> entry : lookupPlayersToActivity.entrySet()) {
-    		NBTTagCompound nbtEntry = new NBTTagCompound();
+    		CompoundNBT nbtEntry = new CompoundNBT();
     		nbtEntry.setString("UUID", entry.getKey().toString());
     		nbtEntry.setTag("playerData", entry.getValue().nbtWrite());
     		//nbtEntry.setLong("activityVal", entry.getValue());
@@ -260,13 +261,13 @@ public class ChunkDataPoint
     	
     	nbt.setLong("lastDPSRecalc", lastDPSRecalc);
     	nbt.setFloat("averageDPS", averageDPS);
-    	NBTTagCompound nbtDPSs = new NBTTagCompound();
+    	CompoundNBT nbtDPSs = new CompoundNBT();
     	for (int i = 0; i < listDPSAveragesLongTerm.size(); i++) {
     		nbtDPSs.setFloat("entry_" + i, listDPSAveragesLongTerm.get(i));
     	}
     	nbt.setTag("listDPSAveragesLongTerm", nbtDPSs);
 
-    	NBTTagCompound highestDamageNBT = new NBTTagCompound();
+    	CompoundNBT highestDamageNBT = new CompoundNBT();
 		highestDamageNBT.setString("source_entity_true", highestDamage.source_entity_true);
 		highestDamageNBT.setString("source_entity_immediate", highestDamage.source_entity_immediate);
 		highestDamageNBT.setString("target_entity", highestDamage.target_entity);

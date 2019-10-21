@@ -3,7 +3,7 @@ package CoroUtil.difficulty.buffs;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAIInfernal;
 import CoroUtil.util.CoroUtilCrossMod;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 
 /**
  * Created by Corosus on 1/9/2017.
@@ -16,7 +16,7 @@ public class BuffAI_Infernal extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
 
         CmodAIInfernal cmod = (CmodAIInfernal)UtilEntityBuffs.getCmodData(ent, getTagName());
 
@@ -54,12 +54,12 @@ public class BuffAI_Infernal extends BuffBase {
     }
 
     @Override
-    public boolean canApplyBuff(EntityCreature ent, float difficulty) {
+    public boolean canApplyBuff(CreatureEntity ent, float difficulty) {
         return CoroUtilCrossMod.hasInfernalMobs();
     }
 
     @Override
-    public void applyBuffFromReload(EntityCreature ent, float difficulty) {
+    public void applyBuffFromReload(CreatureEntity ent, float difficulty) {
 
         //infernal mobs own system should be restoring it correctly now
 

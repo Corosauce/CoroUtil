@@ -1,11 +1,11 @@
 package CoroUtil.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.init.MobEffects;
-import net.minecraft.pathfinding.PathPoint;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.LightType;
+import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 
 import java.awt.*;
@@ -122,7 +122,7 @@ public class CoroUtilBlockLightCache {
         //cached in lightmap, wont be needed in future
         float brightnessSky = world.getSunBrightness(1F);
 
-        float brightnessBlock = world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z)) / 15F;
+        float brightnessBlock = world.getLightFromNeighborsFor(LightType.BLOCK, new BlockPos(x, y, z)) / 15F;
 
         float brightness = brightnessSky;
         if (brightnessBlock > brightnessSky) {
@@ -135,8 +135,8 @@ public class CoroUtilBlockLightCache {
     public static float getBrightnessFromLightmap(World world, float x, float y, float z) {
 
         BlockPos pos = new BlockPos(x, y, z);
-        int i = world.getLightFromNeighborsFor(EnumSkyBlock.SKY, pos);
-        int j = world.getLightFromNeighborsFor(EnumSkyBlock.BLOCK, pos);
+        int i = world.getLightFromNeighborsFor(LightType.SKY, pos);
+        int j = world.getLightFromNeighborsFor(LightType.BLOCK, pos);
 
         int[] texData = Minecraft.getMinecraft().entityRenderer.lightmapTexture.getTextureData();
 

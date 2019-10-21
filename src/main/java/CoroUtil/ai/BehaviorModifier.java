@@ -4,11 +4,10 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import CoroUtil.difficulty.UtilEntityBuffs;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.ai.EntityAITasks.EntityAITaskEntry;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import CoroUtil.util.Vec3;
@@ -30,14 +29,14 @@ public class BehaviorModifier {
 		
 		AxisAlignedBB aabb = new AxisAlignedBB(parPos.xCoord, parPos.yCoord, parPos.zCoord, parPos.xCoord, parPos.yCoord, parPos.zCoord);
 		aabb = aabb.grow(modifyRange, modifyRange, modifyRange);
-		List list = parWorld.getEntitiesWithinAABB(EntityZombie.class, aabb);
+		List list = parWorld.getEntitiesWithinAABB(ZombieEntity.class, aabb);
 		
 		int enhanceCount = 0;
 		int enhanceCountTry = 0;
 		
         for(int j = 0; j < list.size(); j++)
         {
-        	EntityCreature ent = (EntityCreature)list.get(j);
+        	CreatureEntity ent = (CreatureEntity)list.get(j);
             
         	if (ent != null && !ent.isDead) {
         		//if (!aiEnhanced.containsKey(ent.getEntityId())) {
@@ -67,16 +66,16 @@ public class BehaviorModifier {
         //System.out.println("enhanced " + enhanceCount + " of " + enhanceCountTry + " entities");
 	}
 	
-	public static boolean addTaskIfMissing(EntityCreature ent, Class taskToCheckFor, Class[] taskToInject, int priorityOfTask, boolean isTargetTask) {
+	public static boolean addTaskIfMissing(CreatureEntity ent, Class taskToCheckFor, Class[] taskToInject, int priorityOfTask, boolean isTargetTask) {
 		boolean foundTask = false;
 
-		EntityAITasks tasks = ent.tasks;
+		GoalSelector tasks = ent.tasks;
 		if (isTargetTask) {
 			tasks = ent.targetTasks;
 		}
 
 		for (Object entry2 : tasks.taskEntries) {
-			EntityAITaskEntry entry = (EntityAITaskEntry) entry2;
+			Goal entry = (Goal) entry2;
 			if (taskToCheckFor.isAssignableFrom(entry.action.getClass())) {
 				foundTask = true;
 				break;
@@ -97,16 +96,16 @@ public class BehaviorModifier {
 		
 	}
 
-	public static boolean replaceTaskIfMissing(EntityCreature ent, Class taskToReplace, Class tasksToReplaceWith, int priorityOfTask, boolean isTargetTask) {
-		EntityAITaskEntry foundTask = null;
+	public static boolean replaceTaskIfMissing(CreatureEntity ent, Class taskToReplace, Class tasksToReplaceWith, int priorityOfTask, boolean isTargetTask) {
+		Goal foundTask = null;
 
-		EntityAITasks tasks = ent.tasks;
+		GoalSelector tasks = ent.tasks;
 		if (isTargetTask) {
 			tasks = ent.targetTasks;
 		}
 
 		for (Object entry2 : tasks.taskEntries) {
-			EntityAITaskEntry entry = (EntityAITaskEntry) entry2;
+			Goal entry = (Goal) entry2;
 			if (taskToReplace.isAssignableFrom(entry.action.getClass())) {
 				foundTask = entry;
 				break;
@@ -123,16 +122,16 @@ public class BehaviorModifier {
 
 	}
 	
-	public static boolean replaceTaskIfMissing(EntityCreature ent, Class taskToReplace, Class[] tasksToReplaceWith, int[] priorityOfTask, boolean isTargetTask) {
-		EntityAITaskEntry foundTask = null;
+	public static boolean replaceTaskIfMissing(CreatureEntity ent, Class taskToReplace, Class[] tasksToReplaceWith, int[] priorityOfTask, boolean isTargetTask) {
+		Goal foundTask = null;
 
-		EntityAITasks tasks = ent.tasks;
+		GoalSelector tasks = ent.tasks;
 		if (isTargetTask) {
 			tasks = ent.targetTasks;
 		}
 
 		for (Object entry2 : tasks.taskEntries) {
-			EntityAITaskEntry entry = (EntityAITaskEntry) entry2;
+			Goal entry = (Goal) entry2;
 			if (taskToReplace.isAssignableFrom(entry.action.getClass())) {
 				foundTask = entry;
 				break;
@@ -151,10 +150,10 @@ public class BehaviorModifier {
 		
 	}
 	
-	public static boolean addTask(EntityCreature ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
+	public static boolean addTask(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
 		try {
 
-			EntityAITasks tasks = ent.tasks;
+			GoalSelector tasks = ent.tasks;
 			if (isTargetTask) {
 				tasks = ent.targetTasks;
 			}
@@ -165,7 +164,7 @@ public class BehaviorModifier {
 				ITaskInitializer task = (ITaskInitializer) obj;
 				task.setEntity(ent);
 				//System.out.println("adding task into zombie: " + taskToInject);
-				tasks.addTask(priorityOfTask, (EntityAIBase) task);
+				tasks.addTask(priorityOfTask, (Goal) task);
 				//aiEnhanced.put(ent.getEntityId(), true);
 				
 				

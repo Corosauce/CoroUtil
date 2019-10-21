@@ -9,19 +9,21 @@ import com.google.common.base.Predicate;
 import java.util.Comparator;
 import javax.annotation.Nullable;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.EntityPredicates;
+import net.minecraft.util.EntityPredicates;
 
-public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBase> extends EntityAITargetBetter implements ITaskInitializer, IInvasionControlledTask
+public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> extends EntityAITargetBetter implements ITaskInitializer, IInvasionControlledTask
 {
-    protected Class<EntityPlayer> targetClass;
+    protected Class<PlayerEntity> targetClass;
     private int targetChance;
     /** Instance of EntityAINearestAttackableTargetSorter. */
     protected EntityAINearestAttackablePlayerOmniscience.Sorter sorter;
     protected Predicate <? super T > targetEntitySelector;
-    protected EntityPlayer targetEntity;
+    protected PlayerEntity targetEntity;
 
     private boolean disableAtSunrise = true;
 
@@ -29,7 +31,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     public EntityAINearestAttackablePlayerOmniscience() {
         shouldCheckSight = false;
         nearbyOnly = false;
-        this.targetClass = EntityPlayer.class;
+        this.targetClass = PlayerEntity.class;
         this.targetChance = 40;
         this.setMutexBits(0);
         this.targetEntitySelector = new Predicate<T>()
@@ -42,7 +44,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
                 }
                 else
                 {
-                    return !EntitySelectors.NOT_SPECTATING.apply(p_apply_1_) ? false : EntityAINearestAttackablePlayerOmniscience.this.isPlayerItSpawnedForOrBlank(p_apply_1_);
+                    return !EntityPredicates.NOT_SPECTATING.apply(p_apply_1_) ? false : EntityAINearestAttackablePlayerOmniscience.this.isPlayerItSpawnedForOrBlank(p_apply_1_);
                 }
             }
         };
@@ -52,9 +54,9 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
      * A method used to see if an entity is a suitable target through a number of checks. Args : entity,
      * canTargetInvinciblePlayer
      */
-    protected boolean isPlayerItSpawnedForOrBlank(@Nullable EntityLivingBase target)
+    protected boolean isPlayerItSpawnedForOrBlank(@Nullable LivingEntity target)
     {
-        if (target instanceof EntityPlayer) {
+        if (target instanceof PlayerEntity) {
             if (this.taskOwner.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
                 String spawnName = this.taskOwner.getEntityData().getString(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor);
                 if (spawnName != null && target.getName().equals(spawnName)) {
@@ -83,7 +85,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
         {
             this.targetEntity = this.taskOwner.world.getNearestAttackablePlayer(
                     this.taskOwner.posX, this.taskOwner.posY + (double)this.taskOwner.getEyeHeight(), this.taskOwner.posZ,
-                    this.getTargetDistance(), this.getTargetDistance(), null, (Predicate<EntityPlayer>)this.targetEntitySelector);
+                    this.getTargetDistance(), this.getTargetDistance(), null, (Predicate<PlayerEntity>)this.targetEntitySelector);
             return this.targetEntity != null;
         }
     }
@@ -104,7 +106,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
     }
 
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
         this.taskOwner = creature;
         this.sorter = new EntityAINearestAttackablePlayerOmniscience.Sorter(creature);
     }
@@ -116,7 +118,7 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends EntityLivingBa
             if (this.taskOwner.world.isDaytime()) {
                 CULog.dbg("removing omniscience from " + this.taskOwner.getName());
                 //also detarget
-                if (this.taskOwner.getAttackTarget() instanceof EntityPlayer) {
+                if (this.taskOwner.getAttackTarget() instanceof PlayerEntity) {
                     this.taskOwner.setAttackTarget(null);
                 }
                 return true;

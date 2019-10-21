@@ -5,8 +5,9 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.difficulty.data.cmods.CmodXP;
 import CoroUtil.util.EnumAttribModifierType;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -22,7 +23,7 @@ public class BuffXP extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
 
         CmodXP cmod = (CmodXP)UtilEntityBuffs.getCmodData(ent, getTagName());
 
@@ -41,7 +42,7 @@ public class BuffXP extends BuffBase {
     }
 
     @Override
-    public void applyBuffFromReload(EntityCreature ent, float difficulty) {
+    public void applyBuffFromReload(CreatureEntity ent, float difficulty) {
         applyBuff(ent, difficulty);
     }
 }

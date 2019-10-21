@@ -4,14 +4,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.BlockWall;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.FenceBlock;
+import net.minecraft.block.FenceGateBlock;
+import net.minecraft.block.WallBlock;
+import net.minecraft.block.FenceBlock;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.FoodStats;
@@ -92,7 +94,7 @@ public class OldUtil {
 	
     //TODO: 1.8 needs the block pos for checking open fence gates, fix for ZC
 	public static boolean isNoPathBlock(Entity ent, Block parBlock, int meta) {
-		if (ent instanceof EntityPlayer) {
+		if (ent instanceof PlayerEntity) {
 			//barricades
 			System.out.println("FIX BARRICADES SPECIAL RULE HERE!");
 			/*if (id >= 192 && id <= 197) {
@@ -101,16 +103,16 @@ public class OldUtil {
 			
 			Block block = parBlock;//Block.blocksList[id];
 			
-			if (block != null && block instanceof BlockFence) {
+			if (block != null && block instanceof FenceBlock) {
 				return true;
 			}
 			
-			if (block != null && block instanceof BlockWall) {
+			if (block != null && block instanceof WallBlock) {
 				return true;
 			}
 			
 			//force no pass for now till fixed above message
-			if (block != null && block instanceof BlockFenceGate) {
+			if (block != null && block instanceof FenceGateBlock) {
 				return true;
 				//return !BlockFenceGate.isFenceGateOpen(meta);
 			}
@@ -125,11 +127,11 @@ public class OldUtil {
 	}
 	
 	public static Field s_getItemInUse() {
-		return tryGetField(EntityPlayer.class, refl_s_EntityPlayer_itemInUse, refl_mcp_EntityPlayer_itemInUse);
+		return tryGetField(PlayerEntity.class, refl_s_EntityPlayer_itemInUse, refl_mcp_EntityPlayer_itemInUse);
 	}
 	
 	public static Field s_getItemInUseCount() {
-		return tryGetField(EntityPlayer.class, refl_s_EntityPlayer_itemInUseCount, refl_mcp_EntityPlayer_itemInUseCount);
+		return tryGetField(PlayerEntity.class, refl_s_EntityPlayer_itemInUseCount, refl_mcp_EntityPlayer_itemInUseCount);
 	}
 	
 	public static Field s_getFoodLevel() {
@@ -379,7 +381,7 @@ public class OldUtil {
     	return false;
     }
 	
-    public static EntityPlayer getFirstPlayer() {
+    public static PlayerEntity getFirstPlayer() {
     	//if (mc == null) mc = ModLoader.getMinecraftInstance();
     	//return mc.player;
     	return null;
@@ -390,7 +392,7 @@ public class OldUtil {
     	//if (id == 0) return false;
     	//Block block = Block.blocksList[id];
     	if (parBlock != null) {
-    		if (parBlock instanceof BlockChest) return true;
+    		if (parBlock instanceof ChestBlock) return true;
     	}
 		return false;
 	}
@@ -422,10 +424,10 @@ public class OldUtil {
     //public static int getAge(EntityLivingBase ent) { return ent.entityAge; }
     //public static void addAge(EntityLivingBase ent, int offsetAge) { ent.entityAge += offsetAge; }
     //public static void despawnEntity(EntityLiving ent) { ent.despawnEntity(); }
-    public static float getMoveSpeed(EntityLivingBase ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue(); }
+    public static float getMoveSpeed(LivingEntity ent) { return (float) ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue(); }
     //public static void setMoveSpeed(EntityLivingBase ent, float speed) { ent.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setAttribute(speed); }
     //public static void setHealth(EntityLivingBase ent, int health) { ent.health = health; }
-    public static void jump(EntityLivingBase ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
+    public static void jump(LivingEntity ent) { ent.motionY = 0.42F;/*ent.jump();*/ }
     public static boolean chunkExists(World world, int x, int z) { return world.isBlockLoaded(new BlockPos(x * 16, 128, z * 16)); } //fixed for 1.5
     
     public static BlockCoord entToCoord(Entity ent) { return new BlockCoord(MathHelper.floor(ent.posX), MathHelper.floor(ent.posY), MathHelper.floor(ent.posZ)); }

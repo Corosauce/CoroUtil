@@ -2,7 +2,8 @@ package CoroUtil.difficulty;
 
 import CoroUtil.util.BlockCoord;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class DifficultyInfoPlayer {
@@ -50,7 +51,7 @@ public class DifficultyInfoPlayer {
         difficultyDPS = buf.readFloat();
     }
 
-    public void updateData(EntityPlayer player, int countNeededBase, double multiplier) {
+    public void updateData(PlayerEntity player, int countNeededBase, double multiplier) {
 
         int skipCount = player.getEntityData().getInteger(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier);
 

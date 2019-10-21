@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import CoroUtil.util.CoroUtilFile;
 
 public class PetsManager {
@@ -30,7 +33,7 @@ public class PetsManager {
 		return instance;
 	}
 	
-	public void addPet(UUID parOwner, EntityLiving parEnt) {
+	public void addPet(UUID parOwner, MobEntity parEnt) {
 		PetEntry entry = new PetEntry();
 		entry.ownerUUID = parOwner;
 		//entry.UUIDLeast = parEnt.getUniqueID().getLeastSignificantBits();
@@ -44,23 +47,23 @@ public class PetsManager {
 		lookupUUIDToPet.put(parEntry.entUUID, parEntry);
 	}
 	
-	public void removePet(EntityLiving parEnt) {
+	public void removePet(MobEntity parEnt) {
 		PetEntry entry = lookupUUIDToPet.get(parEnt.getUniqueID());
 		pets.remove(entry);
 		lookupUUIDToPet.remove(parEnt.getUniqueID());
 	}
 	
-	public void hookPetInstanceReloaded(EntityCreature ent) {
+	public void hookPetInstanceReloaded(CreatureEntity ent) {
 		CULog.dbg("pet reloaded: " + ent);
 		UUID uuid = ent.getUniqueID();
 		initPetsNewInstance(ent);
 	}
 	
-	public void hookPetInstanceUnloaded(EntityCreature ent) {
+	public void hookPetInstanceUnloaded(CreatureEntity ent) {
 		CULog.dbg("pet unloaded: " + ent);
 	}
 	
-	public void initPetsNewInstance(EntityCreature ent) {
+	public void initPetsNewInstance(CreatureEntity ent) {
 		//do stuff from behavior modifiers
 		PetEntry entry = lookupUUIDToPet.get(ent.getUniqueID());
 		//TODO: readd 1.8.8
@@ -81,7 +84,7 @@ public class PetsManager {
     		if (file.exists()) {
 		    	fis = new FileInputStream(file);
 		    	
-		    	NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(fis);
+		    	CompoundNBT nbttagcompound = CompressedStreamTools.readCompressed(fis);
 		    	
 		    	nbtRead(nbttagcompound);
 				
@@ -101,7 +104,7 @@ public class PetsManager {
 	public void nbtWriteToDisk() {
 		try {
 			
-			NBTTagCompound nbt = nbtWrite();
+			CompoundNBT nbt = nbtWrite();
 			
 			String URL = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroPets" + File.separator;
 			
@@ -119,11 +122,11 @@ public class PetsManager {
 		}
 	}
 	
-	public void nbtRead(NBTTagCompound parNBT) {
+	public void nbtRead(CompoundNBT parNBT) {
 		Iterator it = parNBT.getKeySet().iterator();
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	NBTTagCompound entry = parNBT.getCompoundTag(tagName);
+        	CompoundNBT entry = parNBT.getCompoundTag(tagName);
         	
         	PetEntry petEntry = new PetEntry();
         	petEntry.nbtRead(entry);
@@ -133,11 +136,11 @@ public class PetsManager {
         }
 	}
 	
-	public NBTTagCompound nbtWrite() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT nbtWrite() {
+		CompoundNBT nbt = new CompoundNBT();
 		
 		for (int i = 0; i < pets.size(); i++) {
-			NBTTagCompound nbtEntry = pets.get(i).nbtWrite();
+			CompoundNBT nbtEntry = pets.get(i).nbtWrite();
 			nbt.setTag("entry_" + i, nbtEntry);
 		}
 		

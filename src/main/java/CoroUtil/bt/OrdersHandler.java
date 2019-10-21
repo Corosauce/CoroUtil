@@ -1,6 +1,7 @@
 package CoroUtil.bt;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 public class OrdersHandler {
 	
@@ -41,11 +42,11 @@ public class OrdersHandler {
 		}
 	}*/
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound parentCompound) {
+	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
 		if (activeOrders != null) {
 			parentCompound.setString("activeOrdersName", activeOrders.activeOrdersName);
 			
-			NBTTagCompound activeOrdersNBT = new NBTTagCompound();
+			CompoundNBT activeOrdersNBT = new CompoundNBT();
 			activeOrdersNBT = activeOrders.writeToNBT(activeOrdersNBT);
 			parentCompound.setTag("activeOrdersNBT", activeOrdersNBT);
 		}

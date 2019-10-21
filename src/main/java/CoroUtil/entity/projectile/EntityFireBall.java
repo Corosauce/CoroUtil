@@ -4,13 +4,13 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.util.Vec3;
 import extendedrenderer.ExtendedRenderer;
@@ -22,7 +22,7 @@ public class EntityFireBall extends EntityProjectileBase
 {
 	public int ticksInAir;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public boolean hasDeathTicked;
 
 	public EntityFireBall(World world)
@@ -30,12 +30,12 @@ public class EntityFireBall extends EntityProjectileBase
 		super(world);
 	}
 	
-	public EntityFireBall(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase target, double parSpeed)
+	public EntityFireBall(World par1World, LivingEntity par2EntityLivingBase, LivingEntity target, double parSpeed)
     {
 		super(par1World, par2EntityLivingBase, target, parSpeed);
     }
 
-	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed, float parYaw, float parPitch)
+	public EntityFireBall(World world, LivingEntity entityliving, double parSpeed, float parYaw, float parPitch)
 	{
 		super(world, entityliving, parSpeed);
 		
@@ -47,7 +47,7 @@ public class EntityFireBall extends EntityProjectileBase
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, speed, 1.0F);
 	}
 	
-	public EntityFireBall(World world, EntityLivingBase entityliving, double parSpeed)
+	public EntityFireBall(World world, LivingEntity entityliving, double parSpeed)
 	{
 		super(world, entityliving, parSpeed);
 		
@@ -103,7 +103,7 @@ public class EntityFireBall extends EntityProjectileBase
         Entity entity = null;
         List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(0.5D, 1D, 0.5D));
         double d0 = 0.0D;
-        EntityLivingBase entityliving = this.getThrower();
+        LivingEntity entityliving = this.getThrower();
 
         for (int j = 0; j < list.size(); ++j)
         {
@@ -182,7 +182,7 @@ public class EntityFireBall extends EntityProjectileBase
 		super.setDead();
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void tickAnimate() {
 		int amount = 10 / (Minecraft.getMinecraft().gameSettings.particleSetting+1);
 		
@@ -201,7 +201,7 @@ public class EntityFireBall extends EntityProjectileBase
     	}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void tickDeath() {
 		if (!hasDeathTicked) {
 			hasDeathTicked = true;

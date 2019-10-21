@@ -5,28 +5,26 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 
-import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.io.IOUtils;
 
 public class CoroUtilFile {
 	public static String lastWorldFolder = "";
     
-	public static NBTTagCompound getExtraWorldNBT(String fileName) {
-		NBTTagCompound data = new NBTTagCompound();
+	public static CompoundNBT getExtraWorldNBT(String fileName) {
+		CompoundNBT data = new CompoundNBT();
 		//try load
 		
 		String saveFolder = getWorldSaveFolderPath() + getWorldFolderName();
@@ -44,7 +42,7 @@ public class CoroUtilFile {
 		return data;
 	}
 	
-	public static void setExtraWorldNBT(String fileName, NBTTagCompound data) {
+	public static void setExtraWorldNBT(String fileName, CompoundNBT data) {
 		try {
     		
     		String saveFolder = getWorldSaveFolderPath() + getWorldFolderName();
@@ -64,7 +62,7 @@ public class CoroUtilFile {
 		World world = DimensionManager.getWorld(0);
 		
 		if (world != null) {
-			lastWorldFolder = ((WorldServer)world).getChunkSaveLocation().getName();
+			lastWorldFolder = ((ServerWorld)world).getChunkSaveLocation().getName();
 			return lastWorldFolder + File.separator;
 		}
 		
@@ -96,18 +94,18 @@ public class CoroUtilFile {
     	}
     }
     
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
 	public static String getClientSidePath() {
 		return FMLClientHandler.instance().getClient().mcDataDir/*getAppDir("minecraft")*/.getPath();
 	}
     
-    public static void writeCoords(String name, BlockCoord coords, NBTTagCompound nbt) {
+    public static void writeCoords(String name, BlockCoord coords, CompoundNBT nbt) {
     	nbt.setInteger(name + "X", coords.posX);
     	nbt.setInteger(name + "Y", coords.posY);
     	nbt.setInteger(name + "Z", coords.posZ);
     }
     
-    public static BlockCoord readCoords(String name, NBTTagCompound nbt) {
+    public static BlockCoord readCoords(String name, CompoundNBT nbt) {
     	if (nbt.hasKey(name + "X")) {
     		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
     	} else {
@@ -115,7 +113,7 @@ public class CoroUtilFile {
     	}
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
 		try {
 			IResourceManager resourceManager = Minecraft.getMinecraft().entityRenderer.resourceManager;

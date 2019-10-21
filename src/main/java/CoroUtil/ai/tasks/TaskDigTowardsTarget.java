@@ -13,12 +13,16 @@ import CoroUtil.util.UtilMining;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -26,17 +30,17 @@ import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.util.BlockCoord;
 import net.minecraft.util.math.Vec3d;
 
-public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
+public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInvasionControlledTask
 {
 
 	//set from ConfigInvasion
 	public static boolean convertMinedBlocksToRepairingBlocksDuringInvasions = true;
 	public static boolean preventMinedTileEntitiesDuringInvasions = true;
 
-    private EntityCreature entity = null;
-	private IBlockState stateCurMining = null;
+    private CreatureEntity entity = null;
+	private BlockState stateCurMining = null;
     private BlockCoord posCurMining = null;
-    private EntityLivingBase targetLastTracked = null;
+    private LivingEntity targetLastTracked = null;
     private int digTimeCur = 0;
     private int digTimeMax = 15*20;
     //private double curBlockDamage = 0D;
@@ -64,7 +68,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     }
     
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
     	this.entity = creature;
     }
 
@@ -341,7 +345,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
         boolean oneMinable = false;
 
         for (BlockPos pos : listPillarToMine) {
-            IBlockState state = entity.world.getBlockState(pos);
+            BlockState state = entity.world.getBlockState(pos);
             dbg("set: " + pos + " - " + state.getBlock());
         }
 
@@ -373,7 +377,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
                 } else if (factor >= 0F) {
                     //if (!entity.world.isAirBlock(posFeetCheck.up(2)) && UtilMining.canMineBlock(entity.world, posFeetCheck.up(2), entity.world.getBlockState(posFeetCheck.up(2)).getBlock())) {
 					if (UtilMining.canMineBlockNew(entity.world, posFeetCheck.up(2))) {
-                        IBlockState check = entity.world.getBlockState(posFeetCheck.up(2));
+                        BlockState check = entity.world.getBlockState(posFeetCheck.up(2));
                         dbg("Digging Up Fallback try, Detected block above head, dig it out Fallback try, block was: " + check);
                         listPillarToMine.add(posFeetCheck.up(2));
                     } else {
@@ -392,7 +396,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 
             for (BlockPos pos : listPillarToMine) {
-                IBlockState state = entity.world.getBlockState(pos);
+                BlockState state = entity.world.getBlockState(pos);
                 dbg("set try2: " + pos + " - " + state.getBlock());
             }
 
@@ -426,7 +430,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
     }
 
-    public void setMiningBlock(IBlockState state, BlockCoord pos) {
+    public void setMiningBlock(BlockState state, BlockCoord pos) {
 		dbg("setMiningBlock: " + pos + (state != null ? " - " + state.getBlock() : ""));
 		this.posCurMining = pos;
 		this.stateCurMining = state;
@@ -435,7 +439,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
     public void tickMineBlock() {
     	if (posCurMining == null) return;
 
-		IBlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
+		BlockState state = entity.world.getBlockState(posCurMining.toBlockPos());
 		Block block = state.getBlock();
 
 		//while (entity.world.isAirBlock(posCurMining.toBlockPos()) || !UtilMining.canMineBlock(entity.world, posCurMining.toBlockPos(), entity.world.getBlockState(posCurMining.toBlockPos()).getBlock())) {
@@ -484,7 +488,7 @@ public class TaskDigTowardsTarget extends EntityAIBase implements ITaskInitializ
 
 		if (entity.world.getTotalWorldTime() % 10 == 0) {
 			//entity.swingItem();
-			entity.swingArm(EnumHand.MAIN_HAND);
+			entity.swingArm(Hand.MAIN_HAND);
 			//System.out.println("swing!");
 
 			entity.world.playSound(null, posCurMining.toBlockPos(), block.getSoundType(state, entity.world, posCurMining.toBlockPos(), entity).getBreakSound(), SoundCategory.HOSTILE, 0.5F, 1F);

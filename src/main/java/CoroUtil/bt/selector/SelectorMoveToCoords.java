@@ -1,6 +1,6 @@
 package CoroUtil.bt.selector;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
@@ -42,12 +42,12 @@ public class SelectorMoveToCoords extends Selector {
 			
 			double dist;
 			
-			EntityLivingBase entL = ((EntityLivingBase)ent);
+			LivingEntity entL = ((LivingEntity)ent);
 			
 			if (ignoreY) {
-				dist = ((EntityLivingBase)ent).getDistance(coordsRef[0].posX, ((EntityLivingBase)ent).posY, coordsRef[0].posZ);
+				dist = ((LivingEntity)ent).getDistance(coordsRef[0].posX, ((LivingEntity)ent).posY, coordsRef[0].posZ);
 			} else {
-				dist = ((EntityLivingBase)ent).getDistance(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ);
+				dist = ((LivingEntity)ent).getDistance(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ);
 			}
 			
 			//closeDist = 10;
@@ -100,7 +100,7 @@ public class SelectorMoveToCoords extends Selector {
 	
 	public boolean canBeSeen(Vec3d pos)
     {
-		EntityLivingBase entL = ((EntityLivingBase)ent);
+		LivingEntity entL = ((LivingEntity)ent);
         return entL.world.rayTraceBlocks(new Vec3d(entL.posX, entL.posY + (double)entL.getEyeHeight(), entL.posZ), pos) == null;
     }
 	

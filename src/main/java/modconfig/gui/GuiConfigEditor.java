@@ -8,20 +8,20 @@ import modconfig.ConfigMod;
 import modconfig.ModConfigData;
 import modconfig.forge.PacketHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
-public class GuiConfigEditor extends GuiScreen
+@OnlyIn(Dist.CLIENT)
+public class GuiConfigEditor extends Screen
 {
     /*private int updateCounter2 = 0;
     private int updateCounter = 0;
@@ -291,15 +291,15 @@ public class GuiConfigEditor extends GuiScreen
         //this.buttonList.add(new GuiButton(G_EDITMODE, startX, startY + 0 + var1, 90, 20, (/*ZCGame.instance().mapMan.editMode*/true ? "\u00A7" + '4' : "") + "Edit Mode"));
         
         //this.buttonList.add(new GuiButton(G_RESET, startX + xSize - (buttonWidth + paddingSize) * 3, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Reset"));
-        this.buttonList.add(new GuiButton(G_MODPREV, startX + xSize - (navWidth + 22) * 2, startY + paddingSize - 3, navWidth, navHeight, "<"));
-        this.buttonList.add(new GuiButton(G_MODNEXT, startX + xSize - (navWidth + paddingSize) * 1, startY + paddingSize - 3, navWidth, navHeight, ">"));
-        this.buttonList.add(new GuiButton(G_SAVE, startX + xSize - (buttonWidth + paddingSize) * 2, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Save"));
-        this.buttonList.add(new GuiButton(G_CLOSE, startX + xSize - (buttonWidth + paddingSize) * 1, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Close"));
+        this.buttonList.add(new Button(G_MODPREV, startX + xSize - (navWidth + 22) * 2, startY + paddingSize - 3, navWidth, navHeight, "<"));
+        this.buttonList.add(new Button(G_MODNEXT, startX + xSize - (navWidth + paddingSize) * 1, startY + paddingSize - 3, navWidth, navHeight, ">"));
+        this.buttonList.add(new Button(G_SAVE, startX + xSize - (buttonWidth + paddingSize) * 2, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Save"));
+        this.buttonList.add(new Button(G_CLOSE, startX + xSize - (buttonWidth + paddingSize) * 1, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Close"));
         
         if (mc.isSingleplayer()) {
         	clientMode = false;
         } else {
-        	this.buttonList.add(new GuiButton(G_CONFIGMODE, startX + xSize - (buttonWidth + paddingSize) * 3, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Mode: " + (clientMode ? "Local" : "Remote")));
+        	this.buttonList.add(new Button(G_CONFIGMODE, startX + xSize - (buttonWidth + paddingSize) * 3, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Mode: " + (clientMode ? "Local" : "Remote")));
         }
         
         
@@ -351,7 +351,7 @@ public class GuiConfigEditor extends GuiScreen
 	}
 
     @Override
-    protected void actionPerformed(GuiButton var1)
+    protected void actionPerformed(Button var1)
     {
         if (var1.id == G_RESET) {
             //ZCClientTicks.iMan.toggleEditMode();
@@ -369,14 +369,14 @@ public class GuiConfigEditor extends GuiScreen
         } else if (var1.id == G_CONFIGMODE) {
         	clientMode = !clientMode;
         } else if (var1.id == G_CLOSE) {
-            this.mc.displayGuiScreen((GuiScreen)null);
+            this.mc.displayGuiScreen((Screen)null);
             this.mc.setIngameFocus();
         }
         initGui();
     }
     
     public void updateStates() {
-    	GuiButton var2 = null;
+    	Button var2 = null;
     	
     	//if (!this.textboxWorldName.isFocused()) {
     		//HostileWorlds.dbg("this code needs to get the value to auto updated from data");
@@ -385,7 +385,7 @@ public class GuiConfigEditor extends GuiScreen
 
         for (Iterator var1 = this.buttonList.iterator(); var1.hasNext();)
         {
-            var2 = (GuiButton)var1.next();
+            var2 = (Button)var1.next();
             /*if (var2 instanceof GuiButtonZC) {
         		var2.enabled = false;
         		if (((GuiButtonZC) var2).id == this.G_TOOLMODE_LEVEL && ZCGame.instance().mapMan.editToolMode == 1) {

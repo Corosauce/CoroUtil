@@ -7,15 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.nodes.AttackMeleeBest;
 import CoroUtil.bt.nodes.AttackRangedBest;
@@ -86,17 +86,17 @@ public class PersonalityProfile {
 	
 	public float cacheFurthestMeleeUsable = 0;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public ConcurrentHashMap<String, AnimationStateObject> animationData;
 	
 	public PersonalityProfile(AIBTAgent parAgent) {
 		agent = parAgent;
 		abilities = new ConcurrentHashMap<String, Ability>();
 		
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT) {
 			animationData = new ConcurrentHashMap<String, AnimationStateObject>();
 			
-			Render renderObj = (Render) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
+			EntityRenderer renderObj = (EntityRenderer) Minecraft.getMinecraft().getRenderManager().entityRenderMap.get(agent.ent.getClass());
 			//TODO: readd 1.8.8
 			/*if (renderObj instanceof RenderEntityCoroAI) {
 				
@@ -205,7 +205,7 @@ public class PersonalityProfile {
 		
 		//Persistant animation stuff - needs better consideration
 		//Make these movement methods event based not time loop based, reduces packet load of updating their states when not needed (in theory)
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
 			if (agent.blackboard.isMoving.getValue()) {
 				Ability ability = abilities.get("Walk");
 				if (ability != null) {
@@ -246,8 +246,8 @@ public class PersonalityProfile {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public void tickAbilitiesRender(Render parRender) {
+	@OnlyIn(Dist.CLIENT)
+	public void tickAbilitiesRender(EntityRenderer parRender) {
 		//System.out.println("abilities count: " + abilities.size());
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			//System.out.println("render active? " + entry.getValue().isActive());
@@ -257,7 +257,7 @@ public class PersonalityProfile {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void tickAbilitiesRenderModel(ModelBase parModel) {
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			//System.out.println("render active? " + entry.getValue().isActive());
@@ -300,7 +300,7 @@ public class PersonalityProfile {
 	
 	public void syncAbilitiesFull(boolean rangeOverride) {
 		System.out.println("full sync abilities - " + agent.ent);
-		NBTTagCompound nbt = new NBTTagCompound();
+		CompoundNBT nbt = new CompoundNBT();
 		nbt.setString("command", "CoroAI_Ent");
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
@@ -315,7 +315,7 @@ public class PersonalityProfile {
 	}
 	
 	public void syncAbility(Ability ability) {
-		NBTTagCompound nbt = new NBTTagCompound();
+		CompoundNBT nbt = new CompoundNBT();
 		nbt.setString("command", "CoroAI_Ent");
 		nbt.setInteger("entityID", agent.ent.getEntityId());
 		nbt.setTag("abilities", CoroUtilAbility.nbtSyncWriteAbility(ability, false));
@@ -325,15 +325,15 @@ public class PersonalityProfile {
 		//PacketDispatcher.sendPacketToAllAround(agent.ent.posX, agent.ent.posY, agent.ent.posZ, abilitySyncRange, agent.ent.world.provider.dimensionId, packet);
 	}
 	
-	public void nbtSyncRead(NBTTagCompound par1nbtTagCompound) {
+	public void nbtSyncRead(CompoundNBT par1nbtTagCompound) {
 		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent, true);
 	}
 	
-	public void nbtRead(NBTTagCompound par1nbtTagCompound) {
+	public void nbtRead(CompoundNBT par1nbtTagCompound) {
 		CoroUtilAbility.nbtLoadSkills(par1nbtTagCompound.getCompoundTag("abilities"), abilities, agent.ent);
 	}
 	
-    public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
+    public void nbtWrite(CompoundNBT par1nbtTagCompound) {
     	par1nbtTagCompound.setTag("abilities", CoroUtilAbility.nbtSaveAbilities(abilities));
 	}
     

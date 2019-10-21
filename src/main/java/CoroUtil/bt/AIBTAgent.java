@@ -3,13 +3,12 @@ package CoroUtil.bt;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.*;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import CoroUtil.bt.actions.Delay;
@@ -50,7 +49,7 @@ public class AIBTAgent {
 	public BlackboardBase blackboard;
 	public IBTAgent entInt;
 	public AIInventory entInv; //needs proper setup for this AI type
-	public EntityLivingBase ent;
+	public LivingEntity ent;
 
   	public OrdersHandler ordersHandler;
   	//x y z coords to link to a ManagedLocation for CoroUtil WorldDirector
@@ -321,9 +320,9 @@ public class AIBTAgent {
 		moveHelper.onUpdateMoveHelper();
 		
 		//only runs on true AI entities, patched for potential client player usage
-		if (ent instanceof EntityLiving) {
-			((EntityLiving)ent).getLookHelper().onUpdateLook();
-			((EntityLiving)ent).getJumpHelper().doJump();
+		if (ent instanceof MobEntity) {
+			((MobEntity)ent).getLookHelper().onUpdateLook();
+			((MobEntity)ent).getJumpHelper().doJump();
 		}
 	}
 	
@@ -413,12 +412,12 @@ public class AIBTAgent {
 		coordsManagedLocation = parLocation.spawn;
 	}*/
 	
-	public IEntityLivingData onSpawnEvent(IEntityLivingData par1EntityLivingData) {
+	public ILivingEntityData onSpawnEvent(ILivingEntityData par1EntityLivingData) {
 		initPost(false);
 		return par1EntityLivingData;
 	}
 	
-    public void nbtRead(NBTTagCompound par1nbtTagCompound) {
+    public void nbtRead(CompoundNBT par1nbtTagCompound) {
     	this.entInv.nbtRead(par1nbtTagCompound.getCompoundTag("inventory"));
     	tickAge = par1nbtTagCompound.getInteger("tickAge");
 		canDespawn = par1nbtTagCompound.getBoolean("canDespawn");
@@ -430,7 +429,7 @@ public class AIBTAgent {
     	initPost(true);
 	}
 	
-    public void nbtWrite(NBTTagCompound par1nbtTagCompound) {
+    public void nbtWrite(CompoundNBT par1nbtTagCompound) {
     	par1nbtTagCompound.setTag("inventory", entInv.nbtWrite());
     	par1nbtTagCompound.setInteger("tickAge", tickAge);
     	par1nbtTagCompound.setBoolean("canDespawn", canDespawn);
@@ -442,7 +441,7 @@ public class AIBTAgent {
     	
 	}
     
-    public void nbtDataFromServer(NBTTagCompound nbt) {
+    public void nbtDataFromServer(CompoundNBT nbt) {
 		String command = nbt.getString("command");
 		
 		profile.nbtSyncRead(nbt);
@@ -467,7 +466,7 @@ public class AIBTAgent {
     		}
 
     		if (ent.world.getTotalWorldTime() % 20 == 0) {
-    			EntityPlayer entityplayer = ent.world.getClosestPlayerToEntity(ent, -1.0D);
+    			PlayerEntity entityplayer = ent.world.getClosestPlayerToEntity(ent, -1.0D);
 
     			if (entityplayer != null)
     			{

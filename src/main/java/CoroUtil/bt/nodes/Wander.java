@@ -2,7 +2,7 @@ package CoroUtil.bt.nodes;
 
 import java.util.Random;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import CoroUtil.OldUtil;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -11,13 +11,14 @@ import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.Vec3;
+import net.minecraft.entity.MobEntity;
 
 public class Wander extends Selector {
 
 	//0 = nothing to attack, 1 = attacking, 2 = sanity check says no
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	public float wanderRange = 16;
@@ -28,7 +29,7 @@ public class Wander extends Selector {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		wanderRange = parRange;
 	}
 

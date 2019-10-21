@@ -7,11 +7,13 @@ import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
@@ -25,12 +27,12 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class CoroUtilEntity {
 
-	public static boolean canCoordBeSeen(EntityLivingBase ent, int x, int y, int z)
+	public static boolean canCoordBeSeen(LivingEntity ent, int x, int y, int z)
     {
         return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ), new Vec3d(x, y, z)) == null;
     }
     
-    public static boolean canCoordBeSeenFromFeet(EntityLivingBase ent, int x, int y, int z)
+    public static boolean canCoordBeSeenFromFeet(LivingEntity ent, int x, int y, int z)
     {
         return ent.world.rayTraceBlocks(new Vec3d(ent.posX, ent.getEntityBoundingBox().minY+0.15, ent.posZ), new Vec3d(x, y, z)) == null;
     }
@@ -51,7 +53,7 @@ public class CoroUtilEntity {
         return (double)MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
     }
 	
-	public static Vec3 getTargetVector(EntityLivingBase parEnt, EntityLivingBase target) {
+	public static Vec3 getTargetVector(LivingEntity parEnt, LivingEntity target) {
     	double vecX = target.posX - parEnt.posX;
     	double vecY = target.posY - parEnt.posY;
     	double vecZ = target.posZ - parEnt.posZ;
@@ -75,12 +77,12 @@ public class CoroUtilEntity {
 		return ent != null ? ent.getName() : "nullObject";
 	}
 	
-	public static EntityPlayer getPlayerByUUID(UUID uuid) {
+	public static PlayerEntity getPlayerByUUID(UUID uuid) {
 		Iterator iterator = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers().iterator();
-        EntityPlayerMP entityplayermp;
+        ServerPlayerEntity entityplayermp;
         
         while (iterator.hasNext()) {
-        	entityplayermp = (EntityPlayerMP) iterator.next();
+        	entityplayermp = (ServerPlayerEntity) iterator.next();
         	
         	if (entityplayermp.getGameProfile().getId().equals(uuid)) {
         		return entityplayermp;
@@ -93,7 +95,7 @@ public class CoroUtilEntity {
 	/**
      * Returns the closest vulnerable player to this entity within the given radius, or null if none is found
      */
-    public static EntityPlayer getClosestVulnerablePlayerToEntity(World world, Entity p_72856_1_, double p_72856_2_)
+    public static PlayerEntity getClosestVulnerablePlayerToEntity(World world, Entity p_72856_1_, double p_72856_2_)
     {
         return getClosestVulnerablePlayer(world, p_72856_1_.posX, p_72856_1_.posY, p_72856_1_.posZ, p_72856_2_);
     }
@@ -101,14 +103,14 @@ public class CoroUtilEntity {
     /**
      * Returns the closest vulnerable player within the given radius, or null if none is found.
      */
-    public static EntityPlayer getClosestVulnerablePlayer(World world, double p_72846_1_, double p_72846_3_, double p_72846_5_, double p_72846_7_)
+    public static PlayerEntity getClosestVulnerablePlayer(World world, double p_72846_1_, double p_72846_3_, double p_72846_5_, double p_72846_7_)
     {
         double d4 = -1.0D;
-        EntityPlayer entityplayer = null;
+        PlayerEntity entityplayer = null;
 
         for (int i = 0; i < world.playerEntities.size(); ++i)
         {
-            EntityPlayer entityplayer1 = (EntityPlayer)world.playerEntities.get(i);
+            PlayerEntity entityplayer1 = (PlayerEntity)world.playerEntities.get(i);
 
             if (!entityplayer1.capabilities.disableDamage && entityplayer1.isEntityAlive())
             {
@@ -179,9 +181,9 @@ public class CoroUtilEntity {
      */
     public static boolean canSpawnMobOnGround(World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (CoroUtilBlock.isAir(block) || !block.canCreatureSpawn(state, world, pos, EntityLiving.SpawnPlacementType.ON_GROUND)) {
+        if (CoroUtilBlock.isAir(block) || !block.canCreatureSpawn(state, world, pos, MobEntity.SpawnPlacementType.ON_GROUND)) {
             return false;
         }
         return true;
@@ -190,7 +192,7 @@ public class CoroUtilEntity {
     public static boolean isInDarkCave(World world, int x, int y, int z, boolean checkSpaceToSpawn, boolean skipLightCheck) {
         BlockPos pos = new BlockPos(x, y, z);
         BlockPos posAir = new BlockPos(x, y + 1, z);
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
         if (!world.canSeeSky(posAir) && (skipLightCheck || world.getLightFromNeighbors(posAir) < 5)) {
             if (!CoroUtilBlock.isAir(block) && state.getMaterial() == Material.ROCK/*(block != Blocks.grass || block.getMaterial() != Material.grass)*/) {
@@ -208,7 +210,7 @@ public class CoroUtilEntity {
         return false;
     }
 
-    public static boolean attackEntityAsMobForPassives(EntityLivingBase source, Entity entityIn)
+    public static boolean attackEntityAsMobForPassives(LivingEntity source, Entity entityIn)
     {
 
         float f;
@@ -221,9 +223,9 @@ public class CoroUtilEntity {
 
         int i = 0;
 
-        if (entityIn instanceof EntityLivingBase)
+        if (entityIn instanceof LivingEntity)
         {
-            f += EnchantmentHelper.getModifierForCreature(source.getHeldItemMainhand(), ((EntityLivingBase)entityIn).getCreatureAttribute());
+            f += EnchantmentHelper.getModifierForCreature(source.getHeldItemMainhand(), ((LivingEntity)entityIn).getCreatureAttribute());
             i += EnchantmentHelper.getKnockbackModifier(source);
         }
 
@@ -231,9 +233,9 @@ public class CoroUtilEntity {
 
         if (flag)
         {
-            if (i > 0 && entityIn instanceof EntityLivingBase)
+            if (i > 0 && entityIn instanceof LivingEntity)
             {
-                ((EntityLivingBase)entityIn).knockBack(source, (float)i * 0.5F, (double)MathHelper.sin(source.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(source.rotationYaw * 0.017453292F)));
+                ((LivingEntity)entityIn).knockBack(source, (float)i * 0.5F, (double)MathHelper.sin(source.rotationYaw * 0.017453292F), (double)(-MathHelper.cos(source.rotationYaw * 0.017453292F)));
                 source.motionX *= 0.6D;
                 source.motionZ *= 0.6D;
             }
@@ -245,9 +247,9 @@ public class CoroUtilEntity {
                 entityIn.setFire(j * 4);
             }
 
-            if (entityIn instanceof EntityPlayer)
+            if (entityIn instanceof PlayerEntity)
             {
-                EntityPlayer entityplayer = (EntityPlayer)entityIn;
+                PlayerEntity entityplayer = (PlayerEntity)entityIn;
                 ItemStack itemstack = source.getHeldItemMainhand();
                 ItemStack itemstack1 = entityplayer.isHandActive() ? entityplayer.getActiveItemStack() : ItemStack.EMPTY;
 
@@ -270,7 +272,7 @@ public class CoroUtilEntity {
         return flag;
     }
 
-    public static boolean canPathfindLongDist(EntityCreature ent) {
+    public static boolean canPathfindLongDist(CreatureEntity ent) {
         long lastPathTime = ent.getEntityData().getLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist);
         if (ent.world.getTotalWorldTime() > lastPathTime + ConfigCoroUtilAdvanced.worldTimeDelayBetweenLongDistancePathfindTries) {
             return true;
@@ -278,7 +280,7 @@ public class CoroUtilEntity {
         return false;
     }
 
-    public static void updateLastTimeLongDistPathfinded(EntityCreature ent) {
+    public static void updateLastTimeLongDistPathfinded(CreatureEntity ent) {
         ent.getEntityData().setLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist, ent.world.getTotalWorldTime() + (ent.getEntityId() % 20));
     }
 }

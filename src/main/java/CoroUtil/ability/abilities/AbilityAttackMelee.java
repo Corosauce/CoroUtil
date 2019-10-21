@@ -2,13 +2,13 @@ package CoroUtil.ability.abilities;
 
 import java.util.Random;
 
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.EntityDamageSource;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.Hand;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.inventory.AIInventory;
@@ -17,7 +17,7 @@ public class AbilityAttackMelee extends Ability {
 	
 	//a generic / example class
 	
-	public EntityLivingBase target;
+	public LivingEntity target;
 	public boolean switchToMeleeSlot = true;
 	
 	public AbilityAttackMelee() {
@@ -33,14 +33,14 @@ public class AbilityAttackMelee extends Ability {
 	
 	@Override
 	public void setTarget(Entity parTarget) {
-		if (parTarget instanceof EntityLivingBase) {
-			target = (EntityLivingBase)parTarget;
+		if (parTarget instanceof LivingEntity) {
+			target = (LivingEntity)parTarget;
 		}
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void tickRender(Render parRender) {
+	@OnlyIn(Dist.CLIENT)
+	public void tickRender(EntityRenderer parRender) {
 		super.tickRender(parRender);
 		
 		float amp = 20F;
@@ -79,12 +79,12 @@ public class AbilityAttackMelee extends Ability {
 			double speed = 0.8D;
 			double hitRange = 1.5D;
 			
-			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof EntityLivingBase && ((EntityLivingBase)target).deathTime > 0))) {
+			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof LivingEntity && ((LivingEntity)target).deathTime > 0))) {
 				this.setFinishedPerform();
 			}
 			
 			if (curTickPerform == 1) {
-				this.owner.swingArm(EnumHand.MAIN_HAND);
+				this.owner.swingArm(Hand.MAIN_HAND);
 			}
 			
 			if (target != null) {

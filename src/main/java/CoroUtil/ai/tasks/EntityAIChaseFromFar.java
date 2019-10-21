@@ -6,26 +6,29 @@ import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilPath;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityLookHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.controller.LookController;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.Path;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 /**
  * For making use of long distance partial pathing
  * TODO: test it more to make sure it doesnt double up pathfinding work too much
  */
-public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
+public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInvasionControlledTask
 {
     World world;
-    protected EntityCreature attacker;
+    protected CreatureEntity attacker;
     /** An amount of decrementing ticks that allows the entity to attack once the tick reaches 0. */
     protected int attackTick;
     /** The speed with which the mob will approach the target */
@@ -57,7 +60,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     public boolean shouldExecute()
     {
 
-        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+        LivingEntity entitylivingbase = this.attacker.getAttackTarget();
 
         if (entitylivingbase == null)
         {
@@ -105,7 +108,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     @Override
     public boolean shouldContinueExecuting()
     {
-        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+        LivingEntity entitylivingbase = this.attacker.getAttackTarget();
 
         if (entitylivingbase == null)
         {
@@ -125,7 +128,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
         }
         else
         {
-            return !(entitylivingbase instanceof EntityPlayer) || !((EntityPlayer)entitylivingbase).isSpectator() && !((EntityPlayer)entitylivingbase).isCreative();
+            return !(entitylivingbase instanceof PlayerEntity) || !((PlayerEntity)entitylivingbase).isSpectator() && !((PlayerEntity)entitylivingbase).isCreative();
         }
     }
 
@@ -145,9 +148,9 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     @Override
     public void resetTask()
     {
-        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+        LivingEntity entitylivingbase = this.attacker.getAttackTarget();
 
-        if (entitylivingbase instanceof EntityPlayer && (((EntityPlayer)entitylivingbase).isSpectator() || ((EntityPlayer)entitylivingbase).isCreative()))
+        if (entitylivingbase instanceof PlayerEntity && (((PlayerEntity)entitylivingbase).isSpectator() || ((PlayerEntity)entitylivingbase).isCreative()))
         {
             /** DO NOT SET NULL TARGET UNLESS ITS A TARGET TASK, will crash vanilla with this otherwise:
             Caused by: java.lang.NullPointerException
@@ -168,7 +171,7 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
     @Override
     public void updateTask()
     {
-        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+        LivingEntity entitylivingbase = this.attacker.getAttackTarget();
         //fix edge case where other code was causing this situation
         if (entitylivingbase == null) {
             resetTask();
@@ -218,13 +221,13 @@ public class EntityAIChaseFromFar extends EntityAIBase implements ITaskInitializ
         //this.checkAndPerformAttack(entitylivingbase, d0);
     }
 
-    protected double getAttackReachSqr(EntityLivingBase attackTarget)
+    protected double getAttackReachSqr(LivingEntity attackTarget)
     {
         return (double)(this.attacker.width * 2.0F * this.attacker.width * 2.0F + attackTarget.width);
     }
 
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
         this.attacker = creature;
     }
 

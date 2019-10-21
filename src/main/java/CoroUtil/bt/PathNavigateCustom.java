@@ -1,12 +1,14 @@
 package CoroUtil.bt;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathFinder;
 import net.minecraft.pathfinding.PathPoint;
@@ -21,7 +23,7 @@ import CoroUtil.util.Vec3;
 //TODO: rebase off of newer mojang version when we actually make use of AIBTAgent again
 public class PathNavigateCustom
 {
-    private EntityLivingBase theEntity;
+    private LivingEntity theEntity;
     private World world;
 
     /** The PathEntity being followed. */
@@ -73,7 +75,7 @@ public class PathNavigateCustom
     protected WalkNodeProcessor nodeProcessor;
     
 
-    public PathNavigateCustom(EntityLivingBase par1EntityLiving, World par2World)
+    public PathNavigateCustom(LivingEntity par1EntityLiving, World par2World)
     {
         this.theEntity = par1EntityLiving;
         this.world = par2World;

@@ -4,13 +4,15 @@ import CoroUtil.forge.CULog;
 import com.google.common.collect.Lists;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.biome.Biome;
 
 import java.util.Collection;
@@ -24,9 +26,9 @@ public class CoroUtilMisc {
         double d1 = par1Entity.posZ - entToRotate.posZ;
         double d2;
 
-        if (par1Entity instanceof EntityLivingBase)
+        if (par1Entity instanceof LivingEntity)
         {
-        	EntityLivingBase entityliving = (EntityLivingBase)par1Entity;
+        	LivingEntity entityliving = (LivingEntity)par1Entity;
             d2 = entityliving.posY + (double)entityliving.getEyeHeight() - (entToRotate.posY + (double)entToRotate.getEyeHeight());
         }
         else
@@ -89,12 +91,12 @@ public class CoroUtilMisc {
 		return new BlockCoord(coords1.posX+coords2.posX, coords1.posY+coords2.posY, coords1.posZ+coords2.posZ);
 	}
 	
-	public static void sendPlayerMsg(EntityPlayerMP entP, String msg) {
+	public static void sendPlayerMsg(ServerPlayerEntity entP, String msg) {
 		sendCommandSenderMsg(entP, msg);
 	}
 	
 	public static void sendCommandSenderMsg(ICommandSender entP, String msg) {
-		entP.sendMessage(new TextComponentString(msg));
+		entP.sendMessage(new StringTextComponent(msg));
 	}
 
     public static float adjVal(float source, float target, float adj) {
@@ -121,7 +123,7 @@ public class CoroUtilMisc {
     public static void fixBadBiomeEntitySpawns() {
         for (Biome biome : Biome.REGISTRY) {
 
-            for (EnumCreatureType type : EnumCreatureType.values()) {
+            for (EntityClassification type : EntityClassification.values()) {
 
                 List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
                 boolean found = false;
@@ -142,13 +144,13 @@ public class CoroUtilMisc {
                         CULog.log("Biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name() + "', SpawnListEntry size: " + list.size());
                         CULog.log("Clearing relevant spawnableList to fix issue");
                         //detected crashable state of data, clear out spawnlist then
-                        if (type == EnumCreatureType.MONSTER) {
+                        if (type == EntityClassification.MONSTER) {
                             biome.spawnableMonsterList.clear();
-                        } else if (type == EnumCreatureType.CREATURE) {
+                        } else if (type == EntityClassification.CREATURE) {
                             biome.spawnableCreatureList.clear();
-                        } else if (type == EnumCreatureType.WATER_CREATURE) {
+                        } else if (type == EntityClassification.WATER_CREATURE) {
                             biome.spawnableWaterCreatureList.clear();
-                        } else if (type == EnumCreatureType.AMBIENT) {
+                        } else if (type == EntityClassification.AMBIENT) {
                             biome.spawnableCaveCreatureList.clear();
                         } else {
                             //theres also Biome.modSpawnableLists for modded entries, but ive decided not to care about this one

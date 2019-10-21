@@ -5,19 +5,19 @@ import io.netty.buffer.ByteBuf;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.Vec3;
 
@@ -233,7 +233,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	int aheadEndY = MathHelper.floor(posY + (motionY));
 		    	int aheadEndZ = MathHelper.floor(posZ + (motionZ));
 		    	
-		    	IBlockState id = world.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ));
+		    	BlockState id = world.getBlockState(new BlockPos(aheadEndX, aheadEndY, aheadEndZ));
 	        	//System.out.println(idCurPos);
 		    	
 		    	if (isSolid(id)) {
@@ -245,7 +245,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    		int aheadX = MathHelper.floor(posX + (motion.xCoord*curDist));
 				    	int aheadY = MathHelper.floor(posY + (motion.yCoord*curDist));
 				    	int aheadZ = MathHelper.floor(posZ + (motion.zCoord*curDist));
-				    	IBlockState idCheck = world.getBlockState(new BlockPos(aheadX, aheadY, aheadZ));
+				    	BlockState idCheck = world.getBlockState(new BlockPos(aheadX, aheadY, aheadZ));
 			    		
 			    		if (isSolid(idCheck)) {
 			    			if (curDist < 1D) {
@@ -261,7 +261,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 			    			int tryX = MathHelper.floor(posX + (motion.xCoord*curDist));
 					    	int tryY = MathHelper.floor(posY + (motion.yCoord*curDist));
 					    	int tryZ = MathHelper.floor(posZ + (motion.zCoord*curDist));
-				    		IBlockState idTry = world.getBlockState(new BlockPos(tryX, tryY, tryZ));
+				    		BlockState idTry = world.getBlockState(new BlockPos(tryX, tryY, tryZ));
 				    		if (!isSolid(idTry)) {
 				    			//System.out.println("new solidify pull back!");
 				    			blockify(tryX, tryY, tryZ);
@@ -332,7 +332,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	            
 	            if (var10 != null) {
 	            	if (!var10.isDead) {
-			            if (var10 instanceof EntityLivingBase) {
+			            if (var10 instanceof LivingEntity) {
 			            	var10.attackEntityFrom(DamageSource.causeIndirectMagicDamage(this, this), 4);
 			            } else {
 			            	double speed = Math.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
@@ -349,7 +349,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         
     }
     
-    public boolean isSolid(IBlockState id) {
+    public boolean isSolid(BlockState id) {
     	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.CIRCUITS && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.PLANTS && id.getMaterial().isSolid());
     }
     
@@ -445,7 +445,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	return super.attackEntityFrom(par1DamageSource, par2);
     }
     
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void spawnParticles() {
     	/*for (int i = 0; i < 1; i++) {
     		
@@ -469,7 +469,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound data) {
+	protected void readEntityFromNBT(CompoundNBT data) {
 		blockID = data.getInteger("blockID");
 		blockMeta = data.getInteger("blockMeta");
 		blockifyDelay = data.getInteger("blockifyDelay");
@@ -477,7 +477,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound data) {
+	protected void writeEntityToNBT(CompoundNBT data) {
 		data.setInteger("blockID", blockID);
 		data.setInteger("blockMeta", blockMeta);
 		data.setInteger("blockifyDelay", blockifyDelay);

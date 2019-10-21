@@ -1,18 +1,19 @@
 package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.PersonalityProfile;
 import CoroUtil.bt.selector.Selector;
+import net.minecraft.entity.MobEntity;
 
 public class CombatLogic extends Selector {
 
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	public PersonalityProfile profile;
 	
@@ -21,7 +22,7 @@ public class CombatLogic extends Selector {
 		blackboard = parEnt.getAIBTAgent().blackboard;
 		profile = parEnt.getAIBTAgent().profile;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 	}
 
 	@Override

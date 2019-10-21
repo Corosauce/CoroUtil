@@ -6,13 +6,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
@@ -40,7 +45,7 @@ public class WorldEvent {
 	
 	public EnumJobState state;
 	
-	public ArrayList<EntityLivingBase> invasionEntities = new ArrayList<EntityLivingBase>();
+	public ArrayList<LivingEntity> invasionEntities = new ArrayList<LivingEntity>();
 	public ArrayList<String> cursedPlayers = new ArrayList<String>();
 	
 	public int lastCheckedInvasionCount = 1; //prevent default 0 incase cache isnt generated right away
@@ -94,7 +99,7 @@ public class WorldEvent {
 		//next wave or invasion eventually starts, has currentWavePlayerRating to work with
 	}
 	
-	public static WorldEvent newInvasionFromNBT(NBTTagCompound par1NBTTagCompound) {
+	public static WorldEvent newInvasionFromNBT(CompoundNBT par1NBTTagCompound) {
 		EnumWorldEventType type = EnumWorldEventType.get(par1NBTTagCompound.getInteger("type"));
 		
 		WorldEvent inv = null;
@@ -115,7 +120,7 @@ public class WorldEvent {
 	
 	public void tick() {
 		World world = DimensionManager.getWorld(dimensionID);
-		EntityPlayer entP = world.getPlayerEntityByName(mainPlayerName);
+		PlayerEntity entP = world.getPlayerEntityByName(mainPlayerName);
 		////////////if (entP != null) WorldDirector.getPlayerNBT(entP.username).setInteger("HWInvasionCooldown", ModConfigFields.coolDownBetweenInvasionsPortal + 1);
 		//if (DimensionManager.getWorld(dimensionID).getWorldTime() % 40 == 0) updatePlayerStates();
 		//invasionEnd();
@@ -136,7 +141,7 @@ public class WorldEvent {
     public boolean checkForActiveInvadersCached() {
     	if (lastCheckedInvasionCount == 0 || DimensionManager.getWorld(dimensionID).getWorldTime() % 100 == 0) {
 	    	for (int i = 0; i < invasionEntities.size(); i++) {
-	    		EntityLivingBase ent = invasionEntities.get(i);
+	    		LivingEntity ent = invasionEntities.get(i);
 	    		
 	    		if (ent.isDead) {
 	    			invasionEntities.remove(i);
@@ -178,7 +183,7 @@ public class WorldEvent {
     	//cursedPlayers.clear();
     }
     
-    public void registerWithInvasion(EntityLivingBase ent) {
+    public void registerWithInvasion(LivingEntity ent) {
     	//HostileWorlds.dbg("ent registered with invasion: " + ent);
     	invasionEntities.add(ent);
     }
@@ -188,8 +193,8 @@ public class WorldEvent {
     	ent.primaryTarget = mainPlayerName;
     }*/
     
-    public EntityPlayer tryGetCursedPlayer(String username) {
-    	EntityPlayer entP = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(username);
+    public PlayerEntity tryGetCursedPlayer(String username) {
+    	PlayerEntity entP = FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(username);
     	//EntityPlayer entP = MinecraftServer.getServer().getConfigurationManager().getPlayerForUsername(username);
     	
     	if (entP != null && entP.world.provider.getDimension() == DimensionManager.getWorld(dimensionID).provider.getDimension()) {
@@ -207,7 +212,7 @@ public class WorldEvent {
 		float totalRating = 0;
 		
 		for (int i = 0; i < cursedPlayers.size(); i++) {
-			EntityPlayer entP = tryGetCursedPlayer(cursedPlayers.get(i));
+			PlayerEntity entP = tryGetCursedPlayer(cursedPlayers.get(i));
 			
 			if (entP != null) {
 				playersFound++;
@@ -246,7 +251,7 @@ public class WorldEvent {
 		if (clearList) cursedPlayers.clear();
 		
 		for (int i = 0; i < worldObj.playerEntities.size(); i++) {
-			EntityPlayer entP = (EntityPlayer)worldObj.playerEntities.get(i);
+			PlayerEntity entP = (PlayerEntity)worldObj.playerEntities.get(i);
 			
 			if (!cursedPlayers.contains(CoroUtilEntity.getName(entP)) && entP.getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ) < maxDist) {
 				cursedPlayers.add(CoroUtilEntity.getName(entP));
@@ -261,11 +266,11 @@ public class WorldEvent {
 			float bestWeaponValue = 0;
 			boolean hasGlove = false;
 			
-			EntityPlayer entP = tryGetCursedPlayer(cursedPlayers.get(i));
+			PlayerEntity entP = tryGetCursedPlayer(cursedPlayers.get(i));
 			
 			if (entP != null) {
 				for (int armorIndex = 0; armorIndex < 4; armorIndex++) {
-					if (!entP.inventory.armorInventory.get(armorIndex).isEmpty() && entP.inventory.armorInventory.get(armorIndex).getItem() instanceof ItemArmor) {
+					if (!entP.inventory.armorInventory.get(armorIndex).isEmpty() && entP.inventory.armorInventory.get(armorIndex).getItem() instanceof ArmorItem) {
 						armorValue += EnchantmentHelper.getEnchantmentModifierDamage(entP.getArmorInventoryList(), DamageSource.GENERIC);
 					}
 				}
@@ -281,7 +286,7 @@ public class WorldEvent {
 				
 				//initial removal of current weap attrib
 				ItemStack itemstack = entP.inventory.getCurrentItem();
-				if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+				if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 				
 				for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.size(); slotIndex++) {
 					if (!entP.inventory.mainInventory.get(slotIndex).isEmpty()) {
@@ -291,14 +296,14 @@ public class WorldEvent {
 	                    if (!itemstack.isEmpty())
 	                    {
 	                    	//add attrib
-	                    	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+	                    	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                    }
 	                    
 	                    //get val
 	                    float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
 	                    float f1 = 0.0F;
 
-	                    if (entP instanceof EntityLivingBase)
+	                    if (entP instanceof LivingEntity)
 	                    {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
 	                    	//TODO: update for 1.8 somehow... 
@@ -311,7 +316,7 @@ public class WorldEvent {
 						if (!itemstack.isEmpty())
 	                    {
 							//remove attrib
-							entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+							entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                    }
 						
 	                    if (dmg > bestWeaponValue) {
@@ -322,7 +327,7 @@ public class WorldEvent {
 				
 				//readd of current weapon attrib
 				itemstack = entP.inventory.getCurrentItem();
-				if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND));
+				if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 				
 				//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);
 				/////////////////WorldDirector.getPlayerNBT(entP.username).setInteger("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));
@@ -330,7 +335,7 @@ public class WorldEvent {
 		}
     }
 	
-	public void writeNBT(NBTTagCompound data) {
+	public void writeNBT(CompoundNBT data) {
 		//data.setFloat("lastWavePlayerRating", lastWavePlayerRating);
 		data.setFloat("currentWaveDifficultyRating", currentWaveDifficultyRating);
 		data.setInteger("dimensionID", dimensionID);
@@ -348,13 +353,13 @@ public class WorldEvent {
     	data.setInteger("currentWaveSpawnedInvaders", currentWaveSpawnedInvaders);
     	data.setInteger("currentWavePlayerCount", currentWavePlayerCount);
     	int dist = -1;
-    	if (coordDestination != null && invasionEntities.size() > 0) dist = (int) ((EntityLivingBase)invasionEntities.get(0)).getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ);
+    	if (coordDestination != null && invasionEntities.size() > 0) dist = (int) ((LivingEntity)invasionEntities.get(0)).getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ);
     	data.setInteger("lastLeaderDist", dist);
     	data.setInteger("lastLeaderCount", invasionEntities.size());
     	data.setInteger("curCooldown", curCooldown);
     }
 	
-	public void readNBT(NBTTagCompound data) {
+	public void readNBT(CompoundNBT data) {
 		//lastWavePlayerRating = data.getFloat("lastWavePlayerRating");
 		currentWaveDifficultyRating = data.getFloat("currentWaveDifficultyRating");
 		dimensionID = data.getInteger("dimensionID");

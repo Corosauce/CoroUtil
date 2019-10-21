@@ -1,21 +1,20 @@
 package modconfig.gui;
 
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.AbstractGui;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ChatAllowedCharacters;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.SharedConstants;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
-public class GuiBetterTextField extends Gui
+@OnlyIn(Dist.CLIENT)
+public class GuiBetterTextField extends AbstractGui
 {
     /**
      * Have the font renderer from GuiScreen to render the textbox text into the screen.
@@ -121,7 +120,7 @@ public class GuiBetterTextField extends Gui
     public void writeText(String par1Str)
     {
         String s1 = "";
-        String s2 = ChatAllowedCharacters.filterAllowedCharacters(par1Str);
+        String s2 = SharedConstants.filterAllowedCharacters(par1Str);
         int i = this.cursorPosition < this.selectionEnd ? this.cursorPosition : this.selectionEnd;
         int j = this.cursorPosition < this.selectionEnd ? this.selectionEnd : this.cursorPosition;
         int k = this.maxStringLength - this.text.length() - (i - this.selectionEnd);
@@ -328,20 +327,20 @@ public class GuiBetterTextField extends Gui
                     this.setSelectionPos(0);
                     return true;
                 case 3:
-                    GuiScreen.setClipboardString(this.getSelectedtext());
+                    Screen.setClipboardString(this.getSelectedtext());
                     return true;
                 case 22:
-                    this.writeText(GuiScreen.getClipboardString());
+                    this.writeText(Screen.getClipboardString());
                     return true;
                 case 24:
-                    GuiScreen.setClipboardString(this.getSelectedtext());
+                    Screen.setClipboardString(this.getSelectedtext());
                     this.writeText("");
                     return true;
                 default:
                     switch (par2)
                     {
                         case 14:
-                            if (GuiScreen.isCtrlKeyDown())
+                            if (Screen.isCtrlKeyDown())
                             {
                                 this.deleteWords(-1);
                             }
@@ -352,7 +351,7 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         case 199:
-                            if (GuiScreen.isShiftKeyDown())
+                            if (Screen.isShiftKeyDown())
                             {
                                 this.setSelectionPos(0);
                             }
@@ -363,9 +362,9 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         case 203:
-                            if (GuiScreen.isShiftKeyDown())
+                            if (Screen.isShiftKeyDown())
                             {
-                                if (GuiScreen.isCtrlKeyDown())
+                                if (Screen.isCtrlKeyDown())
                                 {
                                     this.setSelectionPos(this.getNthWordFromPos(-1, this.getSelectionEnd()));
                                 }
@@ -374,7 +373,7 @@ public class GuiBetterTextField extends Gui
                                     this.setSelectionPos(this.getSelectionEnd() - 1);
                                 }
                             }
-                            else if (GuiScreen.isCtrlKeyDown())
+                            else if (Screen.isCtrlKeyDown())
                             {
                                 this.setCursorPosition(this.getNthWordFromCursor(-1));
                             }
@@ -385,9 +384,9 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         case 205:
-                            if (GuiScreen.isShiftKeyDown())
+                            if (Screen.isShiftKeyDown())
                             {
-                                if (GuiScreen.isCtrlKeyDown())
+                                if (Screen.isCtrlKeyDown())
                                 {
                                     this.setSelectionPos(this.getNthWordFromPos(1, this.getSelectionEnd()));
                                 }
@@ -396,7 +395,7 @@ public class GuiBetterTextField extends Gui
                                     this.setSelectionPos(this.getSelectionEnd() + 1);
                                 }
                             }
-                            else if (GuiScreen.isCtrlKeyDown())
+                            else if (Screen.isCtrlKeyDown())
                             {
                                 this.setCursorPosition(this.getNthWordFromCursor(1));
                             }
@@ -407,7 +406,7 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         case 207:
-                            if (GuiScreen.isShiftKeyDown())
+                            if (Screen.isShiftKeyDown())
                             {
                                 this.setSelectionPos(this.text.length());
                             }
@@ -418,7 +417,7 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         case 211:
-                            if (GuiScreen.isCtrlKeyDown())
+                            if (Screen.isCtrlKeyDown())
                             {
                                 this.deleteWords(1);
                             }
@@ -429,7 +428,7 @@ public class GuiBetterTextField extends Gui
 
                             return true;
                         default:
-                            if (ChatAllowedCharacters.isAllowedCharacter(par1))
+                            if (SharedConstants.isAllowedCharacter(par1))
                             {
                                 this.writeText(Character.toString(par1));
                                 return true;
@@ -539,7 +538,7 @@ public class GuiBetterTextField extends Gui
             {
                 if (flag2)
                 {
-                    Gui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRenderer.FONT_HEIGHT, -3092272);
+                    AbstractGui.drawRect(k1, i1 - 1, k1 + 1, i1 + 1 + this.fontRenderer.FONT_HEIGHT, -3092272);
                 }
                 else
                 {

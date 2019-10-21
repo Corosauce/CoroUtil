@@ -1,16 +1,17 @@
 package CoroUtil.bt.nodes;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
+import net.minecraft.entity.MobEntity;
 
 public class SelectorMoveToPathClose extends Selector {
 
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	//public int pathfindRange = 12;
@@ -28,7 +29,7 @@ public class SelectorMoveToPathClose extends Selector {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		closeDist = parCloseDist;
 		partialPathing = parPartialPathing;
 	}

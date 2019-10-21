@@ -1,28 +1,28 @@
 package modconfig.forge;
 
 import modconfig.ConfigMod;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class PacketHelper {
 
     public static FMLProxyPacket getModConfigPacketMenu() {
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
 		nbt.setString("command", "openGUI");
     	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
     }
     
     public static FMLProxyPacket getModConfigPacket(String modid) {
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.setString("command", "setData");
     	nbt.setString("modID", modid);
     	ConfigMod.populateData(modid);
     	
-    	NBTTagCompound nbtEntries = new NBTTagCompound();
+    	CompoundNBT nbtEntries = new CompoundNBT();
     	
     	for (int i = 0; i < ConfigMod.configLookup.get(modid).configData.size(); i++) {
-    		NBTTagCompound nbtEntry = new NBTTagCompound();
+    		CompoundNBT nbtEntry = new CompoundNBT();
     		nbtEntry.setString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
     		nbtEntry.setString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
     		nbtEntries.setTag("entry_" + i, nbtEntry);
@@ -34,7 +34,7 @@ public class PacketHelper {
     }
     
     public static FMLProxyPacket getModConfigPacketForClientToServer(String data) {
-    	NBTTagCompound nbt = new NBTTagCompound();
+    	CompoundNBT nbt = new CompoundNBT();
     	
     	nbt.setString("command", "setData");
     	//nbt.setString("modID", modid);

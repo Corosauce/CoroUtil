@@ -1,13 +1,15 @@
 package CoroUtil.bt.actions;
 
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.leaf.LeafAction;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.Vec3;
+import net.minecraft.entity.MobEntity;
 
 public class ActionMoveToCoords extends LeafAction {
 
@@ -38,12 +40,12 @@ public class ActionMoveToCoords extends LeafAction {
 			
 			double dist;
 			
-			EntityLivingBase entL = ((EntityLivingBase)ent);
+			LivingEntity entL = ((LivingEntity)ent);
 			
 			if (ignoreY) {
-				dist = ((EntityLivingBase)ent).getDistance(coordsRef[0].posX, ((EntityLivingBase)ent).posY, coordsRef[0].posZ);
+				dist = ((LivingEntity)ent).getDistance(coordsRef[0].posX, ((LivingEntity)ent).posY, coordsRef[0].posZ);
 			} else {
-				dist = ((EntityLivingBase)ent).getDistance(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ);
+				dist = ((LivingEntity)ent).getDistance(coordsRef[0].posX, coordsRef[0].posY, coordsRef[0].posZ);
 			}
 			
 			//closeDist = 10;
@@ -56,7 +58,7 @@ public class ActionMoveToCoords extends LeafAction {
 				//((EntityLivingBase)ent).getNavigator().clearPathEntity();
 				return EnumBehaviorState.SUCCESS;
 			} else {
-				if (((EntityLiving)ent).getNavigator().noPath() && ((EntityLiving)ent).world.getWorldTime() % 20 == 0) {
+				if (((MobEntity)ent).getNavigator().noPath() && ((MobEntity)ent).world.getWorldTime() % 20 == 0) {
 					//dbg("moveto trying to set path, cur dist: " + dist);
 					//dbg("moveto: " + coordsRef[0].posX + ", " + coordsRef[0].posY + ", " + coordsRef[0].posZ + " - " + (int)dist);
 					//TODO: 1.10 fix, used to use ICoroAI for some reason despite being a BT class

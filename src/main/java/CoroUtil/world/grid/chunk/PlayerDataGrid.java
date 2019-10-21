@@ -1,6 +1,7 @@
 package CoroUtil.world.grid.chunk;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 public class PlayerDataGrid {
 
@@ -18,14 +19,14 @@ public class PlayerDataGrid {
 		
 	}
 	
-	public void nbtRead(NBTTagCompound parNBT) {
+	public void nbtRead(CompoundNBT parNBT) {
 		playerActivityInteraction = parNBT.getLong("playerActivityInteraction");
 		playerActivityLastUpdated = parNBT.getLong("playerActivityLastUpdated");
 		playerActivityTimeSpent = parNBT.getLong("playerActivityTimeSpent");
 	}
 	
-	public NBTTagCompound nbtWrite() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT nbtWrite() {
+		CompoundNBT nbt = new CompoundNBT();
 		
 		nbt.setLong("playerActivityInteraction", playerActivityInteraction);
 		nbt.setLong("playerActivityLastUpdated", playerActivityLastUpdated);

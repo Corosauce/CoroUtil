@@ -2,15 +2,17 @@ package CoroUtil.ai.tasks;
 
 import java.util.List;
 
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import CoroUtil.ai.ITaskInitializer;
 
-public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
+public class TaskCallForHelp extends Goal implements ITaskInitializer
 {
-    private EntityCreature entity = null;
+    private CreatureEntity entity = null;
     //private EntityLivingBase targetLastTracked = null;
 
     //needed for generic instantiation
@@ -20,7 +22,7 @@ public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
     }
     
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
     	this.entity = creature;
     }
 
@@ -81,11 +83,11 @@ public class TaskCallForHelp extends EntityAIBase implements ITaskInitializer
     	int callRange = 150;
     	AxisAlignedBB aabb = new AxisAlignedBB(entity.posX, entity.posY, entity.posZ, entity.posX, entity.posY, entity.posZ);
 		aabb = aabb.grow(callRange, callRange, callRange);
-		List list = entity.world.getEntitiesWithinAABB(EntityZombie.class, aabb);
+		List list = entity.world.getEntitiesWithinAABB(ZombieEntity.class, aabb);
 		boolean found = false;
         for(int j = 0; j < list.size(); j++)
         {
-        	EntityCreature ent = (EntityCreature)list.get(j);
+        	CreatureEntity ent = (CreatureEntity)list.get(j);
         	if (ent.getAttackTarget() == null && ent.canEntityBeSeen(entity)) {
         		found = true;
         		//System.out.println(ent + " answered call!");

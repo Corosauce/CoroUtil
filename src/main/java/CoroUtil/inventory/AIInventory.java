@@ -1,24 +1,15 @@
 package CoroUtil.inventory;
 
 import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.Item;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.DamageSource;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import CoroUtil.OldUtil;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.ServerWorld;
 import CoroUtil.bt.IBTAgent;
-import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.CoroUtilItem;
 
 import com.mojang.authlib.GameProfile;
 
@@ -31,7 +22,7 @@ public class AIInventory {
 	public GameProfile playerProfile = null;
 	//public FakePlayer fakePlayer = null;
 	
-	public EntityLivingBase entOwner;
+	public LivingEntity entOwner;
 	
 	public InventoryWrapper inventory;
 	
@@ -48,13 +39,13 @@ public class AIInventory {
 	
 	public boolean grabItems = false;
 	
-	public AIInventory(EntityLivingBase parEnt) {
+	public AIInventory(LivingEntity parEnt) {
 		entOwner = parEnt;
 		inventory = new InventoryWrapper();
 		inventory.invInitData(new ItemStack[slot_Count]);
 	}
 	
-	public static AIInventory getInventory(EntityLivingBase parEntSource) {
+	public static AIInventory getInventory(LivingEntity parEntSource) {
 		if (parEntSource instanceof IBTAgent) {
 			return ((IBTAgent)parEntSource).getAIBTAgent().entInv;
 		}
@@ -112,15 +103,15 @@ public class AIInventory {
 		performRightClick();
 	}*/
 	
-	public NBTTagCompound nbtWrite() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT nbtWrite() {
+		CompoundNBT nbt = new CompoundNBT();
 		
-		NBTTagList nbttaglist = new NBTTagList();
-		NBTTagCompound nbttagcompound1;
+		ListNBT nbttaglist = new ListNBT();
+		CompoundNBT nbttagcompound1;
 
         for (int i = 0; i < inventory.invList.length; ++i)
         {
-            nbttagcompound1 = new NBTTagCompound();
+            nbttagcompound1 = new CompoundNBT();
 
             if (inventory.invList[i] != null)
             {
@@ -135,8 +126,8 @@ public class AIInventory {
 		return nbt;
 	}
 	
-	public void nbtRead(NBTTagCompound parNBT) {
-		NBTTagList nbttaglist;
+	public void nbtRead(CompoundNBT parNBT) {
+		ListNBT nbttaglist;
         int i;
 
         if (parNBT.hasKey("listInv", 9))
@@ -204,15 +195,15 @@ public class AIInventory {
                 Entity var5 = (Entity)var3.get(var4);
 
                 if(!var5.isDead) {
-                	if (/*(grabXP && (var5 instanceof EntityXPOrb)) || */(grabItems && (var5 instanceof EntityItem))) {
-                		collideWithItem((EntityItem)var5);
+                	if (/*(grabXP && (var5 instanceof EntityXPOrb)) || */(grabItems && (var5 instanceof ItemEntity))) {
+                		collideWithItem((ItemEntity)var5);
                 	}
                 }
             }
         }
     }
 	
-	public void collideWithItem(EntityItem parItem) {
+	public void collideWithItem(ItemEntity parItem) {
 		ItemStack is = parItem.getItem();
 		inventory.addItemStackToInventory(is);
 		if (is.getCount() <= 0)

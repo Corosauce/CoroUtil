@@ -1,6 +1,7 @@
 package extendedrenderer.particle.behavior;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import CoroUtil.util.Vec3;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -115,7 +116,7 @@ public class ParticleBehaviorFogGround extends ParticleBehaviors {
 				
 				//get pos a bit under particle
 				BlockPos pos = new BlockPos(particle.getPosX(), particle.getPosY() - 0.5D, particle.getPosZ());
-				IBlockState state = particle.getWorld().getBlockState(pos);
+				BlockState state = particle.getWorld().getBlockState(pos);
 				if (!state.getBlock().isAir(state, particle.world, pos)) {
 					if (particle.motionY < 0.09D) {
 						particle.motionY += 0.02D;

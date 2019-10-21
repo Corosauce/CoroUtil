@@ -6,17 +6,17 @@ import CoroUtil.entity.render.RenderBatSmart;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderBat;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-@SideOnly(Side.CLIENT)
+
+@OnlyIn(Dist.CLIENT)
 public class ClientProxy extends CommonProxy
 {
 
@@ -58,7 +58,7 @@ public class ClientProxy extends CommonProxy
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
 
-    private static void addMapping(Class<? extends Entity> entityClass, Render render) {
+    private static void addMapping(Class<? extends Entity> entityClass, EntityRenderer render) {
         RenderingRegistry.registerEntityRenderingHandler(entityClass, render);
     }
 }

@@ -3,7 +3,8 @@ package CoroUtil.util;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 import java.lang.reflect.Method;
@@ -84,7 +85,7 @@ public class CoroUtilCrossMod {
         }
     }
 
-    public static boolean infernalMobs_AddRandomModifiers(EntityLivingBase ent, List<String> listModifiersToUse, int modifierCount) {
+    public static boolean infernalMobs_AddRandomModifiers(LivingEntity ent, List<String> listModifiersToUse, int modifierCount) {
         String listMods = "";
 
         CULog.dbg("infernalMobs_AddRandomModifiers perform:");
@@ -114,7 +115,7 @@ public class CoroUtilCrossMod {
         }
     }
 
-    public static boolean infernalMobs_AddModifiers(EntityLivingBase ent, String modifiers) {
+    public static boolean infernalMobs_AddModifiers(LivingEntity ent, String modifiers) {
 
         if (!hasInfernalMobs()) return false;
 
@@ -132,7 +133,7 @@ public class CoroUtilCrossMod {
             if (clazz != null) {
                 Method method = clazz.getDeclaredMethod("instance");
                 Object obj = method.invoke(null);
-                Method methodMods = obj.getClass().getDeclaredMethod("addEntityModifiersByString", EntityLivingBase.class, String.class);
+                Method methodMods = obj.getClass().getDeclaredMethod("addEntityModifiersByString", LivingEntity.class, String.class);
                 methodMods.invoke(obj, ent, modifiers);
                 return true;
             }
@@ -144,14 +145,14 @@ public class CoroUtilCrossMod {
         return false;
     }
 
-    public static boolean infernalMobs_RemoveAllModifiers(EntityLivingBase ent) {
+    public static boolean infernalMobs_RemoveAllModifiers(LivingEntity ent) {
         if (!hasInfernalMobs()) return false;
 
         try {
             Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
             if (clazz != null) {
 
-                Method method = clazz.getDeclaredMethod("removeEntFromElites", EntityLivingBase.class);
+                Method method = clazz.getDeclaredMethod("removeEntFromElites", LivingEntity.class);
                 method.invoke(null, ent);
 
                 return true;
@@ -180,8 +181,8 @@ public class CoroUtilCrossMod {
         //updated based off of InfernalMobsCore.getNBTTag();
         String infernalNBTString = "InfernalMobsMod";
 
-        if (event.getEntity() instanceof EntityLivingBase) {
-            EntityLivingBase ent = (EntityLivingBase)event.getEntity();
+        if (event.getEntity() instanceof LivingEntity) {
+            LivingEntity ent = (LivingEntity)event.getEntity();
             /**
              * Aggressively remove infernal modifiers and nbt data for it, unless we added them ourselves
              */

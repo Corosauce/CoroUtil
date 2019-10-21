@@ -6,14 +6,14 @@ import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.UtilMining;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.packet.INBTPacketHandler;
 
 public class EventHandlerPacket {
@@ -29,17 +29,17 @@ public class EventHandlerPacket {
 	//- READ ABOVE ^
 	//- CoroAI_Inv could be factored out and replaced with CoroAI_Ent, epoch entities use it this way
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public World getClientWorld() {
 		return Minecraft.getMinecraft().world;
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public EntityPlayer getClientPlayer() {
+	@OnlyIn(Dist.CLIENT)
+	public PlayerEntity getClientPlayer() {
 		return Minecraft.getMinecraft().player;
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public INBTPacketHandler getClientDataInterface() {
 		if (Minecraft.getMinecraft().currentScreen instanceof INBTPacketHandler) {
 			return (INBTPacketHandler)Minecraft.getMinecraft().currentScreen;
@@ -47,11 +47,11 @@ public class EventHandlerPacket {
 		return null;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
 		try {
-			final NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
+			final CompoundNBT nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 
 			String command = nbt.getString("command");
 

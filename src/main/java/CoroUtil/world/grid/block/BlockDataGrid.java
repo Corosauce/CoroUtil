@@ -7,10 +7,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilBlock;
@@ -45,7 +44,7 @@ public class BlockDataGrid
     	return BlockStaticDataMap.getBlockStength(blockID);
     }
     
-    public BlockDataPoint getBlockDataFromNBT(int i, int j, int k, NBTTagCompound nbt)
+    public BlockDataPoint getBlockDataFromNBT(int i, int j, int k, CompoundNBT nbt)
     {
     	return getBlockData(i, j, k, false, false, nbt);
     }
@@ -61,7 +60,7 @@ public class BlockDataGrid
     }
 
     //returns null if air block unless told to not check
-    public BlockDataPoint getBlockData(int i, int j, int k, boolean skipAirCheckOnCreate, boolean onlyIfExists, NBTTagCompound nbt)
+    public BlockDataPoint getBlockData(int i, int j, int k, boolean skipAirCheckOnCreate, boolean onlyIfExists, CompoundNBT nbt)
     {
     	
     	//i could technically add a check to see if bdp.isRemovable(), but thats bad practice, lets plan to have our system keep it clean, and let it balloon up so we can see the issue instead of hiding the issue
@@ -133,14 +132,14 @@ public class BlockDataGrid
 			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator;
 			
 			if ((new File(saveFolder + "BlockDataDim_" + world.provider.getDimension() + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "BlockDataDim_" + world.provider.getDimension() + ".dat"));
+				CompoundNBT data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "BlockDataDim_" + world.provider.getDimension() + ".dat"));
 				
 				//Collection playerDataCl = data.getTags();
 				Iterator it = data.getKeySet().iterator();//playerDataCl.iterator();
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
-					NBTTagCompound nbt = data.getCompoundTag(keyName);
+					CompoundNBT nbt = data.getCompoundTag(keyName);
 					
 					BlockDataPoint bdp = this.getBlockDataFromNBT(nbt.getInteger("xCoord"), nbt.getInteger("yCoord"), nbt.getInteger("zCoord"), nbt);
 					if (bdp != null) {
@@ -160,7 +159,7 @@ public class BlockDataGrid
 	public void writeToFile(boolean unloadInstances) {
     	try {
     		
-    		NBTTagCompound data = new NBTTagCompound();
+    		CompoundNBT data = new CompoundNBT();
     		
     		Collection playerDataCl = grid.values();
 			Iterator it = playerDataCl.iterator();

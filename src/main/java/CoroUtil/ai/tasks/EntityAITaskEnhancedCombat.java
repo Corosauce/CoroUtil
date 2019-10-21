@@ -5,19 +5,22 @@ import java.util.UUID;
 
 import CoroUtil.difficulty.UtilEntityBuffs;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.entity.data.AttackData;
@@ -26,10 +29,10 @@ import CoroUtil.difficulty.DynamicDifficulty;
 
 import CoroUtil.config.ConfigHWMonsters;
 
-public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskInitializer
+public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
 {
     World worldObj;
-    EntityCreature entity;
+    CreatureEntity entity;
     /** An amount of decrementing ticks that allows the entity to attack once the tick reaches 0. */
     int attackTick;
     /** The speed with which the mob will approach the target */
@@ -62,7 +65,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
 
     //needed for generic instantiation
     public EntityAITaskEnhancedCombat() {
-		this.classTarget = EntityPlayer.class;
+		this.classTarget = PlayerEntity.class;
 		this.speedTowardsTarget = 1D;
         this.longMemory = false;
 	}
@@ -73,7 +76,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     @Override
     public boolean shouldExecute()
     {
-        EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
+        LivingEntity entitylivingbase = this.entity.getAttackTarget();
 
         if (entitylivingbase == null)
         {
@@ -111,7 +114,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     @Override
     public boolean shouldContinueExecuting()
     {
-        EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
+        LivingEntity entitylivingbase = this.entity.getAttackTarget();
         return entitylivingbase == null ? false : (!entitylivingbase.isEntityAlive() ? false : (!this.longMemory ? !this.entity.getNavigator().noPath() : this.entity.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(entitylivingbase.posX), MathHelper.floor(entitylivingbase.posY), MathHelper.floor(entitylivingbase.posZ)))));
     }
 
@@ -147,7 +150,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
         long counterAttackReuseDelay = ConfigHWMonsters.counterAttackReuseDelay;
         double counterAttackLeapSpeed = ConfigHWMonsters.counterAttackLeapSpeed;
         
-        EntityLivingBase entitylivingbase = this.entity.getAttackTarget();
+        LivingEntity entitylivingbase = this.entity.getAttackTarget();
 
         //fix for stealth mods that null out target entity in weird spots even after shouldExecute and shouldContinueExecuting is called
         if (entitylivingbase == null) {
@@ -289,7 +292,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
 
             if (this.entity.getHeldItemMainhand() != null)
             {
-                this.entity.swingArm(EnumHand.MAIN_HAND);
+                this.entity.swingArm(Hand.MAIN_HAND);
             }
             
             this.entity.attackEntityAsMob(entitylivingbase);
@@ -301,9 +304,9 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
                 if (leapAttacking && ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier > 0) {
                     double extraDamage = this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
                     extraDamage *= ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier;
-                    if (this.worldObj.getDifficulty() == EnumDifficulty.EASY) {
+                    if (this.worldObj.getDifficulty() == Difficulty.EASY) {
                         extraDamage = extraDamage / 2.0F + 1.0F;
-                    } else if (this.worldObj.getDifficulty() == EnumDifficulty.HARD) {
+                    } else if (this.worldObj.getDifficulty() == Difficulty.HARD) {
                         extraDamage = extraDamage * 3.0F / 2.0F;
                     }
                     //entitylivingbase.attackEntityFrom();
@@ -334,7 +337,7 @@ public class EntityAITaskEnhancedCombat extends EntityAIBase implements ITaskIni
     }
 
 	@Override
-	public void setEntity(EntityCreature creature) {
+	public void setEntity(CreatureEntity creature) {
 		this.entity = creature;
 		this.worldObj = this.entity.world;/*
 		

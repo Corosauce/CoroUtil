@@ -1,8 +1,9 @@
 package CoroUtil.world.grid.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
@@ -77,7 +78,7 @@ public class BlockDataPoint
     public void updateCache()
     {
         //yes this might force a chunk load, but now its only requested when something really needs the data, not on BlockDataPoint instantiation
-    	IBlockState state = grid.world.getBlockState(new BlockPos(xCoord, yCoord, zCoord));
+    	BlockState state = grid.world.getBlockState(new BlockPos(xCoord, yCoord, zCoord));
     	block = state.getBlock();
     	blockMeta = state.getBlock().getMetaFromState(state);
     	needCacheUpdate = false;
@@ -144,7 +145,7 @@ public class BlockDataPoint
         return (new StringBuilder()).append(xCoord).append(", ").append(yCoord).append(", ").append(zCoord).toString();
     }
     
-    public void readFromNBT(NBTTagCompound nbt) {
+    public void readFromNBT(CompoundNBT nbt) {
     	
     	block = Block.getBlockById(nbt.getInteger("blockID"));
     	blockMeta = nbt.getInteger("blockMeta");
@@ -160,8 +161,8 @@ public class BlockDataPoint
     	zCoord = nbt.getInteger("zCoord");*/
     }
     
-    public NBTTagCompound writeToNBT() {
-    	NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT writeToNBT() {
+    	CompoundNBT nbt = new CompoundNBT();
     	
     	//TODO: ((int value) & 15) will give you the lower four bits, and ((int value) >> 4) will give you the upper 12 bits
         //note for extended blcok state? ^

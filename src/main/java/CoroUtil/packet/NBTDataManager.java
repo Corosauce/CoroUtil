@@ -1,19 +1,20 @@
 package CoroUtil.packet;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 public class NBTDataManager {
 
 	//implement a registry to have better sharing, for once these are used for more than just 1 feature/gui
 	
-	public static NBTTagCompound nbtDataClient;
-	public static NBTTagCompound nbtDataServer;
+	public static CompoundNBT nbtDataClient;
+	public static CompoundNBT nbtDataServer;
 	
-	public static void nbtDataFromServer(NBTTagCompound parNBT) {
+	public static void nbtDataFromServer(CompoundNBT parNBT) {
 		
 	}
 	
-	public static void nbtDataFromClient(String parUser, NBTTagCompound parNBT) {
+	public static void nbtDataFromClient(String parUser, CompoundNBT parNBT) {
 		
 	}
 	

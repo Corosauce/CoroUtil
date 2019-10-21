@@ -1,7 +1,8 @@
 package CoroUtil.quest.quests;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
@@ -61,13 +62,13 @@ public class KillEntityQuest extends ActiveQuest {
 		}
 	}
 	
-	public void load(NBTTagCompound parNBT) {
+	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
 		curKillCount = parNBT.getInteger("curKillCount");
 		neededKillCount = parNBT.getInteger("neededKillCount");
 	}
 	
-	public void save(NBTTagCompound parNBT) {
+	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
 		parNBT.setInteger("curKillCount", curKillCount);
 		parNBT.setInteger("neededKillCount", neededKillCount);

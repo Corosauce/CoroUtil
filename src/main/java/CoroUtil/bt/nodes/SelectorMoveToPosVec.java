@@ -1,6 +1,6 @@
 package CoroUtil.bt.nodes;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
@@ -10,7 +10,7 @@ import CoroUtil.bt.selector.Selector;
 public class SelectorMoveToPosVec extends Selector {
 
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	public float closeDist;
@@ -19,7 +19,7 @@ public class SelectorMoveToPosVec extends Selector {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		closeDist = parCloseDist;
 	}
 	

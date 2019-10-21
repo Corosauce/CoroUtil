@@ -14,7 +14,8 @@ import CoroUtil.forge.CULog;
 import modconfig.forge.CommandModConfig;
 import modconfig.forge.EventHandlerPacket;
 import net.minecraft.command.ServerCommandManager;
-import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -23,8 +24,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.OldUtil;
 
 @Mod(modid = "configmod", name="Extended Mod Config", version="v1.0", useMetadata=false)
@@ -123,7 +122,7 @@ public class ConfigMod {
     	
     }
     
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
 	public static String getClientSidePath() {
 		return FMLClientHandler.instance().getClient().mcDataDir.getPath();
 	}

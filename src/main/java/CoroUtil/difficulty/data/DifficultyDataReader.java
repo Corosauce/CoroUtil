@@ -13,7 +13,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.entity.ai.EntityAIZombieAttack;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
 import net.minecraftforge.common.crafting.CraftingHelper;
@@ -138,10 +139,10 @@ public class DifficultyDataReader {
                 EntityAITaskAntiAir.class, 3));
         UtilEntityBuffs.registerBuff(new BuffAI_TaskOmniscience(UtilEntityBuffs.dataEntityBuffed_AI_Omniscience));
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap,
-                EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
+                EntityAITaskEnhancedCombat.class, 2, ZombieAttackGoal.class).setAllowRedundantAttempts());
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Lunge,
-                EntityAITaskEnhancedCombat.class, 2, EntityAIZombieAttack.class).setAllowRedundantAttempts());
+                EntityAITaskEnhancedCombat.class, 2, ZombieAttackGoal.class).setAllowRedundantAttempts());
 
         UtilEntityBuffs.registerBuff(new BuffAI_TaskBase(UtilEntityBuffs.dataEntityBuffed_AI_Hoist,
                 EntityAIHoist.class, 2).setAllowRedundantAttempts());

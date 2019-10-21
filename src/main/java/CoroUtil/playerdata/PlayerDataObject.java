@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 /**
  * Old design, just use entity.getEntityData() nbt
@@ -35,7 +36,7 @@ public class PlayerDataObject {
 		return playerData.get(objectName);
 	}
 	
-	public void nbtLoadAll(NBTTagCompound parNBT) {
+	public void nbtLoadAll(CompoundNBT parNBT) {
 		
 		Iterator it = playerData.entrySet().iterator();
 		while (it.hasNext()) {
@@ -46,7 +47,7 @@ public class PlayerDataObject {
 
 			pdo.init(username);
 			
-			NBTTagCompound nbt = parNBT.getCompoundTag(entryModule);
+			CompoundNBT nbt = parNBT.getCompoundTag(entryModule);
 			if (nbt != null) {
 				pdo.nbtLoad(nbt);
 			} else {
@@ -55,8 +56,8 @@ public class PlayerDataObject {
 		}
 	}
 	
-	public void nbtSyncAll(NBTTagCompound parNBT) {
-		NBTTagCompound data = new NBTTagCompound();
+	public void nbtSyncAll(CompoundNBT parNBT) {
+		CompoundNBT data = new CompoundNBT();
 		
 		Iterator it = playerData.entrySet().iterator();
 		while (it.hasNext()) {
@@ -65,7 +66,7 @@ public class PlayerDataObject {
 			String entryModule = (String)pairs.getKey();
 			IPlayerData pdo = (IPlayerData)pairs.getValue();
 			
-			NBTTagCompound nbt = data.getCompoundTag(entryModule);
+			CompoundNBT nbt = data.getCompoundTag(entryModule);
 			if (nbt != null) {
 				pdo.nbtSyncFromServer(nbt);
 			}

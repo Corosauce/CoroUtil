@@ -1,7 +1,7 @@
 package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.EntityDamageSource;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -14,7 +14,7 @@ public class AttackMelee extends Selector {
 	//0 = nothing to attack, 1 = attacking, 2 = sanity check says no
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	public float attackRange = 16;
@@ -26,7 +26,7 @@ public class AttackMelee extends Selector {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		attackRange = parRange;
 		attackRate = parRate;
 	}

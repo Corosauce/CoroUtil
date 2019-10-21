@@ -5,8 +5,8 @@ import CoroUtil.ai.tasks.EntityAITaskAntiAir;
 import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIZombieAttack;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.ZombieAttackGoal;
 
 /**
  * Created by Corosus on 1/9/2017.
@@ -57,7 +57,7 @@ public class BuffAI_TaskBase extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
 
         if (applyBuffImpl(ent, difficulty, true) || allowRedundantAttempts) {
             return super.applyBuff(ent, difficulty);
@@ -67,12 +67,12 @@ public class BuffAI_TaskBase extends BuffBase {
     }
 
     @Override
-    public boolean canApplyBuff(EntityCreature ent, float difficulty) {
+    public boolean canApplyBuff(CreatureEntity ent, float difficulty) {
         return !UtilEntityBuffs.hasTask(ent, task, isTargetTask) || allowRedundantAttempts;
     }
 
     @Override
-    public void applyBuffFromReload(EntityCreature ent, float difficulty) {
+    public void applyBuffFromReload(CreatureEntity ent, float difficulty) {
 
         //probably redundant if statement, added for safety
         //no longer redundant due to addition of allowRedundantAttempts
@@ -82,7 +82,7 @@ public class BuffAI_TaskBase extends BuffBase {
 
     }
 
-    public boolean applyBuffImpl(EntityCreature ent, float difficulty, boolean firstTime) {
+    public boolean applyBuffImpl(CreatureEntity ent, float difficulty, boolean firstTime) {
         if (taskToReplace != null) {
             if (BehaviorModifier.replaceTaskIfMissing(ent, taskToReplace, task, taskPriority, isTargetTask)) {
                 return true;

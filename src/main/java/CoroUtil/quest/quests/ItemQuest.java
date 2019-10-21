@@ -6,7 +6,8 @@ import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
@@ -71,14 +72,14 @@ public class ItemQuest extends ActiveQuest {
 	}
 	
 	@Override
-	public void load(NBTTagCompound parNBT) {
+	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
 		neededItemID = parNBT.getString("neededItemID");
 		neededItemCount = parNBT.getInteger("neededItemCount");
 	}
 	
 	@Override
-	public void save(NBTTagCompound parNBT) {
+	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
 		parNBT.setString("neededItemID", neededItemID);
 		parNBT.setInteger("neededItemCount", neededItemCount);

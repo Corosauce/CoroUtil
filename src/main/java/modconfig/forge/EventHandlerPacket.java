@@ -9,24 +9,23 @@ import modconfig.ConfigEntryInfo;
 import modconfig.ConfigMod;
 import modconfig.gui.GuiConfigEditor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.ServerPlayNetHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.packet.PacketHelper;
 
 public class EventHandlerPacket {
 
 	@SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
 	public void onPacketFromServer(FMLNetworkEvent.ClientCustomPacketEvent event) {
 
 		try {
-			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
+			CompoundNBT nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 			String command = nbt.getString("command");
 			
 			//System.out.println("command: " + command);
@@ -34,7 +33,7 @@ public class EventHandlerPacket {
 			Minecraft.getMinecraft().addScheduledTask(() -> {
 				if (command.equals("setData")) {
 					String modID = nbt.getString("modID");
-					NBTTagCompound nbtEntries = nbt.getCompoundTag("entries");
+					CompoundNBT nbtEntries = nbt.getCompoundTag("entries");
 					//int entryCount = nbt.getInteger("entryCount");
 					int pos = 0;
 					//ConfigMod.dbg("modconfig packet, size: " + "derp");
@@ -44,7 +43,7 @@ public class EventHandlerPacket {
 						Iterator it = nbtEntries.getKeySet().iterator();
 						while (it.hasNext()) {
 							String tagName = (String) it.next();
-							NBTTagCompound entry = nbtEntries.getCompoundTag(tagName);
+							CompoundNBT entry = nbtEntries.getCompoundTag(tagName);
 							String str1 = entry.getString("name");
 							String str2 = entry.getString("value");
 							String str3 = "";//dis.readUTF();
@@ -71,10 +70,10 @@ public class EventHandlerPacket {
 	
 	@SubscribeEvent
 	public void onPacketFromClient(FMLNetworkEvent.ServerCustomPacketEvent event) {
-		EntityPlayerMP entP = ((NetHandlerPlayServer)event.getHandler()).player;
+		ServerPlayerEntity entP = ((ServerPlayNetHandler)event.getHandler()).player;
 		
 		try {
-			NBTTagCompound nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
+			CompoundNBT nbt = PacketHelper.readNBTTagCompound(event.getPacket().payload());
 			String command = nbt.getString("command");
 			
 			//System.out.println("command: " + command);
@@ -83,8 +82,8 @@ public class EventHandlerPacket {
 				if (command.equals("setData")) {
 					String data = nbt.getString("data");
 
-					if (entP instanceof EntityPlayerMP) {
-						CommandModConfig.parseSetCommand((EntityPlayerMP) entP, data.split(" "));
+					if (entP instanceof ServerPlayerEntity) {
+						CommandModConfig.parseSetCommand((ServerPlayerEntity) entP, data.split(" "));
 					}
 				}
 			});

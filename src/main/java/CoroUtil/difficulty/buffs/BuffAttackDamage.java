@@ -6,7 +6,7 @@ import CoroUtil.difficulty.data.cmods.CmodAttributeHealth;
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilMisc;
 import CoroUtil.util.EnumAttribModifierType;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 
@@ -18,7 +18,7 @@ public class BuffAttackDamage extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
 
         CmodAttributeAttackDamage cmod = (CmodAttributeAttackDamage)UtilEntityBuffs.getCmodData(ent, getTagName());
 

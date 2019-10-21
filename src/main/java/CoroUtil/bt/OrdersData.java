@@ -1,6 +1,6 @@
 package CoroUtil.bt;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import CoroUtil.bt.selector.Selector;
 
 public class OrdersData {
@@ -31,7 +31,7 @@ public class OrdersData {
 		
 	}*/
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound parentCompound) {
+	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
 		return parentCompound;
 	}
 }

@@ -12,20 +12,22 @@ import CoroUtil.difficulty.buffs.BuffBase;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.util.*;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.*;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -43,14 +45,12 @@ import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.test.Headshots;
 import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.grid.block.BlockDataPoint;
 import CoroUtil.world.grid.chunk.ChunkDataPoint;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Iterator;
 import java.util.List;
@@ -66,11 +66,11 @@ public class EventHandlerForge {
 
 		if (CoroUtilCompatibility.isHWInvasionsInstalled()) {
 			if (!event.getEntity().world.isRemote) {
-				if (event.getEntity() instanceof EntityPlayer) {
-					DynamicDifficulty.deathPlayer((EntityPlayer) event.getEntity());
+				if (event.getEntity() instanceof PlayerEntity) {
+					DynamicDifficulty.deathPlayer((PlayerEntity) event.getEntity());
 
 					//also remove invasion skip buff since the invaders got what they wanted (also covers edge case of player removing invasion mod and buff remaining)
-					DynamicDifficulty.setInvasionSkipBuff((EntityPlayer) event.getEntity(), 0);
+					DynamicDifficulty.setInvasionSkipBuff((PlayerEntity) event.getEntity(), 0);
 					//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
 				}
 
@@ -89,8 +89,8 @@ public class EventHandlerForge {
 		
 		//this is called for every dimension
 		//check server side because some mods invoke saving client side (bad standard)
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
+			if (((ServerWorld)event.getWorld()).provider.getDimension() == 0) {
 				CoroUtil.writeOutData(false);
 			}
 		}
@@ -99,7 +99,7 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void worldLoad(Load event) {
 		if (!event.getWorld().isRemote) {
-			if (((WorldServer)event.getWorld()).provider.getDimension() == 0) {
+			if (((ServerWorld)event.getWorld()).provider.getDimension() == 0) {
 				if (WorldDirectorManager.instance().getWorldDirector(CoroUtil.modID, event.getWorld()) == null) {
 					WorldDirectorManager.instance().registerWorldDirector(new WorldDirector(true), CoroUtil.modID, event.getWorld());
 				}
@@ -152,10 +152,10 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void entityTick(LivingUpdateEvent event) {
 		
-		EntityLivingBase ent = event.getEntityLiving();
+		LivingEntity ent = event.getEntityLiving();
 		if (!ent.world.isRemote) {
-			if (ent instanceof EntityPlayer) {
-				CoroUtilPlayer.trackPlayerForSpeed((EntityPlayer) ent);
+			if (ent instanceof PlayerEntity) {
+				CoroUtilPlayer.trackPlayerForSpeed((PlayerEntity) ent);
 			}
 		}
 
@@ -165,7 +165,7 @@ public class EventHandlerForge {
 			int range = 10;
 
 			if (ent.world.isRemote && ent.world.getTotalWorldTime() % rate == 0) {
-				if (ent instanceof EntityPlayer) {
+				if (ent instanceof PlayerEntity) {
 					for (int x = -range; x <= range; x++) {
 						for (int y = -range; y <= range; y++) {
 							for (int z = -range; z <= range; z++) {
@@ -235,8 +235,8 @@ public class EventHandlerForge {
 			if (!ent.world.isRemote) {
 				if (ent.world.getTotalWorldTime() % walkOnRate == 0) {
 					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
-					if (ent instanceof EntityPlayer) {
-						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((EntityPlayer) ent, 0.1F);
+					if (ent instanceof PlayerEntity) {
+						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((PlayerEntity) ent, 0.1F);
 						speed = Math.sqrt(vec.xCoord * vec.xCoord + vec.yCoord * vec.yCoord + vec.zCoord * vec.zCoord);
 					}
 					if (speed > 0.08) {
@@ -244,7 +244,7 @@ public class EventHandlerForge {
 						int newX = MathHelper.floor(ent.posX);
 						int newY = MathHelper.floor(ent.getEntityBoundingBox().minY - 1);
 						int newZ = MathHelper.floor(ent.posZ);
-						IBlockState state = ent.world.getBlockState(new BlockPos(newX, newY, newZ));
+						BlockState state = ent.world.getBlockState(new BlockPos(newX, newY, newZ));
 						Block id = state.getBlock();
 						
 						//check for block that can have beaten path data
@@ -285,11 +285,11 @@ public class EventHandlerForge {
 					//persistance management here too maybe?
 					//invasion mod preventing this via AllowDespawn event in its handler class
 
-					if (ent instanceof EntityLiving) {
-						EntityLiving entL = (EntityLiving) ent;
-						Iterator<EntityAITasks.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
+					if (ent instanceof MobEntity) {
+						MobEntity entL = (MobEntity) ent;
+						Iterator<GoalSelector.EntityAITaskEntry> it = entL.tasks.taskEntries.iterator();
 						while (it.hasNext()) {
-							EntityAITasks.EntityAITaskEntry task = it.next();
+							GoalSelector.EntityAITaskEntry task = it.next();
 							if (task.action instanceof IInvasionControlledTask) {
 								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
 									//entL.tasks.removeTask(task.action);
@@ -301,7 +301,7 @@ public class EventHandlerForge {
 
 						it = entL.targetTasks.taskEntries.iterator();
 						while (it.hasNext()) {
-							EntityAITasks.EntityAITaskEntry task = it.next();
+							GoalSelector.EntityAITaskEntry task = it.next();
 							if (task.action instanceof IInvasionControlledTask) {
 								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
 									//entL.targetTasks.removeTask(task.action);
@@ -320,7 +320,7 @@ public class EventHandlerForge {
 				boolean pushMobsAwayForMiners = ConfigCoroUtilAdvanced.minersPushAwayOtherNonMinerMobsWhileMining;
 				if (pushMobsAwayForMiners) {
 
-					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntitySelectors.getTeamCollisionPredicate(ent));
+					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntityPredicates.getTeamCollisionPredicate(ent));
 
 					if (!list.isEmpty())
 					{
@@ -331,12 +331,12 @@ public class EventHandlerForge {
 
 							//from applyEntityCollision()
 
-							NBTTagCompound data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+							CompoundNBT data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 
 							//if config allows, push only buffed mobs, including wave spawned and extra enhanced ones
 							boolean canPush = !ConfigCoroUtilAdvanced.minersPushAwayOnlyOtherBuffedMobs || ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed);
 
-							if (entityIn instanceof EntityLiving && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging) && canPush)
+							if (entityIn instanceof MobEntity && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging) && canPush)
 							{
 								if (!entityIn.noClip && !ent.noClip)
 								{
@@ -443,8 +443,8 @@ public class EventHandlerForge {
 
 		CoroUtilCrossMod.processSpawnOverride(event);
 
-		if (event.getEntity() instanceof EntityCreature) {
-			EntityCreature ent = (EntityCreature) event.getEntity();
+		if (event.getEntity() instanceof CreatureEntity) {
+			CreatureEntity ent = (CreatureEntity) event.getEntity();
 
 			//if buffed and was not literally just spawned (prevents duplicate buff applying from invasion spawning + this code)
 			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed) && !ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityInitialSpawn)) {
@@ -459,7 +459,7 @@ public class EventHandlerForge {
 				}
 
 				List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-				NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+				CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
 				for (String buff : buffs) {
 					if (data.getBoolean(buff)) {
 						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
@@ -495,7 +495,7 @@ public class EventHandlerForge {
 				if (ConfigHWMonsters.explosionsDontDestroyTileEntities && event.getWorld().getTileEntity(pos) != null) {
 					it.remove();
 				} else if (ConfigHWMonsters.explosionsTurnIntoRepairingBlocks) {
-					IBlockState state = event.getWorld().getBlockState(pos);
+					BlockState state = event.getWorld().getBlockState(pos);
 					if (UtilMining.canMineBlock(event.getWorld(), pos, state.getBlock()) &&
 							UtilMining.canConvertToRepairingBlock(event.getWorld(), state)) {
 						TileEntityRepairingBlock.replaceBlockAndBackup(event.getWorld(), pos);
@@ -513,8 +513,8 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void playerCloneEvent(PlayerEvent.Clone event) {
 
-		NBTTagCompound nbtOld = event.getOriginal().getEntityData();
-		NBTTagCompound nbtNew = event.getEntityPlayer().getEntityData();
+		CompoundNBT nbtOld = event.getOriginal().getEntityData();
+		CompoundNBT nbtNew = event.getEntityPlayer().getEntityData();
 
 		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
 		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestOre, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestOre));
@@ -530,7 +530,7 @@ public class EventHandlerForge {
 	}
 
 	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void worldRender(RenderWorldLastEvent event)
 	{
 		DebugRenderer.renderDebug(event);

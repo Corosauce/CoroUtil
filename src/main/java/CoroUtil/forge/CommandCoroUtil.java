@@ -16,15 +16,17 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.*;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Items;
+import net.minecraft.entity.monster.MonsterEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -34,7 +36,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -58,9 +61,9 @@ public class CommandCoroUtil extends CommandBase {
 	@Override
 	public void execute(MinecraftServer server, ICommandSender var1, String[] var2) {
 		
-		EntityPlayer player = null;
-		if (var1 instanceof EntityPlayer) {
-			player = (EntityPlayer) var1;
+		PlayerEntity player = null;
+		if (var1 instanceof PlayerEntity) {
+			player = (PlayerEntity) var1;
 		}
 		World world = var1.getEntityWorld();
 		int dimension = world.provider.getDimension();
@@ -133,9 +136,9 @@ public class CommandCoroUtil extends CommandBase {
 					}
 
 				} else if (var2[0].equals("height")) {
-					var1.sendMessage(new TextComponentString("height: " + world.getHeight(posBlock)));
+					var1.sendMessage(new StringTextComponent("height: " + world.getHeight(posBlock)));
 				} else if (var2[0].equals("heightprecip")) {
-					var1.sendMessage(new TextComponentString("heightprecip: " + world.getPrecipitationHeight(posBlock)));
+					var1.sendMessage(new StringTextComponent("heightprecip: " + world.getPrecipitationHeight(posBlock)));
 				} else if (var2[0].equals("aitest")) {
 					/*System.out.println("AI TEST MODIFY!");
 					BehaviorModifier.test(world, Vec3.createVectorHelper(player.posX, player.posY, player.posZ), CoroUtilEntity.getName(player));*/
@@ -168,7 +171,7 @@ public class CommandCoroUtil extends CommandBase {
 									for (int j = 0; j < entsToSpawn.size(); j++) {
 										Entity ent2 = EntityList.createEntityByIDFromName(new ResourceLocation(entsToSpawn.get(j)), world);
 										boolean livingOnly = true;
-										if (ent2 != null && (!livingOnly || ent2 instanceof EntityLivingBase)) {
+										if (ent2 != null && (!livingOnly || ent2 instanceof LivingEntity)) {
 											CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent2));
 											spawnEntity(player, ent2);
 										}
@@ -247,10 +250,10 @@ public class CommandCoroUtil extends CommandBase {
 	                    it.remove();
 	                }
 				} else if (var2[0].equalsIgnoreCase("printEntities")) {
-					player.sendMessage(new TextComponentString("Printing all entities names that might be usable in HW-Invasions, use these names in the mob_spawns json, copy these from forge logs for easier use"));
+					player.sendMessage(new StringTextComponent("Printing all entities names that might be usable in HW-Invasions, use these names in the mob_spawns json, copy these from forge logs for easier use"));
 					for (Map.Entry<ResourceLocation, EntityEntry> entry : ForgeRegistries.ENTITIES.getEntries()) {
-						if (EntityCreature.class.isAssignableFrom(entry.getValue().getEntityClass())) {
-							player.sendMessage(new TextComponentString(entry.getValue().getRegistryName().toString()));
+						if (CreatureEntity.class.isAssignableFrom(entry.getValue().getEntityClass())) {
+							player.sendMessage(new StringTextComponent(entry.getValue().getRegistryName().toString()));
 						}
 					}
 	        	} else if (var2[0].equalsIgnoreCase("location")) {
@@ -277,8 +280,8 @@ public class CommandCoroUtil extends CommandBase {
 						CoroUtilMisc.sendCommandSenderMsg(var1, entry);
 					}
 				} else if (var2[0].equalsIgnoreCase("debugdps")) {
-					if ((var1 instanceof EntityPlayer)) {
-						EntityPlayer ent = (EntityPlayer) var1;
+					if ((var1 instanceof PlayerEntity)) {
+						PlayerEntity ent = (PlayerEntity) var1;
 
 						if (var2.length >= 2) {
 							ent = world.getPlayerEntityByName(var2[1]);
@@ -291,12 +294,12 @@ public class CommandCoroUtil extends CommandBase {
 							net.minecraft.util.math.Vec3d posVec2 = new net.minecraft.util.math.Vec3d(ent.posX, ent.posY + (ent.getEyeHeight() - ent.getDefaultEyeHeight()), ent.posZ);//player.getPosition(1F);
 							BlockCoord pos = new BlockCoord(MathHelper.floor(posVec2.x), MathHelper.floor(posVec2.y), MathHelper.floor(posVec2.z));
 							CoroUtilMisc.sendCommandSenderMsg(var1, "Printed extra dps debug to server console");
-							DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos, true, (EntityPlayer) var1);
+							DynamicDifficulty.getDifficultyScaleForPosDPS(ent.world, pos, true, (PlayerEntity) var1);
 						}
 					}
 				} else if (var2[0].equalsIgnoreCase("difficulty") || var2[0].equalsIgnoreCase("diff")) {
-					if ((var1 instanceof EntityPlayer)) {
-						EntityPlayer ent = (EntityPlayer) var1;
+					if ((var1 instanceof PlayerEntity)) {
+						PlayerEntity ent = (PlayerEntity) var1;
 
 						if (var2.length >= 2) {
 							ent = world.getPlayerEntityByName(var2[1]);
@@ -377,7 +380,7 @@ public class CommandCoroUtil extends CommandBase {
 
 				} else if (var2[0].equalsIgnoreCase("reloadData")) {
 					DifficultyDataReader.loadFiles();
-					var1.sendMessage(new TextComponentString("Difficulty data reloaded"));
+					var1.sendMessage(new StringTextComponent("Difficulty data reloaded"));
 				} else if (var2[0].equalsIgnoreCase("registry")) {
 					/*for (Map.Entry<String, Class <? extends Entity >> entry : EntityList.NAME_TO_CLASS.entrySet()) {
 						var1.sendMessage(new TextComponentString(entry.getKey()));
@@ -427,7 +430,7 @@ public class CommandCoroUtil extends CommandBase {
 								var1.sendMessage(new TextComponentString(entry));
 							}*/
 						} else {
-							var1.sendMessage(new TextComponentString("Could not find template by name " + profileName));
+							var1.sendMessage(new StringTextComponent("Could not find template by name " + profileName));
 						}
 
 					}
@@ -456,23 +459,23 @@ public class CommandCoroUtil extends CommandBase {
 							}
 
 							if (profileFound != null) {
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion template validation test, difficulty: " + difficultyScale));
+								var1.sendMessage(new StringTextComponent(TextFormatting.GREEN + "Invasion template validation test, difficulty: " + difficultyScale));
 								String data = profileFound.toString();
 								String[] list = data.split(" \\| ");
 								for (String entry : list) {
-									var1.sendMessage(new TextComponentString(entry));
+									var1.sendMessage(new StringTextComponent(entry));
 								}
 
 								DifficultyDataReader.setDebugFlattenCmodsAndConditions(true);
 
-								var1.sendMessage(new TextComponentString(TextFormatting.GREEN + "Invasion template validation test with cmod/condition templates flattened, difficulty: " + difficultyScale));
+								var1.sendMessage(new StringTextComponent(TextFormatting.GREEN + "Invasion template validation test with cmod/condition templates flattened, difficulty: " + difficultyScale));
 								data = profileFound.toString();
 								list = data.split(" \\| ");
 								for (String entry : list) {
-									var1.sendMessage(new TextComponentString(entry));
+									var1.sendMessage(new StringTextComponent(entry));
 								}
 							} else {
-								var1.sendMessage(new TextComponentString("Could not find template by name " + profileName));
+								var1.sendMessage(new StringTextComponent("Could not find template by name " + profileName));
 							}
 						} finally {
 							DifficultyDataReader.setDebugFlattenCmodsAndConditions(false);
@@ -489,7 +492,7 @@ public class CommandCoroUtil extends CommandBase {
                     System.out.println("TRY 1");
                     System.out.println("");
                     for (Block block : Block.REGISTRY) {
-					    for (IBlockState state : block.getBlockState().getValidStates()) {
+					    for (BlockState state : block.getBlockState().getValidStates()) {
                             AxisAlignedBB aabb = block.getBoundingBox(state, world, new BlockPos(0, 64, 0));
                             if (aabb != null) {
                                 System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
@@ -504,7 +507,7 @@ public class CommandCoroUtil extends CommandBase {
                     System.out.println("TRY 2");
                     System.out.println("");
                     for (Block block : Block.REGISTRY) {
-                        for (IBlockState state : block.getBlockState().getValidStates()) {
+                        for (BlockState state : block.getBlockState().getValidStates()) {
                             AxisAlignedBB aabb = state.getBoundingBox(world, new BlockPos(0, 64, 0));
                             if (aabb != null) {
                                 System.out.println("name: " + block.getRegistryName() + " aabb: " + aabb);
@@ -520,10 +523,10 @@ public class CommandCoroUtil extends CommandBase {
 					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
 
 					BlockPos pos = new BlockPos(sx, sy, sz);
-					IBlockState state = world.getBlockState(pos);
+					BlockState state = world.getBlockState(pos);
 
 					if (UtilMining.canConvertToRepairingBlock(world, state)) {
-						var1.sendMessage(new TextComponentString("Setting coord to repairing block, block was: " + state));
+						var1.sendMessage(new StringTextComponent("Setting coord to repairing block, block was: " + state));
 						TileEntityRepairingBlock.replaceBlockAndBackup(world, pos);
 						/*world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
 						TileEntity tEnt = world.getTileEntity(pos);
@@ -531,7 +534,7 @@ public class CommandCoroUtil extends CommandBase {
 							((TileEntityRepairingBlock) tEnt).setBlockData(state);
 						}*/
 					} else {
-						var1.sendMessage(new TextComponentString("Coordinate does not support repairing block, block was: " + state));
+						var1.sendMessage(new StringTextComponent("Coordinate does not support repairing block, block was: " + state));
 						/*Block.spawnAsEntity(world, pos, new ItemStack(state.getBlock(), 1));
 						world.setBlockToAir(pos);*/
 					}
@@ -542,7 +545,7 @@ public class CommandCoroUtil extends CommandBase {
 					int sz = MathHelper.floor(parseCoordinate(vec.z, var2[3], false).getResult());
 
 					BlockPos pos = new BlockPos(sx, sy, sz);
-					IBlockState state = world.getBlockState(pos);
+					BlockState state = world.getBlockState(pos);
 
 					CoroUtilCompatibility.testPowerInfo(player, pos);
 				} else if (var2[0].equalsIgnoreCase("testBiomeSpawns")) {
@@ -550,19 +553,19 @@ public class CommandCoroUtil extends CommandBase {
 					boolean showAll = false;
 					if (var2.length >= 2) showAll = (var2[1].equalsIgnoreCase("all"));
 
-					var1.sendMessage(new TextComponentString("testing biome entity spawn data for weights, show all? = " + showAll));
+					var1.sendMessage(new StringTextComponent("testing biome entity spawn data for weights, show all? = " + showAll));
 					//System.out.println("testing biome entity spawn data for weights, show all? = " + showAll);
 
 					for (Biome biome : Biome.REGISTRY) {
 
 						if (showAll) {
-							var1.sendMessage(new TextComponentString("Processing entries for biome: " + biome.biomeName));
+							var1.sendMessage(new StringTextComponent("Processing entries for biome: " + biome.biomeName));
 						}
 
-						for (EnumCreatureType type : EnumCreatureType.values()) {
+						for (EntityClassification type : EntityClassification.values()) {
 
 							if (showAll) {
-								var1.sendMessage(new TextComponentString("Processing entries for EnumCreatureType: " + type.name()));
+								var1.sendMessage(new StringTextComponent("Processing entries for EnumCreatureType: " + type.name()));
 							}
 
 							List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
@@ -570,29 +573,29 @@ public class CommandCoroUtil extends CommandBase {
 							int totalWeight = 0;
 
 							if (showAll) {
-								var1.sendMessage(new TextComponentString("SpawnListEntry size: " + list.size()));
+								var1.sendMessage(new StringTextComponent("SpawnListEntry size: " + list.size()));
 							}
 
 							for (Biome.SpawnListEntry entry : list) {
 								totalWeight += entry.itemWeight;
 								if (entry.itemWeight == 0) {
-									var1.sendMessage(new TextComponentString("found zero weight entry: " + entry.entityClass.getName() + " for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name()));
+									var1.sendMessage(new StringTextComponent("found zero weight entry: " + entry.entityClass.getName() + " for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name()));
 									found = true;
 								} else if (showAll) {
-									var1.sendMessage(new TextComponentString("weight entry: " + entry.entityClass.getName() + "weight: " + entry.itemWeight));
+									var1.sendMessage(new StringTextComponent("weight entry: " + entry.entityClass.getName() + "weight: " + entry.itemWeight));
 								}
 							}
 
 							if (found) {
 								if (totalWeight == 0) {
-									var1.sendMessage(new TextComponentString("CRASH RISK! total weight is 0 but list is not empty, mods that add the entity classes above need to sanitize their config input to avoid adding 0 weight spawnables"));
-									var1.sendMessage(new TextComponentString("issue for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name() + "', SpawnListEntry size: " + list.size()));
+									var1.sendMessage(new StringTextComponent("CRASH RISK! total weight is 0 but list is not empty, mods that add the entity classes above need to sanitize their config input to avoid adding 0 weight spawnables"));
+									var1.sendMessage(new StringTextComponent("issue for biome '" + biome.biomeName + "' for EnumCreatureType '" + type.name() + "', SpawnListEntry size: " + list.size()));
 								}
 
 							}
 
 							if (showAll) {
-								var1.sendMessage(new TextComponentString("total weight of list: " + totalWeight));
+								var1.sendMessage(new StringTextComponent("total weight of list: " + totalWeight));
 							}
 						}
 					}
@@ -605,7 +608,7 @@ public class CommandCoroUtil extends CommandBase {
 		
 	}
 	
-	public void spawnEntity(EntityPlayer player, Entity ent) {
+	public void spawnEntity(PlayerEntity player, Entity ent) {
 		double dist = 1D;
 		
 		double finalX = player.posX - (Math.sin(player.rotationYaw * 0.01745329F) * dist);
@@ -617,7 +620,7 @@ public class CommandCoroUtil extends CommandBase {
 
 		//OLD COMMENT: moved to after spawn, so client has an entity at least before syncs fire
 		//new comment: vanilla sets onInitialSpawn before spawning, so do it that way, need for better syncing
-		if (ent instanceof EntityLiving) ((EntityLiving)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
+		if (ent instanceof MobEntity) ((MobEntity)ent).onInitialSpawn(player.world.getDifficultyForLocation(new BlockPos(ent)), null);
 		player.world.spawnEntity(ent);
 	}
 	
@@ -730,7 +733,7 @@ public class CommandCoroUtil extends CommandBase {
         return count;
 	}
 
-	public void spawnInvasionMob(World world, EntityPlayer player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
+	public void spawnInvasionMob(World world, PlayerEntity player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
 
 		if (spawn.equals("minecraft:bat")) {
 			spawn = "coroutil:bat_smart";
@@ -740,9 +743,9 @@ public class CommandCoroUtil extends CommandBase {
 
 		if (clazz != null) {
 			Entity entL = EntityList.newEntity(clazz, world);
-			if (entL != null && entL instanceof EntityCreature) {
+			if (entL != null && entL instanceof CreatureEntity) {
 
-				EntityCreature ent = (EntityCreature) entL;
+				CreatureEntity ent = (CreatureEntity) entL;
 
 				BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
 				float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
@@ -759,10 +762,10 @@ public class CommandCoroUtil extends CommandBase {
 
 				//CoroUtilMisc.sendCommandSenderMsg(player, "spawned: " + CoroUtilEntity.getName(ent));
 			} else {
-				player.sendMessage(new TextComponentString("entity instance null or not EntityCreature"));
+				player.sendMessage(new StringTextComponent("entity instance null or not EntityCreature"));
 			}
 		} else {
-			player.sendMessage(new TextComponentString("entity class null"));
+			player.sendMessage(new StringTextComponent("entity class null"));
 		}
 	}
 	

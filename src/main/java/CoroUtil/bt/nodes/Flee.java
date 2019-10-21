@@ -1,27 +1,28 @@
 package CoroUtil.bt.nodes;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
 import CoroUtil.bt.EnumBehaviorState;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.bt.selector.Selector;
 import CoroUtil.util.Vec3;
+import net.minecraft.entity.MobEntity;
 
 public class Flee extends Selector {
 
 	//0 = nothing to attack, 1 = attacking, 2 = sanity check says no
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	
 	public Flee(Behavior parParent, IBTAgent parEnt, BlackboardBase parBB) {
 		super(parParent);
 		blackboard = parBB;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 	}
 
 	@Override

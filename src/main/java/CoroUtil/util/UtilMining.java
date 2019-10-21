@@ -6,18 +6,19 @@ import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.*;
+import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.InvalidBlockStateException;
 import net.minecraft.command.NumberInvalidException;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
@@ -47,14 +48,14 @@ public class UtilMining {
 	 * - if we readd simudigging, use these rules to work around unmineable things
 	 */
 
-	public static List<IBlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
-	public static List<IBlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
+	public static List<BlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
+	public static List<BlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
 
 	public static GameProfile fakePlayerProfile = null;
 
 	public static class ClientData {
-		public static List<IBlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
-		public static List<IBlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
+		public static List<BlockState> listBlocksBlacklistedRepairing = new ArrayList<>();
+		public static List<BlockState> listTileEntitiesWhitelistedBreakable = new ArrayList<>();
 	}
 
 	/**
@@ -135,14 +136,14 @@ public class UtilMining {
 
 	public static boolean isBlockBlacklistedFromRepairingBlockNonTileEntity(World world, BlockPos pos, boolean client) {
 		//using getActualState here fixes things like upper half of double_plant returning the incorrect runtime value
-		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
+		BlockState state = world.getBlockState(pos).getActualState(world, pos);
 
 		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listBlocksBlacklistedRepairing : listBlocksBlacklistedRepairing);
 	}
 
 	public static boolean isBlockWhitelistedToBreakTileEntity(World world, BlockPos pos, boolean client) {
 
-		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
+		BlockState state = world.getBlockState(pos).getActualState(world, pos);
 
 		return CoroUtilBlockState.partialStateInListMatchesFullState(state, client ? ClientData.listTileEntitiesWhitelistedBreakable : listTileEntitiesWhitelistedBreakable);
 
@@ -150,28 +151,28 @@ public class UtilMining {
 	}
 
 	public static boolean testing(World world, BlockPos pos) {
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 
-		HashSet<IBlockState> listBlocksBlacklisted = new HashSet<>();
-		List<IBlockState> listBlocksBlacklisted2 = new ArrayList<>();
+		HashSet<BlockState> listBlocksBlacklisted = new HashSet<>();
+		List<BlockState> listBlocksBlacklisted2 = new ArrayList<>();
 
 
-		IBlockState state1 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
-				.withProperty(BlockDoublePlant.HALF, BlockDoublePlant.EnumBlockHalf.UPPER);
+		BlockState state1 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
+				.withProperty(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UPPER);
 
-		IBlockState state2 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
-				.withProperty(BlockDoublePlant.HALF, BlockDoublePlant.EnumBlockHalf.UPPER);
+		BlockState state2 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
+				.withProperty(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UPPER);
 
-		IBlockState state3 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER)
+		BlockState state3 = Blocks.DOUBLE_PLANT.getDefaultState()
+				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
 
 				;
 
 		//setblock ~ ~ ~ minecraft:double_plant variant=sunflower
 		String str = "variant=sunflower,half=upper";
-		IBlockState state5 = null;
+		BlockState state5 = null;
 
 		try {
 			state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.DOUBLE_PLANT, str);
@@ -182,7 +183,7 @@ public class UtilMining {
 			e.printStackTrace();
 		}
 
-		IBlockState state4 = Blocks.DOUBLE_PLANT.getStateFromMeta(Blocks.DOUBLE_PLANT.getMetaFromState(state1));
+		BlockState state4 = Blocks.DOUBLE_PLANT.getStateFromMeta(Blocks.DOUBLE_PLANT.getMetaFromState(state1));
 
 		listBlocksBlacklisted.add(state2);
 		if (state5 != null) listBlocksBlacklisted2.add(state5);
@@ -216,7 +217,7 @@ public class UtilMining {
 	public static boolean canMineBlock(World world, BlockPos pos) {
 		//System.out.println("check: " + block);
 
-		IBlockState state = world.getBlockState(pos);
+		BlockState state = world.getBlockState(pos);
 
 		//dont mine tile entities
 		if (state.getBlock().isAir(state, world, pos) || state.getBlock() == CommonProxy.blockRepairingBlock) {
@@ -236,7 +237,7 @@ public class UtilMining {
 	}
 
 	@Deprecated
-    public static boolean canConvertToRepairingBlock(World world, IBlockState state) {
+    public static boolean canConvertToRepairingBlock(World world, BlockState state) {
 
 		if (state.getMaterial() == Material.GLASS) {
 			return true;
@@ -269,7 +270,7 @@ public class UtilMining {
 	}
 
 	public static boolean tryRemoveBlockWithFakePlayer(World world, BlockPos pos) {
-		IBlockState stateRemove = world.getBlockState(pos);
+		BlockState stateRemove = world.getBlockState(pos);
 
 		if (canGrabEventCheck(world, stateRemove, pos)) {
 
@@ -278,7 +279,7 @@ public class UtilMining {
 			if (fakePlayerProfile == null) {
 				fakePlayerProfile = new GameProfile(UUID.fromString("4365749c-bd72-497c-a0dd-73f28dafd8a1"), "coroutilMiningFakePlayer");
 			}
-			FakePlayer player = FakePlayerFactory.get((WorldServer) world, fakePlayerProfile);
+			FakePlayer player = FakePlayerFactory.get((ServerWorld) world, fakePlayerProfile);
 			//for good measure
 			player.setPosition(pos.getX(), pos.getY(), pos.getZ());
 
@@ -304,13 +305,13 @@ public class UtilMining {
 		return false;
 	}
 
-	public static boolean canGrabEventCheck(World world, IBlockState state, BlockPos pos) {
+	public static boolean canGrabEventCheck(World world, BlockState state, BlockPos pos) {
 		if (!ConfigCoroUtilAdvanced.blockBreakingInvokesCancellableEvent) return true;
-		if (world instanceof WorldServer) {
+		if (world instanceof ServerWorld) {
 			if (fakePlayerProfile == null) {
 				fakePlayerProfile = new GameProfile(UUID.fromString("4365749c-bd72-497c-a0dd-73f28dafd8a1"), "coroutilMiningFakePlayer");
 			}
-			BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, FakePlayerFactory.get((WorldServer) world, fakePlayerProfile));
+			BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(world, pos, state, FakePlayerFactory.get((ServerWorld) world, fakePlayerProfile));
 			MinecraftForge.EVENT_BUS.post(event);
 			return !event.isCanceled();
 		} else {
@@ -318,7 +319,7 @@ public class UtilMining {
 		}
 	}
 
-	public static void processBlockBlacklist(String config, List<IBlockState> list) {
+	public static void processBlockBlacklist(String config, List<BlockState> list) {
 		try {
 			String[] names = config.split(" ");
 			for (int i = 0; i < names.length; i++) {
@@ -343,7 +344,7 @@ public class UtilMining {
 
 				Block block = Block.getBlockFromName(name);
 				if (block != null) {
-					IBlockState state = null;
+					BlockState state = null;
 					try {
 						if (metaOrState.equals("")) {
 							state = CoroUtilBlockState.getStatelessBlock(block);

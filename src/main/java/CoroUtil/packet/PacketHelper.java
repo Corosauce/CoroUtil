@@ -7,16 +7,16 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.forge.CoroUtil;
 
 public class PacketHelper {
@@ -29,8 +29,8 @@ public class PacketHelper {
 	
 	//modify to be fully nbt! less headache!
 
-	@SideOnly(Side.CLIENT)
-	public static void sendClientPacket(Packet packet) {
+	@OnlyIn(Dist.CLIENT)
+	public static void sendClientPacket(IPacket packet) {
 		FMLClientHandler.instance().getClient().player.connection.sendPacket(packet);
 	}
 	
@@ -48,7 +48,7 @@ public class PacketHelper {
         }
     }*/
 
-	public static void writeTEntToPacket(TileEntity tEnt, NBTTagCompound nbt) {
+	public static void writeTEntToPacket(TileEntity tEnt, CompoundNBT nbt) {
 		try {
 			nbt.setInteger("dimID", tEnt.getWorld().provider.getDimension());
 			nbt.setInteger("x", tEnt.getPos().getX());
@@ -63,7 +63,7 @@ public class PacketHelper {
 		}
 	}
 	
-	public static FMLProxyPacket createPacketForNBTHandler(String parChannel, String packetChannel, NBTTagCompound parNBT) {
+	public static FMLProxyPacket createPacketForNBTHandler(String parChannel, String packetChannel, CompoundNBT parNBT) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);*/
 		
@@ -140,12 +140,12 @@ public class PacketHelper {
 		return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
 	
-	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, NBTTagCompound data) {
+	public static FMLProxyPacket createPacketForTEntCommand(TileEntity tEnt, CompoundNBT data) {
 		/*ByteArrayOutputStream bos = new ByteArrayOutputStream(); //was ...(140);
         DataOutputStream dos = new DataOutputStream(bos);*/
 
         ByteBuf byteBuf = Unpooled.buffer();
-        NBTTagCompound nbtSendData = new NBTTagCompound();
+        CompoundNBT nbtSendData = new CompoundNBT();
         
         try
         {
@@ -177,7 +177,7 @@ public class PacketHelper {
         return new FMLProxyPacket(new PacketBuffer(byteBuf), CoroUtil.eventChannelName);
 	}
 	
-	public static NBTTagCompound readNBTTagCompound(ByteBuf fullBuffer) throws IOException
+	public static CompoundNBT readNBTTagCompound(ByteBuf fullBuffer) throws IOException
     {
 		return ByteBufUtils.readTag(fullBuffer);
         /*short short1 = fullBuffer.readShort();//par0DataInput.readShort();
@@ -195,7 +195,7 @@ public class PacketHelper {
         }*/
     }
 	
-	public static FMLProxyPacket getNBTPacket(NBTTagCompound parNBT, String parChannel) {
+	public static FMLProxyPacket getNBTPacket(CompoundNBT parNBT, String parChannel) {
         ByteBuf byteBuf = Unpooled.buffer();
         
         try {
@@ -209,7 +209,7 @@ public class PacketHelper {
     }
 	
 	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {
-		NBTTagCompound data = new NBTTagCompound();
+		CompoundNBT data = new CompoundNBT();
 		data.setString("command", "Ent_Motion");
 		data.setInteger("entityID", ent.getEntityId());
 		data.setDouble("motionX", motionX);
@@ -219,7 +219,7 @@ public class PacketHelper {
 	}
 
 	public static FMLProxyPacket getPacketForUpdateBlockList() {
-		NBTTagCompound data = new NBTTagCompound();
+		CompoundNBT data = new CompoundNBT();
 		data.setString("command", "UpdateBlockList");
 		data.setString("blacklistRepairable_RegularBlocks", ConfigBlockDestruction.blacklistRepairable_RegularBlocks);
 		data.setString("whitelistMineable_TileEntities", ConfigBlockDestruction.whitelistMineable_TileEntities);
@@ -227,7 +227,7 @@ public class PacketHelper {
 	}
 
 	public static FMLProxyPacket getPacketForDebugRender(BlockPos pos, int time, int color, int type) {
-		NBTTagCompound data = new NBTTagCompound();
+		CompoundNBT data = new CompoundNBT();
 		data.setString("command", "DebugRender");
 		data.setDouble("posX", pos.getX());
 		data.setDouble("posY", pos.getY());
@@ -239,7 +239,7 @@ public class PacketHelper {
 	}
 
     public static FMLProxyPacket getPacketForDebugRenderClear() {
-        NBTTagCompound data = new NBTTagCompound();
+        CompoundNBT data = new CompoundNBT();
         data.setString("command", "DebugRenderClear");
         return getNBTPacket(data, CoroUtil.eventChannelName);
     }

@@ -7,7 +7,7 @@ import CoroUtil.util.UtilMining;
 import modconfig.ConfigComment;
 import modconfig.IConfigCategory;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 
 import java.io.File;
 import java.util.ArrayList;

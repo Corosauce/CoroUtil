@@ -1,6 +1,7 @@
 package CoroUtil.tile;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
 /* Used for handling special ways of interaction
  * 
@@ -10,6 +11,6 @@ import net.minecraft.entity.player.EntityPlayer;
 public interface ITileInteraction {
 
 	public void clickedLeft();
-	public void clickedRight(EntityPlayer player, int face, float localVecX, float localVecY, float localVecZ);
+	public void clickedRight(PlayerEntity player, int face, float localVecX, float localVecY, float localVecZ);
 	
 }

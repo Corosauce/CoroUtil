@@ -1,6 +1,7 @@
 package CoroUtil.playerdata;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 /**
  * Old design, just use entity.getEntityData() nbt
@@ -14,11 +15,11 @@ public interface IPlayerData {
 
 	public void init(String parUsername);
 	
-	public void nbtLoad(NBTTagCompound nbt);
-	public NBTTagCompound nbtSave();
+	public void nbtLoad(CompoundNBT nbt);
+	public CompoundNBT nbtSave();
 	
-	public void nbtSyncFromServer(NBTTagCompound nbt);
-	public void nbtCommandFromClient(NBTTagCompound nbt);
+	public void nbtSyncFromServer(CompoundNBT nbt);
+	public void nbtCommandFromClient(CompoundNBT nbt);
 	
 	public void tick();
 	

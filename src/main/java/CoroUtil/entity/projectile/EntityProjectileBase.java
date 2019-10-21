@@ -1,13 +1,13 @@
 package CoroUtil.entity.projectile;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import CoroUtil.entity.EntityThrowableUsefull;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
 
@@ -19,7 +19,7 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 	public static int PRJTYPE_ICEBALL = 1;
 	public static int PRJTYPE_ = 2;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public ParticleBehaviors particleBehavior;
 	
 	public boolean tickParticleBehaviorList = true;
@@ -29,12 +29,12 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 		super(world);
 	}
 	
-	public EntityProjectileBase(World world, EntityLivingBase entityliving, double parSpeed)
+	public EntityProjectileBase(World world, LivingEntity entityliving, double parSpeed)
 	{
 		super(world, entityliving, parSpeed);
 	}
 
-	public EntityProjectileBase(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase target, double parSpeed)
+	public EntityProjectileBase(World par1World, LivingEntity par2EntityLivingBase, LivingEntity target, double parSpeed)
     {
 		super(par1World, par2EntityLivingBase, target, parSpeed);
     }
@@ -73,7 +73,7 @@ public class EntityProjectileBase extends EntityThrowableUsefull implements IEnt
 	}
 	
 	@Override
-	public void readEntityFromNBT(NBTTagCompound par1nbtTagCompound) {
+	public void readEntityFromNBT(CompoundNBT par1nbtTagCompound) {
 		super.readEntityFromNBT(par1nbtTagCompound);
 		
 		//kill on reload

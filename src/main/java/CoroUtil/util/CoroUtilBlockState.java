@@ -5,15 +5,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.InvalidBlockStateException;
 import net.minecraft.command.NumberInvalidException;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -33,13 +34,13 @@ public class CoroUtilBlockState {
 		}
 	}
 
-	public static IBlockState getStatelessBlock(Block block) {
+	public static BlockState getStatelessBlock(Block block) {
 		ImmutableMap.Builder<IProperty<?>, Comparable<?>> builder = ImmutableMap.builder();
 		return new CoroUtilBlockState.StateImplementationImpl(block, builder.build());
 	}
 
-	public static boolean partialStateInListMatchesFullState(IBlockState fullState, List<IBlockState> listStates) {
-		for (IBlockState partialState : listStates) {
+	public static boolean partialStateInListMatchesFullState(BlockState fullState, List<BlockState> listStates) {
+		for (BlockState partialState : listStates) {
 			if (partialStateMatchesFullState(partialState, fullState)) {
 				return true;
 			}
@@ -47,7 +48,7 @@ public class CoroUtilBlockState {
 		return false;
 	}
 
-	public static boolean partialStateMatchesFullState(IBlockState partialState, IBlockState fullState) {
+	public static boolean partialStateMatchesFullState(BlockState partialState, BlockState fullState) {
 		if (partialState.getBlock() != fullState.getBlock()) return false;
 		//ImmutableSet<IProperty<?>> temp = partialState.getProperties().keySet();
 		for (IProperty<?> prop : partialState.getProperties().keySet()) {
@@ -58,7 +59,7 @@ public class CoroUtilBlockState {
 		return true;
 	}
 
-	public static IBlockState convertArgToBlockState(Block p_190794_0_, String p_190794_1_) throws NumberInvalidException, InvalidBlockStateException
+	public static BlockState convertArgToBlockState(Block p_190794_0_, String p_190794_1_) throws NumberInvalidException, InvalidBlockStateException
 	{
 		return CommandBase.convertArgToBlockState(p_190794_0_, p_190794_1_);
 	}
@@ -72,7 +73,7 @@ public class CoroUtilBlockState {
 	 * @throws NumberInvalidException
 	 * @throws InvalidBlockStateException
 	 */
-	public static IBlockState convertArgToPartialBlockState(Block p_190794_0_, String p_190794_1_) throws NumberInvalidException, InvalidBlockStateException
+	public static BlockState convertArgToPartialBlockState(Block p_190794_0_, String p_190794_1_) throws NumberInvalidException, InvalidBlockStateException
 	{
 		try
 		{
@@ -112,7 +113,7 @@ public class CoroUtilBlockState {
 					builder.put(entry.getKey(), entry.getValue());
 				}
 
-				IBlockState iblockstate = new CoroUtilBlockState.StateImplementationImpl(p_190794_0_, builder.build());
+				BlockState iblockstate = new CoroUtilBlockState.StateImplementationImpl(p_190794_0_, builder.build());
 
 				//IBlockState statePartial = new CoroUtilBlockState.StateImplementationImpl(p_190794_0_, map);
 
@@ -175,7 +176,7 @@ public class CoroUtilBlockState {
 		}
 	}
 
-	private static <T extends Comparable<T>> IBlockState getBlockState(IBlockState p_190793_0_, IProperty<T> p_190793_1_, Comparable<?> p_190793_2_)
+	private static <T extends Comparable<T>> BlockState getBlockState(BlockState p_190793_0_, IProperty<T> p_190793_1_, Comparable<?> p_190793_2_)
 	{
 		return p_190793_0_.withProperty(p_190793_1_, (T)p_190793_2_);
 	}

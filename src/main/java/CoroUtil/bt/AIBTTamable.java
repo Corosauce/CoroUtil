@@ -3,11 +3,14 @@ package CoroUtil.bt;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import CoroUtil.OldUtil;
 import CoroUtil.util.BlockCoord;
 import CoroUtil.util.CoroUtilEntity;
@@ -19,7 +22,7 @@ public class AIBTTamable {
 	public AIBTAgent agent;
 	public String owner = ""; //when set to "", means not tame
 	public int ownerEntityID = -1; //for non players, should use UUID
-	public EntityLivingBase ownerCachedInstance = null;
+	public LivingEntity ownerCachedInstance = null;
 	public BlockCoord occupyCoord;
 	public double followDistMin = 2D;
 	public double followDistMax = 8D;
@@ -56,12 +59,12 @@ public class AIBTTamable {
 		ownerCachedInstance = agent.ent.world.getPlayerEntityByName(owner);
 	}
 	
-	public EntityLivingBase getPlayerCached() {
+	public LivingEntity getPlayerCached() {
 		return ownerCachedInstance;
 	}
 	
 	public boolean isEnemy(Entity ent) {
-		if (ent instanceof EntityPlayer) {
+		if (ent instanceof PlayerEntity) {
 			if (CoroUtilEntity.getName(ent).equals(owner)) {
 				return false;
 			}
@@ -76,7 +79,7 @@ public class AIBTTamable {
 	public void tick() {
 		if (isTame()) {
 			updateCache();
-			EntityLivingBase ent = getPlayerCached();
+			LivingEntity ent = getPlayerCached();
 			if (ent != null) {
 				
 				occupyCoord = OldUtil.entToCoord(ent);
@@ -97,7 +100,7 @@ public class AIBTTamable {
 					}
 				}*/
 				
-				if (!agent.ent.isPotionActive(MobEffects.NAUSEA)) agent.ent.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 5, 0));
+				if (!agent.ent.isPotionActive(Effects.NAUSEA)) agent.ent.addPotionEffect(new EffectInstance(Effects.NAUSEA, 5, 0));
 			}
 		}
 	}

@@ -1,11 +1,12 @@
 package CoroUtil.util;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 public interface ISerializableNBT {
 
-	public void readFromNBT(NBTTagCompound nbt);
+	public void readFromNBT(CompoundNBT nbt);
 	
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt);
+	public CompoundNBT writeToNBT(CompoundNBT nbt);
 	
 }

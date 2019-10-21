@@ -3,7 +3,8 @@ package CoroUtil.economy;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 
@@ -46,15 +47,15 @@ public class Resources {
 	}
 	
 	//fed its own component
-	public void readFromNBT(NBTTagCompound data) {
+	public void readFromNBT(CompoundNBT data) {
 		resWood.setValue(data.getInteger("resWood"));
 		resStone.setValue(data.getInteger("resStone"));
 		resFood.setValue(data.getInteger("resFood"));
 	}
 	
 	//write its own component
-	public NBTTagCompound writeToNBT() {
-		NBTTagCompound data = new NBTTagCompound();
+	public CompoundNBT writeToNBT() {
+		CompoundNBT data = new CompoundNBT();
 		data.setInteger("resWood", resWood.getValue());
 		data.setInteger("resStone", resStone.getValue());
 		data.setInteger("resFood", resFood.getValue());

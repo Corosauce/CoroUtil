@@ -3,13 +3,13 @@ package CoroUtil.ability.abilities;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.ability.Ability;
 import CoroUtil.bt.IBTAgent;
 import CoroUtil.entity.projectile.EntityProjectileBase;
@@ -20,7 +20,7 @@ import extendedrenderer.particle.entity.EntityRotFX;
 
 public class AbilityShootArrow extends Ability {
 	
-	public EntityLivingBase target;
+	public LivingEntity target;
 	
 	public int projectileType = 0;
 	public boolean switchToRangedSlot = true;
@@ -38,28 +38,28 @@ public class AbilityShootArrow extends Ability {
 	}
 	
 	@Override
-	public void nbtLoad(NBTTagCompound nbt) {
+	public void nbtLoad(CompoundNBT nbt) {
 		super.nbtLoad(nbt);
 		projectileType = nbt.getInteger("projectileType");
 	}
 	
 	@Override
-	public NBTTagCompound nbtSave() {
-		NBTTagCompound nbt = super.nbtSave();
+	public CompoundNBT nbtSave() {
+		CompoundNBT nbt = super.nbtSave();
 		nbt.setInteger("projectileType", projectileType);
 		return nbt;
 	}
 	
 	@Override
 	public void setTarget(Entity parTarget) {
-		if (parTarget instanceof EntityLivingBase) {
-			target = (EntityLivingBase)parTarget;
+		if (parTarget instanceof LivingEntity) {
+			target = (LivingEntity)parTarget;
 		}
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void tickRender(Render parRender) {
+	@OnlyIn(Dist.CLIENT)
+	public void tickRender(EntityRenderer parRender) {
 		super.tickRender(parRender);
 		
 		int curTick = curTickPerform;
@@ -156,18 +156,18 @@ public class AbilityShootArrow extends Ability {
 			//owner.world.spawnParticle("largeexplode", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
 		} else {
 			
-			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof EntityLivingBase && ((EntityLivingBase)target).deathTime > 0))) {
+			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof LivingEntity && ((LivingEntity)target).deathTime > 0))) {
 				//this.setFinishedPerform();
 			} else {
 				if (!hasAppliedDamage) {
 					hasAppliedDamage = true;
 					//System.out.println("hit");
 					
-					if (owner instanceof EntityLiving) {
-						((EntityLiving) owner).faceEntity(target, 180, 180);
+					if (owner instanceof MobEntity) {
+						((MobEntity) owner).faceEntity(target, 180, 180);
 					}
 
-					if (target instanceof EntityLivingBase) {
+					if (target instanceof LivingEntity) {
 						EntityProjectileBase prj = null;
 						
 						if (projectileType == EntityProjectileBase.PRJTYPE_FIREBALL) {

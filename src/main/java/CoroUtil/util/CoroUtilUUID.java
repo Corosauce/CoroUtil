@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
 
 public class CoroUtilUUID {
@@ -22,7 +22,7 @@ public class CoroUtilUUID {
 
         while (iterator.hasNext())
         {
-            EntityLivingBase entitylivingbase = (EntityLivingBase)iterator.next();
+            LivingEntity entitylivingbase = (LivingEntity)iterator.next();
 
             if (entitylivingbase.getUniqueID().equals(uuid))
             {

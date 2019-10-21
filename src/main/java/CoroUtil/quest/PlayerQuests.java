@@ -11,19 +11,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.quest.quests.ActiveQuest;
@@ -69,7 +68,7 @@ public class PlayerQuests {
 		return getPlayer().world;
 	}
 	
-	public EntityPlayer getPlayer() {
+	public PlayerEntity getPlayer() {
 		return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayerByUsername(playerName);
 		//return FMLCommonHandler.instance().getMinecraftServerInstance().getConfigurationManager().getPlayerForUsername(playerName);
 	}
@@ -99,7 +98,7 @@ public class PlayerQuests {
 		if (FMLCommonHandler.instance().getMinecraftServerInstance() != null)
         {
 			
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			
 			
 
@@ -113,13 +112,13 @@ public class PlayerQuests {
             	/*ByteArrayOutputStream bos = new ByteArrayOutputStream((Byte.SIZE * data.length) + Short.SIZE);
                 DataOutputStream dos = new DataOutputStream(bos);*/
 
-            	NBTTagCompound data = new NBTTagCompound();
+            	CompoundNBT data = new CompoundNBT();
             	nbtSave(data);
             	nbt.setString("command", "QuestData");
             	nbt.setTag("data", data);
             	
                 FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
-                CoroUtil.eventChannel.sendTo(packet, (EntityPlayerMP)getPlayer());
+                CoroUtil.eventChannel.sendTo(packet, (ServerPlayerEntity)getPlayer());
                 //writeNBTTagCompound(nbt, dos, data);
                 
                 //dos.write(data);
@@ -138,7 +137,7 @@ public class PlayerQuests {
         }
 	}
 	
-	protected static void writeNBTTagCompound(NBTTagCompound par0NBTTagCompound, DataOutputStream par1DataOutputStream, byte[] data) throws IOException
+	protected static void writeNBTTagCompound(CompoundNBT par0NBTTagCompound, DataOutputStream par1DataOutputStream, byte[] data) throws IOException
     {
         if (par0NBTTagCompound == null)
         {
@@ -221,7 +220,7 @@ public class PlayerQuests {
 		}
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void renderQuestOverlay() {
 		//System.out.println("quests: " + activeQuests.size());
 		
@@ -270,7 +269,7 @@ public class PlayerQuests {
     		if (file.exists()) {
 		    	fis = new FileInputStream(file);
 		    	
-		    	NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(fis);
+		    	CompoundNBT nbttagcompound = CompressedStreamTools.readCompressed(fis);
 		    	
 		    	nbtLoad(nbttagcompound);
 				
@@ -290,7 +289,7 @@ public class PlayerQuests {
 	public void diskSaveToFile() {
 		try {
 			
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			
 			nbtSave(nbt);
 			
@@ -310,11 +309,11 @@ public class PlayerQuests {
 		}
 	}
 	
-	public void syncUpdateQuests(NBTTagCompound parNBT) {
+	public void syncUpdateQuests(CompoundNBT parNBT) {
 		
 	}
 	
-	public void nbtLoad(NBTTagCompound parNBT) {
+	public void nbtLoad(CompoundNBT parNBT) {
 		
 		if (!parNBT.hasNoTags()) {
 			//Iterator it = parNBT.getTags().iterator();
@@ -322,7 +321,7 @@ public class PlayerQuests {
 		
 			while (it.hasNext()) {
 				String tagName = (String) it.next();
-				NBTTagCompound data = parNBT.getCompoundTag(tagName);
+				CompoundNBT data = parNBT.getCompoundTag(tagName);
 				
 				String classNamePath = data.getString("classNamePath");
 				
@@ -359,9 +358,9 @@ public class PlayerQuests {
 		}
 	}*/
 	
-	public void nbtSave(NBTTagCompound parNBT) {
+	public void nbtSave(CompoundNBT parNBT) {
 		for (int i = 0; i < activeQuests.size(); i++) {
-			NBTTagCompound questNBT = new NBTTagCompound();
+			CompoundNBT questNBT = new CompoundNBT();
 			activeQuests.get(i).save(questNBT);
 			parNBT.setTag("qIndex" + i/*activeQuests.get(i).questID*/, questNBT);
 		}

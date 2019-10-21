@@ -1,32 +1,32 @@
 package CoroUtil.block;
 
 import CoroUtil.item.ItemRepairingGel;
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Items;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockRepairingBlock extends BlockContainer
+public class BlockRepairingBlock extends ContainerBlock
 {
 	public static final AxisAlignedBB AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
     public static final AxisAlignedBB NO_COLLIDE_AABB = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F);
@@ -47,13 +47,13 @@ public class BlockRepairingBlock extends BlockContainer
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
         return NULL_AABB;
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && source instanceof World) {
+    public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Dist.CLIENT && source instanceof World) {
             return getSelectedBoundingBox(state, (World)source, pos);
         } else {
             return NO_COLLIDE_AABB;
@@ -61,16 +61,16 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Deprecated
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos)
+    public AxisAlignedBB getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos)
     {
 
         //special behavior to let block only be selectable to repair if correct context
 
         if (Minecraft.getMinecraft().player != null &&
                 (/*!Minecraft.getMinecraft().player.isSneaking() &&*/
-                        Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
+                        Minecraft.getMinecraft().player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
             return AABB;
         } else {
             return NO_COLLIDE_AABB;
@@ -81,19 +81,19 @@ public class BlockRepairingBlock extends BlockContainer
      * Used to determine ambient occlusion and culling when rebuilding chunks for render
      */
     @Override
-    public boolean isOpaqueCube(IBlockState state)
+    public boolean isOpaqueCube(BlockState state)
     {
         return false;
     }
 
     @Override
-    public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
+    public boolean canCollideCheck(BlockState state, boolean hitIfLiquid)
     {
         return super.canCollideCheck(state, hitIfLiquid);
     }
 
     @Override
-    public boolean isFullCube(IBlockState state)
+    public boolean isFullCube(BlockState state)
     {
         return false;/*super.isFullCube(state);*/
     }
@@ -110,12 +110,12 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
+    public BlockRenderType getRenderType(BlockState state)
     {
-        return EnumBlockRenderType.MODEL;
+        return BlockRenderType.MODEL;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public BlockRenderLayer getBlockLayer()
     {
@@ -123,7 +123,7 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Override
-    public float getBlockHardness(IBlockState blockState, World worldIn, BlockPos pos) {
+    public float getBlockHardness(BlockState blockState, World worldIn, BlockPos pos) {
         TileEntity tEnt = worldIn.getTileEntity(pos);
 
         if (tEnt instanceof TileEntityRepairingBlock) {
@@ -176,15 +176,15 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos,
-                                            EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
-                                            EntityLivingBase placer) {
+    public BlockState getStateForPlacement(World worldIn, BlockPos pos,
+                                           Direction facing, float hitX, float hitY, float hitZ, int meta,
+                                           LivingEntity placer) {
         //worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
         return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand)
+    public void updateTick(World world, BlockPos pos, BlockState state, Random rand)
     {
         if (world.isRemote) return;
 
@@ -196,13 +196,13 @@ public class BlockRepairingBlock extends BlockContainer
     }
 
     @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+    public void onBlockAdded(World worldIn, BlockPos pos, BlockState state) {
         //super.onBlockAdded(worldIn, pos, state);
         worldIn.scheduleBlockUpdate(pos, this, 20*30, 1);
     }
 
     @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+    public Item getItemDropped(BlockState state, Random rand, int fortune) {
         return Items.AIR;
     }
 }

@@ -4,23 +4,27 @@ import java.util.List;
 
 import CoroUtil.config.ConfigHWMonsters;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.Effects;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.math.AxisAlignedBB;
 import CoroUtil.ai.ITaskInitializer;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.packet.PacketHelper;
 import CoroUtil.difficulty.DynamicDifficulty;
 
-public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitializer
+public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 {
-    private EntityCreature entity = null;
-    private EntityPlayer targetLastTracked = null;
+    private CreatureEntity entity = null;
+    private PlayerEntity targetLastTracked = null;
     
     private int leapDelayCur = 0;
     //private int leapDelayRate = 40;
@@ -38,7 +42,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     }
     
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
     	this.entity = creature;
     }
 
@@ -96,7 +100,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
 	public void resetTask()
     {
     	for (Entity ent : entity.getRecursivePassengers()) {
-    		if (ent instanceof EntityPlayer) {
+    		if (ent instanceof PlayerEntity) {
     			//entity.dismountEntity(entityIn);
     			//since removePassenger is private i guess just remove all...
     			//oh wait
@@ -187,13 +191,13 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
 	    		} else if (ConfigHWMonsters.antiAirType == 1) {
 	    			if (inAirLongEnough) {
 	    				if (ConfigHWMonsters.antiAirApplyPotions) {
-				    		targetLastTracked.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 100, 2));
-				    		targetLastTracked.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 2));
-				    		targetLastTracked.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 100, 2));
+				    		targetLastTracked.addPotionEffect(new EffectInstance(Effects.WEAKNESS, 100, 2));
+				    		targetLastTracked.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 100, 2));
+				    		targetLastTracked.addPotionEffect(new EffectInstance(Effects.HUNGER, 100, 2));
 	    				}
 			    		
-			    		if (targetLastTracked instanceof EntityPlayerMP) {
-			    			EntityPlayerMP entMP = (EntityPlayerMP) targetLastTracked;
+			    		if (targetLastTracked instanceof ServerPlayerEntity) {
+			    			ServerPlayerEntity entMP = (ServerPlayerEntity) targetLastTracked;
 			    			long lastPullTime = targetLastTracked.getEntityData().getLong(dataPlayerLastPullDownTick);
 			    			if (entMP.world.getTotalWorldTime() != lastPullTime) {
 			    				targetLastTracked.getEntityData().setLong(dataPlayerLastPullDownTick, entMP.world.getTotalWorldTime());
@@ -216,7 +220,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
 	    		}
 	    		grabLock = false;
 	    		for (Entity ent : entity.getRecursivePassengers()) {
-	        		if (ent instanceof EntityPlayer) {
+	        		if (ent instanceof PlayerEntity) {
 	        			ent.dismountRidingEntity();
 	        		}
 	        	}
@@ -227,18 +231,18 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     	}
     }
     
-    public EntityPlayer getFlyingPlayerNear() {
+    public PlayerEntity getFlyingPlayerNear() {
     	
     	int findRange = ConfigHWMonsters.antiAirTryDist;
     	AxisAlignedBB aabb = new AxisAlignedBB(entity.posX, entity.posY, entity.posZ, entity.posX, entity.posY, entity.posZ);
 		aabb = aabb.grow(findRange, findRange, findRange);
-		List list = entity.world.getEntitiesWithinAABB(EntityPlayer.class, aabb);
+		List list = entity.world.getEntitiesWithinAABB(PlayerEntity.class, aabb);
 		boolean found = false;
 		double closest = 99999;
-		EntityPlayer closestPlayer = null;
+		PlayerEntity closestPlayer = null;
         for(int j = 0; j < list.size(); j++)
         {
-        	EntityPlayer ent = (EntityPlayer)list.get(j);
+        	PlayerEntity ent = (PlayerEntity)list.get(j);
         	
         	if (isPlayerFlying(ent)) {
         		if (ent.canEntityBeSeen(entity) && ent.getRidingEntity() == null) {
@@ -254,7 +258,7 @@ public class EntityAITaskAntiAir extends EntityAIBase implements ITaskInitialize
     	return closestPlayer;
     }
     
-    public boolean isPlayerFlying(EntityPlayer player) {
+    public boolean isPlayerFlying(PlayerEntity player) {
     	return player.getEntityData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime) > 0;
     }
 }

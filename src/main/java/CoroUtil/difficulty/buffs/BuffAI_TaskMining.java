@@ -3,11 +3,15 @@ package CoroUtil.difficulty.buffs;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Items;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.item.Items;
+import net.minecraft.pathfinding.GroundPathNavigator;
+import net.minecraft.pathfinding.GroundPathNavigator;
 
 /**
  * Created by Corosus on 1/18/2017.
@@ -19,12 +23,12 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
     }
 
     @Override
-    public void applyBuffPost(EntityCreature ent, float difficulty) {
+    public void applyBuffPost(CreatureEntity ent, float difficulty) {
 
         CULog.dbg("applyBuffPost enhancing with digging: " + ent.getName());
 
-        if (ent.getNavigator() instanceof PathNavigateGround) {
-            ((PathNavigateGround)ent.getNavigator()).setBreakDoors(false);
+        if (ent.getNavigator() instanceof GroundPathNavigator) {
+            ((GroundPathNavigator)ent.getNavigator()).setBreakDoors(false);
         }
 
         /**
@@ -33,18 +37,18 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
         ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityEnhanced, true);
         ent.getEntityData().setBoolean("CoroAI_HW_GravelDeath", true);
 
-        ItemStack is = ent.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
+        ItemStack is = ent.getItemStackFromSlot(EquipmentSlotType.MAINHAND);
         if (is == null) {
-            UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+            UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
         } else {
             if (is.getItem() == Items.WOODEN_SWORD) {
-                UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, new ItemStack(Items.WOODEN_PICKAXE));
+                UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, new ItemStack(Items.WOODEN_PICKAXE));
             } else if (is.getItem() == Items.STONE_SWORD) {
-                UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, new ItemStack(Items.STONE_PICKAXE));
+                UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, new ItemStack(Items.STONE_PICKAXE));
             } else if (is.getItem() == Items.IRON_SWORD) {
-                UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
+                UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
             } else if (is.getItem() == Items.DIAMOND_SWORD) {
-                UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_PICKAXE));
+                UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, new ItemStack(Items.DIAMOND_PICKAXE));
             }
         }
 

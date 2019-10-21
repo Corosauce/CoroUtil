@@ -3,7 +3,7 @@ package CoroUtil.bt.nodes;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Vec3d;
 import CoroUtil.bt.Behavior;
 import CoroUtil.bt.BlackboardBase;
@@ -30,7 +30,7 @@ public class SenseEnvironment extends LeafAction {
 		
 		Entity target = blackboard.getTarget();
 		if (target != null) {
-			if (target.isDead || (target instanceof EntityLivingBase && ((EntityLivingBase)target).deathTime > 0)) {
+			if (target.isDead || (target instanceof LivingEntity && ((LivingEntity)target).deathTime > 0)) {
 				blackboard.setTarget(null);
 			}
 		}
@@ -77,7 +77,7 @@ public class SenseEnvironment extends LeafAction {
 		            Entity entity1 = (Entity)list.get(j);
 		            if(blackboard.agent.isEnemy(entity1))
 		            {
-		            	if (false || ((EntityLivingBase) entity1).canEntityBeSeen(blackboard.agent.ent)) {
+		            	if (false || ((LivingEntity) entity1).canEntityBeSeen(blackboard.agent.ent)) {
 		            		//if (sanityCheck()/* && entity1 instanceof EntityPlayer*/) {
 		            			float dist = blackboard.agent.ent.getDistanceToEntity(entity1);
 		            			//System.out.println("dist: " + dist);

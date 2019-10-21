@@ -6,9 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.world.grid.block.BlockDataGrid;
 import CoroUtil.world.grid.chunk.ChunkDataGrid;
@@ -29,7 +29,7 @@ public class WorldDirectorManager {
 	private static WorldDirectorManager instanceClient; //not setup yet
 	
 	public static WorldDirectorManager instance() {
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+		if (FMLCommonHandler.instance().getEffectiveSide() == Dist.SERVER) {
 			if (instanceServer == null) {
 				instanceServer = new WorldDirectorManager();
 				//sided singleton with reset methods

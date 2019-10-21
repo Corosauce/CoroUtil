@@ -11,29 +11,29 @@ import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.ShaderManager;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.shader.*;
+import net.minecraft.client.particle.EmitterParticle;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleEmitter;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ReportedException;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,7 +43,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class RotatingParticleManager
 {
     private static final ResourceLocation PARTICLE_TEXTURES = new ResourceLocation("textures/particle/particles.png");
@@ -53,7 +53,7 @@ public class RotatingParticleManager
      * Second dimension: 0 = GlStateManager.depthMask false aka transparent textures, 1 = true
      */
     public final LinkedHashMap<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> fxLayers = new LinkedHashMap<>();
-    private final Queue<ParticleEmitter> particleEmitters = Queues.<ParticleEmitter>newArrayDeque();
+    private final Queue<EmitterParticle> particleEmitters = Queues.<EmitterParticle>newArrayDeque();
     private final TextureManager renderer;
     private final Map<Integer, IParticleFactory> particleTypes = Maps.<Integer, IParticleFactory>newHashMap();
     private final Queue<Particle> queueEntityFX = Queues.<Particle>newArrayDeque();
@@ -128,9 +128,9 @@ public class RotatingParticleManager
         this.particleTypes.put(Integer.valueOf(id), particleFactory);
     }
 
-    public void emitParticleAtEntity(Entity entityIn, EnumParticleTypes particleTypes)
+    public void emitParticleAtEntity(Entity entityIn, ParticleTypes particleTypes)
     {
-        this.particleEmitters.add(new ParticleEmitter(this.world, entityIn, particleTypes));
+        this.particleEmitters.add(new EmitterParticle(this.world, entityIn, particleTypes));
     }
 
     /**
@@ -170,9 +170,9 @@ public class RotatingParticleManager
 
         if (!this.particleEmitters.isEmpty())
         {
-            List<ParticleEmitter> list = Lists.<ParticleEmitter>newArrayList();
+            List<EmitterParticle> list = Lists.<EmitterParticle>newArrayList();
 
-            for (ParticleEmitter particleemitter : this.particleEmitters)
+            for (EmitterParticle particleemitter : this.particleEmitters)
             {
                 particleemitter.onUpdate();
 
@@ -470,7 +470,7 @@ public class RotatingParticleManager
                                         this.renderer.bindTexture(PARTICLE_TEXTURES);
                                         break;
                                     case 1:
-                                        this.renderer.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                                        this.renderer.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
                                 }
 
                                 if (useParticleShaders) {

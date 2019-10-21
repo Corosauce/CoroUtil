@@ -5,15 +5,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.registries.IRegistryDelegate;
 import org.apache.commons.lang3.ArrayUtils;
 
 import CoroUtil.util.CoroUtilColor;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockDoublePlant.EnumBlockHalf;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.block.DoublePlantBlock.EnumBlockHalf;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -29,7 +30,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	private static final Field _blockColorMap = ReflectionHelper.findField(BlockColors.class, "blockColorMap");
 	private static Map<IRegistryDelegate<Block>, IBlockColor> blockColorMap;
 
-	private static ConcurrentHashMap<IBlockState, int[]> colorCache = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<BlockState, int[]> colorCache = new ConcurrentHashMap<>();
 	static {
 		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
 	}
@@ -53,11 +54,11 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		}
 		
 		BlockPos pos = new BlockPos(posXIn, posYIn, posZIn);
-		IBlockState state = worldIn.getBlockState(pos);
+		BlockState state = worldIn.getBlockState(pos);
 
 	    // top of double plants doesn't have variant property
-		if (state.getBlock() instanceof BlockDoublePlant && state.getValue(BlockDoublePlant.HALF) == EnumBlockHalf.UPPER) {
-		    state = state.withProperty(BlockDoublePlant.VARIANT, worldIn.getBlockState(pos.down()).getValue(BlockDoublePlant.VARIANT));
+		if (state.getBlock() instanceof DoublePlantBlock && state.getValue(DoublePlantBlock.HALF) == EnumBlockHalf.UPPER) {
+		    state = state.withProperty(DoublePlantBlock.VARIANT, worldIn.getBlockState(pos.down()).getValue(DoublePlantBlock.VARIANT));
 		}
 
 		int multiplier = this.colors.colorMultiplier(state, this.world, pos, 0);
@@ -140,7 +141,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		}
 	}
 
-	private final boolean hasColor(IBlockState state) {
+	private final boolean hasColor(BlockState state) {
 		return blockColorMap.containsKey(state.getBlock().delegate);
 	}
 

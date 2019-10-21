@@ -1,8 +1,9 @@
 package CoroUtil.learning;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 
 public class EncounterHelper {
 
@@ -21,7 +22,7 @@ public class EncounterHelper {
 	//how to keep relevant? trim down total weights count once in a while?
 	//detect quick shift in chances and trim down fast?
 	
-	public static NBTTagCompound data;
+	public static CompoundNBT data;
 	
 	public static void check() {
 		if (data == null) {
@@ -33,7 +34,7 @@ public class EncounterHelper {
 	}
 	
 	public static void load() {
-		data = new NBTTagCompound();
+		data = new CompoundNBT();
 	}
 	
 	public static void save() {
@@ -65,7 +66,7 @@ public class EncounterHelper {
 	}
 	
 	//log target damage vs source total health (and other resistances)
-	public static void logDamageFrom(EntityLivingBase source, Entity target, float parDamage) {
+	public static void logDamageFrom(LivingEntity source, Entity target, float parDamage) {
 		check();
 		String strVal = "attack-value-" + source.getName() + "-" + target.getName();
 		String strCount = "attack-count-" + source.getName() + "-" + target.getName();

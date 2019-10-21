@@ -3,21 +3,22 @@ package CoroUtil;
 import java.util.HashMap;
 import java.util.List;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IRangedAttackMob;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIAttackRangedBow;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.entity.*;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
 import CoroUtil.pathfinding.c_IEnhPF;
+import net.minecraft.item.Items;
 
 
 public class Behaviors {
@@ -46,7 +47,7 @@ public class Behaviors {
 		}
 	}
 	
-	public static void AI(EntityCreature me) {
+	public static void AI(CreatureEntity me) {
 		
 		//Pre-use check stuff for static class awesomeness
 		
@@ -84,7 +85,7 @@ public class Behaviors {
         	ticks = 0;
         }
 		
-		if (me instanceof EntityCreeper) {	
+		if (me instanceof CreeperEntity) {
 			//wheatFollow(me);
 		}
 		
@@ -93,18 +94,18 @@ public class Behaviors {
 		//((DataLatcher)entFields.get(me)).values.put(DataTypes.noMoveTicks, ticks);
 	}
 	
-	public static void enhanceMonsterAIClose(EntityCreature koa, EntityCreature entHit) {
+	public static void enhanceMonsterAIClose(CreatureEntity koa, CreatureEntity entHit) {
 		entHit.setAttackTarget(koa);
 	}
 	
-	public static void checkOrFixTargetTasks(EntityCreature ent, Class targetClass) {
+	public static void checkOrFixTargetTasks(CreatureEntity ent, Class targetClass) {
 		if (!aiEnhanced.containsKey(ent)) {
-			EntityAIBase newTask = new EntityAIAttackMelee(ent, /*targetClass, */0.23D/*entC.getAIMoveSpeed()*/, true);
-			EntityAIBase newTargetTask = new EntityAINearestAttackableTarget(ent, targetClass, true);
-			if (ent instanceof IRangedAttackMob && ent instanceof EntitySkeleton) newTask = new EntityAIAttackRangedBow((EntitySkeleton)ent, 0.25F, /*20, */60, 15.0F);
+			Goal newTask = new MeleeAttackGoal(ent, /*targetClass, */0.23D/*entC.getAIMoveSpeed()*/, true);
+			Goal newTargetTask = new NearestAttackableTargetGoal(ent, targetClass, true);
+			if (ent instanceof IRangedAttackMob && ent instanceof SkeletonEntity) newTask = new RangedBowAttackGoal((SkeletonEntity)ent, 0.25F, /*20, */60, 15.0F);
 			
 			ent.tasks.addTask(3, newTask);
-			EntityAITasks targetTasks = (EntityAITasks)OldUtil.getPrivateValueSRGMCP(EntityLiving.class, ent, "field_70715_bh", "targetTasks");
+			GoalSelector targetTasks = (GoalSelector)OldUtil.getPrivateValueSRGMCP(MobEntity.class, ent, "field_70715_bh", "targetTasks");
 			if (targetTasks != null) {
 				targetTasks.addTask(2, newTargetTask);
 				//System.out.println("Adding targetting!");
@@ -129,13 +130,13 @@ public class Behaviors {
 		return ((DataLatcher)entFields.get(ent.getEntityId())).values.get(dtEnum);
 	}
 	
-	public static void wheatFollow(EntityCreature me) {
+	public static void wheatFollow(CreatureEntity me) {
 		boolean found = false;
 		//followTriggerDist = 32F;
 		//if (me.getEntityToAttack() == null) {
-			List ents = me.world.getEntitiesWithinAABB(EntityPlayer.class, me.getEntityBoundingBox().grow((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
+			List ents = me.world.getEntitiesWithinAABB(PlayerEntity.class, me.getEntityBoundingBox().grow((double)followTriggerDist, (double)followTriggerDist, (double)followTriggerDist));
 	        for(int var3 = 0; var3 < ents.size(); ++var3) {
-	           EntityPlayer var5 = (EntityPlayer)ents.get(var3);
+	           PlayerEntity var5 = (PlayerEntity)ents.get(var3);
 	           if (me.getDistanceToEntity(var5) > 3F) {
 		           if(var5.getActiveItemStack() != null && var5.getActiveItemStack().getItem() == Items.WHEAT) {
 		        	  found = true;
@@ -151,8 +152,8 @@ public class Behaviors {
         if (!found) {
         	//if (entFields.containsKey(me)) {
         		Entity target = (Entity)getData(me, DataTypes.followTarg);
-        		if (target instanceof EntityPlayer) {
-        			EntityPlayer var5 = (EntityPlayer)target;
+        		if (target instanceof PlayerEntity) {
+        			PlayerEntity var5 = (PlayerEntity)target;
  	           		if(var5.getActiveItemStack() == null || (var5.getActiveItemStack() != null && var5.getActiveItemStack().getItem() == Items.WHEAT)) {
  	           			setTarget(me, null);
  	           		}
@@ -163,7 +164,7 @@ public class Behaviors {
         }
 	}
 	
-	public static void setTarget(EntityCreature me, Entity targ) {
+	public static void setTarget(CreatureEntity me, Entity targ) {
 		if (instance == null) new Behaviors();
 		
 		//System.out.println("setting target: " + targ);
@@ -182,19 +183,19 @@ public class Behaviors {
     		
     		//entFields.put(me, targ);
     	//}
-    		if (targ instanceof EntityLivingBase) {
-    			me.setAttackTarget((EntityLivingBase)targ);
+    		if (targ instanceof LivingEntity) {
+    			me.setAttackTarget((LivingEntity)targ);
     		}
 	}
 	
-	public static void follow(EntityCreature me, Entity targ, float dist) {
+	public static void follow(CreatureEntity me, Entity targ, float dist) {
 		if (instance == null) new Behaviors();
 		
 		
 	}
 	
 	//Generic functions
-	public static boolean notMoving(EntityLivingBase var0, float var1) {
+	public static boolean notMoving(LivingEntity var0, float var1) {
         double var2 = var0.prevPosX - var0.posX;
         double var4 = var0.prevPosZ - var0.posZ;
         float var6 = (float)Math.sqrt(var2 * var2 + var4 * var4);

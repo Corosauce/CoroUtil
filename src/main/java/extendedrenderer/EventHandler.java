@@ -12,9 +12,10 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.init.Blocks;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -22,8 +23,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
 import extendedrenderer.particle.ParticleRegistry;
 import org.lwjgl.opengl.GL11;
 
@@ -51,7 +51,7 @@ public class EventHandler {
     public static boolean lastLightningBoltLightState = false;
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void tickRenderScreen(TickEvent.RenderTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             tickShaderTest();
@@ -63,7 +63,7 @@ public class EventHandler {
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void tickClient(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
 
@@ -101,7 +101,7 @@ public class EventHandler {
     }
 
 	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public void worldRender(RenderWorldLastEvent event)
     {
         if (!ConfigCoroUtil.useEntityRenderHookForShaders) {
@@ -129,7 +129,7 @@ public class EventHandler {
         return RotatingParticleManager.useShaders;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static void hookRenderShaders(float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
 
@@ -213,7 +213,7 @@ public class EventHandler {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static void preShaderRender(Entity entityIn, float partialTicks) {
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -270,7 +270,7 @@ public class EventHandler {
 
         //fix mipmapping making low alpha transparency particles dissapear based on distance, window size, particle size
         if (!ConfigCoroUtilAdvanced.disableMipmapFix) {
-            mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            mc.renderEngine.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             //                                  3553                10241
             mip_min = GL11.glGetTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER);
             //                                                      10240
@@ -282,12 +282,12 @@ public class EventHandler {
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static void postShaderRender(Entity entityIn, float partialTicks) {
 
         //restore original mipmap state
         if (!ConfigCoroUtilAdvanced.disableMipmapFix) {
-            Minecraft.getMinecraft().renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            Minecraft.getMinecraft().renderEngine.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, mip_min);
             GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, mip_mag);
         }
@@ -304,7 +304,7 @@ public class EventHandler {
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
     }
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
     public boolean isPaused() {
         if (FMLClientHandler.instance().getClient().isGamePaused()) return true;
     	//if (FMLClientHandler.instance().getClient().getIntegratedServer() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread() != null && FMLClientHandler.instance().getClient().getIntegratedServer().getServerListeningThread().isGamePaused()) return true;
@@ -312,19 +312,19 @@ public class EventHandler {
     }
 	
 	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void registerIcons(TextureStitchEvent.Pre event) {
 		ParticleRegistry.init(event);
 	}
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void registerIconsPost(TextureStitchEvent.Post event) {
         ParticleRegistry.initPost(event);
     }
 
     @SubscribeEvent
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void modelBake(ModelBakeEvent event) {
 
         if (true) return;

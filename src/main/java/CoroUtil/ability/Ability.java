@@ -1,13 +1,13 @@
 package CoroUtil.ability;
 
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.util.Vec3;
 import extendedrenderer.particle.behavior.ParticleBehaviorCharge;
 
@@ -26,7 +26,7 @@ public class Ability {
 	//this design change will let the inner AI system use other skills while this one is still cooling down, better management and less locking
 	//atm all abilities use 'setFinishedPerform' to cancel, but isActive isnt set to false, needs logic fix
 	
-	public EntityLivingBase owner; //this should be allowed to be null, entityless abilities should be possible
+	public LivingEntity owner; //this should be allowed to be null, entityless abilities should be possible
 	
 	//Settings
 	public String name = "";
@@ -56,13 +56,13 @@ public class Ability {
 	public int usageCount = 0;
 	
 	//central particle use
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public ParticleBehaviorCharge particleBehavior;
 	
 	public Ability() {
 	}
 	
-	public Ability init(EntityLivingBase parOwner) {
+	public Ability init(LivingEntity parOwner) {
 		this.owner = parOwner;
 		return this;
 	}
@@ -118,12 +118,12 @@ public class Ability {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
-	public void tickRender(Render parRender) {
+	@OnlyIn(Dist.CLIENT)
+	public void tickRender(EntityRenderer parRender) {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public void tickRenderModel(ModelBase parModel) {
 		
 	}
@@ -206,13 +206,13 @@ public class Ability {
 	
 	//For loading from disk and first time full syncing data to client
 	
-	public void nbtLoad(NBTTagCompound nbt) {
+	public void nbtLoad(CompoundNBT nbt) {
 		name = nbt.getString("name");
 		type = nbt.getInteger("type");
 	}
 	
-	public NBTTagCompound nbtSave() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT nbtSave() {
+		CompoundNBT nbt = new CompoundNBT();
 		nbt.setString("name", name);
 		nbt.setString("classname", this.getClass().getCanonicalName());
 		nbt.setInteger("type", type);
@@ -222,7 +222,7 @@ public class Ability {
 	
 	//For constant sync to client, runtime updates
 	
-	public void nbtSyncRead(NBTTagCompound nbt) {
+	public void nbtSyncRead(CompoundNBT nbt) {
 		name = nbt.getString("name");
 		usageCount = nbt.getInteger("usageCount");
 		boolean wasActive = isActive;
@@ -234,8 +234,8 @@ public class Ability {
 		curTickCooldown = nbt.getInteger("curTickCooldown");
 	}
 	
-	public NBTTagCompound nbtSyncWrite() {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public CompoundNBT nbtSyncWrite() {
+		CompoundNBT nbt = new CompoundNBT();
 		nbt.setString("name", name);
 		nbt.setString("classname", this.getClass().getCanonicalName());
 		nbt.setInteger("usageCount", usageCount);

@@ -1,24 +1,26 @@
 package CoroUtil.ai.tasks;
 
 import javax.annotation.Nullable;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IEntityOwnable;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathPoint;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public abstract class EntityAITargetBetter extends EntityAIBase
+public abstract class EntityAITargetBetter extends Goal
 {
     /** The entity that this task belongs to */
-    protected EntityCreature taskOwner;
+    protected CreatureEntity taskOwner;
     /** If true, EntityAI targets must be able to be seen (cannot be blocked by walls) to be suitable targets. */
     protected boolean shouldCheckSight;
     /** When true, only entities that can be reached with minimal effort will be targetted. */
@@ -32,7 +34,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
      * see the target
      */
     private int targetUnseenTicks;
-    protected EntityLivingBase target;
+    protected LivingEntity target;
     protected int unseenMemoryTicks;
 
     //needed for generic instantiation
@@ -46,7 +48,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
     @Override
     public boolean shouldContinueExecuting()
     {
-        EntityLivingBase entitylivingbase = this.taskOwner.getAttackTarget();
+        LivingEntity entitylivingbase = this.taskOwner.getAttackTarget();
 
         if (entitylivingbase == null)
         {
@@ -92,7 +94,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
                         }
                     }
 
-                    if (entitylivingbase instanceof EntityPlayer && ((EntityPlayer)entitylivingbase).capabilities.disableDamage)
+                    if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).capabilities.disableDamage)
                     {
                         return false;
                     }
@@ -129,14 +131,14 @@ public abstract class EntityAITargetBetter extends EntityAIBase
     @Override
     public void resetTask()
     {
-        this.taskOwner.setAttackTarget((EntityLivingBase)null);
+        this.taskOwner.setAttackTarget((LivingEntity)null);
         this.target = null;
     }
 
     /**
      * A static method used to see if an entity is a suitable target through a number of checks.
      */
-    public static boolean isSuitableTarget(EntityLiving attacker, @Nullable EntityLivingBase target, boolean includeInvincibles, boolean checkSight)
+    public static boolean isSuitableTarget(MobEntity attacker, @Nullable LivingEntity target, boolean includeInvincibles, boolean checkSight)
     {
         if (target == null)
         {
@@ -172,7 +174,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
                     return false;
                 }
             }
-            else if (target instanceof EntityPlayer && !includeInvincibles && ((EntityPlayer)target).capabilities.disableDamage)
+            else if (target instanceof PlayerEntity && !includeInvincibles && ((PlayerEntity)target).capabilities.disableDamage)
             {
                 return false;
             }
@@ -185,7 +187,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
      * A method used to see if an entity is a suitable target through a number of checks. Args : entity,
      * canTargetInvinciblePlayer
      */
-    protected boolean isSuitableTarget(@Nullable EntityLivingBase target, boolean includeInvincibles)
+    protected boolean isSuitableTarget(@Nullable LivingEntity target, boolean includeInvincibles)
     {
         if (!isSuitableTarget(this.taskOwner, target, includeInvincibles, this.shouldCheckSight))
         {
@@ -222,7 +224,7 @@ public abstract class EntityAITargetBetter extends EntityAIBase
     /**
      * Checks to see if this entity can find a short path to the given target.
      */
-    private boolean canEasilyReach(EntityLivingBase target)
+    private boolean canEasilyReach(LivingEntity target)
     {
         this.targetSearchDelay = 10 + this.taskOwner.getRNG().nextInt(5);
         Path path = this.taskOwner.getNavigator().getPathToEntityLiving(target);

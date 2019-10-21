@@ -2,14 +2,14 @@ package extendedrenderer;
 
 import CoroUtil.config.ConfigCoroUtil;
 import extendedrenderer.render.FoliageRenderer;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
 import extendedrenderer.render.RotatingParticleManager;
 
 @Mod(modid = "extendedrenderer", name="Extended Renderer", version="v1.0")
@@ -25,10 +25,10 @@ public class ExtendedRenderer {
     /*@SideOnly(Side.CLIENT)
     public static RotatingEffectRenderer rotEffRenderer;*/
     
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static RotatingParticleManager rotEffRenderer;
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public static FoliageRenderer foliageRenderer;
     
     @Mod.EventHandler

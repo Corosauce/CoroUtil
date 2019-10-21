@@ -10,13 +10,15 @@ import CoroUtil.util.CoroUtilEntity;
 import CoroUtil.util.CoroUtilPath;
 import CoroUtil.util.UtilMining;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.Path;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -24,10 +26,10 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayDeque;
 
-public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskInitializer, IInvasionControlledTask
+public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, IInvasionControlledTask
 {
-    private EntityCreature entity = null;
-    private EntityLivingBase targetLastTracked = null;
+    private CreatureEntity entity = null;
+    private LivingEntity targetLastTracked = null;
     private int noMoveTicks = 0;
 
     private Vec3d posLastTracked = null;
@@ -53,7 +55,7 @@ public class TaskExplodeTowardsTarget extends EntityAIBase implements ITaskIniti
     }
     
     @Override
-    public void setEntity(EntityCreature creature) {
+    public void setEntity(CreatureEntity creature) {
     	this.entity = creature;
     }
 

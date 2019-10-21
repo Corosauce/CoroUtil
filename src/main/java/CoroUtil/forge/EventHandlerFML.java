@@ -5,8 +5,9 @@ import java.util.List;
 
 import CoroUtil.client.debug.DebugRenderer;
 import CoroUtil.difficulty.DynamicDifficulty;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -19,8 +20,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import CoroUtil.quest.PlayerQuestManager;
 import CoroUtil.quest.PlayerQuests;
 import CoroUtil.test.SoundTest;
@@ -29,7 +29,7 @@ public class EventHandlerFML {
 
 	//public static Manager formationManager;
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static SoundTest soundTest;
 	
 	public static long timeLast = 0;
@@ -82,7 +82,7 @@ public class EventHandlerFML {
 			boolean testSendRequestIMC = false;
 			if (testSendRequestIMC) {
 				
-				NBTTagCompound nbt = new NBTTagCompound();
+				CompoundNBT nbt = new CompoundNBT();
 				nbt.setInteger("x", 1);
 				nbt.setInteger("y", 2);
 				nbt.setInteger("z", 3);
@@ -97,7 +97,7 @@ public class EventHandlerFML {
 		
 	}
 	
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public void tickRender(RenderTickEvent event) {
 		//test CoroUtil context render all quests
@@ -118,7 +118,7 @@ public class EventHandlerFML {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public void tickClient(TickEvent.ClientTickEvent event) {
 		DebugRenderer.tickClient();

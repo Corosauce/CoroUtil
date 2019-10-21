@@ -6,7 +6,7 @@ import CoroUtil.ai.tasks.EntityAINearestAttackablePlayerOmniscience;
 import CoroUtil.ai.tasks.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 
 /**
  * Dual AI task user, one a task, one a targetTask
@@ -18,17 +18,17 @@ public class BuffAI_TaskOmniscience extends BuffAI_TaskBase {
     }
 
     @Override
-    public boolean canApplyBuff(EntityCreature ent, float difficulty) {
+    public boolean canApplyBuff(CreatureEntity ent, float difficulty) {
         return super.canApplyBuff(ent, difficulty);
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
         return super.applyBuff(ent, difficulty);
     }
 
     @Override
-    public boolean applyBuffImpl(EntityCreature ent, float difficulty, boolean firstTime) {
+    public boolean applyBuffImpl(CreatureEntity ent, float difficulty, boolean firstTime) {
         CULog.dbg("trying to enhance with omniscience: " + ent.getName());
 
         //already confirmed we dont have via usual routes

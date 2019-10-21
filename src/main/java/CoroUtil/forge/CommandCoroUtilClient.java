@@ -10,9 +10,10 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 public class CommandCoroUtilClient extends CommandBase {
@@ -30,17 +31,17 @@ public class CommandCoroUtilClient extends CommandBase {
 			if (var2.length > 0) {
 				if (var2[0].equalsIgnoreCase("list")) {
 					String param = null;
-	        		int dim = ((EntityPlayer)var1).dimension;
+	        		int dim = ((PlayerEntity)var1).dimension;
 	        		if (var2.length > 1) dim = Integer.valueOf(var2[1]);
 	        		if (var2.length > 2) param = var2[2];
 	        		HashMap<String, Integer> entNames = listEntities(param, dim);
 	                
-	        		var1.sendMessage(new TextComponentString("List for dimension id: " + dim));
+	        		var1.sendMessage(new StringTextComponent("List for dimension id: " + dim));
 	        		
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    var1.sendMessage(new TextComponentString(pairs.getKey() + " = " + pairs.getValue()));
+	                    var1.sendMessage(new StringTextComponent(pairs.getKey() + " = " + pairs.getValue()));
 	                    //CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, pairs.getKey() + " = " + pairs.getValue());
 	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 	                    it.remove();

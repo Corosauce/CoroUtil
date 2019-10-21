@@ -3,7 +3,7 @@ package CoroUtil.bt.nodes;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
@@ -19,7 +19,7 @@ import CoroUtil.bt.selector.Selector;
 public class AttackRangedBest extends Selector implements IAbilityUsageCallback {
 
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	public PersonalityProfile profile;
 	
@@ -36,7 +36,7 @@ public class AttackRangedBest extends Selector implements IAbilityUsageCallback 
 		blackboard = parEnt.getAIBTAgent().blackboard;
 		profile = parEnt.getAIBTAgent().profile;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 	}
 
 	@Override

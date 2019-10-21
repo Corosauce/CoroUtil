@@ -5,12 +5,14 @@ import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.config.ConfigDynamicDifficulty;
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CommonProxy;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockLeaves;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.*;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +23,7 @@ import java.util.List;
 public class TileEntityRepairingBlock extends TileEntity
 {
 
-    private IBlockState orig_blockState;
+    private BlockState orig_blockState;
     private float orig_hardness = 1;
     private float orig_explosionResistance = 1;
 
@@ -54,7 +56,7 @@ public class TileEntityRepairingBlock extends TileEntity
                     //i think its using no collide AABB so this fixes it
                     aabb = Block.FULL_BLOCK_AABB;
                     aabb = aabb.offset(this.getPos());
-                    List<EntityLivingBase> listTest = this.getWorld().getEntitiesWithinAABB(EntityLivingBase.class, aabb);
+                    List<LivingEntity> listTest = this.getWorld().getEntitiesWithinAABB(LivingEntity.class, aabb);
                     if (listTest.size() == 0)
                     {
                         //System.out.println("restoring: " + orig_blockState);
@@ -84,11 +86,11 @@ public class TileEntityRepairingBlock extends TileEntity
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos posFix = pos.add(x, y, z);
-                    IBlockState state = world.getBlockState(posFix);
-                    if (state.getBlock() instanceof BlockLeaves) {
+                    BlockState state = world.getBlockState(posFix);
+                    if (state.getBlock() instanceof LeavesBlock) {
                         try {
                             //CULog.dbg("restoring leaf to non decay state at pos: " + posFix);
-                            world.setBlockState(posFix, state.withProperty(BlockLeaves.CHECK_DECAY, false), 4);
+                            world.setBlockState(posFix, state.withProperty(LeavesBlock.CHECK_DECAY, false), 4);
                         } catch (Exception ex) {
                             //must be a modded block that doesnt use decay
                             if (ConfigCoroUtil.useLoggingDebug) {
@@ -104,12 +106,12 @@ public class TileEntityRepairingBlock extends TileEntity
         //getWorld().setBlockState(this.getPos(), Blocks.STONE.getDefaultState());
     }
 
-    public void setBlockData(IBlockState state) {
+    public void setBlockData(BlockState state) {
         //System.out.println(this + " - setting orig block as " + state);
         this.orig_blockState = state;
     }
 
-    public IBlockState getOrig_blockState() {
+    public BlockState getOrig_blockState() {
         return orig_blockState;
     }
 
@@ -120,7 +122,7 @@ public class TileEntityRepairingBlock extends TileEntity
     }*/
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound var1)
+    public CompoundNBT writeToNBT(CompoundNBT var1)
     {
         if (orig_blockState != null) {
             String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
@@ -136,7 +138,7 @@ public class TileEntityRepairingBlock extends TileEntity
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound var1)
+    public void readFromNBT(CompoundNBT var1)
     {
         super.readFromNBT(var1);
         timeToRepairAt = var1.getLong("timeToRepairAt");
@@ -174,7 +176,7 @@ public class TileEntityRepairingBlock extends TileEntity
      * @param pos
      */
     public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos, int ticksToRepair) {
-        IBlockState oldState = world.getBlockState(pos);
+        BlockState oldState = world.getBlockState(pos);
         float oldHardness = oldState.getBlockHardness(world, pos);
         float oldExplosionResistance = 1;
         try {
@@ -186,7 +188,7 @@ public class TileEntityRepairingBlock extends TileEntity
         world.setBlockState(pos, CommonProxy.blockRepairingBlock.getDefaultState());
         TileEntity tEnt = world.getTileEntity(pos);
         if (tEnt instanceof TileEntityRepairingBlock) {
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             //CULog.dbg("set repairing block for pos: " + pos + ", " + oldState.getBlock());
             TileEntityRepairingBlock repairing = ((TileEntityRepairingBlock) tEnt);
             repairing.setBlockData(oldState);

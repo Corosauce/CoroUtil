@@ -1,10 +1,10 @@
 package CoroUtil.bt;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 public interface IBTAgent {
 	
 	public AIBTAgent getAIBTAgent();
-	public EntityLivingBase getEntityLiving();
+	public LivingEntity getEntityLiving();
 	public void cleanup();
 }

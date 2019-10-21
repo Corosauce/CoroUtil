@@ -1,7 +1,8 @@
 package CoroUtil.world.location;
 
 import CoroUtil.util.BlockCoord;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -46,13 +47,13 @@ import net.minecraftforge.common.DimensionManager;
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound parData) {
+    public void readFromNBT(CompoundNBT parData) {
         origin = new BlockCoord(parData.getInteger("posX"), parData.getInteger("posY"), parData.getInteger("posZ"));
         dimensionID = parData.getInteger("dimensionID");
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound parData) {
+    public CompoundNBT writeToNBT(CompoundNBT parData) {
         parData.setString("classname", this.getClass().getCanonicalName());
         parData.setInteger("posX", origin.getX());
         parData.setInteger("posY", origin.getY());

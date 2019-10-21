@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import CoroUtil.bt.AIBTAgent;
 import CoroUtil.bt.Behavior;
@@ -20,7 +22,7 @@ public class TargetEnemy extends Selector {
 	//no longer forces a moveto
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	
 	public float rangeHunt = 16;
 	public BlockCoord holdPos = null; //if not null, center scan and best target scan is based from this instead of entity, shouldnt cancel active target, and should have a range higher than enemy projectile ranges
@@ -31,7 +33,7 @@ public class TargetEnemy extends Selector {
 	public TargetEnemy(Behavior parParent, IBTAgent parEnt, float parRange, BlockCoord parHoldPos, int parScanRate, int parRandRate) {
 		super(parParent);
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 		rangeHunt = parRange;
 		holdPos = parHoldPos;
 		scanRate = parScanRate;
@@ -54,7 +56,7 @@ public class TargetEnemy extends Selector {
 		
 		boolean xRay = false;
 		
-		EntityLivingBase protectEnt = ent;
+		LivingEntity protectEnt = ent;
 		Random rand = new Random();
 		
 		AIBTAgent ai = entInt.getAIBTAgent();
@@ -75,7 +77,7 @@ public class TargetEnemy extends Selector {
 	            Entity entity1 = (Entity)list.get(j);
 	            if(ai.isEnemy(entity1))
 	            {
-	            	if (xRay || ((EntityLivingBase) entity1).canEntityBeSeen(protectEnt)) {
+	            	if (xRay || ((LivingEntity) entity1).canEntityBeSeen(protectEnt)) {
 	            		if (sanityCheck(entity1)/* && entity1 instanceof EntityPlayer*/) {
 	            			float dist = 0;// = protectEnt.getDistanceToEntity(entity1);
 	            			/*if (holdPos != null) {

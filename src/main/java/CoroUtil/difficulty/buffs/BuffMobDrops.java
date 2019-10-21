@@ -4,7 +4,7 @@ import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.data.DifficultyDataReader;
 import CoroUtil.difficulty.data.cmods.CmodMobDrops;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -20,17 +20,17 @@ public class BuffMobDrops extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
         return super.applyBuff(ent, difficulty);
     }
 
     @Override
-    public void applyBuffFromReload(EntityCreature ent, float difficulty) {
+    public void applyBuffFromReload(CreatureEntity ent, float difficulty) {
         applyBuff(ent, difficulty);
     }
 
     @Override
-    public void applyBuffOnDeath(EntityCreature ent, float difficulty, LivingDeathEvent event) {
+    public void applyBuffOnDeath(CreatureEntity ent, float difficulty, LivingDeathEvent event) {
         CmodMobDrops cmod = (CmodMobDrops)UtilEntityBuffs.getCmodData(ent, getTagName());
 
         if (cmod != null) {

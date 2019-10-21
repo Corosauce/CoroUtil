@@ -2,13 +2,13 @@ package CoroUtil.util;
 
 import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -204,7 +204,7 @@ public class CoroUtilCompatibility {
 
     public static int lastPowerVal = -1;
 
-    public static void testPowerInfo(EntityPlayer player, BlockPos pos) {
+    public static void testPowerInfo(PlayerEntity player, BlockPos pos) {
         TileEntity tEnt = player.world.getTileEntity(pos);
         if (tEnt != null) {
 
@@ -214,9 +214,9 @@ public class CoroUtilCompatibility {
 
             if (cap != null) {
                 value = cap.getEnergyStored();
-                player.sendMessage(new TextComponentString("cap power stored: " + value));
+                player.sendMessage(new StringTextComponent("cap power stored: " + value));
                 if (lastPowerVal != -1) {
-                    player.sendMessage(new TextComponentString("relative power change: " + (value - lastPowerVal)));
+                    player.sendMessage(new StringTextComponent("relative power change: " + (value - lastPowerVal)));
                 }
                 lastPowerVal = value;
             } else {
@@ -224,10 +224,10 @@ public class CoroUtilCompatibility {
                     boolean success = true;
                     Class classTry = Class.forName("crazypants.enderio.base.power.ILegacyPoweredTile");
                     if (classTry == null) {
-                        player.sendMessage(new TextComponentString("EIO class not found, trying cofh"));
+                        player.sendMessage(new StringTextComponent("EIO class not found, trying cofh"));
                         classTry = Class.forName("cofh.redstoneflux.api.IEnergyStorage");
                         if (classTry == null) {
-                            player.sendMessage(new TextComponentString("cofh class not found"));
+                            player.sendMessage(new StringTextComponent("cofh class not found"));
                         }
                     }
 
@@ -236,7 +236,7 @@ public class CoroUtilCompatibility {
                         if (method != null) {
                             value = (int) method.invoke(tEnt);
                         } else {
-                            player.sendMessage(new TextComponentString("method not found"));
+                            player.sendMessage(new StringTextComponent("method not found"));
                             success = false;
                         }
                     } else {
@@ -244,9 +244,9 @@ public class CoroUtilCompatibility {
                     }
 
                     if (success) {
-                        player.sendMessage(new TextComponentString("non cap power stored: " + value));
+                        player.sendMessage(new StringTextComponent("non cap power stored: " + value));
                         if (lastPowerVal != -1) {
-                            player.sendMessage(new TextComponentString("relative power change: " + (value - lastPowerVal)));
+                            player.sendMessage(new StringTextComponent("relative power change: " + (value - lastPowerVal)));
                         }
                         lastPowerVal = value;
                     }
@@ -261,7 +261,7 @@ public class CoroUtilCompatibility {
         }
     }
 
-    public static boolean tryPathToXYZModCompat(EntityLiving ent, int x, int y, int z, double speed) {
+    public static boolean tryPathToXYZModCompat(MobEntity ent, int x, int y, int z, double speed) {
         /***
          *
          * com.lycanitesmobs.core.entity.EntityCreatureBase extends EntityLiving
@@ -317,7 +317,7 @@ public class CoroUtilCompatibility {
         }
     }
 
-    public static boolean tryPathToXYZVanilla(EntityLiving ent, int x, int y, int z, double speed) {
+    public static boolean tryPathToXYZVanilla(MobEntity ent, int x, int y, int z, double speed) {
         return ent.getNavigator().tryMoveToXYZ(x, y, z, speed);
     }
 
@@ -333,7 +333,7 @@ public class CoroUtilCompatibility {
         return Loader.isModLoaded(CoroUtil.modID_HWInvasions);
     }
 
-    public static boolean canTornadoGrabBlockRefinedRules(IBlockState state) {
+    public static boolean canTornadoGrabBlockRefinedRules(BlockState state) {
         ResourceLocation registeredName = state.getBlock().getRegistryName();
         if (registeredName.getResourceDomain().equals("dynamictrees")) {
             if (registeredName.getResourcePath().contains("rooty") || registeredName.getResourcePath().contains("branch")) {

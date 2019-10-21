@@ -1,8 +1,8 @@
 package CoroUtil.difficulty.buffs;
 
 import CoroUtil.difficulty.UtilEntityBuffs;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 /**
@@ -23,8 +23,8 @@ public abstract class BuffBase {
      * @param ent
      * @param difficulty
      */
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
+        CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
         data.setBoolean(getTagName(), true);
         ent.getEntityData().setTag(UtilEntityBuffs.dataEntityBuffed_Data, data);
         return true;
@@ -37,7 +37,7 @@ public abstract class BuffBase {
      * @param ent
      * @param difficulty
      */
-    public void applyBuffPost(EntityCreature ent, float difficulty) {
+    public void applyBuffPost(CreatureEntity ent, float difficulty) {
         return;
     }
 
@@ -48,7 +48,7 @@ public abstract class BuffBase {
      * @param difficulty
      * @return
      */
-    public boolean canApplyBuff(EntityCreature ent, float difficulty) {
+    public boolean canApplyBuff(CreatureEntity ent, float difficulty) {
         return true;
     }
 
@@ -59,9 +59,9 @@ public abstract class BuffBase {
      * @param ent
      * @param difficulty
      */
-    public void applyBuffFromReload(EntityCreature ent, float difficulty) {};
+    public void applyBuffFromReload(CreatureEntity ent, float difficulty) {};
 
-    public void applyBuffOnDeath(EntityCreature ent, float difficulty, LivingDeathEvent event) {};
+    public void applyBuffOnDeath(CreatureEntity ent, float difficulty, LivingDeathEvent event) {};
 
     public float getMinRequiredDifficulty() {
         return 0;

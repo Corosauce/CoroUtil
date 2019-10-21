@@ -5,7 +5,7 @@ import CoroUtil.world.WorldDirector;
 import CoroUtil.world.WorldDirectorManager;
 import CoroUtil.world.location.ISimulationTickable;
 import CoroUtil.world.location.TickableLocationBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -91,14 +91,14 @@ public class BuffedLocation extends TickableLocationBase {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound parData) {
+    public void readFromNBT(CompoundNBT parData) {
         super.readFromNBT(parData);
         difficulty = parData.getFloat("difficulty");
         buffDistRadius = parData.getInteger("radius");
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound parData) {
+    public CompoundNBT writeToNBT(CompoundNBT parData) {
         parData = super.writeToNBT(parData);
         parData.setInteger("radius", buffDistRadius);
         parData.setFloat("difficulty", difficulty);

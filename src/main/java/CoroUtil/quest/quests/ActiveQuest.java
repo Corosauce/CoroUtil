@@ -4,7 +4,7 @@ package CoroUtil.quest.quests;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import CoroUtil.quest.EnumQuestState;
 import CoroUtil.quest.PlayerQuests;
@@ -58,14 +58,14 @@ public class ActiveQuest {
 		playerQuests.saveAndSyncAllPlayers();
 	}
 	
-	public void load(NBTTagCompound parNBT) {
+	public void load(CompoundNBT parNBT) {
 		curState = EnumQuestState.get(parNBT.getInteger("curState"));
 		dimIDCreatedIn = parNBT.getInteger("dimIDCreatedIn");
 		modOwner = parNBT.getString("modOwner");
 		returnToQuestGiver = parNBT.getBoolean("returnToQuestGiver");
 	}
 	
-	public void save(NBTTagCompound parNBT) {
+	public void save(CompoundNBT parNBT) {
 		parNBT.setString("classNamePath", this.getClass().getCanonicalName());
 		parNBT.setInteger("curState", curState.ordinal());
 		parNBT.setInteger("dimIDCreatedIn", dimIDCreatedIn);

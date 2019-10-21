@@ -3,7 +3,7 @@ package CoroUtil.bt.nodes;
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
@@ -36,7 +36,7 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 	//design flaw, default attack requires this to be ticked, skills were added so they only need the 1 call from CombatLogic
 	
 	public IBTAgent entInt;
-	public EntityLiving ent;
+	public MobEntity ent;
 	public BlackboardBase blackboard;
 	public PersonalityProfile profile;
 	
@@ -53,7 +53,7 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 		blackboard = parEnt.getAIBTAgent().blackboard;
 		profile = parEnt.getAIBTAgent().profile;
 		entInt = parEnt;
-		ent = (EntityLiving)parEnt;
+		ent = (MobEntity)parEnt;
 	}
 
 	@Override

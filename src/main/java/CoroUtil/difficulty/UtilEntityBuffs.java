@@ -11,17 +11,17 @@ import CoroUtil.forge.CULog;
 import CoroUtil.forge.CoroUtil;
 import CoroUtil.util.BlockCoord;
 import com.google.gson.JsonArray;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -95,7 +95,7 @@ public class UtilEntityBuffs {
      * @param cmods
      * @param difficulty
      */
-    public static void registerAndApplyCmods(EntityCreature ent, List<DataCmod> cmods, float difficulty) {
+    public static void registerAndApplyCmods(CreatureEntity ent, List<DataCmod> cmods, float difficulty) {
 
         List<DataCmod> cmodsFlat = DeserializerAllJson.getCmodsFlattened(cmods);
 
@@ -123,9 +123,9 @@ public class UtilEntityBuffs {
         }
 
         if (!ent.getEntityData().hasKey(dataEntityBuffed_Data)) {
-            ent.getEntityData().setTag(dataEntityBuffed_Data, new NBTTagCompound());
+            ent.getEntityData().setTag(dataEntityBuffed_Data, new CompoundNBT());
         }
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
 
         //add the json that holds config data for cmods
         JsonArray array = DeserializerAllJson.serializeCmods(cmodsFlat);
@@ -145,14 +145,14 @@ public class UtilEntityBuffs {
         //ent.getEntityData().setTag(dataEntityBuffed_Data, data);
     }
 
-    public static List<DataCmod> getAllCmodData(EntityCreature ent) {
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+    public static List<DataCmod> getAllCmodData(CreatureEntity ent) {
+        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
         String json = data.getString(dataEntityCmodJson);
         return DeserializerAllJson.deserializeCmods(json);
     }
 
-    public static DataCmod getCmodData(EntityCreature ent, String cmodName) {
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+    public static DataCmod getCmodData(CreatureEntity ent, String cmodName) {
+        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
         String json = data.getString(dataEntityCmodJson);
         List<DataCmod> cmods = DeserializerAllJson.deserializeCmods(json);
         for (DataCmod cmod : cmods) {
@@ -168,12 +168,12 @@ public class UtilEntityBuffs {
         lookupBuffs.put(buff.getTagName(), buff);
     }
 
-    public static boolean hasBuff(EntityCreature ent, BuffBase buff) {
+    public static boolean hasBuff(CreatureEntity ent, BuffBase buff) {
         return hasBuff(ent, buff.getTagName());
     }
 
-    public static boolean hasBuff(EntityCreature ent, String buff) {
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
+    public static boolean hasBuff(CreatureEntity ent, String buff) {
+        CompoundNBT data = ent.getEntityData().getCompoundTag(dataEntityBuffed_Data);
         return data.getBoolean(buff);
     }
 
@@ -185,7 +185,7 @@ public class UtilEntityBuffs {
      * @param difficulty
      * @return
      */
-    public static boolean applyBuff(String buffName, EntityCreature ent, float difficulty) {
+    public static boolean applyBuff(String buffName, CreatureEntity ent, float difficulty) {
         if (lookupBuffs.containsKey(buffName)) {
 
             //mark entity is buffed
@@ -213,7 +213,7 @@ public class UtilEntityBuffs {
      * @param difficulty
      * @return
      */
-    public static void applyBuffPost(String buffName, EntityCreature ent, float difficulty) {
+    public static void applyBuffPost(String buffName, CreatureEntity ent, float difficulty) {
         if (lookupBuffs.containsKey(buffName)) {
 
             //System.out.println("applying buff: " + buffName);
@@ -222,9 +222,9 @@ public class UtilEntityBuffs {
         }
     }
 
-    public static void applyBuffPostAll(EntityCreature ent, float difficulty) {
+    public static void applyBuffPostAll(CreatureEntity ent, float difficulty) {
         List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-        NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+        CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
         for (String buff : buffs) {
             if (data.getBoolean(buff)) {
                 BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
@@ -253,7 +253,7 @@ public class UtilEntityBuffs {
      * @param ent
      * @param playerClosest
      */
-    public static void buff_RollDice(World world, EntityCreature ent, EntityPlayer playerClosest) {
+    public static void buff_RollDice(World world, CreatureEntity ent, PlayerEntity playerClosest) {
 
         if (true) return;
 
@@ -310,7 +310,7 @@ public class UtilEntityBuffs {
         UtilEntityBuffs.applyBuffPostAll(ent, difficulty);
     }
 
-    public static void setEquipment(EntityCreature ent, EntityEquipmentSlot slot, ItemStack stack) {
+    public static void setEquipment(CreatureEntity ent, EquipmentSlotType slot, ItemStack stack) {
         //used to prevent skeletons from being changed, but lets support it
         /*if (slot == EntityEquipmentSlot.MAINHAND && ent instanceof EntitySkeleton) {
             return;
@@ -319,14 +319,14 @@ public class UtilEntityBuffs {
         ent.setDropChance(slot, 0);
     }
 
-    public static boolean hasTask(EntityCreature ent, Class taskToCheckFor, boolean isTargetTask) {
-        EntityAITasks tasks = ent.tasks;
+    public static boolean hasTask(CreatureEntity ent, Class taskToCheckFor, boolean isTargetTask) {
+        GoalSelector tasks = ent.tasks;
         if (isTargetTask) {
             tasks = ent.targetTasks;
         }
         boolean foundTask = false;
         for (Object entry2 : tasks.taskEntries) {
-            EntityAITasks.EntityAITaskEntry entry = (EntityAITasks.EntityAITaskEntry) entry2;
+            GoalSelector.EntityAITaskEntry entry = (GoalSelector.EntityAITaskEntry) entry2;
             if (taskToCheckFor.isAssignableFrom(entry.action.getClass())) {
                 foundTask = true;
                 break;
@@ -336,12 +336,12 @@ public class UtilEntityBuffs {
     }
 
     /** example sexier version of hasTask **/
-    public static boolean hasAi(EntityLiving entity, Class<? extends EntityAIBase> clazz) {
+    public static boolean hasAi(MobEntity entity, Class<? extends Goal> clazz) {
         return entity.tasks.taskEntries.stream().anyMatch(task -> clazz.isAssignableFrom(task.action.getClass()));
     }
 
-    public static boolean addTask(EntityCreature ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
-        EntityAITasks tasks = ent.tasks;
+    public static boolean addTask(CreatureEntity ent, Class taskToInject, int priorityOfTask, boolean isTargetTask) {
+        GoalSelector tasks = ent.tasks;
         if (isTargetTask) {
             tasks = ent.targetTasks;
         }
@@ -352,7 +352,7 @@ public class UtilEntityBuffs {
                 ITaskInitializer task = (ITaskInitializer) obj;
                 task.setEntity(ent);
                 //System.out.println("adding task into zombie: " + taskToInject);
-                tasks.addTask(priorityOfTask, (EntityAIBase) task);
+                tasks.addTask(priorityOfTask, (Goal) task);
                 //aiEnhanced.put(ent.getEntityId(), true);
 
 
@@ -364,8 +364,8 @@ public class UtilEntityBuffs {
         return false;
     }
 
-    public static void processLootTableOnEntity(EntityCreature ent, LootTable loottable, LivingDeathEvent event) {
-        LootContext.Builder lootcontext$builder = (new LootContext.Builder((WorldServer)ent.world)).withLootedEntity(ent).withDamageSource(event.getSource());
+    public static void processLootTableOnEntity(CreatureEntity ent, LootTable loottable, LivingDeathEvent event) {
+        LootContext.Builder lootcontext$builder = (new LootContext.Builder((ServerWorld)ent.world)).withLootedEntity(ent).withDamageSource(event.getSource());
 
         if (ent.recentlyHit > 0 && ent.attackingPlayer != null)
         {
@@ -460,8 +460,8 @@ public class UtilEntityBuffs {
 
     public static void onDeath(LivingDeathEvent event) {
 
-        if (event.getEntityLiving() instanceof EntityCreature) {
-            EntityCreature ent = (EntityCreature)event.getEntityLiving();
+        if (event.getEntityLiving() instanceof CreatureEntity) {
+            CreatureEntity ent = (CreatureEntity)event.getEntityLiving();
             if (/*ent.canDropLoot() && */ent.world.getGameRules().getBoolean("doMobLoot")) {
 
                 if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
@@ -476,7 +476,7 @@ public class UtilEntityBuffs {
                     }
 
                     List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-                    NBTTagCompound data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+                    CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
                     for (String buff : buffs) {
                         if (data.getBoolean(buff)) {
                             BuffBase buffObj = UtilEntityBuffs.getBuff(buff);

@@ -1,10 +1,10 @@
 package CoroUtil.packet;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public interface INBTPacketHandler {
 
-	public void nbtDataFromServer(NBTTagCompound nbt);
-	public void nbtDataFromClient(String parUser, NBTTagCompound nbt);
+	public void nbtDataFromServer(CompoundNBT nbt);
+	public void nbtDataFromClient(String parUser, CompoundNBT nbt);
 	
 }

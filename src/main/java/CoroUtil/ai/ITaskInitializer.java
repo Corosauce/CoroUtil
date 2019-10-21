@@ -1,9 +1,10 @@
 package CoroUtil.ai;
 
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.CreatureEntity;
 
 public interface ITaskInitializer {
 
-	public void setEntity(EntityCreature creature);
+	public void setEntity(CreatureEntity creature);
 	
 }

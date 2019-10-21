@@ -2,19 +2,19 @@ package CoroUtil.entity.render;
 
 import CoroUtil.entity.EntityBatSmart;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderBatSmart extends RenderLiving<EntityBatSmart>
+@OnlyIn(Dist.CLIENT)
+public class RenderBatSmart extends MobRenderer<EntityBatSmart>
 {
     private static final ResourceLocation BAT_TEXTURES = new ResourceLocation("textures/entity/bat.png");
 
-    public RenderBatSmart(RenderManager renderManagerIn)
+    public RenderBatSmart(EntityRendererManager renderManagerIn)
     {
         super(renderManagerIn, new ModelBatSmart(), 0.25F);
     }

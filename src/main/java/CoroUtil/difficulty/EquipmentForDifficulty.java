@@ -1,8 +1,8 @@
 package CoroUtil.difficulty;
 
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class EquipmentForDifficulty {
     private ItemStack weapon;
     private ItemStack weaponOffhand;
     //unused for now, worth considering in future
-    private List<Potion> listPotions;
+    private List<Effect> listPotions;
 
     public EquipmentForDifficulty() {
 
@@ -46,19 +46,19 @@ public class EquipmentForDifficulty {
         this.weaponOffhand = weaponOffhand;
     }
 
-    public List<Potion> getListPotions() {
+    public List<Effect> getListPotions() {
         return listPotions;
     }
 
-    public void setListPotions(List<Potion> listPotions) {
+    public void setListPotions(List<Effect> listPotions) {
         this.listPotions = listPotions;
     }
 
-    public EntityEquipmentSlot getSlotForSlotID(int ID) {
-        if (ID == 0) return EntityEquipmentSlot.HEAD;
-        if (ID == 1) return EntityEquipmentSlot.CHEST;
-        if (ID == 2) return EntityEquipmentSlot.LEGS;
-        if (ID == 3) return EntityEquipmentSlot.FEET;
+    public EquipmentSlotType getSlotForSlotID(int ID) {
+        if (ID == 0) return EquipmentSlotType.HEAD;
+        if (ID == 1) return EquipmentSlotType.CHEST;
+        if (ID == 2) return EquipmentSlotType.LEGS;
+        if (ID == 3) return EquipmentSlotType.FEET;
         return null;
     }
 

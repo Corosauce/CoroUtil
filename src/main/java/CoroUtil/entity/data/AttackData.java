@@ -5,7 +5,7 @@ import java.util.List;
 
 import CoroUtil.difficulty.DamageSourceEntry;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.BlockPos;
 
@@ -21,7 +21,7 @@ public class AttackData extends EntityData {
 
 	public DamageSourceEntry highestDamage;
 	
-	public AttackData(EntityCreature ent) {
+	public AttackData(CreatureEntity ent) {
 		super(ent);
 		highestDamage = new DamageSourceEntry();
 	}

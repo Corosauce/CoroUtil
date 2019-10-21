@@ -1,7 +1,7 @@
 package CoroUtil.util;
 
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.io.IOUtils;
 
@@ -32,10 +32,10 @@ public class UtilClasspath {
     }
 
 
-    public static NBTTagCompound getNBTFromResourceLocation(ResourceLocation resourceLocation) {
+    public static CompoundNBT getNBTFromResourceLocation(ResourceLocation resourceLocation) {
         try {
             URL url = UtilClasspath.class.getResource("/assets/" + resourceLocation.getResourceDomain() + "/" + resourceLocation.getResourcePath());
-            NBTTagCompound nbttagcompound = CompressedStreamTools.readCompressed(url.openStream());
+            CompoundNBT nbttagcompound = CompressedStreamTools.readCompressed(url.openStream());
             return nbttagcompound;
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -12,11 +12,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -39,7 +42,7 @@ public class WorldDirector implements Runnable {
 	//private World world;
 	
 	public int cachedTopBlockHome = -1;
-	private NBTTagCompound extraData = new NBTTagCompound(); //this worlds extra data, excluding the read in non nbt stuff
+	private CompoundNBT extraData = new CompoundNBT(); //this worlds extra data, excluding the read in non nbt stuff
 	
 	//Not serialized for now
 	public List<WorldEvent> worldEvents = new ArrayList<WorldEvent>();
@@ -124,12 +127,12 @@ public class WorldDirector implements Runnable {
 		return world;
 	}
 	
-	public NBTTagCompound getExtraData() {
+	public CompoundNBT getExtraData() {
 		return extraData;
 	}
 	
 	public void reset() {
-		extraData = new NBTTagCompound();
+		extraData = new CompoundNBT();
 		cachedTopBlockHome = -1;
 		worldEvents.clear();
 	}
@@ -227,7 +230,7 @@ public class WorldDirector implements Runnable {
 		if (ConfigCoroUtilAdvanced.trackPlayerData) {
 			if (world.getTotalWorldTime() % PlayerDataGrid.playerTimeSpentUpdateInterval == 0) {
 				for (int i = 0; i < world.playerEntities.size(); i++) {
-					EntityPlayer entP = world.playerEntities.get(i);
+					PlayerEntity entP = world.playerEntities.get(i);
 					ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(MathHelper.floor(entP.posX) / 16, MathHelper.floor(entP.posZ) / 16);
 					cdp.addToPlayerActivityTime(entP.getGameProfile().getId(), PlayerDataGrid.playerTimeSpentUpdateInterval);
 				}
@@ -309,7 +312,7 @@ public class WorldDirector implements Runnable {
 		//if (extraData == null) return;
     	try {
     		
-    		NBTTagCompound nbt = new NBTTagCompound();
+    		CompoundNBT nbt = new CompoundNBT();
     		
     		boolean bool = false;
     		if (extraData != null) bool = extraData.getBoolean("generatedTown");
@@ -334,7 +337,7 @@ public class WorldDirector implements Runnable {
 		}
 	}
 	
-	public void readFromNBT(NBTTagCompound parData) {
+	public void readFromNBT(CompoundNBT parData) {
 		extraData = parData.getCompoundTag("extraData");
 		
 		//these are mandatory fields set during registration, and would lose their values if read in here
@@ -342,14 +345,14 @@ public class WorldDirector implements Runnable {
 		type = parData.getString("type");
 		dimID = parData.getInteger("dimID");*/
 		
-		NBTTagCompound tickingLocations = parData.getCompoundTag("tickingLocations");
+		CompoundNBT tickingLocations = parData.getCompoundTag("tickingLocations");
 		
 		Iterator it = tickingLocations.getKeySet().iterator();
 		
 		
 		while (it.hasNext()) {
 			String keyName = (String)it.next();
-			NBTTagCompound nbt = tickingLocations.getCompoundTag(keyName);
+			CompoundNBT nbt = tickingLocations.getCompoundTag(keyName);
 			
 			String classname = nbt.getString("classname");
 			
@@ -383,8 +386,8 @@ public class WorldDirector implements Runnable {
 		}
 	}
 	
-	public void writeToNBT(NBTTagCompound parData) {
-		NBTTagCompound nbtSet = new NBTTagCompound();
+	public void writeToNBT(CompoundNBT parData) {
+		CompoundNBT nbtSet = new CompoundNBT();
 		
 		int index = 0;
 		/*for (Map.Entry<Integer, ISimulationTickable> entry : lookupTickingManagedLocations.entrySet()) {
@@ -393,7 +396,7 @@ public class WorldDirector implements Runnable {
 			nbtSet.setTag("" + index++, nbt);
 		}*/
 		for (ISimulationTickable entry : listTickingLocations) {
-			NBTTagCompound nbt = new NBTTagCompound();
+			CompoundNBT nbt = new CompoundNBT();
 			entry.writeToNBT(nbt);
 			nbtSet.setTag("" + index++, nbt);
 		}

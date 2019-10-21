@@ -3,17 +3,11 @@ package CoroUtil.client.debug;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.lwjgl.opengl.GL11;
 
 public class DebugRenderEntry {
 
@@ -62,7 +56,7 @@ public class DebugRenderEntry {
         double f2 = 0;
         double f3 = 0;
 
-        RenderManager rm = Minecraft.getMinecraft().getRenderManager();
+        EntityRendererManager rm = Minecraft.getMinecraft().getRenderManager();
 
         buffer.setTranslation(pos.getX() + 0.5F - rm.renderPosX, pos.getY() + 0.5F - rm.renderPosY, pos.getZ() + 0.5F - rm.renderPosZ);
 
@@ -130,7 +124,7 @@ public class DebugRenderEntry {
         if (world == null) return;
 
         if (world.getTotalWorldTime() % 10 == 0) {
-            world.spawnParticle(EnumParticleTypes.REDSTONE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0D, 0.0D, 0.0D);
+            world.spawnParticle(ParticleTypes.REDSTONE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0D, 0.0D, 0.0D);
         }
     }
 

@@ -6,10 +6,12 @@ import CoroUtil.difficulty.data.cmods.CmodInventory;
 import CoroUtil.difficulty.data.cmods.CmodInventoryDifficultyScaled;
 import CoroUtil.difficulty.data.cmods.CmodInventoryEntry;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.monster.AbstractSkeleton;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 
 /**
@@ -23,7 +25,7 @@ public class BuffInventoryDifficultyScaled extends BuffBase {
     }
 
     @Override
-    public boolean applyBuff(EntityCreature ent, float difficulty) {
+    public boolean applyBuff(CreatureEntity ent, float difficulty) {
 
         CmodInventoryDifficultyScaled cmod = (CmodInventoryDifficultyScaled)UtilEntityBuffs.getCmodData(ent, getTagName());
 
@@ -43,22 +45,22 @@ public class BuffInventoryDifficultyScaled extends BuffBase {
 
                 //allow for original weapon to remain if there was one and we are trying to remove it
                 if (equipment.getWeapon() != null)
-                    UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.MAINHAND, equipment.getWeapon());
+                    UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.MAINHAND, equipment.getWeapon());
 
                 if (equipment.getWeaponOffhand() != null)
-                    UtilEntityBuffs.setEquipment(ent, EntityEquipmentSlot.OFFHAND, equipment.getWeaponOffhand());
+                    UtilEntityBuffs.setEquipment(ent, EquipmentSlotType.OFFHAND, equipment.getWeaponOffhand());
 
                 for (ItemStack itemStack : equipment.getListArmor()) {
-                    if (itemStack.getItem() instanceof ItemArmor) {
-                        ItemArmor itemArmor = (ItemArmor) itemStack.getItem();
+                    if (itemStack.getItem() instanceof ArmorItem) {
+                        ArmorItem itemArmor = (ArmorItem) itemStack.getItem();
 
                         UtilEntityBuffs.setEquipment(ent, itemArmor.armorType, itemStack);
                     }
                 }
 
                 //update skeleton AI for melee/bow
-                if (ent instanceof AbstractSkeleton) {
-                    ((AbstractSkeleton) ent).setCombatTask();
+                if (ent instanceof AbstractSkeletonEntity) {
+                    ((AbstractSkeletonEntity) ent).setCombatTask();
                 }
             } else {
                 CULog.log("warning, couldnt find an inventory to use given the difficulty of :" + difficulty);

@@ -1,7 +1,7 @@
 package CoroUtil.util;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -30,7 +30,7 @@ public class CoroUtilInventory {
 	}
 	
 	public static boolean isChest(Block block) {
-		if (block instanceof BlockChest) {
+		if (block instanceof ChestBlock) {
 			return true;
 		} else {
 			return false;

@@ -5,14 +5,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundNBT;
 import CoroUtil.ability.Ability;
 
 public class CoroUtilAbility {
 
-	public static NBTTagCompound nbtSyncWriteAbility(String abilityName, ConcurrentHashMap<String, Ability> abilities, boolean fullSync) {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public static CompoundNBT nbtSyncWriteAbility(String abilityName, ConcurrentHashMap<String, Ability> abilities, boolean fullSync) {
+		CompoundNBT nbt = new CompoundNBT();
 		Ability ability = abilities.get(abilityName);
 		if (ability != null) {
 			nbt = nbtSyncWriteAbility(ability, fullSync);
@@ -22,8 +24,8 @@ public class CoroUtilAbility {
 		return nbt;
 	}
 	
-	public static NBTTagCompound nbtSyncWriteAbility(Ability ability, boolean fullSync) {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public static CompoundNBT nbtSyncWriteAbility(Ability ability, boolean fullSync) {
+		CompoundNBT nbt = new CompoundNBT();
 		if (fullSync) {
 			nbt.setTag(ability.name, ability.nbtSave());
 		} else {
@@ -32,16 +34,16 @@ public class CoroUtilAbility {
 		return nbt;
 	}
 	
-	public static NBTTagCompound nbtSyncWriteAbilities(ConcurrentHashMap<String, Ability> abilities) {
+	public static CompoundNBT nbtSyncWriteAbilities(ConcurrentHashMap<String, Ability> abilities) {
 		return nbtWriteAbilities(abilities, true);
 	}
 	
-	public static NBTTagCompound nbtSaveAbilities(ConcurrentHashMap<String, Ability> abilities) {
+	public static CompoundNBT nbtSaveAbilities(ConcurrentHashMap<String, Ability> abilities) {
 		return nbtWriteAbilities(abilities, false);
 	}
 	
-	public static NBTTagCompound nbtWriteAbilities(ConcurrentHashMap<String, Ability> abilities, boolean syncOnly) {
-		NBTTagCompound nbt = new NBTTagCompound();
+	public static CompoundNBT nbtWriteAbilities(ConcurrentHashMap<String, Ability> abilities, boolean syncOnly) {
+		CompoundNBT nbt = new CompoundNBT();
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			if (syncOnly) {
@@ -53,18 +55,18 @@ public class CoroUtilAbility {
 		return nbt;
 	}
 	
-	public static void nbtLoadSkills(NBTTagCompound nbt, ConcurrentHashMap<String, Ability> abilities, EntityLivingBase owner) {
+	public static void nbtLoadSkills(CompoundNBT nbt, ConcurrentHashMap<String, Ability> abilities, LivingEntity owner) {
 		nbtLoadSkills(nbt, abilities, owner, false);
 	}
 	
 	/* It will try a full nbt load if it detected the skill wasnt there, but this requires the server to have predicted this and actually sent a full nbtLoad() package */
-	public static void nbtLoadSkills(NBTTagCompound nbt, ConcurrentHashMap<String, Ability> abilities, EntityLivingBase owner, boolean syncOnly) {
+	public static void nbtLoadSkills(CompoundNBT nbt, ConcurrentHashMap<String, Ability> abilities, LivingEntity owner, boolean syncOnly) {
 
 		Iterator it = nbt.getKeySet().iterator();
 		
 		while (it.hasNext()) {
 			String tagName = (String) it.next();
-			NBTTagCompound data = (NBTTagCompound)nbt.getTag(tagName);
+			CompoundNBT data = (CompoundNBT)nbt.getTag(tagName);
 			
 			String abilityName = data.getString("name");
 			Ability ability = null;

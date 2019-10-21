@@ -3,18 +3,18 @@ package modconfig.gui;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public abstract class GuiBetterSlot
 {
     public final Minecraft mc;
@@ -202,7 +202,7 @@ public abstract class GuiBetterSlot
         this.initialClickY = -2.0F;
     }
 
-    public void actionPerformed(GuiButton par1GuiButton)
+    public void actionPerformed(Button par1GuiButton)
     {
         if (par1GuiButton.enabled)
         {

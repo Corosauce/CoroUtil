@@ -7,7 +7,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Quaternion;
 import org.lwjgl.util.vector.Vector4f;
@@ -56,8 +57,8 @@ public class Foliage implements IShaderRenderedEntity {
 
     private static final Random rand = new Random(439875L);
 
-    private static final NoiseGeneratorPerlin angleNoise = new NoiseGeneratorPerlin(rand, 1);
-    private static final NoiseGeneratorPerlin delayNoise = new NoiseGeneratorPerlin(rand, 3);
+    private static final PerlinNoiseGenerator angleNoise = new PerlinNoiseGenerator(rand, 1);
+    private static final PerlinNoiseGenerator delayNoise = new PerlinNoiseGenerator(rand, 3);
 
     public Foliage(TextureAtlasSprite sprite) {
         particleTexture = sprite;

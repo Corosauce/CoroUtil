@@ -5,11 +5,12 @@ import java.util.LinkedList;
 
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
+import net.minecraft.block.FenceBlock;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.IntHashMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -45,7 +46,7 @@ public class PFQueue implements Runnable {
     public long dropSize = 4; //adjusted per queue request
     
     //hmmmmmmm
-    public EntityCreature entH = null;
+    public CreatureEntity entH = null;
 
     
     //public boolean firstUse = true;
@@ -449,7 +450,7 @@ public class PFQueue implements Runnable {
 		    	//PathPointEx points[] = new PathPointEx[1];
 		        //points[0] = new PathPointEx((int)(var1.posX-0.5), (int)(var1.posY + 4D), (int)(var1.posZ-0.5));
 		        //entC.setPathToEntity(new PathEntityEx(points));
-	    	} else if (var1 instanceof EntityLiving) {
+	    	} else if (var1 instanceof MobEntity) {
 	    		//EntityLiving entL = (EntityLiving)var1;
 	    		//PathPoint points[] = new PathPoint[1];
 		        //points[0] = new PathPoint((int)(var1.posX-0.5), (int)(var1.posY + 4D), (int)(var1.posZ-0.5));
@@ -473,7 +474,7 @@ public class PFQueue implements Runnable {
     }
     
     public static boolean isFenceLike(Block block) {
-    	return block instanceof BlockFence || block == Blocks.COBBLESTONE_WALL;
+    	return block instanceof FenceBlock || block == Blocks.COBBLESTONE_WALL;
     }
     
     public static boolean isPressurePlate(Block block) {
