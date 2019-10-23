@@ -16,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -69,7 +69,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     		}
     		
     		for (int j = 0; j < listBlacklistNamess.size(); j++) {
-    			if (world != null && world.provider.getDimensionType().getName().contains(listBlacklistNamess.get(j))) {
+    			if (world != null && world.provider.getType().getName().contains(listBlacklistNamess.get(j))) {
         			skip = true;
         			break;
         		}
@@ -111,7 +111,7 @@ public class DimensionChunkCacheNew implements IBlockAccess {
     			if (ConfigCoroUtilAdvanced.usePlayerRadiusChunkLoadingForFallback) {
     				System.out.println("unable to get loaded chunks, reverting to potentially cpu/memory heavy player radius method, to deactivate set usePlayerRadiusChunkLoadingForFallback in CoroUtil.cfg to false");
     			} else {
-    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getDimensionType().getName());
+    				System.out.println("loadedChunks is null, DimensionChunkCache unable to cache chunk data for dimension: " + world.provider.getDimension() + " - " + world.provider.getType().getName());
     			}
     		}
 	    	

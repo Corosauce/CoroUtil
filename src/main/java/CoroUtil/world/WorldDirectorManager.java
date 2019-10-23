@@ -158,7 +158,7 @@ public class WorldDirectorManager {
 		}
 	}
 	
-	public void onTick() {
+	public void tick() {
 		
 		Iterator<WorldDirector> it = listWorldDirectors.iterator();
 		while (it.hasNext()) {

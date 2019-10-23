@@ -11,7 +11,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -36,7 +36,7 @@ public class CoroUtilFile {
 				System.out.println("CoroUtilFile: getExtraWorldNBT: Error loading " + saveFolder + fileName);
 			}
 			
-			//NBTTagList var14 = gameData.getTagList("playerData");
+			//NBTTagList var14 = gameData.getList("playerData");
 		}
 		
 		return data;
@@ -96,18 +96,18 @@ public class CoroUtilFile {
     
     @OnlyIn(Dist.CLIENT)
 	public static String getClientSidePath() {
-		return FMLClientHandler.instance().getClient().mcDataDir/*getAppDir("minecraft")*/.getPath();
+		return FMLClientHandler.instance().getClient().gameDir/*getAppDir("minecraft")*/.getPath();
 	}
     
     public static void writeCoords(String name, BlockCoord coords, CompoundNBT nbt) {
-    	nbt.setInteger(name + "X", coords.posX);
-    	nbt.setInteger(name + "Y", coords.posY);
-    	nbt.setInteger(name + "Z", coords.posZ);
+    	nbt.putInt(name + "X", coords.posX);
+    	nbt.putInt(name + "Y", coords.posY);
+    	nbt.putInt(name + "Z", coords.posZ);
     }
     
     public static BlockCoord readCoords(String name, CompoundNBT nbt) {
-    	if (nbt.hasKey(name + "X")) {
-    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInteger(name + "Y"), nbt.getInteger(name + "Z"));
+    	if (nbt.contains(name + "X")) {
+    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInt(name + "Y"), nbt.getInt(name + "Z"));
     	} else {
     		return null;
     	}
@@ -116,7 +116,7 @@ public class CoroUtilFile {
     @OnlyIn(Dist.CLIENT)
     public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
 		try {
-			IResourceManager resourceManager = Minecraft.getMinecraft().entityRenderer.resourceManager;
+			IResourceManager resourceManager = Minecraft.getInstance().gameRenderer.resourceManager;
 			IResource iresource = resourceManager.getResource(resourceLocation);
 			String contents = IOUtils.toString(iresource.getInputStream(), StandardCharsets.UTF_8);
 			return contents;

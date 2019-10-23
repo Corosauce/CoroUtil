@@ -86,24 +86,24 @@ public class CommonProxy implements IGuiHandler
                 new ItemStack(itemRepairingGel, 1), new Object[] {"X X", "   ", "XXX", 'X', Items.GOLD_INGOT});*/
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName) {
-        addBlock(event, block, tEnt, unlocalizedName, true);
+    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String translationKey) {
+        addBlock(event, block, tEnt, translationKey, true);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String unlocalizedName, boolean creativeTab) {
-        addBlock(event, block, unlocalizedName, creativeTab);
-        GameRegistry.registerTileEntity(tEnt, CoroUtil.modID + ":" + unlocalizedName);
+    public void addBlock(RegistryEvent.Register<Block> event, Block block, Class tEnt, String translationKey, boolean creativeTab) {
+        addBlock(event, block, translationKey, creativeTab);
+        GameRegistry.registerTileEntity(tEnt, CoroUtil.modID + ":" + translationKey);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName) {
-        addBlock(event, parBlock, unlocalizedName, true);
+    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String translationKey) {
+        addBlock(event, parBlock, translationKey, true);
     }
 
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
-        //GameRegistry.registerBlock(parBlock, unlocalizedName);
+    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String translationKey, boolean creativeTab) {
+        //GameRegistry.registerBlock(parBlock, translationKey);
 
-        parBlock.setUnlocalizedName(getNameUnlocalized(unlocalizedName));
-        parBlock.setRegistryName(getNameDomained(unlocalizedName));
+        parBlock.setUnlocalizedName(getNameUnlocalized(translationKey));
+        parBlock.setRegistryName(getNameDomained(translationKey));
 
         parBlock.setCreativeTab(ItemGroup.MISC);
 

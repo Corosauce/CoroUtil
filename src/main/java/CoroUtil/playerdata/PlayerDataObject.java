@@ -9,7 +9,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompoundNBT;
 
 /**
- * Old design, just use entity.getEntityData() nbt
+ * Old design, just use entity.getPersistentData() nbt
  * 
  * @author Corosus
  *
@@ -43,11 +43,11 @@ public class PlayerDataObject {
 			Map.Entry pairs = (Map.Entry)it.next();
 			
 			String entryModule = (String)pairs.getKey();
-			IPlayerData pdo = (IPlayerData)pairs.getValue();
+			IPlayerData pdo = (IPlayerData)pairs.get();
 
 			pdo.init(username);
 			
-			CompoundNBT nbt = parNBT.getCompoundTag(entryModule);
+			CompoundNBT nbt = parNBT.getCompound(entryModule);
 			if (nbt != null) {
 				pdo.nbtLoad(nbt);
 			} else {
@@ -64,9 +64,9 @@ public class PlayerDataObject {
 			Map.Entry pairs = (Map.Entry)it.next();
 			
 			String entryModule = (String)pairs.getKey();
-			IPlayerData pdo = (IPlayerData)pairs.getValue();
+			IPlayerData pdo = (IPlayerData)pairs.get();
 			
-			CompoundNBT nbt = data.getCompoundTag(entryModule);
+			CompoundNBT nbt = data.getCompound(entryModule);
 			if (nbt != null) {
 				pdo.nbtSyncFromServer(nbt);
 			}

@@ -52,7 +52,7 @@ public class CoroUtilBlockState {
 		if (partialState.getBlock() != fullState.getBlock()) return false;
 		//ImmutableSet<IProperty<?>> temp = partialState.getProperties().keySet();
 		for (IProperty<?> prop : partialState.getProperties().keySet()) {
-			if (partialState.getValue(prop) != fullState.getValue(prop)) {
+			if (partialState.get(prop) != fullState.get(prop)) {
 				return false;
 			}
 		}
@@ -104,13 +104,13 @@ public class CoroUtilBlockState {
 				ImmutableMap.Builder<IProperty<?>, Comparable<?>> builder = ImmutableMap.builder();
 				//IBlockState iblockstate = p_190794_0_.getDefaultState();
 
-				//builder.put(BlockDoublePlant.VARIANT, BlockDoublePlant.EnumPlantType.SUNFLOWER);
+				//builder.put(BlockDoublePlant.name, BlockDoublePlant.EnumPlantType.SUNFLOWER);
 
 				//need to convert from Immutable
 				for (Map.Entry< IProperty<?>, Comparable<? >> entry : map.entrySet())
 				{
-					//iblockstate = getBlockState(iblockstate, entry.getKey(), entry.getValue());
-					builder.put(entry.getKey(), entry.getValue());
+					//iblockstate = getBlockState(iblockstate, entry.getKey(), entry.get());
+					builder.put(entry.getKey(), entry.get());
 				}
 
 				BlockState iblockstate = new CoroUtilBlockState.StateImplementationImpl(p_190794_0_, builder.build());
@@ -122,7 +122,7 @@ public class CoroUtilBlockState {
 			}
 			catch (RuntimeException var6)
 			{
-				throw new InvalidBlockStateException("commands.generic.blockstate.invalid", new Object[] {p_190794_1_, Block.REGISTRY.getNameForObject(p_190794_0_)});
+				throw new InvalidBlockStateException("commands.generic.blockstate.invalid", new Object[] {p_190794_1_, Block.REGISTRY.getKey(p_190794_0_)});
 			}
 		}
 	}
@@ -172,13 +172,13 @@ public class CoroUtilBlockState {
 				map.put(iproperty, comparable);
 			}
 
-			throw new InvalidBlockStateException("commands.generic.blockstate.invalid", new Object[] {p_190795_1_, Block.REGISTRY.getNameForObject(p_190795_0_)});
+			throw new InvalidBlockStateException("commands.generic.blockstate.invalid", new Object[] {p_190795_1_, Block.REGISTRY.getKey(p_190795_0_)});
 		}
 	}
 
 	private static <T extends Comparable<T>> BlockState getBlockState(BlockState p_190793_0_, IProperty<T> p_190793_1_, Comparable<?> p_190793_2_)
 	{
-		return p_190793_0_.withProperty(p_190793_1_, (T)p_190793_2_);
+		return p_190793_0_.with(p_190793_1_, (T)p_190793_2_);
 	}
 
 	@Nullable

@@ -30,20 +30,20 @@ public class EventHandlerPacket {
 			
 			//System.out.println("command: " + command);
 
-			Minecraft.getMinecraft().addScheduledTask(() -> {
+			Minecraft.getInstance().execute(() -> {
 				if (command.equals("setData")) {
 					String modID = nbt.getString("modID");
-					CompoundNBT nbtEntries = nbt.getCompoundTag("entries");
-					//int entryCount = nbt.getInteger("entryCount");
+					CompoundNBT nbtEntries = nbt.getCompound("entries");
+					//int entryCount = nbt.getInt("entryCount");
 					int pos = 0;
 					//ConfigMod.dbg("modconfig packet, size: " + "derp");
 					if (!GuiConfigEditor.clientMode || ConfigMod.configLookup.get(modID).configData.size() == 0) {
 						ConfigMod.configLookup.get(modID).configData.clear();
-						//Iterator it = nbtEntries.getTagList(p_150295_1_, p_150295_2_)
-						Iterator it = nbtEntries.getKeySet().iterator();
+						//Iterator it = nbtEntries.getList(p_150295_1_, p_150295_2_)
+						Iterator it = nbtEntries.keySet().iterator();
 						while (it.hasNext()) {
 							String tagName = (String) it.next();
-							CompoundNBT entry = nbtEntries.getCompoundTag(tagName);
+							CompoundNBT entry = nbtEntries.getCompound(tagName);
 							String str1 = entry.getString("name");
 							String str2 = entry.getString("value");
 							String str3 = "";//dis.readUTF();
@@ -57,7 +57,7 @@ public class EventHandlerPacket {
 						}
 					}
 				} else if (command.equals("openGUI")) {
-					Minecraft.getMinecraft().displayGuiScreen(new GuiConfigEditor());
+					Minecraft.getInstance().displayGuiScreen(new GuiConfigEditor());
 				}
 			});
 
@@ -78,7 +78,7 @@ public class EventHandlerPacket {
 			
 			//System.out.println("command: " + command);
 
-			entP.mcServer.addScheduledTask(() -> {
+			entP.server.execute(() -> {
 				if (command.equals("setData")) {
 					String data = nbt.getString("data");
 

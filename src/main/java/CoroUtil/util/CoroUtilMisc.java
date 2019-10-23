@@ -33,7 +33,7 @@ public class CoroUtilMisc {
         }
         else
         {
-            d2 = (par1Entity.getEntityBoundingBox().minY + par1Entity.getEntityBoundingBox().maxY) / 2.0D - (entToRotate.posY + (double)entToRotate.getEyeHeight());
+            d2 = (par1Entity.getBoundingBox().minY + par1Entity.getBoundingBox().maxY) / 2.0D - (entToRotate.posY + (double)entToRotate.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt(d0 * d0 + d1 * d1);
@@ -125,7 +125,7 @@ public class CoroUtilMisc {
 
             for (EntityClassification type : EntityClassification.values()) {
 
-                List<Biome.SpawnListEntry> list = biome.getSpawnableList(type);
+                List<Biome.SpawnListEntry> list = biome.getSpawns(type);
                 boolean found = false;
                 String str = "";
                 int totalWeight = 0;

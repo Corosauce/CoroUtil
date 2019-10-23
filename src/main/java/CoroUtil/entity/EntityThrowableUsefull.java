@@ -51,7 +51,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         this.setSize(0.25F, 0.25F);
     }
 
-    protected void entityInit() {}
+    protected void registerData() {}
 
     @OnlyIn(Dist.CLIENT)
 
@@ -61,7 +61,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      */
     public boolean isInRangeToRenderDist(double par1)
     {
-        double d1 = this.getEntityBoundingBox().getAverageEdgeLength() * 4.0D;
+        double d1 = this.getBoundingBox().getAverageEdgeLength() * 4.0D;
         d1 *= 64.0D;
         return par1 < d1 * d1;
     }
@@ -186,14 +186,14 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     }
 
     /**
-     * Called to update the entity's position/logic.
+     * Called to tick the entity's position/logic.
      */
-    public void onUpdate()
+    public void tick()
     {
         this.lastTickPosX = this.posX;
         this.lastTickPosY = this.posY;
         this.lastTickPosZ = this.posZ;
-        super.onUpdate();
+        super.tick();
 
         if (this.throwableShake > 0)
         {
@@ -201,7 +201,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
 
         if (this.isCollidedHorizontally) {
-        	this.setDead();
+        	this.remove();
         }
         
         if (this.inGround)
@@ -214,7 +214,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
                 if (this.ticksInGround == 1200)
                 {
-                    this.setDead();
+                    this.remove();
                 }
 
                 return;
@@ -233,7 +233,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
         
         if (ticksExisted >= ticksMaxAlive) {
-        	setDead();
+        	remove();
         }
 
         Vec3 vec3 = new Vec3(this.posX, this.posY, this.posZ);
@@ -244,7 +244,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
 
         if (movingobjectposition != null)
         {
-            vec31 = new Vec3(movingobjectposition.hitVec.x, movingobjectposition.hitVec.y, movingobjectposition.hitVec.z);
+            vec31 = new Vec3(movingobjectposition.hitResult.x, movingobjectposition.hitResult.y, movingobjectposition.hitResult.z);
         }
 
         if (!this.world.isRemote)
@@ -302,7 +302,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             for (int k = 0; k < 4; ++k)
             {
                 float f4 = 0.25F;
-                this.world.spawnParticle(ParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
+                this.world.addParticle(ParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ);
             }
 
             f2 = 0.8F;
@@ -373,7 +373,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
         }
         else
         {
-            d1 = (p_70625_1_.getEntityBoundingBox().minY + p_70625_1_.getEntityBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
+            d1 = (p_70625_1_.getBoundingBox().minY + p_70625_1_.getBoundingBox().maxY) / 2.0D - (this.posY + (double)this.getEyeHeight());
         }
 
         double d3 = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
@@ -405,7 +405,7 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
     
     public RayTraceResult tickEntityCollision(Vec3 vec3, Vec3 vec31) {
     	Entity entity = null;
-        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+        List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
         double d0 = 0.0D;
         LivingEntity entityliving = this.getThrower();
 
@@ -416,12 +416,12 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
             if (entity1.canBeCollidedWith() && (entity1 != entityliving || this.ticksInAir >= 5))
             {
                 float f = 0.3F;
-                AxisAlignedBB axisalignedbb = entity1.getEntityBoundingBox().grow((double)f, (double)f, (double)f);
+                AxisAlignedBB axisalignedbb = entity1.getBoundingBox().grow((double)f, (double)f, (double)f);
                 RayTraceResult movingobjectposition1 = axisalignedbb.calculateIntercept(vec3.toMCVec(), vec31.toMCVec());
 
                 if (movingobjectposition1 != null)
                 {
-                    double d1 = vec3.toMCVec().distanceTo(movingobjectposition1.hitVec);
+                    double d1 = vec3.toMCVec().distanceTo(movingobjectposition1.hitResult);
 
                     if (d1 < d0 || d0 == 0.0D)
                     {
@@ -451,33 +451,33 @@ public abstract class EntityThrowableUsefull extends Entity implements IProjecti
      * Called when this EntityThrowable hits a block or entity.
      */
     protected void onImpact(RayTraceResult movingobjectposition) {
-    	setDead();
+    	remove();
     }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(CompoundNBT par1NBTTagCompound)
+    public void writeAdditional(CompoundNBT par1NBTTagCompound)
     {
-        par1NBTTagCompound.setShort("xTile", (short)this.xTile);
-        par1NBTTagCompound.setShort("yTile", (short)this.yTile);
-        par1NBTTagCompound.setShort("zTile", (short)this.zTile);
-        par1NBTTagCompound.setByte("inTile", (byte)Block.getIdFromBlock(this.inTile));
-        par1NBTTagCompound.setByte("shake", (byte)this.throwableShake);
-        par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
+        par1NBTTagCompound.putShort("xTile", (short)this.xTile);
+        par1NBTTagCompound.putShort("yTile", (short)this.yTile);
+        par1NBTTagCompound.putShort("zTile", (short)this.zTile);
+        par1NBTTagCompound.putByte("inTile", (byte)Block.getIdFromBlock(this.inTile));
+        par1NBTTagCompound.putByte("shake", (byte)this.throwableShake);
+        par1NBTTagCompound.putByte("inGround", (byte)(this.inGround ? 1 : 0));
 
         if ((this.throwerName == null || this.throwerName.length() == 0) && this.thrower != null && this.thrower instanceof PlayerEntity)
         {
             this.throwerName = CoroUtilEntity.getName(thrower);
         }
 
-        par1NBTTagCompound.setString("ownerName", this.throwerName == null ? "" : this.throwerName);
+        par1NBTTagCompound.putString("ownerName", this.throwerName == null ? "" : this.throwerName);
     }
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(CompoundNBT par1NBTTagCompound)
+    public void readAdditional(CompoundNBT par1NBTTagCompound)
     {
         this.xTile = par1NBTTagCompound.getShort("xTile");
         this.yTile = par1NBTTagCompound.getShort("yTile");

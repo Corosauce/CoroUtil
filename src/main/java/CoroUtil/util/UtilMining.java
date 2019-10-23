@@ -1,6 +1,6 @@
 package CoroUtil.util;
 
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.ai.goalSelector.TaskDigTowardsTarget;
 import CoroUtil.config.ConfigBlockDestruction;
 import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.forge.CULog;
@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
@@ -158,15 +158,15 @@ public class UtilMining {
 
 
 		BlockState state1 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
-				.withProperty(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UPPER);
+				.with(DoublePlantBlock.name, DoublePlantBlock.EnumPlantType.SUNFLOWER)
+				.with(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UP);
 
 		BlockState state2 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
-				.withProperty(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UPPER);
+				.with(DoublePlantBlock.name, DoublePlantBlock.EnumPlantType.SUNFLOWER)
+				.with(DoublePlantBlock.HALF, DoublePlantBlock.EnumBlockHalf.UP);
 
 		BlockState state3 = Blocks.DOUBLE_PLANT.getDefaultState()
-				.withProperty(DoublePlantBlock.VARIANT, DoublePlantBlock.EnumPlantType.SUNFLOWER)
+				.with(DoublePlantBlock.name, DoublePlantBlock.EnumPlantType.SUNFLOWER)
 
 				;
 
@@ -176,7 +176,7 @@ public class UtilMining {
 
 		try {
 			state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.DOUBLE_PLANT, str);
-			//state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.GRASS, str);
+			//state5 = CoroUtilBlockState.convertArgToPartialBlockState(Blocks.ORGANIC, str);
 		} catch (NumberInvalidException e) {
 			e.printStackTrace();
 		} catch (InvalidBlockStateException e) {
@@ -294,7 +294,7 @@ public class UtilMining {
 			}
 
 			if (actuallyRemoved) {
-				stateRemove.getBlock().onBlockDestroyedByPlayer(world, pos, stateRemove);
+				stateRemove.getBlock().onPlayerDestroy(world, pos, stateRemove);
 				if (canHarvest) {
 					ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
 					stateRemove.getBlock().harvestBlock(world, player, pos, stateRemove, world.getTileEntity(pos), stack);

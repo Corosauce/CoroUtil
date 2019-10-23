@@ -17,7 +17,7 @@ public class CoroUtilUUID {
 		Entity ent = null;
         
 		UUID uuid = new UUID(UUIDMost, UUIDLeast);
-        List list = parWorld.loadedEntityList;//.getEntitiesWithinAABB(EntityLivingBase.class, this.boundingBox.expand(10.0D, 10.0D, 10.0D));
+        List list = parWorld.loadedEntityList;//.getEntitiesWithinAABB(EntityLivingBase.class, this.bounds.expand(10.0D, 10.0D, 10.0D));
         Iterator iterator = list.iterator();
 
         while (iterator.hasNext())

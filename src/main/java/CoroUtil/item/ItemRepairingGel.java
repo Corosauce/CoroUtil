@@ -46,7 +46,7 @@ public class ItemRepairingGel extends Item
 
                         ((TileEntityRepairingBlock) tEnt).restoreBlock();
 
-                        if (!player.capabilities.isCreativeMode) {
+                        if (!player.abilities.isCreativeMode) {
                             itemstack.shrink(1);
                         }
 

@@ -28,7 +28,7 @@ public class Headshots {
 						
 						if (source.getImmediateSource() instanceof AbstractArrowEntity) {
 							double realPosY = source.getImmediateSource().posY + source.getImmediateSource().motionY;
-							double arrowHeight = realPosY - event.getEntity().getEntityBoundingBox().minY;
+							double arrowHeight = realPosY - event.getEntity().getBoundingBox().minY;
 							/*System.out.println("arrow height: " + arrowHeight);
 							System.out.println("mob: " + event.getEntity());*/
 							

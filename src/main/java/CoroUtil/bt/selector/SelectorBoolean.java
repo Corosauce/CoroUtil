@@ -25,18 +25,18 @@ public class SelectorBoolean extends Selector {
 	@Override
 	public EnumBehaviorState tick() {
 		//== false required apparently
-		if (valRef.getValue() == false) {
-			dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 0");
+		if (valRef.get() == false) {
+			dbg("valRef.get() is " + valRef.get() + ", exec: 0");
 			setState(children.get(0).tick());
 		} else {
-			dbg("valRef.getValue() is " + valRef.getValue() + ", exec: 1");
+			dbg("valRef.get() is " + valRef.get() + ", exec: 1");
 			setState(children.get(1).tick());
 		}
-		if (valRef.getValue() != lastVal) {
-			dbg("switch to " + valRef.getValue());
-			lastVal = valRef.getValue();
+		if (valRef.get() != lastVal) {
+			dbg("switch to " + valRef.get());
+			lastVal = valRef.get();
 		}
-		if (shouldPrintDebug()) dbg(valRef.getValue());
+		if (shouldPrintDebug()) dbg(valRef.get());
 		return this.state;
 	}
 }

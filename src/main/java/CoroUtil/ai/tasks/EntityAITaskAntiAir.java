@@ -58,7 +58,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     	if (entity.getAttackTarget() != null || autoAttackTest) {
     		targetLastTracked = getFlyingPlayerNear();
     		return targetLastTracked != null;
-    		/*if (entity.worldObj.getTotalWorldTime() % 60 == 0) {
+    		/*if (entity.worldObj.getGameTime() % 60 == 0) {
     			return true;
     		}*/
     		
@@ -104,7 +104,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     			//entity.dismountEntity(entityIn);
     			//since removePassenger is private i guess just remove all...
     			//oh wait
-    			ent.dismountRidingEntity();
+    			ent.stopRiding();
     			//entity.removePassengers();
     			//break;
     		}
@@ -119,7 +119,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
      * Updates the task
      */
     @Override
-	public void updateTask()
+	public void tick()
     {
     	
     	entity.fallDistance = 0;
@@ -134,7 +134,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 	    		//System.out.println(targetLastTracked.motionY);
 	    		
 	    		
-	    		long time = targetLastTracked.getEntityData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime);
+	    		long time = targetLastTracked.getPersistentData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime);
 	    		boolean inAirLongEnough = time > ConfigHWMonsters.antiAirLeapRate;
 	    		
 	    		if (ConfigHWMonsters.antiAirType == 0) {
@@ -179,8 +179,8 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 			    					targetLastTracked.startRiding(entity, true);
 				    				//targetLastTracked.mountEntity(entity);
 				    				grabLock = true;
-				    				if (autoAttackTest && targetLastTracked.capabilities.isFlying) {
-				    					targetLastTracked.capabilities.isFlying = false;
+				    				if (autoAttackTest && targetLastTracked.abilities.isFlying) {
+				    					targetLastTracked.abilities.isFlying = false;
 				    				}
 			    				}
 			    				tryingToGrab = false;
@@ -198,9 +198,9 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 			    		
 			    		if (targetLastTracked instanceof ServerPlayerEntity) {
 			    			ServerPlayerEntity entMP = (ServerPlayerEntity) targetLastTracked;
-			    			long lastPullTime = targetLastTracked.getEntityData().getLong(dataPlayerLastPullDownTick);
-			    			if (entMP.world.getTotalWorldTime() != lastPullTime) {
-			    				targetLastTracked.getEntityData().setLong(dataPlayerLastPullDownTick, entMP.world.getTotalWorldTime());
+			    			long lastPullTime = targetLastTracked.getPersistentData().getLong(dataPlayerLastPullDownTick);
+			    			if (entMP.world.getGameTime() != lastPullTime) {
+			    				targetLastTracked.getPersistentData().putLong(dataPlayerLastPullDownTick, entMP.world.getGameTime());
 			    				if (ConfigHWMonsters.antiAirUseRelativeMotion) {
 			    					CoroUtil.eventChannel.sendTo(PacketHelper.getPacketForRelativeMotion(entMP, 0, ConfigHWMonsters.antiAirPullDownRate, 0), entMP);
 			    				} else {
@@ -221,7 +221,7 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
 	    		grabLock = false;
 	    		for (Entity ent : entity.getRecursivePassengers()) {
 	        		if (ent instanceof PlayerEntity) {
-	        			ent.dismountRidingEntity();
+	        			ent.stopRiding();
 	        		}
 	        	}
 		    	/*if (entity.riddenByEntity instanceof EntityPlayer) {
@@ -259,6 +259,6 @@ public class EntityAITaskAntiAir extends Goal implements ITaskInitializer
     }
     
     public boolean isPlayerFlying(PlayerEntity player) {
-    	return player.getEntityData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime) > 0;
+    	return player.getPersistentData().getLong(DynamicDifficulty.dataPlayerDetectInAirTime) > 0;
     }
 }

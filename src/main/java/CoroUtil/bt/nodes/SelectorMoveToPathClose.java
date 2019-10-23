@@ -40,7 +40,7 @@ public class SelectorMoveToPathClose extends Selector {
 		
 		//TODO: 1.8, CARE ABOUT FIXING THIS 
 		
-		/*int pathfindRange = blackboard.distMed.getValue() + 8;
+		/*int pathfindRange = blackboard.distMed.get() + 8;
 		
 		if (blackboard.posMoveTo != null) {
 			double distToPos = blackboard.agent.ent.getDistance(blackboard.posMoveTo.xCoord, blackboard.posMoveTo.yCoord, blackboard.posMoveTo.zCoord);
@@ -49,9 +49,9 @@ public class SelectorMoveToPathClose extends Selector {
 				if (children.size() > 0) return children.get(0).tick();
 			} else {
 				if (ent.onGround || ent.isInWater()) {
-					if ((entInt.getAIBTAgent().pathNav.noPath() && !lastAttemptFailed) || (lastPathTime + repathDelay < ent.world.getTotalWorldTime() && ent.world.getTotalWorldTime() % 20 == 0)) {
-						//System.out.println(distToPos + " insta pathing - " + ent.entityId + " - " + (lastPathTime + repathDelay - ent.world.getTotalWorldTime()));
-						lastPathTime = ent.world.getTotalWorldTime();
+					if ((entInt.getAIBTAgent().pathNav.noPath() && !lastAttemptFailed) || (lastPathTime + repathDelay < ent.world.getGameTime() && ent.world.getGameTime() % 20 == 0)) {
+						//System.out.println(distToPos + " insta pathing - " + ent.entityId + " - " + (lastPathTime + repathDelay - ent.world.getGameTime()));
+						lastPathTime = ent.world.getGameTime();
 						if (partialPathing) {
 							if (lastPathTime % 5 == 0) {
 								//PFQueue based retry code goes here
@@ -76,7 +76,7 @@ public class SelectorMoveToPathClose extends Selector {
 		    							if (result == null || result.isFinished() || result.getCurrentPathLength() <= 2) {
 		    								//System.out.println("try failed");
 		    								lastAttemptFailed = true;
-		    								lastPathTime = ent.world.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
+		    								lastPathTime = ent.world.getGameTime() + repathDelayFailAdd; //add on penalty
 		    							} else {
 			    			        		retryStage = 0;
 		    								//System.out.println("try success");
@@ -94,7 +94,7 @@ public class SelectorMoveToPathClose extends Selector {
 							if (result == null || result.isFinished() || result.getCurrentPathLength() <= 2) {
 								//System.out.println("try failed");
 								lastAttemptFailed = true;
-								lastPathTime = ent.world.getTotalWorldTime() + repathDelayFailAdd; //add on penalty
+								lastPathTime = ent.world.getGameTime() + repathDelayFailAdd; //add on penalty
 							} else {
 								//System.out.println("try success");
 								lastAttemptFailed = false;
@@ -105,7 +105,7 @@ public class SelectorMoveToPathClose extends Selector {
 					}
 				}
 				//entInt.getAIBTAgent().pathNav.setCanSwim(true);
-				entInt.getAIBTAgent().pathNav.onUpdateNavigation();
+				entInt.getAIBTAgent().pathNav.tick();
 			}
 		}*/
 		

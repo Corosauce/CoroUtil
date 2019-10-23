@@ -82,7 +82,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
         {
             return false;
         }
-        else if (!entitylivingbase.isEntityAlive())
+        else if (!entitylivingbase.isAlive())
         {
             return false;
         }
@@ -115,7 +115,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
     public boolean shouldContinueExecuting()
     {
         LivingEntity entitylivingbase = this.entity.getAttackTarget();
-        return entitylivingbase == null ? false : (!entitylivingbase.isEntityAlive() ? false : (!this.longMemory ? !this.entity.getNavigator().noPath() : this.entity.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(entitylivingbase.posX), MathHelper.floor(entitylivingbase.posY), MathHelper.floor(entitylivingbase.posZ)))));
+        return entitylivingbase == null ? false : (!entitylivingbase.isAlive() ? false : (!this.longMemory ? !this.entity.getNavigator().noPath() : this.entity.isWithinHomeDistanceFromPosition(new BlockPos(MathHelper.floor(entitylivingbase.posX), MathHelper.floor(entitylivingbase.posY), MathHelper.floor(entitylivingbase.posZ)))));
     }
 
     /**
@@ -141,7 +141,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
      * Updates the task
      */
     @Override
-    public void updateTask()
+    public void tick()
     {
     	//add to config!
     	double lungeDist = ConfigHWMonsters.lungeDist;
@@ -158,8 +158,8 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
             return;
         }
 
-        this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
-        double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+        this.entity.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+        double d0 = this.entity.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
         double d1 = (double)(/*Math.sqrt(*/this.entity.width * 2.0F * this.entity.width * 2.0F/*)*/ + entitylivingbase.width);
         --this.delayCounter;
         //TEST
@@ -171,7 +171,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
         		entitylivingbase.getDistanceSq(this.x, this.y, this.z) >= 1.0D || this.entity.getRNG().nextFloat() < 0.05F))
         {
             this.x = entitylivingbase.posX;
-            this.y = entitylivingbase.getEntityBoundingBox().minY;
+            this.y = entitylivingbase.getBoundingBox().minY;
             this.z = entitylivingbase.posZ;
             this.delayCounter = failedPathFindingPenalty + 4 + this.entity.getRNG().nextInt(7);
 
@@ -204,15 +204,15 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
             boolean pathResult = false;
             
             if (canUseLunging()) {
-	            double curSpeed = entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue();
+	            double curSpeed = entity.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).get();
 	            
 	            if (d0 <= lungeDist * lungeDist && curSpeed < UtilEntityBuffs.speedCap) {
-	            	if (this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(lungeSpeedUUID) == null) {
-	            		this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(this.lungeSpeedModifier);
+	            	if (this.entity.getAttributes().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(lungeSpeedUUID) == null) {
+	            		this.entity.getAttributes().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(this.lungeSpeedModifier);
 	            	}
 	            } else {
-	            	if (this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(lungeSpeedUUID) != null) {
-	            		this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(this.lungeSpeedModifier);
+	            	if (this.entity.getAttributes().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(lungeSpeedUUID) != null) {
+	            		this.entity.getAttributes().getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(this.lungeSpeedModifier);
 	            	}
 	            }
             }
@@ -241,7 +241,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
 	        		AttackData data = DynamicDifficulty.lookupEntToDamageLog.get(entity.getEntityId());
 	        		if (data != null) {
 	        			if (data.getLastLogTime() > this.counterAttackLastHitTime) {
-		        			if (data.getLastLogTime() + counterAttackDetectThreshold < entity.world.getTotalWorldTime()) {
+		        			if (data.getLastLogTime() + counterAttackDetectThreshold < entity.world.getGameTime()) {
 		        				this.counterAttackLastHitTime = data.getLastLogTime() + counterAttackReuseDelay;
 		        				
 		        				double vecX = entitylivingbase.posX - this.entity.posX;
@@ -253,15 +253,15 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
 		        		        this.entity.motionY = 0.4D;
 		        		        
 		        		        //extra vertical
-		        		        if (this.entity.getEntityBoundingBox().minY < entitylivingbase.getEntityBoundingBox().minY) {
-		        		        	double extraY = Math.min(5D, entitylivingbase.getEntityBoundingBox().minY - this.entity.getEntityBoundingBox().minY);
+		        		        if (this.entity.getBoundingBox().minY < entitylivingbase.getBoundingBox().minY) {
+		        		        	double extraY = Math.min(5D, entitylivingbase.getBoundingBox().minY - this.entity.getBoundingBox().minY);
 		        		        	this.entity.motionY += 0.1D * extraY;
 		        		        }
 		        		        
 		                		wasInAir = false;
 		                		leapAttacking = true;
 		                		this.entity.getNavigator().clearPathEntity();
-		                		//important, if you clear path to entity, be sure to update or clear where hes supposed to be last moving to
+		                		//important, if you clear path to entity, be sure to tick or clear where hes supposed to be last moving to
 		                		//if you dont, it could look like they flee
 		                		this.entity.getMoveHelper().setMoveTo(entitylivingbase.posX, entitylivingbase.posY, entitylivingbase.posZ, 1D);
 
@@ -302,7 +302,7 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
             //make sure theyre actually still alive, and can lose more health
             if (entitylivingbase.getHealth() > lowestHealthAllowed) {
                 if (leapAttacking && ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier > 0) {
-                    double extraDamage = this.entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+                    double extraDamage = this.entity.getAttributes().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).get();
                     extraDamage *= ConfigHWMonsters.counterAttackLeapExtraDamageMultiplier;
                     if (this.worldObj.getDifficulty() == Difficulty.EASY) {
                         extraDamage = extraDamage / 2.0F + 1.0F;
@@ -329,11 +329,11 @@ public class EntityAITaskEnhancedCombat extends Goal implements ITaskInitializer
     }
 
     public boolean canUseLeapAttack() {
-        return entity.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap);
+        return entity.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_CounterLeap);
     }
 
     public boolean canUseLunging() {
-        return entity.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Lunge);
+        return entity.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Lunge);
     }
 
 	@Override

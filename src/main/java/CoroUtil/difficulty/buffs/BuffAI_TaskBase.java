@@ -1,9 +1,9 @@
 package CoroUtil.difficulty.buffs;
 
 import CoroUtil.ai.BehaviorModifier;
-import CoroUtil.ai.tasks.EntityAITaskAntiAir;
-import CoroUtil.ai.tasks.EntityAITaskEnhancedCombat;
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.ai.goalSelector.EntityAITaskAntiAir;
+import CoroUtil.ai.goalSelector.EntityAITaskEnhancedCombat;
+import CoroUtil.ai.goalSelector.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.ai.goal.ZombieAttackGoal;
@@ -92,7 +92,7 @@ public class BuffAI_TaskBase extends BuffBase {
         } else {
             //added since addition of allowRedundantAttempts feature
             if (!UtilEntityBuffs.hasTask(ent, task, isTargetTask)) {
-                return UtilEntityBuffs.addTask(ent, task, taskPriority, isTargetTask);
+                return UtilEntityBuffs.addGoal(ent, task, taskPriority, isTargetTask);
             } else {
                 return false;
             }

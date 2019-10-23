@@ -1,6 +1,6 @@
 package CoroUtil.difficulty.data;
 
-import CoroUtil.ai.tasks.*;
+import CoroUtil.ai.goalSelector.*;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.difficulty.buffs.*;
 import CoroUtil.difficulty.data.cmods.*;

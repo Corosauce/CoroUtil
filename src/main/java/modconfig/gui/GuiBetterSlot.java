@@ -119,7 +119,7 @@ public abstract class GuiBetterSlot
     /**
      * Gets the size of the current slot list.
      */
-    protected abstract int getSize();
+    protected abstract int size();
 
     /**
      * the element in the slot that was clicked, boolean for wether it was double clicked or not
@@ -136,7 +136,7 @@ public abstract class GuiBetterSlot
      */
     protected int getContentHeight()
     {
-        return this.getSize() * this.slotHeight + this.field_77242_t;
+        return this.size() * this.slotHeight + this.field_77242_t;
     }
 
     protected abstract void drawBackground();
@@ -155,7 +155,7 @@ public abstract class GuiBetterSlot
         int l = this.width / 2 + 110;
         int i1 = par2 - this.top - this.field_77242_t + (int)this.amountScrolled - 4;
         int j1 = i1 / this.slotHeight;
-        return par1 >= k && par1 <= l && j1 >= 0 && i1 >= 0 && j1 < this.getSize() ? j1 : -1;
+        return par1 >= k && par1 <= l && j1 >= 0 && i1 >= 0 && j1 < this.size() ? j1 : -1;
     }
 
     /**
@@ -229,7 +229,7 @@ public abstract class GuiBetterSlot
         this.mouseX = par1;
         this.mouseY = par2;
         this.drawBackground();
-        int k = this.getSize();
+        int k = this.size();
         
         //System.out.println("SIZE: " + k);
         
@@ -518,7 +518,7 @@ public abstract class GuiBetterSlot
     {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();
-        //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
+        //this.mc.textureManager.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         float f = 32.0F;
@@ -542,7 +542,7 @@ public abstract class GuiBetterSlot
     protected void drawContainerBackground(Tessellator tessellator)
     {
         BufferBuilder vertexbuffer = tessellator.getBuffer();
-        //this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
+        //this.mc.textureManager.bindTexture(BACKGROUND_IMAGE);
         mc.getTextureManager().bindTexture(resBG);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         float height = 32.0F;

@@ -5,8 +5,8 @@ import net.minecraft.nbt.CompoundNBT;
 
 public interface ISerializableNBT {
 
-	public void readFromNBT(CompoundNBT nbt);
+	public void read(CompoundNBT nbt);
 	
-	public CompoundNBT writeToNBT(CompoundNBT nbt);
+	public CompoundNBT write(CompoundNBT nbt);
 	
 }

@@ -11,7 +11,7 @@ public class ParticleTexFX extends EntityRotFX {
     {
         super(worldIn, posXIn, posYIn, posZIn, mX, mY-0.5, mZ);
         this.setParticleTexture(par8Item);
-        //this.setParticleTexture(Minecraft.getMinecraft().getRenderItem().getItemModelMesher().getParticleIcon(Items.IRON_AXE, 0));
+        //this.setParticleTexture(Minecraft.getInstance().getItemRenderer().getItemModelMesher().getParticleIcon(Items.IRON_AXE, 0));
         this.particleRed = 1.0F;
         this.particleGreen = 1.0F;
         this.particleBlue = 1.0F;

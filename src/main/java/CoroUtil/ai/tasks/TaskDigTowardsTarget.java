@@ -124,10 +124,10 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     		}
 
     		//prevent invasion spawned diggers to not dig for players with invasions off
-			if (entity.getEntityData().getBoolean(dataUsePlayerList)) {
+			if (entity.getPersistentData().getBoolean(dataUsePlayerList)) {
 				String playerName = CoroUtilEntity.getName(entity.getAttackTarget());
-				boolean whitelistMode = entity.getEntityData().getBoolean(dataWhitelistMode);
-				String listPlayers = entity.getEntityData().getString(dataListPlayers);
+				boolean whitelistMode = entity.getPersistentData().getBoolean(dataWhitelistMode);
+				String listPlayers = entity.getPersistentData().getString(dataListPlayers);
 
 				if (whitelistMode) {
 					if (!listPlayers.contains(playerName)) {
@@ -196,7 +196,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     public void resetTask()
     {
     	//System.out.println("reset!");
-		//Minecraft.getMinecraft().mouseHelper.ungrabMouseCursor();
+		//Minecraft.getInstance().mouseHelper.ungrabMouseCursor();
     	digTimeCur = 0;
     	//curBlockDamage = 0;
     	listPillarToMine.clear();
@@ -208,7 +208,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
      */
 
     @Override
-    public void updateTask()
+    public void tick()
     {
     	//System.out.println("running!");
 		entity.idleTime = 0;
@@ -243,7 +243,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	
     	double vecX = entity.getAttackTarget().posX - entPosX;
     	//feet
-    	double vecY = entity.getAttackTarget().getEntityBoundingBox().minY - entity.getEntityBoundingBox().minY;
+    	double vecY = entity.getAttackTarget().getBoundingBox().minY - entity.getBoundingBox().minY;
     	double vecZ = entity.getAttackTarget().posZ - entPosZ;
 
     	//get angle, snap it to 90, then reconvert back to scalar which is now locked to best 90 degree option
@@ -295,10 +295,10 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
         //i think the y is the block under feet, not where feet occupy
         //actually, must be where feet occupy...
-        BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(scanZ));
+        BlockPos posFrontFeet = new BlockPos(MathHelper.floor(scanX), MathHelper.floor(entity.getBoundingBox().minY), MathHelper.floor(scanZ));
 
 
-        BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getEntityBoundingBox().minY), MathHelper.floor(entPosZ));
+        BlockPos posFeetCheck = new BlockPos(MathHelper.floor(entPosX), MathHelper.floor(entity.getBoundingBox().minY), MathHelper.floor(entPosZ));
 
         /**
          * when digging up, or down, need to make sure theres space above to jump up to next pillar
@@ -424,7 +424,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 			}
 		}
 
-        setMiningBlock(entity.world.getBlockState(listPillarToMine.getFirst()), new BlockCoord(listPillarToMine.getFirst()));
+        setMiningBlock(entity.world.getBlockState(listPillarToMine.getA()), new BlockCoord(listPillarToMine.getA()));
 
         return true;
 
@@ -447,7 +447,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 			dbg("Detected air or unmineable block, moving to next block in list, cur size: " + listPillarToMine.size());
 			if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
-				BlockPos pos = listPillarToMine.getFirst();
+				BlockPos pos = listPillarToMine.getA();
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 				//return;
 			} else {
@@ -486,7 +486,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
     	}
 
 
-		if (entity.world.getTotalWorldTime() % 10 == 0) {
+		if (entity.world.getGameTime() % 10 == 0) {
 			//entity.swingItem();
 			entity.swingArm(Hand.MAIN_HAND);
 			//System.out.println("swing!");
@@ -499,13 +499,13 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 		BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(entity.world).getBlockData(posCurMining.getX(), posCurMining.getY(), posCurMining.getZ());// ServerTickHandler.wd.getBlockDataGrid(world).getBlockData(newX, newY, newZ);
 		//only allow continual progress if was dug at within last 30 seconds
 		int maxTimeBetweenDigProgress = 20*30;
-		if (bdp.lastTickTimeDig + maxTimeBetweenDigProgress > entity.world.getTotalWorldTime()) {
+		if (bdp.lastTickTimeDig + maxTimeBetweenDigProgress > entity.world.getGameTime()) {
 			//do nothing?
 		} else {
 			//reset it
 			bdp.digDamage = 0;
 		}
-		bdp.lastTickTimeDig = entity.world.getTotalWorldTime();
+		bdp.lastTickTimeDig = entity.world.getGameTime();
 		double digSpeed = ConfigDynamicDifficulty.digSpeed;
 		bdp.digDamage += digSpeed / blockStrength;
     	
@@ -531,7 +531,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
             if (listPillarToMine.size() > 1) {
 				listPillarToMine.removeFirst();
-            	BlockPos pos = listPillarToMine.getFirst();
+            	BlockPos pos = listPillarToMine.getA();
 				setMiningBlock(entity.world.getBlockState(pos), new BlockCoord(pos));
 			} else {
             	listPillarToMine.clear();
@@ -550,7 +550,7 @@ public class TaskDigTowardsTarget extends Goal implements ITaskInitializer, IInv
 
 	@Override
 	public boolean shouldBeRemoved() {
-		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
+		boolean forInvasion = entity.getPersistentData().getBoolean(dataUseInvasionRules);
 
 		if (forInvasion && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
 			//once its day, disable forever

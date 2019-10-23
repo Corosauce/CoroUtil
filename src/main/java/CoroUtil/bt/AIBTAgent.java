@@ -45,7 +45,7 @@ public class AIBTAgent {
 	
 	public AIEventHandler eventHandler;
 	public PersonalityProfile profile;
-	public TeamInstance dipl_info = TeamTypes.getType("neutral");
+	public TeamInstance dipl_info = TeamTypes.getMinecartType("neutral");
 	public BlackboardBase blackboard;
 	public IBTAgent entInt;
 	public AIInventory entInv; //needs proper setup for this AI type
@@ -102,7 +102,7 @@ public class AIBTAgent {
 		ent.entityCollisionReduction = 0.2F;
 	}
 	
-	public void entityInit()
+	public void registerData()
     {
 		//IDS USED ELSEWHERE:
 		//27 is used in baseentai
@@ -223,7 +223,7 @@ public class AIBTAgent {
 		moveSpeed = var;
 	}
 	
-	public void applyEntityAttributes() {
+	public void registerAttributes() {
 		
 		//attribute operators
 		
@@ -234,7 +234,7 @@ public class AIBTAgent {
 		//2: (prev operations) * (1F + modifier) (so a negative can multiply it down)
 		
 		//baseline movespeed
-		ent.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(moveSpeed);
+		ent.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(moveSpeed);
 	}
 	
 	public void tickAI() {
@@ -260,18 +260,18 @@ public class AIBTAgent {
 		
 		//for pathfind based movement
 		//needs conditional
-		//ent.getNavigator().onUpdateNavigation();
+		//ent.getNavigator().tick();
 		double entSpeed = Math.sqrt(ent.motionX + ent.motionX * ent.motionY + ent.motionY * ent.motionZ + ent.motionZ);
 		
 		//dont let them suffocate if they're marked to allow swimming underwater
-		if (blackboard.canSwimPath.getValue()) {
+		if (blackboard.canSwimPath.get()) {
 			ent.setAir(300);
 		}
 		
 		//help!
-		if (ent.isInWater() && !blackboard.canFlyPath.getValue() && !blackboard.canSwimPath.getValue()) {
+		if (ent.isInWater() && !blackboard.canFlyPath.get() && !blackboard.canSwimPath.get()) {
 			//bah!
-			//ent.setDead();
+			//ent.remove();
 			Random rand = new Random();
 			if (entSpeed < 0.5F) {
 				ent.motionX *= 1.4F;
@@ -284,7 +284,7 @@ public class AIBTAgent {
 		}
 		
 		double speed = 0.2D;
-		Block block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getEntityBoundingBox().minY, MathHelper.floor(ent.posZ))).getBlock();
+		Block block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getBoundingBox().minY, MathHelper.floor(ent.posZ))).getBlock();
 		if (PFQueue.isFenceLike(block)) {
 			Random rand = new Random();
 			ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -292,7 +292,7 @@ public class AIBTAgent {
 			ent.motionZ += rand.nextDouble()*speed - rand.nextDouble()*speed;
 			blackboard.posMoveTo = null;
 		} else {
-			block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getEntityBoundingBox().minY-1, MathHelper.floor(ent.posZ))).getBlock();
+			block = ent.world.getBlockState(new BlockPos(MathHelper.floor(ent.posX), (int)ent.getBoundingBox().minY-1, MathHelper.floor(ent.posZ))).getBlock();
 			if (PFQueue.isFenceLike(block)) {
 				Random rand = new Random();
 				ent.motionX += rand.nextDouble()*speed - rand.nextDouble()*speed;
@@ -307,7 +307,7 @@ public class AIBTAgent {
 			//if (ent.motionY < 0.5F) ent.motionY += 0.5F;
 		}
 		
-		if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+		if (blackboard.canFlyPath.get() || blackboard.canSwimPath.get()) {
 			this.ent.fallDistance = 0;
 			
 			//hacky fall fix for flying
@@ -317,12 +317,12 @@ public class AIBTAgent {
 		}
 		
 		//main mc movement class calls
-		moveHelper.onUpdateMoveHelper();
+		moveHelper.tick();
 		
 		//only runs on true AI entities, patched for potential client player usage
 		if (ent instanceof MobEntity) {
-			((MobEntity)ent).getLookHelper().onUpdateLook();
-			((MobEntity)ent).getJumpHelper().doJump();
+			((MobEntity)ent).getLookController().tick();
+			((MobEntity)ent).getJumpController().tick();
 		}
 	}
 	
@@ -342,7 +342,7 @@ public class AIBTAgent {
 			profile.tickAbilities();
 		}
         
-        if (blackboard.canFlyPath.getValue() || blackboard.canSwimPath.getValue()) {
+        if (blackboard.canFlyPath.get() || blackboard.canSwimPath.get()) {
 			this.ent.fallDistance = 0;
 			
 			//ent.onGround = false;
@@ -418,11 +418,11 @@ public class AIBTAgent {
 	}
 	
     public void nbtRead(CompoundNBT par1nbtTagCompound) {
-    	this.entInv.nbtRead(par1nbtTagCompound.getCompoundTag("inventory"));
-    	tickAge = par1nbtTagCompound.getInteger("tickAge");
+    	this.entInv.nbtRead(par1nbtTagCompound.getCompound("inventory"));
+    	tickAge = par1nbtTagCompound.getInt("tickAge");
 		canDespawn = par1nbtTagCompound.getBoolean("canDespawn");
-    	if (par1nbtTagCompound.hasKey("coordsManagedLocationX")) coordsManagedLocation = CoroUtilNBT.readCoords("coordsManagedLocation", par1nbtTagCompound);
-    	if (par1nbtTagCompound.hasKey("coordsHomeX")) coordsHome = CoroUtilNBT.readCoords("coordsHome", par1nbtTagCompound);
+    	if (par1nbtTagCompound.contains("coordsManagedLocationX")) coordsManagedLocation = CoroUtilNBT.readCoords("coordsManagedLocation", par1nbtTagCompound);
+    	if (par1nbtTagCompound.contains("coordsHomeX")) coordsHome = CoroUtilNBT.readCoords("coordsHome", par1nbtTagCompound);
 		
     	profile.nbtRead(par1nbtTagCompound);
     	tamable.setTamedByOwner(par1nbtTagCompound.getString("owner"));
@@ -430,14 +430,14 @@ public class AIBTAgent {
 	}
 	
     public void nbtWrite(CompoundNBT par1nbtTagCompound) {
-    	par1nbtTagCompound.setTag("inventory", entInv.nbtWrite());
-    	par1nbtTagCompound.setInteger("tickAge", tickAge);
-    	par1nbtTagCompound.setBoolean("canDespawn", canDespawn);
+    	par1nbtTagCompound.put("inventory", entInv.nbtWrite());
+    	par1nbtTagCompound.putInt("tickAge", tickAge);
+    	par1nbtTagCompound.putBoolean("canDespawn", canDespawn);
     	if (coordsManagedLocation != null) CoroUtilNBT.writeCoords("coordsManagedLocation", coordsManagedLocation, par1nbtTagCompound);
     	if (coordsHome != null) CoroUtilNBT.writeCoords("coordsHome", coordsHome, par1nbtTagCompound);
     	
     	profile.nbtWrite(par1nbtTagCompound);
-    	par1nbtTagCompound.setString("owner", tamable.owner);
+    	par1nbtTagCompound.putString("owner", tamable.owner);
     	
 	}
     
@@ -465,7 +465,7 @@ public class AIBTAgent {
     			tickDespawn = 0;
     		}
 
-    		if (ent.world.getTotalWorldTime() % 20 == 0) {
+    		if (ent.world.getGameTime() % 20 == 0) {
     			PlayerEntity entityplayer = ent.world.getClosestPlayerToEntity(ent, -1.0D);
 
     			if (entityplayer != null)
@@ -499,7 +499,7 @@ public class AIBTAgent {
     				
     				if (despawn) {
     					//if (blackboard.getTarget() == null) {
-    						ent.setDead();
+    						ent.remove();
     					//}
     				}
     			}

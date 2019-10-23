@@ -73,7 +73,7 @@ public class BuffedLocation extends TickableLocationBase {
             }
         }
 
-        if (world.getTotalWorldTime() % 40 == 0) {
+        if (world.getGameTime() % 40 == 0) {
             //System.out.println("tick! " + origin);
         }
     }
@@ -91,17 +91,17 @@ public class BuffedLocation extends TickableLocationBase {
     }
 
     @Override
-    public void readFromNBT(CompoundNBT parData) {
-        super.readFromNBT(parData);
+    public void read(CompoundNBT parData) {
+        super.read(parData);
         difficulty = parData.getFloat("difficulty");
-        buffDistRadius = parData.getInteger("radius");
+        buffDistRadius = parData.getInt("radius");
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT parData) {
-        parData = super.writeToNBT(parData);
-        parData.setInteger("radius", buffDistRadius);
-        parData.setFloat("difficulty", difficulty);
+    public CompoundNBT write(CompoundNBT parData) {
+        parData = super.write(parData);
+        parData.putInt("radius", buffDistRadius);
+        parData.putFloat("difficulty", difficulty);
         return parData;
     }
 

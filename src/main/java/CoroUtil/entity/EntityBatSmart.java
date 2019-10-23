@@ -48,12 +48,12 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
         this.setIsBatHanging(true);
         //TEMP
         this.setIsBatHanging(false);
-        this.moveHelper = new FlyingMovementController(this);
+        this.moveController = new FlyingMovementController(this);
     }
 
-    protected void entityInit()
+    protected void registerData()
     {
-        super.entityInit();
+        super.registerData();
         this.dataManager.register(HANGING, Byte.valueOf((byte)0));
     }
 
@@ -68,17 +68,17 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
     }
 
     @Override
-    protected void initEntityAI()
+    protected void registerGoals()
     {
-        //this.aiSit = new EntityAISit(this);
-        //this.tasks.addTask(0, new EntityAIPanic(this, 1.25D));
-        this.tasks.addTask(0, new SwimGoal(this));
-        this.tasks.addTask(1, new LookAtGoal(this, PlayerEntity.class, 8.0F));
-        //this.tasks.addTask(2, this.aiSit);
-        //this.tasks.addTask(2, new EntityAIFollowOwnerFlying(this, 1.0D, 5.0F, 1.0F));
-        this.tasks.addTask(2, new WaterAvoidingRandomFlyingGoal(this, 1.0D));
-        //this.tasks.addTask(3, new EntityAILandOnOwnersShoulder(this));
-        //this.tasks.addTask(3, new EntityAIFollow(this, 1.0D, 3.0F, 7.0F));
+        //this.field_70911_d = new EntityAISit(this);
+        //this.goalSelector.addGoal(0, new EntityAIPanic(this, 1.25D));
+        this.goalSelector.addGoal(0, new SwimGoal(this));
+        this.goalSelector.addGoal(1, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        //this.goalSelector.addGoal(2, this.field_70911_d);
+        //this.goalSelector.addGoal(2, new EntityAIFollowOwnerFlying(this, 1.0D, 5.0F, 1.0F));
+        this.goalSelector.addGoal(2, new WaterAvoidingRandomFlyingGoal(this, 1.0D));
+        //this.goalSelector.addGoal(3, new EntityAILandOnOwnersShoulder(this));
+        //this.goalSelector.addGoal(3, new EntityAIFollow(this, 1.0D, 3.0F, 7.0F));
     }
 
     /**
@@ -129,13 +129,13 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
     {
     }
 
-    protected void applyEntityAttributes()
+    protected void registerAttributes()
     {
-        super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(6.0D);
-        this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
-        this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4000000059604645D);
-        this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20000000298023224D);
+        super.registerAttributes();
+        this.getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(6.0D);
+        this.getAttributes().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
+        this.getAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.4000000059604645D);
+        this.getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.20000000298023224D);
     }
 
     public boolean getIsBatHanging()
@@ -158,11 +158,11 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
     }
 
     /**
-     * Called to update the entity's position/logic.
+     * Called to tick the entity's position/logic.
      */
-    public void onUpdate()
+    public void tick()
     {
-        super.onUpdate();
+        super.tick();
 
         if (this.getIsBatHanging())
         {
@@ -255,7 +255,7 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
      */
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
-        if (this.isEntityInvulnerable(source))
+        if (this.isInvulnerableTo(source))
         {
             return false;
         }
@@ -273,19 +273,19 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(CompoundNBT compound)
+    public void readAdditional(CompoundNBT compound)
     {
-        super.readEntityFromNBT(compound);
+        super.readAdditional(compound);
         this.dataManager.set(HANGING, Byte.valueOf(compound.getByte("BatFlags")));
     }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(CompoundNBT compound)
+    public void writeAdditional(CompoundNBT compound)
     {
-        super.writeEntityToNBT(compound);
-        compound.setByte("BatFlags", ((Byte)this.dataManager.get(HANGING)).byteValue());
+        super.writeAdditional(compound);
+        compound.putByte("BatFlags", ((Byte)this.dataManager.get(HANGING)).byteValue());
     }
 
     /**
@@ -293,7 +293,7 @@ public class EntityBatSmart extends CreatureEntity implements IFlyingAnimal
      */
     public boolean getCanSpawnHere()
     {
-        BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+        BlockPos blockpos = new BlockPos(this.posX, this.getBoundingBox().minY, this.posZ);
 
         if (blockpos.getY() >= this.world.getSeaLevel())
         {

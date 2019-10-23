@@ -118,20 +118,20 @@ public class PlayerQuestManager {
 	
 	public void onEvent(Event event) {
 		for (Map.Entry<String, PlayerQuests> entry : playerQuests.entrySet()) {
-			entry.getValue().onEvent(event);
+			entry.get().onEvent(event);
 		}
 	}
 	
 	public void saveData(boolean andSync, boolean andUnload) {
 		for (Map.Entry<String, PlayerQuests> entry : playerQuests.entrySet()) {
 			if (andSync) {
-				entry.getValue().saveAndSyncPlayer();
+				entry.get().saveAndSyncPlayer();
 			} else {
-				entry.getValue().diskSaveToFile();
+				entry.get().diskSaveToFile();
 			}
 			
 			if (andUnload) {
-				entry.getValue().reset();
+				entry.get().reset();
 			}
 		}/*
 		for (int i = 0; i < parWorld.playerEntities.size(); i++) {
@@ -144,7 +144,7 @@ public class PlayerQuestManager {
 	//its assumed the data was saved already
 	public void reset() {
 		for (Map.Entry<String, PlayerQuests> entry : playerQuests.entrySet()) {
-			entry.getValue().reset();
+			entry.get().reset();
 		}
 		playerQuests.clear();
 	}

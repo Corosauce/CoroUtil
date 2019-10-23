@@ -27,11 +27,11 @@ public class OrdersData {
 		return importance;
 	}
 	
-	/*public void readFromNBT(NBTTagCompound parNBT) {
+	/*public void read(NBTTagCompound parNBT) {
 		
 	}*/
 	
-	public CompoundNBT writeToNBT(CompoundNBT parentCompound) {
+	public CompoundNBT write(CompoundNBT parentCompound) {
 		return parentCompound;
 	}
 }

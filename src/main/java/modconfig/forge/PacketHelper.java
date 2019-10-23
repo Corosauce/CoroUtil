@@ -8,27 +8,27 @@ public class PacketHelper {
 
     public static FMLProxyPacket getModConfigPacketMenu() {
     	CompoundNBT nbt = new CompoundNBT();
-		nbt.setString("command", "openGUI");
+		nbt.putString("command", "openGUI");
     	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
     }
     
     public static FMLProxyPacket getModConfigPacket(String modid) {
     	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString("command", "setData");
-    	nbt.setString("modID", modid);
+    	nbt.putString("command", "setData");
+    	nbt.putString("modID", modid);
     	ConfigMod.populateData(modid);
     	
     	CompoundNBT nbtEntries = new CompoundNBT();
     	
     	for (int i = 0; i < ConfigMod.configLookup.get(modid).configData.size(); i++) {
     		CompoundNBT nbtEntry = new CompoundNBT();
-    		nbtEntry.setString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
-    		nbtEntry.setString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
-    		nbtEntries.setTag("entry_" + i, nbtEntry);
+    		nbtEntry.putString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
+    		nbtEntry.putString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
+    		nbtEntries.put("entry_" + i, nbtEntry);
     	}
     	
-    	nbt.setTag("entries", nbtEntries);
+    	nbt.put("entries", nbtEntries);
     	
     	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
     }
@@ -36,21 +36,21 @@ public class PacketHelper {
     public static FMLProxyPacket getModConfigPacketForClientToServer(String data) {
     	CompoundNBT nbt = new CompoundNBT();
     	
-    	nbt.setString("command", "setData");
-    	//nbt.setString("modID", modid);
-    	nbt.setString("data", data);
+    	nbt.putString("command", "setData");
+    	//nbt.putString("modID", modid);
+    	nbt.putString("data", data);
     	//ConfigMod.populateData(modid);
     	
     	/*NBTTagCompound nbtEntries = new NBTTagCompound();
     	
     	for (int i = 0; i < ConfigMod.configLookup.get(modid).configData.size(); i++) {
     		NBTTagCompound nbtEntry = new NBTTagCompound();
-    		nbtEntry.setString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
-    		nbtEntry.setString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
-    		nbtEntries.setTag("entry_" + i, nbtEntry);
+    		nbtEntry.putString("name", (String)ConfigMod.configLookup.get(modid).configData.get(i).name);
+    		nbtEntry.putString("value", String.valueOf(ConfigMod.configLookup.get(modid).configData.get(i).value));
+    		nbtEntries.put("entry_" + i, nbtEntry);
     	}
     	
-    	nbt.setTag("entries", nbtEntries);*/
+    	nbt.put("entries", nbtEntries);*/
     	
     	return CoroUtil.packet.PacketHelper.getNBTPacket(nbt, ConfigMod.eventChannelName);
     }

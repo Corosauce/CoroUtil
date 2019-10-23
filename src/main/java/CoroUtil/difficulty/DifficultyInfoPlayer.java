@@ -53,7 +53,7 @@ public class DifficultyInfoPlayer {
 
     public void updateData(PlayerEntity player, int countNeededBase, double multiplier) {
 
-        int skipCount = player.getEntityData().getInteger(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier);
+        int skipCount = player.getPersistentData().getInt(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier);
 
         if (skipCount == 0) {
             itemsNeeded = countNeededBase;

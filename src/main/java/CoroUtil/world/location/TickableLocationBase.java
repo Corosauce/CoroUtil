@@ -47,18 +47,18 @@ import net.minecraftforge.common.DimensionManager;
     }
 
     @Override
-    public void readFromNBT(CompoundNBT parData) {
-        origin = new BlockCoord(parData.getInteger("posX"), parData.getInteger("posY"), parData.getInteger("posZ"));
+    public void read(CompoundNBT parData) {
+        origin = new BlockCoord(parData.getInteger("posX"), parData.getInt("posY"), parData.getInt("posZ"));
         dimensionID = parData.getInteger("dimensionID");
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT parData) {
-        parData.setString("classname", this.getClass().getCanonicalName());
-        parData.setInteger("posX", origin.getX());
-        parData.setInteger("posY", origin.getY());
-        parData.setInteger("posZ", origin.getZ());
-        parData.setInteger("dimensionID", dimensionID);
+    public CompoundNBT write(CompoundNBT parData) {
+        parData.putString("classname", this.getClass().getCanonicalName());
+        parData.putInt("posX", origin.getX());
+        parData.putInt("posY", origin.getY());
+        parData.putInt("posZ", origin.getZ());
+        parData.putInt("dimensionID", dimensionID);
         return parData;
     }
 

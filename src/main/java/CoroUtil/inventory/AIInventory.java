@@ -8,7 +8,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import CoroUtil.bt.IBTAgent;
 
 import com.mojang.authlib.GameProfile;
@@ -115,13 +115,13 @@ public class AIInventory {
 
             if (inventory.invList[i] != null)
             {
-            	inventory.invList[i].writeToNBT(nbttagcompound1);
+            	inventory.invList[i].write(nbttagcompound1);
             }
 
-            nbttaglist.appendTag(nbttagcompound1);
+            nbttaglist.add(nbttagcompound1);
         }
 
-        nbt.setTag("listInv", nbttaglist);
+        nbt.put("listInv", nbttaglist);
 		
 		return nbt;
 	}
@@ -130,13 +130,13 @@ public class AIInventory {
 		ListNBT nbttaglist;
         int i;
 
-        if (parNBT.hasKey("listInv", 9))
+        if (parNBT.contains("listInv", 9))
         {
-            nbttaglist = parNBT.getTagList("listInv", 10);
+            nbttaglist = parNBT.getList("listInv", 10);
 
             for (i = 0; i < inventory.invList.length; ++i)
             {
-            	inventory.invList[i] = new ItemStack(nbttaglist.getCompoundTagAt(i));
+            	inventory.invList[i] = new ItemStack(nbttaglist.write(i));
             }
         }
 	}/*
@@ -188,13 +188,13 @@ public class AIInventory {
 	}
 	
 	public void tickItemPickupScan() {
-    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getEntityBoundingBox().grow(2.0D, 1.0D, 2.0D));
+    	List var3 = entOwner.world.getEntitiesWithinAABBExcludingEntity(entOwner, entOwner.getBoundingBox().grow(2.0D, 1.0D, 2.0D));
     	
         if(var3 != null) {
             for(int var4 = 0; var4 < var3.size(); ++var4) {
                 Entity var5 = (Entity)var3.get(var4);
 
-                if(!var5.isDead) {
+                if(!var5.removed) {
                 	if (/*(grabXP && (var5 instanceof EntityXPOrb)) || */(grabItems && (var5 instanceof ItemEntity))) {
                 		collideWithItem((ItemEntity)var5);
                 	}
@@ -208,7 +208,7 @@ public class AIInventory {
 		inventory.addItemStackToInventory(is);
 		if (is.getCount() <= 0)
         {
-			parItem.setDead();
+			parItem.remove();
         }
 	}
 	

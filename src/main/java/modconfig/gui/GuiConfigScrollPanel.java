@@ -39,7 +39,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
     }
 
     @Override
-    protected int getSize()
+    protected int size()
     {
     	ModConfigData data = config.getData();
         return data.configData.size();
@@ -61,7 +61,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             }
             else
             {
-                //options.setKeyBinding(selected, -100);
+                //option.setKeyBinding(selected, -100);
                 selected = -1;
                 KeyBinding.resetKeyBindingArrayAndHash();
             }*/
@@ -113,7 +113,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
     
     @Override
     protected void drawContainerBackground(Tessellator tess) {
-    	/*this.mc.renderEngine.bindTexture(BACKGROUND_IMAGE);
+    	/*this.mc.textureManager.bindTexture(BACKGROUND_IMAGE);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         float height = 32.0F;
         
@@ -142,7 +142,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             if (Mouse.next() && Mouse.getEventButtonState())
             {
                 //System.out.println(Mouse.getEventButton());
-                //options.setKeyBinding(selected, -100 + Mouse.getEventButton());
+                //option.setKeyBinding(selected, -100 + Mouse.getEventButton());
                 selected = -1;
                 KeyBinding.resetKeyBindingArrayAndHash();
             }
@@ -166,7 +166,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         boolean flag = _mouseX >= xPosition && _mouseY >= yPosition && _mouseX < xPosition + width && _mouseY < yPosition + height;
         int k = (flag ? 2 : 1);
 
-        //mc.renderEngine.bindTexture("/gui/gui.png");
+        //mc.textureManager.bindTexture("/gui/gui.png");
         //mc.getTextureManager().bindTexture(resGUI);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         //config.drawTexturedModalRect(xPosition, yPosition, 0, 46 + k * 20, width / 2, height);
@@ -176,13 +176,13 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
 
         if (data.get(index) == null || data.get(index).editBox == null) return;
 
-        int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(data.get(index).name);
-        config.drawString(mc.fontRenderer, data.get(index).name/*options.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
+        int stringWidth = Minecraft.getInstance().fontRenderer.getStringWidth(data.get(index).name);
+        config.drawString(mc.fontRenderer, data.get(index).name/*option.getKeyBindingDescription(index)*/, xPosition - stringWidth + 15/* + width + 4*/, yPosition + 3, 0xFFFFFFFF);
 
         boolean conflict = false;
-        /*for (int x = 0; x < options.keyBindings.length; x++)
+        /*for (int x = 0; x < option.keyBindings.length; x++)
         {
-            if (x != index && options.keyBindings[x].keyCode == options.keyBindings[index].keyCode)
+            if (x != index && option.keyBindings[x].keyCode == option.keyBindings[index].keyCode)
             {
                 conflict = true;
                 break;
@@ -191,11 +191,11 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         
         String value = data.get(index).value.toString();
         int maxWidth = (config.xSize / 2) - 45;
-        //int valWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(value);
+        //int valWidth = Minecraft.getInstance().fontRenderer.getStringWidth(value);
         
-        value = Minecraft.getMinecraft().fontRenderer.trimStringToWidth(value, maxWidth);
+        value = Minecraft.getInstance().fontRenderer.trimStringToWidth(value, maxWidth);
 
-        String str = (conflict ? TextFormatting.RED : "") + value;//options.getOptionDisplayString(index);
+        String str = (conflict ? TextFormatting.RED : "") + value;//option.getOptionDisplayString(index);
         str = (index == selected ? TextFormatting.WHITE + "> " + TextFormatting.YELLOW + "??? " + TextFormatting.WHITE + "<" : str);
         //config.drawString(mc.fontRenderer, str, xPosition + 20/* + (width / 2)*/, yPosition + (height - 8) / 2, 0xFFFFFFFF);
         List<ConfigEntryInfo> configDataTest = data;
@@ -218,11 +218,11 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
             RenderHelper.disableStandardItemLighting();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
 
-            int l2 = Minecraft.getMinecraft().fontRenderer.getStringWidth(s);
+            int l2 = Minecraft.getInstance().fontRenderer.getStringWidth(s);
             int i2 = hover_x_min;
             int k2 = hover_y_min - 10;
             drawGradientRect(i2 - 3, k2 - 3, i2 + l2 + 3, k2 + 8 + 3, 0xc0000000, 0xc0000000);
-            Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(s, i2, k2, -1);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
         }
     }
@@ -281,7 +281,7 @@ public class GuiConfigScrollPanel extends GuiBetterSlot
         		return true;
         	}
         	//config.configData.get(selected).value = config.configData.get(selected).editBox.text;
-            //options.setKeyBinding(selected, i);
+            //option.setKeyBinding(selected, i);
             //selected = -1;
             //KeyBinding.resetKeyBindingArrayAndHash();
             return false;

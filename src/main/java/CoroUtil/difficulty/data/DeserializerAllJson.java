@@ -142,7 +142,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         if (json.has("spawn_type")) {
             String spawnType = json.get("spawn_type").getAsString();
             if (spawnType.equals("ground")) {
-                spawnTemplate.spawnType = EnumSpawnPlacementType.GROUND;
+                spawnTemplate.spawnType = EnumSpawnPlacementType.EARTH;
             } else if (spawnType.equals("surface")) {
                 spawnTemplate.spawnType = EnumSpawnPlacementType.SURFACE;
             } else if (spawnType.equals("cave")) {
@@ -154,10 +154,10 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
             }
         }
 
-        JsonArray arr2 = json.get("entities").getAsJsonArray();
+        JsonArray arr2 = json.get("field_76702_h").getAsJsonArray();
         Iterator<JsonElement> it2 = arr2.iterator();
         while (it2.hasNext()) {
-            spawnTemplate.entities.add(it2.next().getAsString());
+            spawnTemplate.field_76702_h.add(it2.next().getAsString());
         }
 
         if (json.has("cmods")) {
@@ -174,10 +174,10 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         obj.addProperty("count_difficulty_multiplier", spawns.count_difficulty_multiplier);
         obj.addProperty("spawnType", spawns.spawnType.name().toLowerCase());
         JsonArray arr1 = new JsonArray();
-        for (String str : spawns.entities) {
+        for (String str : spawns.field_76702_h) {
             arr1.add(new JsonPrimitive(str));
         }
-        obj.add("entities", arr1);
+        obj.add("field_76702_h", arr1);
         obj.add("cmods", serializeCmods(spawns.cmods));
         return obj;
     }
@@ -187,7 +187,7 @@ public class DeserializerAllJson implements JsonDeserializer<DifficultyData> {
         for (DataCmod cmod : cmods) {
             if (cmod instanceof CmodInventoryDifficultyScaled) {
                 //CULog.err("design flaw in serialization, CmodInventoryDifficultyScaled shouldnt exist here, it was supposed to be processed and turned into CmodInventory on entity spawn");
-                //need to serialize for game state sake, so we can reload game and still spawn more entities
+                //need to serialize for game state sake, so we can reload game and still spawn more field_76702_h
                 //JsonSerializer<CmodInventoryDifficultyScaled> serializer = new JsonSerializer<CmodInventoryDifficultyScaled>();
                 JsonElement ele = ((CmodInventoryDifficultyScaled) cmod).serialize(null, null, null);
                 arr2.add(ele.getAsJsonObject());

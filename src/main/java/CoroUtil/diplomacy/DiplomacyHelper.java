@@ -48,18 +48,18 @@ public class DiplomacyHelper {
 			} else */if (target instanceof IBTAgent) {
 				tiTarget = ((IBTAgent)target).getAIBTAgent().dipl_info;
 			} else if (target instanceof PlayerEntity) {
-				if (!((PlayerEntity)target).capabilities.isCreativeMode) {
-					tiTarget = TeamTypes.getType("player");//if (tiSource.listEnemies.contains("player")) return true;
+				if (!((PlayerEntity)target).abilities.isCreativeMode) {
+					tiTarget = TeamTypes.getMinecartType("player");//if (tiSource.listEnemies.contains("player")) return true;
 				}
 			} else {
 				//custom rule to avoid vanilla threats that wont attack us if left alone
 				if (!isThreat(target)) {
 					if ((target instanceof MonsterEntity || target instanceof SlimeEntity)) {
-						tiTarget = TeamTypes.getType("undead");
+						tiTarget = TeamTypes.getMinecartType("undead");
 					} else if (target instanceof AnimalEntity) {
-						tiTarget = TeamTypes.getType("animal");
+						tiTarget = TeamTypes.getMinecartType("animal");
 					} else {
-						tiTarget = TeamTypes.getType("neutral");
+						tiTarget = TeamTypes.getMinecartType("neutral");
 					}
 				}
 			}

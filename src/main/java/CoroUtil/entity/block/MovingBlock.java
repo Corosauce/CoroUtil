@@ -136,7 +136,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
 
     @Override
-    public void entityInit() {
+    public void registerData() {
     	//TODO: 1.10 datawatcher to new system
     	/*this.dataWatcher.addObject(2, Float.valueOf(rotationYawB));
     	this.dataWatcher.addObject(3, Float.valueOf(rotationPitchB));
@@ -148,22 +148,22 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     @Override
     public boolean canBePushed()
     {
-        return !this.isDead;
+        return !this.removed;
     }
 
     @Override
     public boolean canBeCollidedWith()
     {
-        return !this.isDead && !this.noCollision;
+        return !this.removed && !this.noCollision;
     }
 
     @Override
-    public void onUpdate()
+    public void tick()
     {
-        //super.onUpdate();
+        //super.tick();
         boolean superTick = true;
         if (superTick) {
-        	super.onUpdate();
+        	super.tick();
         } else {
         	this.prevDistanceWalkedModified = this.distanceWalkedModified;
             this.prevPosX = this.posX;
@@ -216,7 +216,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
         if (!world.isRemote) {
         	
         	if (posY < 0) {
-        		this.setDead();
+        		this.remove();
         		return;
         	}
         	
@@ -238,7 +238,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    	
 		    	if (isSolid(id)) {
 		    		Vec3 motion = new Vec3(motionX, motionY, motionZ);
-			    	double aheadDistEnd = motion.lengthVector();
+			    	double aheadDistEnd = motion.length();
 			    	motion = motion.normalize();
 			    	
 			    	for (double curDist = 0; curDist < aheadDistEnd; curDist += 0.5D) {
@@ -268,7 +268,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 				    		} else {
 				    			//fail
 				    			//System.out.println("solidify fail");
-				    			this.setDead();
+				    			this.remove();
 				    		}
 				    		break;
 			    		}
@@ -282,7 +282,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 		    		
 	        }
 	        
-	    	/*if (idCurPos == 0 || Block.blocksList[idCurPos].blockMaterial == Material.snow || Block.blocksList[idCurPos].blockMaterial == Material.plants) {
+	    	/*if (idCurPos == 0 || Block.blocksList[idCurPos].material == Material.snow || Block.blocksList[idCurPos].material == Material.plants) {
 	    		coordsLastAir = new BlockCoord(curX, curY, curZ);
 	    	}
 	    	
@@ -301,22 +301,22 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
 	        
 	    	
 	        //temp
-	        //setDead();
+	        //remove();
 	        
         } else {
         	//temp?
         	//motionY = 0.00F;
         }
         
-        //if (gravity > 0) setDead();
-        //setDead();
+        //if (gravity > 0) remove();
+        //remove();
     	
         //so temp
     	//posY = 72F;
     	
         //onGround = true;
         
-        //taken from super onUpdate()
+        //taken from super tick()
     }
     
     public void tickCollisionEntities() {
@@ -324,14 +324,14 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     	
     	if (blockToEntCollision) {
         	double size = 0.5D;
-	        List entities = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(size, size, size));
+	        List entities = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getBoundingBox().grow(size, size, size));
 	        
 	        for (int i = 0; entities != null && i < entities.size(); ++i)
 	        {
 	            Entity var10 = (Entity)entities.get(i);
 	            
 	            if (var10 != null) {
-	            	if (!var10.isDead) {
+	            	if (!var10.removed) {
 			            if (var10 instanceof LivingEntity) {
 			            	var10.attackEntityFrom(DamageSource.causeIndirectMagicDamage(this, this), 4);
 			            } else {
@@ -350,7 +350,7 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
     
     public boolean isSolid(BlockState id) {
-    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.CIRCUITS && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.PLANTS && id.getMaterial().isSolid());
+    	return (id.getMaterial() != Material.WATER && id.getMaterial() != Material.MISCELLANEOUS && id.getMaterial() != Material.SNOW && id.getMaterial() != Material.PLANTS && id.getMaterial().isSolid());
     }
     
     public void setPositionAndRotation(double par1, double par3, double par5, float par7, float par8, float parRoll)
@@ -436,12 +436,12 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     
     public void blockify(int x, int y, int z) {
     	world.setBlockState(new BlockPos(x, y, z), Block.getBlockById(blockID).getDefaultState(), 3);
-    	setDead();
+    	remove();
     }
     
     @Override
     public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
-    	setDead();
+    	remove();
     	return super.attackEntityFrom(par1DamageSource, par2);
     }
     
@@ -469,18 +469,18 @@ public class MovingBlock extends Entity implements IEntityAdditionalSpawnData
     }
 
 	@Override
-	protected void readEntityFromNBT(CompoundNBT data) {
-		blockID = data.getInteger("blockID");
-		blockMeta = data.getInteger("blockMeta");
-		blockifyDelay = data.getInteger("blockifyDelay");
+	protected void readAdditional(CompoundNBT data) {
+		blockID = data.getInt("blockID");
+		blockMeta = data.getInt("blockMeta");
+		blockifyDelay = data.getInt("blockifyDelay");
 		gravity = data.getFloat("gravity");
 	}
 
 	@Override
-	protected void writeEntityToNBT(CompoundNBT data) {
-		data.setInteger("blockID", blockID);
-		data.setInteger("blockMeta", blockMeta);
-		data.setInteger("blockifyDelay", blockifyDelay);
-		data.setFloat("gravity", gravity);
+	protected void writeAdditional(CompoundNBT data) {
+		data.putInt("blockID", blockID);
+		data.putInt("blockMeta", blockMeta);
+		data.putInt("blockifyDelay", blockifyDelay);
+		data.putFloat("gravity", gravity);
 	}
 }

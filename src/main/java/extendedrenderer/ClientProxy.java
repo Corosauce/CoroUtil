@@ -27,8 +27,8 @@ public class ClientProxy extends CommonProxy
     public void postInit()
     {
     	super.postInit();
-    	ExtendedRenderer.rotEffRenderer = new RotatingParticleManager(mc.world, mc.renderEngine);
-        ExtendedRenderer.foliageRenderer = new FoliageRenderer(mc.renderEngine);
+    	ExtendedRenderer.rotEffRenderer = new RotatingParticleManager(mc.world, mc.textureManager);
+        ExtendedRenderer.foliageRenderer = new FoliageRenderer(mc.textureManager);
     }
 
     @Override

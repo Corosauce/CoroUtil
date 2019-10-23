@@ -52,7 +52,7 @@ public class GuiConfigEditor extends Screen
     
     public GuiConfigEditor() {
     	super();
-    	mc = Minecraft.getMinecraft();
+    	client = Minecraft.getInstance();
     }
     
     //Change this to using client synced data when that part is done
@@ -81,7 +81,7 @@ public class GuiConfigEditor extends Screen
 	    	if (ConfigMod.liveEditConfigs.size() > 0) {
 		    	for (int i = 0; i < getData().configData.size(); i++) {
 		    		if (getData().configData.get(i).editBox != null && getData().configData.get(i).editBox.isFocused()) {
-		    			getData().configData.get(i).editBox.updateCursorCounter();
+		    			getData().configData.get(i).editBox.tick();
 		    		}
 		    	}
 	    	}
@@ -173,11 +173,11 @@ public class GuiConfigEditor extends Screen
     	
     	//inventoryRows = 5;
     	
-        //int var4 = this.mc.renderEngine.getTexture("/mods/ZombieCraft/textures/textures/menus/editorCP.png");
+        //int var4 = this.client.textureManager.getTexture("/mods/ZombieCraft/textures/textures/menus/editorCP.png");
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        //this.mc.renderEngine.bindTexture("/mods/ModConfig/textures/gui/gui512.png");
-        mc.getTextureManager().bindTexture(resGUI);
-        //this.mc.renderEngine.bindTexture("/mods/HostileWorlds/textures/gui/demo_bg.png");
+        //this.client.textureManager.bindTexture("/mods/ModConfig/textures/gui/gui512.png");
+        client.getTextureManager().bindTexture(resGUI);
+        //this.client.textureManager.bindTexture("/mods/HostileWorlds/textures/gui/demo_bg.png");
         int startX = (this.width - this.xSize) / 2;
         int startY = (this.height - this.ySize) / 2;
         
@@ -200,7 +200,7 @@ public class GuiConfigEditor extends Screen
     	    while (it.hasNext()) {
     	        Map.Entry pairs = (Map.Entry)it.next();
     	        String name = (String)pairs.getKey();
-    	        Object val = pairs.getValue();
+    	        Object val = pairs.get();
     	        int wat = this.fontRenderer.getStringWidth(name);
     	        this.drawString(this.fontRenderer, name, startX + 10, startY + 10 + (pos * 12), 16777215);
     	        this.drawString(this.fontRenderer, val.toString(), startX + 10 + xSize / 2, startY + 10 + (pos * 12), 16777215);
@@ -227,7 +227,7 @@ public class GuiConfigEditor extends Screen
     		if (!getData().configData.get(i).editBox.text.equals(getData().configData.get(i).value.toString())/*info.markForUpdate*//*!realVal.toString().equals(info.value.toString())*/) {
     			
     			if (!clientMode) {
-    				//this.mc.player.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
+    				//this.client.player.sendChatMessage("/config" + " set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text);
     				ConfigMod.eventChannel.sendToServer(PacketHelper.getModConfigPacketForClientToServer("set " + getCategory() + " " + getData().configData.get(i).name + " " + getData().configData.get(i).editBox.text));
     			} else {
     				if (ConfigMod.updateField(getCategory(), getData().configData.get(i).name, getData().configData.get(i).editBox.text)) {
@@ -246,15 +246,15 @@ public class GuiConfigEditor extends Screen
     	int startX = (this.width - this.xSize) / 2;
         int startY = (this.height - this.ySize) / 2;
         
-        ScaledResolution var8 = new ScaledResolution(mc);
+        ScaledResolution var8 = new ScaledResolution(client);
         int scaledWidth = var8.getScaledWidth();
         int scaledHeight = var8.getScaledHeight();
         
-    	scrollPane = new GuiConfigScrollPanel(this, mc, startX, startY, startY + ySize - 50/*ySize*/, 20);
+    	scrollPane = new GuiConfigScrollPanel(this, client, startX, startY, startY + ySize - 50/*ySize*/, 20);
     	scrollPane.registerScrollButtons(null, 7, 8);
     	
     	if (!clientMode) {
-    		this.mc.player.sendChatMessage("/config update " + getCategory());
+    		this.client.player.sendChatMessage("/config tick " + getCategory());
     	} else {
     		ConfigMod.populateData(getCategory());
     	}
@@ -296,7 +296,7 @@ public class GuiConfigEditor extends Screen
         this.buttonList.add(new Button(G_SAVE, startX + xSize - (buttonWidth + paddingSize) * 2, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Save"));
         this.buttonList.add(new Button(G_CLOSE, startX + xSize - (buttonWidth + paddingSize) * 1, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Close"));
         
-        if (mc.isSingleplayer()) {
+        if (client.isSingleplayer()) {
         	clientMode = false;
         } else {
         	this.buttonList.add(new Button(G_CONFIGMODE, startX + xSize - (buttonWidth + paddingSize) * 3, startY + ySize - buttonHeight - paddingSize, buttonWidth, buttonHeight, "Mode: " + (clientMode ? "Local" : "Remote")));
@@ -307,7 +307,7 @@ public class GuiConfigEditor extends Screen
         //int startY2 = (this.height - this.ySize) / 2 + 23;
         
         //this.textboxWorldName = new GuiTextField(this.fontRenderer, startX + xSize - buttonWidth - paddingSize, startY + 10 + paddingSize, buttonWidth, buttonHeight);
-        //this.textboxWorldName.setFocused(true);
+        //this.textboxWorldName.setFocused2(true);
         //this.textboxWorldName.setText("derp");
         
     }
@@ -369,8 +369,8 @@ public class GuiConfigEditor extends Screen
         } else if (var1.id == G_CONFIGMODE) {
         	clientMode = !clientMode;
         } else if (var1.id == G_CLOSE) {
-            this.mc.displayGuiScreen((Screen)null);
-            this.mc.setIngameFocus();
+            this.client.displayGuiScreen((Screen)null);
+            this.client.setIngameFocus();
         }
         initGui();
     }

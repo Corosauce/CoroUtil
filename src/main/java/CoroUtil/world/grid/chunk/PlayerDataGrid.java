@@ -12,7 +12,7 @@ public class PlayerDataGrid {
 	public static long playerTimeSpentUpdateInterval = 20*10;
 	
 	public long playerActivityInteraction = 0; //interaction count in chunks
-	public long playerActivityLastUpdated = 0; //world time last update happened (to track freshness of data)
+	public long playerActivityLastUpdated = 0; //world time last tick happened (to track freshness of data)
 	public long playerActivityTimeSpent = 0; //world time spent in chunk
 	
 	public PlayerDataGrid() {
@@ -28,9 +28,9 @@ public class PlayerDataGrid {
 	public CompoundNBT nbtWrite() {
 		CompoundNBT nbt = new CompoundNBT();
 		
-		nbt.setLong("playerActivityInteraction", playerActivityInteraction);
-		nbt.setLong("playerActivityLastUpdated", playerActivityLastUpdated);
-		nbt.setLong("playerActivityTimeSpent", playerActivityTimeSpent);
+		nbt.putLong("playerActivityInteraction", playerActivityInteraction);
+		nbt.putLong("playerActivityLastUpdated", playerActivityLastUpdated);
+		nbt.putLong("playerActivityTimeSpent", playerActivityTimeSpent);
 		
 		return nbt;
 	}

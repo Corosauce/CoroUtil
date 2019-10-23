@@ -61,7 +61,7 @@ public class TargetEnemy extends Selector {
 		
 		AIBTAgent ai = entInt.getAIBTAgent();
 		
-		if ((scanRate == -1 || ent.world.getTotalWorldTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
+		if ((scanRate == -1 || ent.world.getGameTime() % scanRate == 0) && (ai.blackboard.getTarget() == null || (randRate == -1 || rand.nextInt(randRate) == 0))) {
 			boolean found = false;
 			boolean sanityAborted = false;
 			Entity clEnt = null;
@@ -70,7 +70,7 @@ public class TargetEnemy extends Selector {
 	    	if (holdPos != null) {
 	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, new AxisAlignedBB(holdPos.posX, holdPos.posY, holdPos.posZ, holdPos.posX, holdPos.posY, holdPos.posZ).grow(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	} else {
-	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getEntityBoundingBox().grow(rangeHunt*2, rangeHunt/2, rangeHunt*2));
+	    		list = ent.world.getEntitiesWithinAABBExcludingEntity(ent, protectEnt.getBoundingBox().grow(rangeHunt*2, rangeHunt/2, rangeHunt*2));
 	    	}
 	        for(int j = 0; j < list.size(); j++)
 	        {

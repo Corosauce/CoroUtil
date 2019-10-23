@@ -32,7 +32,7 @@ public class BreakBlockQuest extends ActiveQuest {
 		super.initCustomData();
 
 		blockCoords = parCoords;
-		blockType = Block.REGISTRY.getNameForObject(parBlock).toString();
+		blockType = Block.REGISTRY.getKey(parBlock).toString();
 		
 	}
 
@@ -87,22 +87,22 @@ public class BreakBlockQuest extends ActiveQuest {
 	}
 	
 	public Block getBlock() {
-		return (Block)Block.REGISTRY.getObject(new ResourceLocation(blockType));
+		return (Block)Block.REGISTRY.getOrDefault(new ResourceLocation(blockType));
 	}
 	
 	public void load(CompoundNBT parNBT) {
 		super.load(parNBT);
-		blockCountNeeded = parNBT.getInteger("blockCountNeeded");
-		blockCountCurrent = parNBT.getInteger("blockCountCurrent");
+		blockCountNeeded = parNBT.getInt("blockCountNeeded");
+		blockCountCurrent = parNBT.getInt("blockCountCurrent");
 		blockCoords = CoroUtilNBT.readCoords("blockCoords", parNBT);
 		blockType = parNBT.getString("blockType");
 	}
 	
 	public void save(CompoundNBT parNBT) {
 		super.save(parNBT);
-		parNBT.setInteger("blockCountNeeded", blockCountNeeded);
-		parNBT.setInteger("blockCountCurrent", blockCountCurrent);
+		parNBT.putInt("blockCountNeeded", blockCountNeeded);
+		parNBT.putInt("blockCountCurrent", blockCountCurrent);
 		CoroUtilNBT.writeCoords("blockCoords", blockCoords, parNBT);
-		parNBT.setString("blockType", blockType);
+		parNBT.putString("blockType", blockType);
 	}
 }

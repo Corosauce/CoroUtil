@@ -1,6 +1,6 @@
 package CoroUtil.difficulty.buffs;
 
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.ai.goalSelector.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.CreatureEntity;
@@ -34,8 +34,8 @@ public class BuffAI_TaskMining extends BuffAI_TaskBase {
         /**
          * These 2 might be redundantly applied during deserialization
          */
-        ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityEnhanced, true);
-        ent.getEntityData().setBoolean("CoroAI_HW_GravelDeath", true);
+        ent.getPersistentData().putBoolean(UtilEntityBuffs.dataEntityEnhanced, true);
+        ent.getPersistentData().putBoolean("CoroAI_HW_GravelDeath", true);
 
         ItemStack is = ent.getItemStackFromSlot(EquipmentSlotType.MAINHAND);
         if (is == null) {

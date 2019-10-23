@@ -51,7 +51,7 @@ public class TileEntityRepairingBlock extends TileEntity
 
                 //System.out.println(listTest.size());
 
-                if (world.getTotalWorldTime() > timeToRepairAt || ConfigCoroUtilAdvanced.repairBlockNextRandomTick) {
+                if (world.getGameTime() > timeToRepairAt || ConfigCoroUtilAdvanced.repairBlockNextRandomTick) {
                     AxisAlignedBB aabb = this.getBlockType().getDefaultState().getBoundingBox(this.getWorld(), this.getPos());
                     //i think its using no collide AABB so this fixes it
                     aabb = Block.FULL_BLOCK_AABB;
@@ -90,7 +90,7 @@ public class TileEntityRepairingBlock extends TileEntity
                     if (state.getBlock() instanceof LeavesBlock) {
                         try {
                             //CULog.dbg("restoring leaf to non decay state at pos: " + posFix);
-                            world.setBlockState(posFix, state.withProperty(LeavesBlock.CHECK_DECAY, false), 4);
+                            world.setBlockState(posFix, state.with(LeavesBlock.CHECK_DECAY, false), 4);
                         } catch (Exception ex) {
                             //must be a modded block that doesnt use decay
                             if (ConfigCoroUtil.useLoggingDebug) {
@@ -122,30 +122,30 @@ public class TileEntityRepairingBlock extends TileEntity
     }*/
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT var1)
+    public CompoundNBT write(CompoundNBT var1)
     {
         if (orig_blockState != null) {
-            String str = Block.REGISTRY.getNameForObject(this.orig_blockState.getBlock()).toString();
-            var1.setString("orig_blockName", str);
-            var1.setInteger("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
+            String str = Block.REGISTRY.getKey(this.orig_blockState.getBlock()).toString();
+            var1.putString("orig_blockName", str);
+            var1.putInt("orig_blockMeta", this.orig_blockState.getBlock().getMetaFromState(this.orig_blockState));
         }
-        var1.setLong("timeToRepairAt", timeToRepairAt);
+        var1.putLong("timeToRepairAt", timeToRepairAt);
 
-        var1.setFloat("orig_hardness", orig_hardness);
-        var1.setFloat("orig_explosionResistance", orig_explosionResistance);
+        var1.putFloat("orig_hardness", orig_hardness);
+        var1.putFloat("orig_explosionResistance", orig_explosionResistance);
 
-        return super.writeToNBT(var1);
+        return super.write(var1);
     }
 
     @Override
-    public void readFromNBT(CompoundNBT var1)
+    public void read(CompoundNBT var1)
     {
-        super.readFromNBT(var1);
+        super.read(var1);
         timeToRepairAt = var1.getLong("timeToRepairAt");
         try {
             Block block = Block.getBlockFromName(var1.getString("orig_blockName"));
             if (block != null) {
-                int meta = var1.getInteger("orig_blockMeta");
+                int meta = var1.getInt("orig_blockMeta");
                 this.orig_blockState = block.getStateFromMeta(meta);
             }
         } catch (Exception ex) {
@@ -160,8 +160,8 @@ public class TileEntityRepairingBlock extends TileEntity
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
+    public void remove() {
+        super.remove();
     }
 
     public static TileEntityRepairingBlock replaceBlockAndBackup(World world, BlockPos pos) {
@@ -194,7 +194,7 @@ public class TileEntityRepairingBlock extends TileEntity
             repairing.setBlockData(oldState);
             repairing.setOrig_hardness(oldHardness);
             repairing.setOrig_explosionResistance(oldExplosionResistance);
-            repairing.timeToRepairAt = world.getTotalWorldTime() + ticksToRepair;
+            repairing.timeToRepairAt = world.getGameTime() + ticksToRepair;
             //world.scheduleBlockUpdate(pos, state.getBlock(), 20*5, 1);
             return (TileEntityRepairingBlock) tEnt;
         } else {

@@ -31,21 +31,21 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 		float randFloat = (rand.nextFloat() * 0.6F);
 		float baseBright = 0.7F;
 		float finalBright = Math.min(1F, baseBright+randFloat);
-		particle.setRBGColorF(finalBright, finalBright, finalBright);
-		//particle.setRBGColorF(72F/255F, 239F/255F, 8F/255F);
+		particle.setColor(finalBright, finalBright, finalBright);
+		//particle.setColor(72F/255F, 239F/255F, 8F/255F);
 		
 		//sand
-		//particle.setRBGColorF(204F/255F, 198F/255F, 120F/255F);
+		//particle.setColor(204F/255F, 198F/255F, 120F/255F);
 		//red
-		//particle.setRBGColorF(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
+		//particle.setColor(0.6F + (rand.nextFloat() * 0.4F), 0.2F + (rand.nextFloat() * 0.7F), 0);
 		//green
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0);
 		//tealy blue
-		//particle.setRBGColorF(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
-		//particle.setRBGColorF(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0, 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
+		//particle.setColor(0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F), 0.4F + (rand.nextFloat() * 0.4F));
 		
 		//location based color shift
-		//particle.setRBGColorF((float) (0.4F + (Math.abs(particle.posX / 300D) * 0.6D)), 0.4F, (float) (0.4F + (Math.abs(particle.posZ / 300D) * 0.6D)));
+		//particle.setColor((float) (0.4F + (Math.abs(particle.posX / 300D) * 0.6D)), 0.4F, (float) (0.4F + (Math.abs(particle.posZ / 300D) * 0.6D)));
 		//particle.setScale(0.25F + 0.2F * rand.nextFloat());
 		particle.brightness = 1F;
 		particle.setAlphaF(1F);
@@ -101,7 +101,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					/*if (particle.getAlphaF() > 0) {
 						particle.setAlphaF(particle.getAlphaF() - rateAlpha*1.3F);
 					} else {
-						particle.setDead();
+						particle.remove();
 					}*/
 					//particle.setAlphaF(1F);
 				}
@@ -159,7 +159,7 @@ public class ParticleBehaviorSandstorm extends ParticleBehaviors {
 					//particle.posY = particle.spawnY;
 				}
 				
-				//particle.setDead();
+				//particle.remove();
 			}
 		//}
 	}

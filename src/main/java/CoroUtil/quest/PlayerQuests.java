@@ -114,8 +114,8 @@ public class PlayerQuests {
 
             	CompoundNBT data = new CompoundNBT();
             	nbtSave(data);
-            	nbt.setString("command", "QuestData");
-            	nbt.setTag("data", data);
+            	nbt.putString("command", "QuestData");
+            	nbt.put("data", data);
             	
                 FMLProxyPacket packet = PacketHelper.getNBTPacket(nbt, CoroUtil.eventChannelName);
                 CoroUtil.eventChannel.sendTo(packet, (ServerPlayerEntity)getPlayer());
@@ -317,11 +317,11 @@ public class PlayerQuests {
 		
 		if (!parNBT.hasNoTags()) {
 			//Iterator it = parNBT.getTags().iterator();
-			Iterator it = parNBT.getKeySet().iterator();
+			Iterator it = parNBT.keySet().iterator();
 		
 			while (it.hasNext()) {
 				String tagName = (String) it.next();
-				CompoundNBT data = parNBT.getCompoundTag(tagName);
+				CompoundNBT data = parNBT.getCompound(tagName);
 				
 				String classNamePath = data.getString("classNamePath");
 				
@@ -345,7 +345,7 @@ public class PlayerQuests {
 		//FIX!!! iterates over active quests, not quests to load from nbt!!!!
 		
 		for (int i = 0; i < QuestManager.maxQuestCount; i++) {
-			NBTTagCompound questNBT = parNBT.getCompoundTag("q" + i);
+			NBTTagCompound questNBT = parNBT.getCompound("q" + i);
 			if (!questNBT.hasNoTags()) {
 				ActiveQuest quest = getQuestByID(i);
 				if (quest == null) {
@@ -362,7 +362,7 @@ public class PlayerQuests {
 		for (int i = 0; i < activeQuests.size(); i++) {
 			CompoundNBT questNBT = new CompoundNBT();
 			activeQuests.get(i).save(questNBT);
-			parNBT.setTag("qIndex" + i/*activeQuests.get(i).questID*/, questNBT);
+			parNBT.put("qIndex" + i/*activeQuests.get(i).questID*/, questNBT);
 		}
 	}
 	

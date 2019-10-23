@@ -335,8 +335,8 @@ public class CoroUtilCompatibility {
 
     public static boolean canTornadoGrabBlockRefinedRules(BlockState state) {
         ResourceLocation registeredName = state.getBlock().getRegistryName();
-        if (registeredName.getResourceDomain().equals("dynamictrees")) {
-            if (registeredName.getResourcePath().contains("rooty") || registeredName.getResourcePath().contains("branch")) {
+        if (registeredName.getNamespace().equals("dynamictrees")) {
+            if (registeredName.getPath().contains("rooty") || registeredName.getPath().contains("branch")) {
                 return false;
             }
         }

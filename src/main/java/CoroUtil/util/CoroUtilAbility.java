@@ -27,9 +27,9 @@ public class CoroUtilAbility {
 	public static CompoundNBT nbtSyncWriteAbility(Ability ability, boolean fullSync) {
 		CompoundNBT nbt = new CompoundNBT();
 		if (fullSync) {
-			nbt.setTag(ability.name, ability.nbtSave());
+			nbt.put(ability.name, ability.nbtSave());
 		} else {
-			nbt.setTag(ability.name, ability.nbtSyncWrite());
+			nbt.put(ability.name, ability.nbtSyncWrite());
 		}
 		return nbt;
 	}
@@ -47,9 +47,9 @@ public class CoroUtilAbility {
 		
 		for (Map.Entry<String, Ability> entry : abilities.entrySet()) {
 			if (syncOnly) {
-				nbt.setTag(entry.getValue().name, entry.getValue().nbtSyncWrite());
+				nbt.put(entry.get().name, entry.get().nbtSyncWrite());
 			} else {
-				nbt.setTag(entry.getValue().name, entry.getValue().nbtSave());
+				nbt.put(entry.get().name, entry.get().nbtSave());
 			}
 		}
 		return nbt;
@@ -62,11 +62,11 @@ public class CoroUtilAbility {
 	/* It will try a full nbt load if it detected the skill wasnt there, but this requires the server to have predicted this and actually sent a full nbtLoad() package */
 	public static void nbtLoadSkills(CompoundNBT nbt, ConcurrentHashMap<String, Ability> abilities, LivingEntity owner, boolean syncOnly) {
 
-		Iterator it = nbt.getKeySet().iterator();
+		Iterator it = nbt.keySet().iterator();
 		
 		while (it.hasNext()) {
 			String tagName = (String) it.next();
-			CompoundNBT data = (CompoundNBT)nbt.getTag(tagName);
+			CompoundNBT data = (CompoundNBT)nbt.get(tagName);
 			
 			String abilityName = data.getString("name");
 			Ability ability = null;
@@ -92,7 +92,7 @@ public class CoroUtilAbility {
 						System.out.println("Abilities error: code tried to do a full nbt load but one is not available, implementation error - " + owner);
 						//note to self, 2 causes is:
 						//- world mass entity reload causing different load ordering
-						//- entities spawned outside of entity tracker range, entity is added to client later, doesnt get packets
+						//- field_76702_h spawned outside of entity tracker range, entity is added to client later, doesnt get packets
 						
 						//solution 1:
 						//- let client side request a full sync

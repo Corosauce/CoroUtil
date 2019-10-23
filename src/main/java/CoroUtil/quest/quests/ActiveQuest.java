@@ -59,18 +59,18 @@ public class ActiveQuest {
 	}
 	
 	public void load(CompoundNBT parNBT) {
-		curState = EnumQuestState.get(parNBT.getInteger("curState"));
-		dimIDCreatedIn = parNBT.getInteger("dimIDCreatedIn");
+		curState = EnumQuestState.get(parNBT.getInt("curState"));
+		dimIDCreatedIn = parNBT.getInt("dimIDCreatedIn");
 		modOwner = parNBT.getString("modOwner");
 		returnToQuestGiver = parNBT.getBoolean("returnToQuestGiver");
 	}
 	
 	public void save(CompoundNBT parNBT) {
-		parNBT.setString("classNamePath", this.getClass().getCanonicalName());
-		parNBT.setInteger("curState", curState.ordinal());
-		parNBT.setInteger("dimIDCreatedIn", dimIDCreatedIn);
-		parNBT.setString("modOwner", modOwner);
-		parNBT.setBoolean("returnToQuestGiver", returnToQuestGiver);
+		parNBT.putString("classNamePath", this.getClass().getCanonicalName());
+		parNBT.putInt("curState", curState.ordinal());
+		parNBT.putInt("dimIDCreatedIn", dimIDCreatedIn);
+		parNBT.putString("modOwner", modOwner);
+		parNBT.putBoolean("returnToQuestGiver", returnToQuestGiver);
 	}
 	
 	public void setState(EnumQuestState state) {

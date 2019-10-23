@@ -93,7 +93,7 @@ public class RotatingParticleManager
         }*/
 
 
-        //this.registerVanillaParticles();
+        //this.registerFactories();
     }
 
     public void initNewArrayData(TextureAtlasSprite sprite) {
@@ -161,7 +161,7 @@ public class RotatingParticleManager
         this.queueEntityFX.add(effect);
     }
 
-    public void updateEffects()
+    public void tick()
     {
         for (int i = 0; i < 4; ++i)
         {
@@ -174,7 +174,7 @@ public class RotatingParticleManager
 
             for (EmitterParticle particleemitter : this.particleEmitters)
             {
-                particleemitter.onUpdate();
+                particleemitter.tick();
 
                 if (!particleemitter.isAlive())
                 {
@@ -207,7 +207,7 @@ public class RotatingParticleManager
 
                 if (entry[j][k].size() >= 16384) {
                     //fix bug of particles not being cleaned up from other lists
-                    entry[j][k].getFirst().setExpired();
+                    entry[j][k].getA().setExpired();
                     entry[j][k].removeFirst();
                 }
 
@@ -228,7 +228,7 @@ public class RotatingParticleManager
         {
             //this.worldObj.theProfiler.startSection(i + "");
             for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
-                for (ArrayDeque<Particle>[][] entry2 : entry1.getValue()) {
+                for (ArrayDeque<Particle>[][] entry2 : entry1.get()) {
                     this.tickParticleList(entry2[layer][i]);
                 }
             }
@@ -264,7 +264,7 @@ public class RotatingParticleManager
     {
         try
         {
-            particle.onUpdate();
+            particle.tick();
         }
         catch (Throwable throwable)
         {
@@ -307,7 +307,7 @@ public class RotatingParticleManager
         Particle.interpPosZ = entityIn.lastTickPosZ + (entityIn.posZ - entityIn.lastTickPosZ) * (double)partialTicks;
         Particle.cameraViewDir = entityIn.getLook(partialTicks);
 
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         debugParticleRenderCount = 0;
 
@@ -351,7 +351,7 @@ public class RotatingParticleManager
         Transformation transformation = null;
         Matrix4fe viewMatrix = null;
 
-        if (world.getTotalWorldTime() % 20 < 10) {
+        if (world.getGameTime() % 20 < 10) {
             //useShaders = false;
         }
 
@@ -435,7 +435,7 @@ public class RotatingParticleManager
 
             if (mesh != null || !useParticleShaders) {
                 //do cloud layer, then funnel layer
-                for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+                for (ArrayDeque<Particle>[][] entry : entry1.get()) {
                     //do each texture mode, 0 and 1 are the only ones used now
                     for (int i_nf = 0; i_nf < 3; ++i_nf) {
                         final int i = i_nf;
@@ -618,7 +618,7 @@ public class RotatingParticleManager
             ShaderEngine.renderer.getShaderProgram("particle").unbind();
         }
 
-        if (ConfigCoroUtil.debugShaders && world.getTotalWorldTime() % 60 == 0) {
+        if (ConfigCoroUtil.debugShaders && world.getGameTime() % 60 == 0) {
             System.out.println("particles: " + particles);
             System.out.println("debugParticleRenderCount: " + debugParticleRenderCount);
             System.out.println("trueRenderCount: " + trueRenderCount);
@@ -636,7 +636,7 @@ public class RotatingParticleManager
         float f5 = MathHelper.cos(entityIn.rotationPitch * 0.017453292F);
 
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
-            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.get()) {
                 for (int i = 0; i < 2; ++i) {
                     Queue<Particle> queue = entry[3][i];
                     if (!queue.isEmpty()) {
@@ -658,7 +658,7 @@ public class RotatingParticleManager
 
         //shader way
         for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : fxLayers.entrySet()) {
-            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.get()) {
                 for (int i = 0; i < entry.length; i++) {
                     for (int j = 0; j < entry[i].length; j++) {
                         if (entry[i][j] != null) {
@@ -671,7 +671,7 @@ public class RotatingParticleManager
         }
 
         /*for (Map.Entry<TextureAtlasSprite, List<ArrayDeque<Particle>[][]>> entry1 : ExtendedRenderer.rotEffRenderer.fxLayers.entrySet()) {
-            for (ArrayDeque<Particle>[][] entry : entry1.getValue()) {
+            for (ArrayDeque<Particle>[][] entry : entry1.get()) {
                 for (int i = 0; i < entry.length; i++) {
                     for (int j = 0; j < entry[i].length; j++) {
                         if (entry[i][j] != null) {

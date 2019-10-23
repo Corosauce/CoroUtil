@@ -21,7 +21,7 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 	//Convert default melee into a default melee ability, for all the benefits of ability system for all attacks
 	
 	//This and AttackRangedBest will use default melee and skill melee based on situation  
-	//- will update blackboard.isUsingMelee/Ranged
+	//- will tick blackboard.isUsingMelee/Ranged
 	//- no combos, just strait up uses a skill, so
 	//- this COULD use ISkillCallback
 	//- default attack cooldown from profile i guess
@@ -134,7 +134,7 @@ public class AttackMeleeBest extends Selector implements IAbilityUsageCallback {
 		//added to fix issue of it not updating due to tick possible ordering lock out
 		boolean isReadyBool = /*(activeIsDefault && profile.attackCooldownMelee <= 0) || */activeAbility == null;
 		isReady.setValue(isReadyBool);
-		return !isReady.getValue();
+		return !isReady.get();
 	}
 	
 	public void abilityStart(Ability ability, Entity parTarget) {

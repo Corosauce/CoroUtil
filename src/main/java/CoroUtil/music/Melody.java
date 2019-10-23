@@ -27,7 +27,7 @@ public class Melody {
 	public void setMidiData(int parChannel, int parInstrument) {
 		channel = parChannel;
 		instrument = parInstrument;
-		MusicPlayer.mc[channel].programChange(0, MusicPlayer.instr[instrument].getPatch().getProgram());
+		MusicPlayer.client[channel].programChange(0, MusicPlayer.instr[instrument].getPatch().getProgram());
 	}
 	
 	public void addNote(int parNote, float parStart, float parLength) {
@@ -44,12 +44,12 @@ public class Melody {
 			
 			if (ticksPlaying == getNoteStart(note)) {
 				System.out.println("Start note! " + note.note);
-				MusicPlayer.mc[channel].noteOn((octive * NoteHelper.NOTES_IN_OCTIVE) + note.note, velocity);
+				MusicPlayer.client[channel].noteOn((octive * NoteHelper.NOTES_IN_OCTIVE) + note.note, velocity);
 			}
 			
 			if (ticksPlaying == getNoteEnd(note)) {
 				System.out.println("End note! " + note.note);
-				MusicPlayer.mc[channel].noteOff((octive * NoteHelper.NOTES_IN_OCTIVE) + note.note);
+				MusicPlayer.client[channel].noteOff((octive * NoteHelper.NOTES_IN_OCTIVE) + note.note);
 			}
 		}
 		

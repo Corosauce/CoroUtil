@@ -1,9 +1,9 @@
 package CoroUtil.difficulty.buffs;
 
 import CoroUtil.ai.BehaviorModifier;
-import CoroUtil.ai.tasks.EntityAIChaseFromFar;
-import CoroUtil.ai.tasks.EntityAINearestAttackablePlayerOmniscience;
-import CoroUtil.ai.tasks.TaskDigTowardsTarget;
+import CoroUtil.ai.goalSelector.EntityAIChaseFromFar;
+import CoroUtil.ai.goalSelector.EntityAINearestAttackablePlayerOmniscience;
+import CoroUtil.ai.goalSelector.TaskDigTowardsTarget;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.CreatureEntity;
@@ -32,11 +32,11 @@ public class BuffAI_TaskOmniscience extends BuffAI_TaskBase {
         CULog.dbg("trying to enhance with omniscience: " + ent.getName());
 
         //already confirmed we dont have via usual routes
-        UtilEntityBuffs.addTask(ent, EntityAIChaseFromFar.class, 4, false);
+        UtilEntityBuffs.addGoal(ent, EntityAIChaseFromFar.class, 4, false);
 
         if (!UtilEntityBuffs.hasTask(ent, EntityAINearestAttackablePlayerOmniscience.class, true)) {
 
-            UtilEntityBuffs.addTask(ent, EntityAINearestAttackablePlayerOmniscience.class, 10, true);
+            UtilEntityBuffs.addGoal(ent, EntityAINearestAttackablePlayerOmniscience.class, 10, true);
         }
 
         return true;

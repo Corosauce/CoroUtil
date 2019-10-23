@@ -35,7 +35,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
 
 		/*cachedLight = new float[CoroUtilParticle.rainPositions.length];
-		if (worldObj.getTotalWorldTime() % 5 == 0) {
+		if (worldObj.getGameTime() % 5 == 0) {
 			for (int i = 0; i < cachedLight.length; i++) {
 				Vec3 vec = CoroUtilParticle.rainPositions[i];
 				cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
@@ -74,7 +74,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		}
 
 		if (!quatControl) {
-			Entity ent = Minecraft.getMinecraft().getRenderViewEntity();
+			Entity ent = Minecraft.getInstance().getRenderViewEntity();
 			updateQuaternion(ent);
 		}
 	}

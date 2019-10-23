@@ -17,13 +17,13 @@ public class CoroUtilPhysics {
      * @return true if the point is inside the boundary, false otherwise
      *
      */
-    public static boolean isInConvexShape(Vec3 test, List<Vec3> points) {
+    public static boolean isInConvexShape(Vec3 test, List<Vec3> field_75884_a) {
     	int i;
     	int j;
     	boolean result = false;
-    	for (i = 0, j = points.size() - 1; i < points.size(); j = i++) {
-    		Vec3 vecI = points.get(i);
-    		Vec3 vecJ = points.get(j);
+    	for (i = 0, j = field_75884_a.size() - 1; i < field_75884_a.size(); j = i++) {
+    		Vec3 vecI = field_75884_a.get(i);
+    		Vec3 vecJ = field_75884_a.get(j);
     		if ((vecI.zCoord > test.zCoord) != (vecJ.zCoord > test.zCoord) &&
     				(test.xCoord < (vecJ.xCoord - vecI.xCoord) * (test.zCoord - vecI.zCoord) / (vecJ.zCoord-vecI.zCoord) + vecI.xCoord)) {
     			result = !result;
@@ -37,19 +37,19 @@ public class CoroUtilPhysics {
      * Doesnt check if you are inside shape, use isInConvexShape for that
      * 
      * @param point
-     * @param points
+     * @param field_75884_a
      * @return
      */
-    public static double getDistanceToShape(Vec3 point, List<Vec3> points) {
+    public static double getDistanceToShape(Vec3 point, List<Vec3> field_75884_a) {
     	float closestDist1 = 9999;
     	float closestDist2 = 9999;
     	
     	Vec3 closestPoint1 = null;
     	Vec3 closestPoint2 = null;
     	
-    	//loop twice to account for edge case where points are ordered in increasing order of closeness, causing second closest clause to never trigger
+    	//loop twice to account for edge case where field_75884_a are ordered in increasing order of closeness, causing second closest clause to never trigger
     	for (int i = 0; i < 2; i++) {
-	    	for (Vec3 pointTest : points) {
+	    	for (Vec3 pointTest : field_75884_a) {
 	    		double dist = pointTest.distanceTo(point);
 	    		
 	    		if (dist < closestDist1) {
@@ -63,7 +63,7 @@ public class CoroUtilPhysics {
     	}
     	
     	if (closestPoint1 == null || closestPoint2 == null) {
-    		//should never happen unless too few points
+    		//should never happen unless too few field_75884_a
     		return -1;
     	}
     	

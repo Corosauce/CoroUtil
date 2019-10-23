@@ -27,7 +27,7 @@ public class CoroUtilPath {
 	}
 	
 	public static boolean tryMoveToEntityLivingLongDist(MobEntity entSource, Entity entityTo, double moveSpeedAmp) {
-		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getEntityBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
+		return tryMoveToXYZLongDist(entSource, entityTo.posX, entityTo.getBoundingBox().minY, entityTo.posZ, moveSpeedAmp);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public class CoroUtilPath {
 
 				double distToPlayer = ent.getDistance(x, y, z);//ent.getDistanceToEntity(player);
 
-				double followDist = ent.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).getAttributeValue();
+				double followDist = ent.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).get();
 
 				if (distToPlayer <= followDist) {
 					//boolean success = ent.getNavigator().tryMoveToEntityLiving(player, moveSpeedAmp);

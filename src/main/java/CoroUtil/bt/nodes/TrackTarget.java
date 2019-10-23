@@ -24,7 +24,7 @@ public class TrackTarget extends Selector {
 	@Override
 	public EnumBehaviorState tick() {
 		
-		if (blackboard.isFighting.getValue() && blackboard.shouldChaseTarget.getValue()) {
+		if (blackboard.isFighting.get() && blackboard.shouldChaseTarget.get()) {
 			blackboard.trackTarget(false);
 		}
 		

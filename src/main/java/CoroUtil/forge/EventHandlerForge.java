@@ -25,7 +25,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -71,7 +71,7 @@ public class EventHandlerForge {
 
 					//also remove invasion skip buff since the invaders got what they wanted (also covers edge case of player removing invasion mod and buff remaining)
 					DynamicDifficulty.setInvasionSkipBuff((PlayerEntity) event.getEntity(), 0);
-					//event.getEntity().getEntityData().setFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
+					//event.getEntity().getPersistentData().putFloat(DynamicDifficulty.dataPlayerInvasionSkipBuff, 0);
 				}
 
 				UtilEntityBuffs.onDeath(event);
@@ -164,7 +164,7 @@ public class EventHandlerForge {
 			int rate = 10;
 			int range = 10;
 
-			if (ent.world.isRemote && ent.world.getTotalWorldTime() % rate == 0) {
+			if (ent.world.isRemote && ent.world.getGameTime() % rate == 0) {
 				if (ent instanceof PlayerEntity) {
 					for (int x = -range; x <= range; x++) {
 						for (int y = -range; y <= range; y++) {
@@ -190,39 +190,39 @@ public class EventHandlerForge {
 
 										if (isTileEntity) {
 											if (cantMineTileEntity) {
-												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xAA0000));
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0xAA0000));
 											} else {
-												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x0000FF));
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0x0000FF));
 											}
 										} else {
 											//use this code when it becomes a thing
 											/*if (cantBreakAtAllEver) {
-												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0xFF0000));
 											}*/
 											if (cantConvertToRepairing_RegularBlock) {
-												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFFFF00));
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0xFFFF00));
 											} else {
-												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
+												DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0x00FF00));
 											}
 										}
 
 										//if (UtilMining.canMineBlock(ent.world, pos) && UtilMining.canConvertToRepairingBlock(ent.world, ent.world.getBlockState(pos))) {
 										/*if (cantMineRegularBlock) {
-											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFF0000));
+											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0xFF0000));
 											//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0xFF0000, 0);
 										} else if (!ent.world.isAirBlock(pos)) {
-											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0x00FF00));
+											DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0x00FF00));
 											//PacketHelper.spawnDebugRender(ent.world.provider.getDimension(), pos, 40, 0x00FF00, 0);
 										}*/
 									} else if (!ent.world.isAirBlock(pos)) {
-										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getTotalWorldTime() + rate, 0xFFFFFF));
+										DebugRenderer.addRenderable(new DebugRenderEntry(pos, ent.world.getGameTime() + rate, 0xFFFFFF));
 									}
 								}
 							}
 						}
 					}
-					/*DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getTotalWorldTime() + 70, 0x00FF00));
-					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition().add(1, 0, 0), ent.world.getTotalWorldTime() + 70, 0x00FF00));*/
+					/*DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition(), ent.world.getGameTime() + 70, 0x00FF00));
+					DebugRenderer.addRenderable(new DebugRenderEntry(ent.getPosition().add(1, 0, 0), ent.world.getGameTime() + 70, 0x00FF00));*/
 				}
 			}
 
@@ -233,7 +233,7 @@ public class EventHandlerForge {
 			int walkOnRate = 5;
 			
 			if (!ent.world.isRemote) {
-				if (ent.world.getTotalWorldTime() % walkOnRate == 0) {
+				if (ent.world.getGameTime() % walkOnRate == 0) {
 					double speed = Math.sqrt(ent.motionX * ent.motionX + ent.motionY * ent.motionY + ent.motionZ * ent.motionZ);
 					if (ent instanceof PlayerEntity) {
 						Vec3 vec = CoroUtilPlayer.getPlayerSpeedCapped((PlayerEntity) ent, 0.1F);
@@ -242,14 +242,14 @@ public class EventHandlerForge {
 					if (speed > 0.08) {
 						//System.out.println(entityId + " - speed: " + speed);
 						int newX = MathHelper.floor(ent.posX);
-						int newY = MathHelper.floor(ent.getEntityBoundingBox().minY - 1);
+						int newY = MathHelper.floor(ent.getBoundingBox().minY - 1);
 						int newZ = MathHelper.floor(ent.posZ);
 						BlockState state = ent.world.getBlockState(new BlockPos(newX, newY, newZ));
 						Block id = state.getBlock();
 						
 						//check for block that can have beaten path data
 						
-						if (id == Blocks.GRASS) {
+						if (id == Blocks.ORGANIC) {
 							BlockDataPoint bdp = WorldDirectorManager.instance().getBlockDataGrid(ent.world).getBlockData(newX, newY, newZ);// ServerTickHandler.wd.getBlockDataGrid(worldObj).getBlockData(newX, newY, newZ);
 							
 							//add depending on a weight?
@@ -260,7 +260,7 @@ public class EventHandlerForge {
 							if (bdp.walkedOnAmount > 5F) {
 								//System.out.println("dirt!!!");
 								if (ent.world.getBlockState(new BlockPos(newX, newY+1, newZ)).getBlock() == Blocks.AIR) {
-									ent.world.setBlockState(new BlockPos(newX, newY, newZ), Blocks.GRASS_PATH.getDefaultState());
+									ent.world.setBlockState(new BlockPos(newX, newY, newZ), Blocks.ORGANIC_PATH.getDefaultState());
 								}
 
 								//reset walked on amount since its a new block state
@@ -277,10 +277,10 @@ public class EventHandlerForge {
 
 		//remove tasks that are marked to be removed
 		if (!ent.world.isRemote) {
-			if ((ent.world.getTotalWorldTime() + ent.getEntityId()) % 20 == 0) {
+			if ((ent.world.getGameTime() + ent.getEntityId()) % 20 == 0) {
 
 				//NOTE: this code doesnt actually know if its an invasion, it just assumes if it has the buff and its now daytime, invasion is over
-				if (ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone && ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
+				if (ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone && ent.getPersistentData().getBoolean(UtilEntityBuffs.dataEntityBuffed)) {
 
 					//persistance management here too maybe?
 					//invasion mod preventing this via AllowDespawn event in its handler class
@@ -292,19 +292,19 @@ public class EventHandlerForge {
 							GoalSelector.EntityAITaskEntry task = it.next();
 							if (task.action instanceof IInvasionControlledTask) {
 								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
-									//entL.tasks.removeTask(task.action);
+									//entL.tasks.removeGoal(task.action);
 									task.action.resetTask();
 									it.remove();
 								}
 							}
 						}
 
-						it = entL.targetTasks.taskEntries.iterator();
+						it = entL.targetSelector.taskEntries.iterator();
 						while (it.hasNext()) {
 							GoalSelector.EntityAITaskEntry task = it.next();
 							if (task.action instanceof IInvasionControlledTask) {
 								if (((IInvasionControlledTask) task.action).shouldBeRemoved()) {
-									//entL.targetTasks.removeTask(task.action);
+									//entL.targetSelector.removeGoal(task.action);
 									task.action.resetTask();
 									it.remove();
 								}
@@ -315,12 +315,12 @@ public class EventHandlerForge {
 			}
 
 
-			if (ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
+			if (ent.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging)) {
 				//trying to get miners to push others out of the way
 				boolean pushMobsAwayForMiners = ConfigCoroUtilAdvanced.minersPushAwayOtherNonMinerMobsWhileMining;
 				if (pushMobsAwayForMiners) {
 
-					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getEntityBoundingBox().grow(0.5, 0.5, 0.5), EntityPredicates.getTeamCollisionPredicate(ent));
+					List<Entity> list = ent.world.getEntitiesInAABBexcluding(ent, ent.getBoundingBox().grow(0.5, 0.5, 0.5), EntityPredicates.getTeamCollisionPredicate(ent));
 
 					if (!list.isEmpty())
 					{
@@ -331,10 +331,10 @@ public class EventHandlerForge {
 
 							//from applyEntityCollision()
 
-							CompoundNBT data2 = entityIn.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+							CompoundNBT data2 = entityIn.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data);
 
 							//if config allows, push only buffed mobs, including wave spawned and extra enhanced ones
-							boolean canPush = !ConfigCoroUtilAdvanced.minersPushAwayOnlyOtherBuffedMobs || ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed);
+							boolean canPush = !ConfigCoroUtilAdvanced.minersPushAwayOnlyOtherBuffedMobs || ent.getPersistentData().getBoolean(UtilEntityBuffs.dataEntityBuffed);
 
 							if (entityIn instanceof MobEntity && !ent.isRidingSameEntity(entityIn) && !data2.getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Digging) && canPush)
 							{
@@ -395,7 +395,7 @@ public class EventHandlerForge {
 						ent.motionX = 0;
 						ent.motionY = 0;
 						ent.motionZ = 0;
-						ent.world.handleMaterialAcceleration(ent.getEntityBoundingBox(), Material.WATER, ent);
+						ent.world.handleMaterialAcceleration(ent.getBoundingBox(), Material.WATER, ent);
 						//get changes
 						double motionXChange = ent.motionX;
 						double motionYChange = ent.motionY;
@@ -410,7 +410,7 @@ public class EventHandlerForge {
 				boolean waterFixLeapOut = true;
 				if (waterFixLeapOut) {
 					String nbtID = "CoroUtil_wasInWater";
-					if (ent.getEntityData().getBoolean(nbtID)) {
+					if (ent.getPersistentData().getBoolean(nbtID)) {
 						if (!ent.isInWater()) {
 							if (ent.isCollidedHorizontally) {
 								ent.motionY += 0.4F;
@@ -418,7 +418,7 @@ public class EventHandlerForge {
 						}
 					}
 
-					ent.getEntityData().setBoolean(nbtID, ent.isInWater());
+					ent.getPersistentData().putBoolean(nbtID, ent.isInWater());
 				}
 			}
 
@@ -447,10 +447,10 @@ public class EventHandlerForge {
 			CreatureEntity ent = (CreatureEntity) event.getEntity();
 
 			//if buffed and was not literally just spawned (prevents duplicate buff applying from invasion spawning + this code)
-			if (ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityBuffed) && !ent.getEntityData().getBoolean(UtilEntityBuffs.dataEntityInitialSpawn)) {
+			if (ent.getPersistentData().getBoolean(UtilEntityBuffs.dataEntityBuffed) && !ent.getPersistentData().getBoolean(UtilEntityBuffs.dataEntityInitialSpawn)) {
 				float difficultySpawnedIn = 0;
-				if (ent.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
-					difficultySpawnedIn = ent.getEntityData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
+				if (ent.getPersistentData().contains(UtilEntityBuffs.dataEntityBuffed_Difficulty)) {
+					difficultySpawnedIn = ent.getPersistentData().getFloat(UtilEntityBuffs.dataEntityBuffed_Difficulty);
 				} else {
 					//safely get difficulty for area
 					if (ent.world.isBlockLoaded(ent.getPosition())) {
@@ -459,7 +459,7 @@ public class EventHandlerForge {
 				}
 
 				List<String> buffs = UtilEntityBuffs.getAllBuffNames();
-				CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
+				CompoundNBT data = ent.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data);
 				for (String buff : buffs) {
 					if (data.getBoolean(buff)) {
 						BuffBase buffObj = UtilEntityBuffs.getBuff(buff);
@@ -513,19 +513,19 @@ public class EventHandlerForge {
 	@SubscribeEvent
 	public void playerCloneEvent(PlayerEvent.Clone event) {
 
-		CompoundNBT nbtOld = event.getOriginal().getEntityData();
-		CompoundNBT nbtNew = event.getEntityPlayer().getEntityData();
+		CompoundNBT nbtOld = event.getOriginal().getPersistentData();
+		CompoundNBT nbtNew = event.getEntityPlayer().getPersistentData();
 
-		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestOre, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestOre));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestLog, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestLog));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerHarvestRating, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestRating));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipping, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipping));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipCount, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCount));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerInvasionSkipBuff, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipBuff));
-		nbtNew.setLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerHarvestOre, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestOre));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerHarvestLog, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestLog));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerHarvestRating, nbtOld.getLong(DynamicDifficulty.dataPlayerHarvestRating));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerInvasionSkipping, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipping));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkippingTooSoon));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerInvasionSkipCount, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCount));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipCountForMultiplier));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerInvasionSkipBuff, nbtOld.getLong(DynamicDifficulty.dataPlayerInvasionSkipBuff));
+		nbtNew.putLong(DynamicDifficulty.dataPlayerServerTicks, nbtOld.getLong(DynamicDifficulty.dataPlayerServerTicks));
 
 	}
 

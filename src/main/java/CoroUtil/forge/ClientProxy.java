@@ -32,7 +32,7 @@ public class ClientProxy extends CommonProxy
         
         ClientCommandHandler.instance.registerCommand(new CommandCoroUtilClient());
 
-        addMapping(EntityBatSmart.class, new RenderBatSmart(Minecraft.getMinecraft().getRenderManager()));
+        addMapping(EntityBatSmart.class, new RenderBatSmart(Minecraft.getInstance().getRenderManager()));
     }
 
     @Override
@@ -43,11 +43,11 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String unlocalizedName, boolean creativeTab) {
-        super.addBlock(event, parBlock, unlocalizedName, creativeTab);
+    public void addBlock(RegistryEvent.Register<Block> event, Block parBlock, String translationKey, boolean creativeTab) {
+        super.addBlock(event, parBlock, translationKey, creativeTab);
 
         if (!(parBlock instanceof BlockBlank)) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(parBlock), 0, new ModelResourceLocation(CoroUtil.modID + ":" + unlocalizedName, "inventory"));
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(parBlock), 0, new ModelResourceLocation(CoroUtil.modID + ":" + translationKey, "inventory"));
         }
     }
 

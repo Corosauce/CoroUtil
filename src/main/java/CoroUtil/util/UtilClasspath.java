@@ -14,7 +14,7 @@ public class UtilClasspath {
     public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
         try {
             //client side only way
-            /*IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+            /*IResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
             IResource iresource = resourceManager.getResource(resourceLocation);*/
             //server side compatible way
             String str = "assets/" + resourceLocation.toString().replace(":", "/");
@@ -34,7 +34,7 @@ public class UtilClasspath {
 
     public static CompoundNBT getNBTFromResourceLocation(ResourceLocation resourceLocation) {
         try {
-            URL url = UtilClasspath.class.getResource("/assets/" + resourceLocation.getResourceDomain() + "/" + resourceLocation.getResourcePath());
+            URL url = UtilClasspath.class.getResource("/assets/" + resourceLocation.getNamespace() + "/" + resourceLocation.getPath());
             CompoundNBT nbttagcompound = CompressedStreamTools.readCompressed(url.openStream());
             return nbttagcompound;
         } catch (Exception ex) {

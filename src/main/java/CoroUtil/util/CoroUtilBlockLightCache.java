@@ -135,10 +135,10 @@ public class CoroUtilBlockLightCache {
     public static float getBrightnessFromLightmap(World world, float x, float y, float z) {
 
         BlockPos pos = new BlockPos(x, y, z);
-        int i = world.getLightFromNeighborsFor(LightType.SKY, pos);
+        int i = world.getLightFromNeighborsFor(LightType.THE_END, pos);
         int j = world.getLightFromNeighborsFor(LightType.BLOCK, pos);
 
-        int[] texData = Minecraft.getMinecraft().entityRenderer.lightmapTexture.getTextureData();
+        int[] texData = Minecraft.getInstance().gameRenderer.lightmapTexture.getTextureData();
 
         int color = texData[(i * 16) + j];
 

@@ -66,7 +66,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
         {
             return false;
         }
-        else if (!entitylivingbase.isEntityAlive())
+        else if (!entitylivingbase.isAlive())
         {
             return false;
         }
@@ -80,7 +80,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
 
                 boolean debugTPSSpike = false;
                 if (debugTPSSpike) {
-                    CULog.dbg("EntityAIChaseFromFar shouldExecute trypath: " + attacker.world.getTotalWorldTime());
+                    CULog.dbg("EntityAIChaseFromFar shouldExecute trypath: " + attacker.world.getGameTime());
                 }
 
                 CoroUtilPath.tryMoveToEntityLivingLongDist(attacker, entitylivingbase, 1);
@@ -94,7 +94,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
                 }
                 else
                 {
-                    return this.getAttackReachSqr(entitylivingbase) >= this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+                    return this.getAttackReachSqr(entitylivingbase) >= this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
                 }
             } else {
                 return false;
@@ -114,7 +114,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
         {
             return false;
         }
-        else if (!entitylivingbase.isEntityAlive())
+        else if (!entitylivingbase.isAlive())
         {
             return false;
         }
@@ -155,7 +155,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
             /** DO NOT SET NULL TARGET UNLESS ITS A TARGET TASK, will crash vanilla with this otherwise:
             Caused by: java.lang.NullPointerException
             at net.minecraft.entity.ai.EntityLookHelper.setLookPositionWithEntity(EntityLookHelper.java:31) ~[EntityLookHelper.class:?]
-            at net.minecraft.entity.ai.EntityAIAttackMelee.updateTask(EntityAIAttackMelee.java:142) ~[EntityAIAttackMelee.class:?]
+            at net.minecraft.entity.ai.EntityAIAttackMelee.tick(EntityAIAttackMelee.java:142) ~[EntityAIAttackMelee.class:?]
             vanilla can get away with this because its own only task this one was based on is the only one that does it in the task list, 2 doing it = crash
             */
 
@@ -169,7 +169,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
      * Keep ticking a continuous task that has already been started
      */
     @Override
-    public void updateTask()
+    public void tick()
     {
         LivingEntity entitylivingbase = this.attacker.getAttackTarget();
         //fix edge case where other code was causing this situation
@@ -177,8 +177,8 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
             resetTask();
             return;
         }
-        this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
-        double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+        this.attacker.getLookController().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+        double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getBoundingBox().minY, entitylivingbase.posZ);
         --this.delayCounter;
 
         if ((this.longMemory ||
@@ -188,7 +188,7 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
                         this.attacker.getRNG().nextFloat() < 0.05F))
         {
             this.targetX = entitylivingbase.posX;
-            this.targetY = entitylivingbase.getEntityBoundingBox().minY;
+            this.targetY = entitylivingbase.getBoundingBox().minY;
             this.targetZ = entitylivingbase.posZ;
             this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
 
@@ -221,9 +221,9 @@ public class EntityAIChaseFromFar extends Goal implements ITaskInitializer, IInv
         //this.checkAndPerformAttack(entitylivingbase, d0);
     }
 
-    protected double getAttackReachSqr(LivingEntity attackTarget)
+    protected double getAttackReachSqr(LivingEntity field_70696_bz)
     {
-        return (double)(this.attacker.width * 2.0F * this.attacker.width * 2.0F + attackTarget.width);
+        return (double)(this.attacker.width * 2.0F * this.attacker.width * 2.0F + field_70696_bz.width);
     }
 
     @Override

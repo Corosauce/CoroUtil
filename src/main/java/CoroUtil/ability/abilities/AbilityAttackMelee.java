@@ -63,7 +63,7 @@ public class AbilityAttackMelee extends Ability {
 		//System.out.println("isRemote: " + owner.world.isRemote);
 		if (owner.world.isRemote) {
 			Random rand = new Random();
-			//owner.world.spawnParticle("largesmoke", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
+			//owner.world.addParticle("largesmoke", owner.posX + (rand.nextDouble() - 0.5D) * (double)owner.width, owner.posY + rand.nextDouble() * (double)owner.height, owner.posZ + (rand.nextDouble() - 0.5D) * (double)owner.width, 0.0D, 0.0D, 0.0D);
 		} else {
 			
 			if (switchToMeleeSlot) {
@@ -79,7 +79,7 @@ public class AbilityAttackMelee extends Ability {
 			double speed = 0.8D;
 			double hitRange = 1.5D;
 			
-			if (target != null && (target.isDead || /*target.getHealth() <= 0 || */(target instanceof LivingEntity && ((LivingEntity)target).deathTime > 0))) {
+			if (target != null && (target.removed || /*target.getHealth() <= 0 || */(target instanceof LivingEntity && ((LivingEntity)target).deathTime > 0))) {
 				this.setFinishedPerform();
 			}
 			

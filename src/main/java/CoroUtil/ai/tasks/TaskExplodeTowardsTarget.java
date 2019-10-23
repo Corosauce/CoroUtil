@@ -147,7 +147,7 @@ public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, 
 
 	@Override
 	public boolean shouldBeRemoved() {
-		boolean forInvasion = entity.getEntityData().getBoolean(dataUseInvasionRules);
+		boolean forInvasion = entity.getPersistentData().getBoolean(dataUseInvasionRules);
 
 		if (forInvasion && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
 			//once its day, disable forever
@@ -174,7 +174,7 @@ public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, 
 		{
 			boolean flag = entity.world.getGameRules().getBoolean("mobGriefing");
 			entity.world.createExplosion(entity, entity.posX, entity.posY, entity.posZ, (float)3, flag);
-			entity.setDead();
+			entity.remove();
 		}
 	}
 
@@ -190,7 +190,7 @@ public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, 
 	 * @return
 	 */
 	public boolean isClosestPathable() {
-		if (entity.world.getTotalWorldTime() > lastTimePathChecked + pathableCheckCountMax) {
+		if (entity.world.getGameTime() > lastTimePathChecked + pathableCheckCountMax) {
 			if (entity.getAttackTarget() == null) {
 				failedPathCount = 0;
 				return false;
@@ -204,7 +204,7 @@ public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, 
 				if (explodeAboveInstantly) {
 					double vecX = entity.getAttackTarget().posX - entity.posX;
 					//feet
-					double vecY = entity.getAttackTarget().getEntityBoundingBox().minY - entity.getEntityBoundingBox().minY;
+					double vecY = entity.getAttackTarget().getBoundingBox().minY - entity.getBoundingBox().minY;
 					double vecZ = entity.getAttackTarget().posZ - entity.posZ;
 
 					double distHoriz = Math.sqrt(vecX * vecX + vecZ * vecZ);
@@ -237,7 +237,7 @@ public class TaskExplodeTowardsTarget extends Goal implements ITaskInitializer, 
 					return false;
 				}
 
-				lastTimePathChecked = entity.world.getTotalWorldTime();
+				lastTimePathChecked = entity.world.getGameTime();
 
 
 				//backup path since tryMoveToEntityLivingLongDist will override existing one and we just want to query if theres a path

@@ -64,7 +64,7 @@ public class WorldEvent {
 	public int lastLeaderCount;
 	
 	public enum EnumWorldEventType {
-		INV_PORTAL_CATACOMBS, INV_PORTAL_NETHER, INV_CAVE, BOSS_CATACOMBS;
+		INV_PORTAL_CATACOMBS, INV_NETHER_NETHER_NETHER_NETHER_PORTAL_NETHER, INV_CAVE, BOSS_CATACOMBS;
 		public String[] eventEnumToName = new String[] { "Portal Invasion", "Nether Invasion", "Cave Invasion", "Boss Event" };
 		
 		private static final Map<Integer, EnumWorldEventType> lookup = new HashMap<Integer, EnumWorldEventType>();
@@ -93,14 +93,14 @@ public class WorldEvent {
 		
 		//at end of wave
 		//scan area for MORE players to add, dont clear the existing list
-		//update each players rating, it sets it to player nbt
+		//tick each players rating, it sets it to player nbt
 		//invasion sets currentWavePlayerRating to the calculated average across all players
 		
 		//next wave or invasion eventually starts, has currentWavePlayerRating to work with
 	}
 	
 	public static WorldEvent newInvasionFromNBT(CompoundNBT par1NBTTagCompound) {
-		EnumWorldEventType type = EnumWorldEventType.get(par1NBTTagCompound.getInteger("type"));
+		EnumWorldEventType type = EnumWorldEventType.get(par1NBTTagCompound.getInt("type"));
 		
 		WorldEvent inv = null;
 		
@@ -108,21 +108,21 @@ public class WorldEvent {
 		
 		if (type == EnumWorldEventType.INV_CAVE) {
 			
-		} else if (type == EnumWorldEventType.INV_PORTAL_CATACOMBS) {
+		} else if (type == EnumWorldEventType.INV_NETHER_NETHER_NETHER_NETHER_PORTAL_CATACOMBS) {
 			inv = new InvasionPortalCatacombs();
 		} else if (type == EnumWorldEventType.BOSS_CATACOMBS) {
 			inv = new BossCatacombs();
 		}*/
 			
-		inv.readNBT(par1NBTTagCompound);
+		inv.read(par1NBTTagCompound);
 		return inv;
 	}
 	
 	public void tick() {
 		World world = DimensionManager.getWorld(dimensionID);
 		PlayerEntity entP = world.getPlayerEntityByName(mainPlayerName);
-		////////////if (entP != null) WorldDirector.getPlayerNBT(entP.username).setInteger("HWInvasionCooldown", ModConfigFields.coolDownBetweenInvasionsPortal + 1);
-		//if (DimensionManager.getWorld(dimensionID).getWorldTime() % 40 == 0) updatePlayerStates();
+		////////////if (entP != null) WorldDirector.getPlayerNBT(entP.username).putInt("HWInvasionCooldown", ModConfigFields.coolDownBetweenInvasionsPortal + 1);
+		//if (DimensionManager.getWorld(dimensionID).getDayTime() % 40 == 0) updatePlayerStates();
 		//invasionEnd();
 		
 		//TEMP!!!
@@ -139,11 +139,11 @@ public class WorldEvent {
 	}
     
     public boolean checkForActiveInvadersCached() {
-    	if (lastCheckedInvasionCount == 0 || DimensionManager.getWorld(dimensionID).getWorldTime() % 100 == 0) {
+    	if (lastCheckedInvasionCount == 0 || DimensionManager.getWorld(dimensionID).getDayTime() % 100 == 0) {
 	    	for (int i = 0; i < invasionEntities.size(); i++) {
 	    		LivingEntity ent = invasionEntities.get(i);
 	    		
-	    		if (ent.isDead) {
+	    		if (ent.removed) {
 	    			invasionEntities.remove(i);
 	    		} else {
 	    			//HostileWorlds.dbg("murrrrrrrr" + ((EntityLivingBase)ent).getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ));
@@ -216,7 +216,7 @@ public class WorldEvent {
 			
 			if (entP != null) {
 				playersFound++;
-				////////////totalRating += WorldDirector.getPlayerNBT(entP.username).getInteger("HWPlayerRating");
+				////////////totalRating += WorldDirector.getPlayerNBT(entP.username).getInt("HWPlayerRating");
 			}
 		}
 		
@@ -229,7 +229,7 @@ public class WorldEvent {
 			waveCount = portal.numOfWavesSpawned;
 		}*/
 		
-		////////////waveCount = WorldDirector.getPlayerNBT(mainPlayerName).getInteger("numOfWavesSpawned");
+		////////////waveCount = WorldDirector.getPlayerNBT(mainPlayerName).getInt("numOfWavesSpawned");
 		
 		float playerCountAdditiveFactor = 3;
 		float waveCountFactor = 2;
@@ -286,7 +286,7 @@ public class WorldEvent {
 				
 				//initial removal of current weap attrib
 				ItemStack itemstack = entP.inventory.getCurrentItem();
-				if (!itemstack.isEmpty()) entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+				if (!itemstack.isEmpty()) entP.getAttributes().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 				
 				for (int slotIndex = 0; slotIndex < entP.inventory.mainInventory.size(); slotIndex++) {
 					if (!entP.inventory.mainInventory.get(slotIndex).isEmpty()) {
@@ -296,17 +296,17 @@ public class WorldEvent {
 	                    if (!itemstack.isEmpty())
 	                    {
 	                    	//add attrib
-	                    	entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+	                    	entP.getAttributes().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                    }
 	                    
 	                    //get val
-	                    float f = (float)entP.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
+	                    float f = (float)entP.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).get();
 	                    float f1 = 0.0F;
 
 	                    if (entP instanceof LivingEntity)
 	                    {
 	                    	//these need to have a target entity passed to them, hmmmmmmm, use own reference for now like old code apparently did
-	                    	//TODO: update for 1.8 somehow... 
+	                    	//TODO: tick for 1.8 somehow... 
 	                        //f1 = EnchantmentHelper.getEnchantmentModifierLiving(entP, (EntityLivingBase)entP);
 	                        //i += EnchantmentHelper.getKnockbackModifier(this, (EntityLivingBase)par1Entity);
 	                    }
@@ -316,7 +316,7 @@ public class WorldEvent {
 						if (!itemstack.isEmpty())
 	                    {
 							//remove attrib
-							entP.getAttributeMap().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+							entP.getAttributes().removeAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 	                    }
 						
 	                    if (dmg > bestWeaponValue) {
@@ -327,58 +327,58 @@ public class WorldEvent {
 				
 				//readd of current weapon attrib
 				itemstack = entP.inventory.getCurrentItem();
-				if (!itemstack.isEmpty()) entP.getAttributeMap().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
+				if (!itemstack.isEmpty()) entP.getAttributes().applyAttributeModifiers(itemstack.getAttributeModifiers(EquipmentSlotType.MAINHAND));
 				
 				//System.out.println("calculated bestWeaponValue: " + bestWeaponValue);
-				/////////////////WorldDirector.getPlayerNBT(entP.username).setInteger("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));
+				/////////////////WorldDirector.getPlayerNBT(entP.username).putInt("HWPlayerRating", (int)(armorValue + bestWeaponValue + (hasGlove ? 20 : 0)));
 			}
 		}
     }
 	
-	public void writeNBT(CompoundNBT data) {
-		//data.setFloat("lastWavePlayerRating", lastWavePlayerRating);
-		data.setFloat("currentWaveDifficultyRating", currentWaveDifficultyRating);
-		data.setInteger("dimensionID", dimensionID);
-    	data.setInteger("type", type.ordinal());
+	public void write(CompoundNBT data) {
+		//data.putFloat("lastWavePlayerRating", lastWavePlayerRating);
+		data.putFloat("currentWaveDifficultyRating", currentWaveDifficultyRating);
+		data.putInt("dimensionID", dimensionID);
+    	data.putInt("type", type.ordinal());
     	if (coordSource != null) CoroUtilFile.writeCoords("source", coordSource, data);
     	if (coordDestination != null) CoroUtilFile.writeCoords("dest", coordDestination, data);
-    	data.setInteger("ticksActive", ticksActive);
-    	data.setInteger("ticksMaxActive", ticksMaxActive);
-    	data.setInteger("waveCount", waveCount);
-    	data.setString("mainPlayerName", mainPlayerName);
-    	data.setInteger("state", state.ordinal());
+    	data.putInt("ticksActive", ticksActive);
+    	data.putInt("ticksMaxActive", ticksMaxActive);
+    	data.putInt("waveCount", waveCount);
+    	data.putString("mainPlayerName", mainPlayerName);
+    	data.putInt("state", state.ordinal());
     	
     	//for client syncing
-    	data.setInteger("currentWaveCountFromPortal", currentWaveCountFromPortal);
-    	data.setInteger("currentWaveSpawnedInvaders", currentWaveSpawnedInvaders);
-    	data.setInteger("currentWavePlayerCount", currentWavePlayerCount);
+    	data.putInt("currentWaveCountFromPortal", currentWaveCountFromPortal);
+    	data.putInt("currentWaveSpawnedInvaders", currentWaveSpawnedInvaders);
+    	data.putInt("currentWavePlayerCount", currentWavePlayerCount);
     	int dist = -1;
     	if (coordDestination != null && invasionEntities.size() > 0) dist = (int) ((LivingEntity)invasionEntities.get(0)).getDistance(coordDestination.posX, coordDestination.posY, coordDestination.posZ);
-    	data.setInteger("lastLeaderDist", dist);
-    	data.setInteger("lastLeaderCount", invasionEntities.size());
-    	data.setInteger("curCooldown", curCooldown);
+    	data.putInt("lastLeaderDist", dist);
+    	data.putInt("lastLeaderCount", invasionEntities.size());
+    	data.putInt("curCooldown", curCooldown);
     }
 	
-	public void readNBT(CompoundNBT data) {
+	public void read(CompoundNBT data) {
 		//lastWavePlayerRating = data.getFloat("lastWavePlayerRating");
 		currentWaveDifficultyRating = data.getFloat("currentWaveDifficultyRating");
-		dimensionID = data.getInteger("dimensionID");
-    	type = EnumWorldEventType.get(data.getInteger("type"));
+		dimensionID = data.getInt("dimensionID");
+    	type = EnumWorldEventType.get(data.getInt("type"));
     	coordSource = CoroUtilFile.readCoords("source", data);
     	coordDestination = CoroUtilFile.readCoords("dest", data);
-    	ticksActive = data.getInteger("ticksActive");
-    	ticksMaxActive = data.getInteger("ticksMaxActive");
-    	waveCount = data.getInteger("waveCount");
+    	ticksActive = data.getInt("ticksActive");
+    	ticksMaxActive = data.getInt("ticksMaxActive");
+    	waveCount = data.getInt("waveCount");
     	mainPlayerName = data.getString("mainPlayerName");
-    	state = EnumJobState.get(data.getInteger("state"));
+    	state = EnumJobState.get(data.getInt("state"));
     	
     	//for client syncing
-    	currentWaveCountFromPortal = data.getInteger("currentWaveCountFromPortal");
-    	currentWaveSpawnedInvaders = data.getInteger("currentWaveSpawnedInvaders");
-    	currentWavePlayerCount = data.getInteger("currentWavePlayerCount");
-    	lastLeaderDist = data.getInteger("lastLeaderDist");
-    	lastLeaderCount = data.getInteger("lastLeaderCount");
-    	curCooldown = data.getInteger("curCooldown");
+    	currentWaveCountFromPortal = data.getInt("currentWaveCountFromPortal");
+    	currentWaveSpawnedInvaders = data.getInt("currentWaveSpawnedInvaders");
+    	currentWavePlayerCount = data.getInt("currentWavePlayerCount");
+    	lastLeaderDist = data.getInt("lastLeaderDist");
+    	lastLeaderCount = data.getInt("lastLeaderCount");
+    	curCooldown = data.getInt("curCooldown");
     }
 	
 	public void init() {

@@ -2,7 +2,7 @@ package CoroUtil.util;
 
 public enum EnumSpawnPlacementType
     {
-        GROUND,
+        EARTH,
         SURFACE,
         CAVE,
         AIR,

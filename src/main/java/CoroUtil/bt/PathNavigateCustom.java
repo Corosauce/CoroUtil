@@ -79,7 +79,7 @@ public class PathNavigateCustom
     {
         this.theEntity = par1EntityLiving;
         this.world = par2World;
-        this.pathSearchRange = par1EntityLiving.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+        this.pathSearchRange = par1EntityLiving.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
         this.pathFinder = getPathFinder();
     }
     
@@ -150,7 +150,7 @@ public class PathNavigateCustom
      */
     public float getPathSearchRange()
     {
-        return (float)this.pathSearchRange.getAttributeValue();
+        return (float)this.pathSearchRange.get();
     }
 
     /**
@@ -243,7 +243,7 @@ public class PathNavigateCustom
 
             if (this.noSunPathfind)
             {
-                this.removeSunnyPath();
+                this.trimPath();
             }
 
             if (this.currentPath.getCurrentPathLength() == 0)
@@ -269,7 +269,7 @@ public class PathNavigateCustom
         return this.currentPath;
     }
 
-    public void onUpdateNavigation()
+    public void tick()
     {
         ++this.totalTicks;
 
@@ -288,7 +288,7 @@ public class PathNavigateCustom
 
                 if (vec3 != null)
                 {
-                    ((IBTAgent)this.theEntity).getAIBTAgent().moveHelper.setMoveTo(vec3.x, vec3.y, vec3.z, this.speed);
+                    ((IBTAgent)this.theEntity).getAIBTAgent().moveController.setMoveTo(vec3.x, vec3.y, vec3.z, this.speed);
                 }
             }
         }
@@ -410,7 +410,7 @@ public class PathNavigateCustom
     {
         if (this.theEntity.isInWater() && this.canSwimOnSurface)
         {
-            int i = (int)this.theEntity.getEntityBoundingBox().minY;
+            int i = (int)this.theEntity.getBoundingBox().minY;
             Block block = this.world.getBlockState(new BlockPos(MathHelper.floor(this.theEntity.posX), i, MathHelper.floor(this.theEntity.posZ))).getBlock();
             int k = 0;
 
@@ -427,11 +427,11 @@ public class PathNavigateCustom
             }
             while (k <= 16);
 
-            return (int)this.theEntity.getEntityBoundingBox().minY;
+            return (int)this.theEntity.getBoundingBox().minY;
         }
         else
         {
-            return (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D);
+            return (int)(this.theEntity.getBoundingBox().minY + 0.5D);
         }
     }
 
@@ -455,9 +455,9 @@ public class PathNavigateCustom
     /**
      * Trims path data from the end to the first sun covered block
      */
-    private void removeSunnyPath()
+    private void trimPath()
     {
-        if (!this.world.canBlockSeeSky(new BlockPos(MathHelper.floor(this.theEntity.posX), (int)(this.theEntity.getEntityBoundingBox().minY + 0.5D), MathHelper.floor(this.theEntity.posZ))))
+        if (!this.world.canBlockSeeSky(new BlockPos(MathHelper.floor(this.theEntity.posX), (int)(this.theEntity.getBoundingBox().minY + 0.5D), MathHelper.floor(this.theEntity.posZ))))
         {
             for (int i = 0; i < this.currentPath.getCurrentPathLength(); ++i)
             {

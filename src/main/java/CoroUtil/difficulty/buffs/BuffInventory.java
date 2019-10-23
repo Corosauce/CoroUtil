@@ -43,11 +43,11 @@ public class BuffInventory extends BuffBase {
                 if (itemStack.getItem() instanceof ArmorItem) {
                     ArmorItem itemArmor = (ArmorItem) itemStack.getItem();
 
-                    UtilEntityBuffs.setEquipment(ent, itemArmor.armorType, itemStack);
+                    UtilEntityBuffs.setEquipment(ent, itemArmor.slot, itemStack);
                 }
             }
 
-            //update skeleton AI for melee/bow
+            //tick skeleton AI for melee/bow
             if (ent instanceof AbstractSkeletonEntity) {
                 ((AbstractSkeletonEntity) ent).setCombatTask();
             }

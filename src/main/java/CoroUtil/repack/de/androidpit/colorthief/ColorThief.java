@@ -164,7 +164,7 @@ public class ColorThief {
 
         int[][] pixelArray;
 
-        switch (sourceImage.getType()) {
+        switch (sourceImage.getMinecartType()) {
         case BufferedImage.TYPE_3BYTE_BGR:
         case BufferedImage.TYPE_4BYTE_ABGR:
             pixelArray = getPixelsFast(sourceImage, quality, ignoreWhite);
@@ -200,10 +200,10 @@ public class ColorThief {
             boolean ignoreWhite) {
         DataBufferByte imageData = (DataBufferByte) sourceImage.getRaster().getDataBuffer();
         byte[] pixels = imageData.getData();
-        int pixelCount = sourceImage.getWidth() * sourceImage.getHeight();
+        int pixelCount = sourceImage.getAdjustedWidth() * sourceImage.getHeight();
 
         int colorDepth;
-        int type = sourceImage.getType();
+        int type = sourceImage.getMinecartType();
         switch (type) {
         case BufferedImage.TYPE_3BYTE_BGR:
             colorDepth = 3;
@@ -294,7 +294,7 @@ public class ColorThief {
             BufferedImage sourceImage,
             int quality,
             boolean ignoreWhite) {
-        int width = sourceImage.getWidth();
+        int width = sourceImage.getAdjustedWidth();
         int height = sourceImage.getHeight();
 
         int pixelCount = width * height;

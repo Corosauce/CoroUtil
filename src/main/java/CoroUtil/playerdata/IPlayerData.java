@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompoundNBT;
 
 /**
- * Old design, just use entity.getEntityData() nbt
+ * Old design, just use entity.getPersistentData() nbt
  * 
  * @author Corosus
  *

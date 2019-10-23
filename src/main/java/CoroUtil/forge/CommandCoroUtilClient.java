@@ -41,14 +41,14 @@ public class CommandCoroUtilClient extends CommandBase {
 	                Iterator it = entNames.entrySet().iterator();
 	                while (it.hasNext()) {
 	                    Map.Entry pairs = (Map.Entry)it.next();
-	                    var1.sendMessage(new StringTextComponent(pairs.getKey() + " = " + pairs.getValue()));
-	                    //CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, pairs.getKey() + " = " + pairs.getValue());
-	                    //System.out.println(pairs.getKey() + " = " + pairs.getValue());
+	                    var1.sendMessage(new StringTextComponent(pairs.getKey() + " = " + pairs.get()));
+	                    //CoroUtil.sendPlayerMsg((EntityPlayerMP) var1, pairs.getKey() + " = " + pairs.get());
+	                    //System.out.println(pairs.getKey() + " = " + pairs.get());
 	                    it.remove();
 	                }
 				} else if (var2[0].equalsIgnoreCase("reloadshaders") || var2[0].equalsIgnoreCase("rs")) {
 					//RotatingParticleManager.forceShaderReset = true;
-					Minecraft.getMinecraft().refreshResources();
+					Minecraft.getInstance().refreshResources();
 				}
 				
 			}
@@ -63,7 +63,7 @@ public class CommandCoroUtilClient extends CommandBase {
 	public HashMap<String, Integer> listEntities(String entName, int dim) {
 		HashMap<String, Integer> entNames = new HashMap<String, Integer>();
 		
-		World world = Minecraft.getMinecraft().world;
+		World world = Minecraft.getInstance().world;
         
 		
 		

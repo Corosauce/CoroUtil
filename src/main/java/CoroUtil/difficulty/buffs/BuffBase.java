@@ -24,9 +24,9 @@ public abstract class BuffBase {
      * @param difficulty
      */
     public boolean applyBuff(CreatureEntity ent, float difficulty) {
-        CompoundNBT data = ent.getEntityData().getCompoundTag(UtilEntityBuffs.dataEntityBuffed_Data);
-        data.setBoolean(getTagName(), true);
-        ent.getEntityData().setTag(UtilEntityBuffs.dataEntityBuffed_Data, data);
+        CompoundNBT data = ent.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data);
+        data.putBoolean(getTagName(), true);
+        ent.getPersistentData().put(UtilEntityBuffs.dataEntityBuffed_Data, data);
         return true;
     }
 

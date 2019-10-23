@@ -32,7 +32,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 
 	private static ConcurrentHashMap<BlockState, int[]> colorCache = new ConcurrentHashMap<>();
 	static {
-		((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
+		((SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
 	}
 
 	//only use positives for now
@@ -45,7 +45,7 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
 		
 		if (colors == null) {
-		    colors = Minecraft.getMinecraft().getBlockColors();
+		    colors = Minecraft.getInstance().getBlockColors();
 			try {
 				blockColorMap = (Map<IRegistryDelegate<Block>, IBlockColor>) _blockColorMap.get(colors);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -57,11 +57,11 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		BlockState state = worldIn.getBlockState(pos);
 
 	    // top of double plants doesn't have variant property
-		if (state.getBlock() instanceof DoublePlantBlock && state.getValue(DoublePlantBlock.HALF) == EnumBlockHalf.UPPER) {
-		    state = state.withProperty(DoublePlantBlock.VARIANT, worldIn.getBlockState(pos.down()).getValue(DoublePlantBlock.VARIANT));
+		if (state.getBlock() instanceof DoublePlantBlock && state.get(DoublePlantBlock.HALF) == EnumBlockHalf.UP) {
+		    state = state.with(DoublePlantBlock.name, worldIn.getBlockState(pos.down()).get(DoublePlantBlock.name));
 		}
 
-		int multiplier = this.colors.colorMultiplier(state, this.world, pos, 0);
+		int multiplier = this.colors.getColor(state, this.world, pos, 0);
 
 		int[] colors = colorCache.get(state);
 		if (colors == null) {
@@ -102,8 +102,8 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	}
 
 	@Override
-	public void onUpdate() {
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 
 		//make leafs catch on the ground and cause them to bounce up and slow a bit for effect
 		if (isCollidedVerticallyDownwards && rand.nextInt(10) == 0) {

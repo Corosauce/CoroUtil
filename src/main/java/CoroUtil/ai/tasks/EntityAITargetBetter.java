@@ -59,7 +59,7 @@ public abstract class EntityAITargetBetter extends Goal
         {
             return false;
         }
-        else if (!entitylivingbase.isEntityAlive())
+        else if (!entitylivingbase.isAlive())
         {
             return false;
         }
@@ -94,7 +94,7 @@ public abstract class EntityAITargetBetter extends Goal
                         }
                     }
 
-                    if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).capabilities.disableDamage)
+                    if (entitylivingbase instanceof PlayerEntity && ((PlayerEntity)entitylivingbase).abilities.disableDamage)
                     {
                         return false;
                     }
@@ -110,8 +110,8 @@ public abstract class EntityAITargetBetter extends Goal
 
     protected double getTargetDistance()
     {
-        IAttributeInstance iattributeinstance = this.taskOwner.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
-        return iattributeinstance == null ? 16.0D : iattributeinstance.getAttributeValue();
+        IAttributeInstance iattributeinstance = this.taskOwner.getAttribute(SharedMonsterAttributes.FOLLOW_RANGE);
+        return iattributeinstance == null ? 16.0D : iattributeinstance.get();
     }
 
     /**
@@ -138,48 +138,48 @@ public abstract class EntityAITargetBetter extends Goal
     /**
      * A static method used to see if an entity is a suitable target through a number of checks.
      */
-    public static boolean isSuitableTarget(MobEntity attacker, @Nullable LivingEntity target, boolean includeInvincibles, boolean checkSight)
+    public static boolean isSuitableTarget(MobEntity field_75441_b, @Nullable LivingEntity target, boolean includeInvincibles, boolean checkSight)
     {
         if (target == null)
         {
             return false;
         }
-        else if (target == attacker)
+        else if (target == field_75441_b)
         {
             return false;
         }
-        else if (!target.isEntityAlive())
+        else if (!target.isAlive())
         {
             return false;
         }
-        else if (!attacker.canAttackClass(target.getClass()))
+        else if (!field_75441_b.canAttackClass(target.getClass()))
         {
             return false;
         }
-        else if (attacker.isOnSameTeam(target))
+        else if (field_75441_b.isOnSameTeam(target))
         {
             return false;
         }
         else
         {
-            if (attacker instanceof IEntityOwnable && ((IEntityOwnable)attacker).getOwnerId() != null)
+            if (field_75441_b instanceof IEntityOwnable && ((IEntityOwnable)field_75441_b).getOwnerId() != null)
             {
-                if (target instanceof IEntityOwnable && ((IEntityOwnable)attacker).getOwnerId().equals(((IEntityOwnable)target).getOwnerId()))
+                if (target instanceof IEntityOwnable && ((IEntityOwnable)field_75441_b).getOwnerId().equals(((IEntityOwnable)target).getOwnerId()))
                 {
                     return false;
                 }
 
-                if (target == ((IEntityOwnable)attacker).getOwner())
+                if (target == ((IEntityOwnable)field_75441_b).getOwner())
                 {
                     return false;
                 }
             }
-            else if (target instanceof PlayerEntity && !includeInvincibles && ((PlayerEntity)target).capabilities.disableDamage)
+            else if (target instanceof PlayerEntity && !includeInvincibles && ((PlayerEntity)target).abilities.disableDamage)
             {
                 return false;
             }
 
-            return !checkSight || attacker.getEntitySenses().canSee(target);
+            return !checkSight || field_75441_b.getEntitySenses().canSee(target);
         }
     }
 

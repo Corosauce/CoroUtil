@@ -57,8 +57,8 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> 
     protected boolean isPlayerItSpawnedForOrBlank(@Nullable LivingEntity target)
     {
         if (target instanceof PlayerEntity) {
-            if (this.taskOwner.getEntityData().hasKey(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
-                String spawnName = this.taskOwner.getEntityData().getString(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor);
+            if (this.field_75299_d.getPersistentData().contains(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor)) {
+                String spawnName = this.field_75299_d.getPersistentData().getString(UtilEntityBuffs.dataEntityBuffed_PlayerSpawnedFor);
                 if (spawnName != null && target.getName().equals(spawnName)) {
                     return true;
                 }
@@ -77,14 +77,14 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> 
     public boolean shouldExecute()
     {
 
-        if (this.targetChance > 0 && this.taskOwner.getRNG().nextInt(this.targetChance) != 0)
+        if (this.targetChance > 0 && this.field_75299_d.getRNG().nextInt(this.targetChance) != 0)
         {
             return false;
         }
         else
         {
-            this.targetEntity = this.taskOwner.world.getNearestAttackablePlayer(
-                    this.taskOwner.posX, this.taskOwner.posY + (double)this.taskOwner.getEyeHeight(), this.taskOwner.posZ,
+            this.targetEntity = this.field_75299_d.world.getNearestAttackablePlayer(
+                    this.field_75299_d.posX, this.field_75299_d.posY + (double)this.field_75299_d.getEyeHeight(), this.field_75299_d.posZ,
                     this.getTargetDistance(), this.getTargetDistance(), null, (Predicate<PlayerEntity>)this.targetEntitySelector);
             return this.targetEntity != null;
         }
@@ -101,13 +101,13 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> 
     @Override
     public void startExecuting()
     {
-        this.taskOwner.setAttackTarget(this.targetEntity);
+        this.field_75299_d.setAttackTarget(this.targetEntity);
         super.startExecuting();
     }
 
     @Override
     public void setEntity(CreatureEntity creature) {
-        this.taskOwner = creature;
+        this.field_75299_d = creature;
         this.sorter = new EntityAINearestAttackablePlayerOmniscience.Sorter(creature);
     }
 
@@ -115,11 +115,11 @@ public class EntityAINearestAttackablePlayerOmniscience<T extends LivingEntity> 
     public boolean shouldBeRemoved() {
         if (disableAtSunrise && ConfigCoroUtilAdvanced.removeInvasionAIWhenInvasionDone) {
             //once its day, disable forever
-            if (this.taskOwner.world.isDaytime()) {
-                CULog.dbg("removing omniscience from " + this.taskOwner.getName());
+            if (this.field_75299_d.world.isDaytime()) {
+                CULog.dbg("removing omniscience from " + this.field_75299_d.getName());
                 //also detarget
-                if (this.taskOwner.getAttackTarget() instanceof PlayerEntity) {
-                    this.taskOwner.setAttackTarget(null);
+                if (this.field_75299_d.getAttackTarget() instanceof PlayerEntity) {
+                    this.field_75299_d.setAttackTarget(null);
                 }
                 return true;
                 //taskActive = false;

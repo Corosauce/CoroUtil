@@ -33,7 +33,7 @@ public class BlockRepairingBlock extends ContainerBlock
 	
     public BlockRepairingBlock()
     {
-        super(Material.GROUND);
+        super(Material.EARTH);
 
         /**
          * To make water not flow into the block, a material with blocksMovement being true is required, its the only option in BlockDynamicLiquid.isBlocked(...)
@@ -47,7 +47,7 @@ public class BlockRepairingBlock extends ContainerBlock
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(BlockState stateContainer, IBlockAccess worldIn, BlockPos pos) {
         return NULL_AABB;
     }
 
@@ -68,9 +68,9 @@ public class BlockRepairingBlock extends ContainerBlock
 
         //special behavior to let block only be selectable to repair if correct context
 
-        if (Minecraft.getMinecraft().player != null &&
-                (/*!Minecraft.getMinecraft().player.isSneaking() &&*/
-                        Minecraft.getMinecraft().player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
+        if (Minecraft.getInstance().player != null &&
+                (/*!Minecraft.getInstance().player.isSneaking() &&*/
+                        Minecraft.getInstance().player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof ItemRepairingGel)) {
             return AABB;
         } else {
             return NO_COLLIDE_AABB;
@@ -117,19 +117,19 @@ public class BlockRepairingBlock extends ContainerBlock
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public BlockRenderLayer getBlockLayer()
+    public BlockRenderLayer getRenderLayer()
     {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public float getBlockHardness(BlockState blockState, World worldIn, BlockPos pos) {
+    public float getBlockHardness(BlockState stateContainer, World worldIn, BlockPos pos) {
         TileEntity tEnt = worldIn.getTileEntity(pos);
 
         if (tEnt instanceof TileEntityRepairingBlock) {
             return 0;//((TileEntityRepairingBlock) tEnt).getOrig_hardness();
         } else {
-            return super.getBlockHardness(blockState, worldIn, pos);
+            return super.getBlockHardness(stateContainer, worldIn, pos);
         }
     }
 
@@ -184,7 +184,7 @@ public class BlockRepairingBlock extends ContainerBlock
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, BlockState state, Random rand)
+    public void tick(World world, BlockPos pos, BlockState state, Random rand)
     {
         if (world.isRemote) return;
 

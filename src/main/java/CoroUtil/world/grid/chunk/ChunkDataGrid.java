@@ -94,15 +94,15 @@ public class ChunkDataGrid
 				/*Collection playerDataCl = data.getTags();
 				Iterator it = playerDataCl.iterator();*/
 				
-				Iterator it = data.getKeySet().iterator();
+				Iterator it = data.keySet().iterator();
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
-					CompoundNBT nbt = data.getCompoundTag(keyName);
+					CompoundNBT nbt = data.getCompound(keyName);
 					
-					ChunkDataPoint bdp = this.getChunkData(nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
+					ChunkDataPoint bdp = this.getChunkData(nbt.getInt("xCoord"), nbt.getInt("zCoord"));
 					if (bdp != null) {
-						bdp.readFromNBT(nbt);
+						bdp.read(nbt);
 					} else {
 						//must have been set to air at some point...
 					}
@@ -125,7 +125,7 @@ public class ChunkDataGrid
 			
 			while (it.hasNext()) {
 				ChunkDataPoint bdp = (ChunkDataPoint)it.next();
-				data.setTag(""+bdp.hash, bdp.writeToNBT());
+				data.put(""+bdp.hash, bdp.write());
 			}
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;

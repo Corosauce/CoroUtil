@@ -123,10 +123,10 @@ public class PetsManager {
 	}
 	
 	public void nbtRead(CompoundNBT parNBT) {
-		Iterator it = parNBT.getKeySet().iterator();
+		Iterator it = parNBT.keySet().iterator();
         while (it.hasNext()) {
         	String tagName = (String) it.next();
-        	CompoundNBT entry = parNBT.getCompoundTag(tagName);
+        	CompoundNBT entry = parNBT.getCompound(tagName);
         	
         	PetEntry petEntry = new PetEntry();
         	petEntry.nbtRead(entry);
@@ -141,7 +141,7 @@ public class PetsManager {
 		
 		for (int i = 0; i < pets.size(); i++) {
 			CompoundNBT nbtEntry = pets.get(i).nbtWrite();
-			nbt.setTag("entry_" + i, nbtEntry);
+			nbt.put("entry_" + i, nbtEntry);
 		}
 		
 		return nbt;

@@ -49,10 +49,10 @@ public class PacketHelper {
 
 	public static void writeTEntToPacket(TileEntity tEnt, NBTTagCompound nbt) {
 		try {
-			nbt.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-			nbt.setInteger("x", tEnt.xCoord);
-			nbt.setInteger("y", tEnt.yCoord);
-			nbt.setInteger("z", tEnt.zCoord);
+			nbt.putInt("dimID", tEnt.getWorldObj().provider.dimensionId);
+			nbt.putInt("x", tEnt.xCoord);
+			nbt.putInt("y", tEnt.yCoord);
+			nbt.putInt("z", tEnt.zCoord);
 			/*buff.writeInt(tEnt.getWorldObj().provider.dimensionId);
 			buff.writeInt(tEnt.xCoord);
 	    	buff.writeInt(tEnt.yCoord);
@@ -148,12 +148,12 @@ public class PacketHelper {
         
         try
         {
-        	nbtSendData.setString("command", "CoroAI_TEntCmd");
-        	nbtSendData.setInteger("dimID", tEnt.getWorldObj().provider.dimensionId);
-        	nbtSendData.setInteger("x", tEnt.xCoord);
-        	nbtSendData.setInteger("y", tEnt.yCoord);
-        	nbtSendData.setInteger("z", tEnt.zCoord);
-        	nbtSendData.setTag("data", data);
+        	nbtSendData.putString("command", "CoroAI_TEntCmd");
+        	nbtSendData.putInt("dimID", tEnt.getWorldObj().provider.dimensionId);
+        	nbtSendData.putInt("x", tEnt.xCoord);
+        	nbtSendData.putInt("y", tEnt.yCoord);
+        	nbtSendData.putInt("z", tEnt.zCoord);
+        	nbtSendData.put("data", data);
         	//ByteBufUtils.writeUTF8String(byteBuf, "CoroAI_TEntCmd");
         	/*byteBuf.writeInt(tEnt.getWorldObj().provider.dimensionId);
         	byteBuf.writeInt(tEnt.xCoord);
@@ -208,11 +208,11 @@ public class PacketHelper {
 	
 	public static FMLProxyPacket getPacketForRelativeMotion(Entity ent, double motionX, double motionY, double motionZ) {
 		NBTTagCompound data = new NBTTagCompound();
-		data.setString("command", "Ent_Motion");
-		data.setInteger("entityID", ent.getEntityId());
-		data.setDouble("motionX", motionX);
-		data.setDouble("motionY", motionY);
-		data.setDouble("motionZ", motionZ);
+		data.putString("command", "Ent_Motion");
+		data.putInt("entityID", ent.getEntityId());
+		data.putDouble("motionX", motionX);
+		data.putDouble("motionY", motionY);
+		data.putDouble("motionZ", motionZ);
 		return getNBTPacket(data, CoroAI.eventChannelName);
 	}
 	
