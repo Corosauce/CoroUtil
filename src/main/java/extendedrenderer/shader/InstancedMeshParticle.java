@@ -1,7 +1,7 @@
 package extendedrenderer.shader;
 
+import com.mojang.blaze3d.platform.GLX;
 import extendedrenderer.particle.ShaderManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -56,7 +56,7 @@ public class InstancedMeshParticle extends Mesh {
         instanceDataVBO = GL15.glGenBuffers();
         vboIdList.add(instanceDataVBO);
         instanceDataBuffer = BufferUtils.createFloatBuffer(numInstances * INSTANCE_SIZE_FLOATS);//MemoryUtil.memAllocFloat(numInstances * INSTANCE_SIZE_FLOATS);
-        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO);
+        GLX.glBindBuffer(GL15.GL_ARRAY_BUFFER, instanceDataVBO);
         int start = vboSizeMesh;
         int strideStart = 0;
         for (int i = 0; i < 4; i++) {
@@ -118,7 +118,7 @@ public class InstancedMeshParticle extends Mesh {
         ShaderManager.glVertexAttribDivisor(start, 1);
         start++;*/
 
-        OpenGlHelper.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GLX.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         ShaderManager.glBindVertexArray(0);
     }
 

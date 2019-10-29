@@ -12,6 +12,7 @@ import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import extendedrenderer.ExtendedRenderer;
@@ -237,8 +239,13 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
             }
 
+            BlockPos pos = new BlockPos(new BlockPos(this.posX, this.posY, this.posZ));
+
             if (killWhenUnderTopmostBlock) {
-                int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+
+
+                //int height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+                int height = world.getHeight(Heightmap.Type.MOTION_BLOCKING, pos).getY();
                 if (this.posY - killWhenUnderTopmostBlock_ScanAheadRange <= height) {
                     startDeath();
                 }
@@ -254,7 +261,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
             if (killWhenFarFromCameraAtLeast != 0) {
                 if (getAge() > 20 && getAge() % 5 == 0) {
 
-                    if (ent.getDistance(this.posX, this.posY, this.posZ) > killWhenFarFromCameraAtLeast) {
+                    if (ent.getDistanceSq(this.posX, this.posY, this.posZ) > killWhenFarFromCameraAtLeast * killWhenFarFromCameraAtLeast) {
                         //System.out.println("far kill");
                         startDeath();
                     }
@@ -358,12 +365,12 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public int getAge()
     {
-        return particleAge;
+        return age;
     }
 
     public void setAge(int age)
     {
-        particleAge = age;
+        age = age;
     }
 
     public int getMaxAge()
@@ -513,9 +520,18 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         double d2 = this.posZ - z;
         return (double)MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
-	
+
+    /*@Override
+    public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn,
+                               float partialTicks, float rotationX, float rotationZ, float rotationYZ,
+                               float rotationXY, float rotationXZ) {
+
+
+
+    }*/
+
 	@Override
-	public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
+	public void renderParticle(BufferBuilder worldRendererIn, ActiveRenderInfo entityIn,
 			float partialTicks, float rotationX, float rotationZ,
 			float rotationYZ, float rotationXY, float rotationXZ) {
 		
@@ -532,7 +548,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 		if (state.getBlock() != Blocks.AIR) {
 			System.out.println("particle in: " + state);
 		}*/
-		
+
 		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
 				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
@@ -618,6 +634,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     }
     
     //override to fix isCollided check
+    //TODO: 1.14 MAYBE NOT NEEDED NOW?
     @Override
     public void move(double x, double y, double z)
     {
