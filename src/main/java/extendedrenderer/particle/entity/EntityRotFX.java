@@ -1,6 +1,7 @@
 package extendedrenderer.particle.entity;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.util.CoroUtilBlockLightCache;
@@ -11,14 +12,19 @@ import extendedrenderer.shader.InstancedMeshParticle;
 import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.SpriteTexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ReuseableStream;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
@@ -31,7 +37,7 @@ import org.lwjgl.util.vector.Vector4f;
 import javax.vecmath.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
-public class EntityRotFX extends Particle implements IWindHandler, IShaderRenderedEntity
+public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler, IShaderRenderedEntity
 {
     public boolean weatherEffect = false;
 
@@ -349,11 +355,11 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         if (this.getFXLayer() == 0) super.setParticleTextureIndex(par1);
     }
 
-    @Override
+    /*@Override
     public int getFXLayer()
     {
         return 5;
-    }
+    }*/
 
     public void spawnAsWeatherEffect()
     {
@@ -521,15 +527,6 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
         return (double)MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
-    /*@Override
-    public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn,
-                               float partialTicks, float rotationX, float rotationZ, float rotationYZ,
-                               float rotationXY, float rotationXZ) {
-
-
-
-    }*/
-
 	@Override
 	public void renderParticle(BufferBuilder worldRendererIn, ActiveRenderInfo entityIn,
 			float partialTicks, float rotationX, float rotationZ,
@@ -548,9 +545,6 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 		if (state.getBlock() != Blocks.AIR) {
 			System.out.println("particle in: " + state);
 		}*/
-
-		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
-				rotationZ, rotationYZ, rotationXY, rotationXZ);
 	}
 
 	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
@@ -583,11 +577,11 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
         int rgbaIndex = 0;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleRed);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleGreen);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleBlue);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
@@ -623,72 +617,47 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 	public int getParticleDecayExtra() {
 		return particleDecayExtra;
 	}
-    
-    @Override
+
+	//TODO: 1.14 now sets depth buffer use in IParticleRenderType types
+    /*@Override
     public boolean shouldDisableDepth() {
     	return isTransparent;
-    }
+    }*/
     
     public void setKillOnCollide(boolean val) {
     	this.killOnCollide = val;
     }
     
-    //override to fix isCollided check
-    //TODO: 1.14 MAYBE NOT NEEDED NOW?
+    //override for extra isCollided types
     @Override
-    public void move(double x, double y, double z)
-    {
-        double yy = y;
+    public void move(double x, double y, double z) {
         double xx = x;
+        double yy = y;
         double zz = z;
-
-        if (this.canCollide)
-        {
-            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().expand(x, y, z));
-
-            for (AxisAlignedBB axisalignedbb : list)
-            {
-                y = axisalignedbb.calculateYOffset(this.getBoundingBox(), y);
-            }
-
-            this.setBoundingBox(this.getBoundingBox().offset(0.0D, y, 0.0D));
-
-            for (AxisAlignedBB axisalignedbb1 : list)
-            {
-                x = axisalignedbb1.calculateXOffset(this.getBoundingBox(), x);
-            }
-
-            this.setBoundingBox(this.getBoundingBox().offset(x, 0.0D, 0.0D));
-
-            for (AxisAlignedBB axisalignedbb2 : list)
-            {
-                z = axisalignedbb2.calculateZOffset(this.getBoundingBox(), z);
-            }
-
-            this.setBoundingBox(this.getBoundingBox().offset(0.0D, 0.0D, z));
+        if (this.canCollide && (x != 0.0D || y != 0.0D || z != 0.0D)) {
+            Vec3d vec3d = Entity.func_223307_a((Entity)null, new Vec3d(x, y, z), this.getBoundingBox(), this.world, ISelectionContext.dummy(), new ReuseableStream<>(Stream.empty()));
+            x = vec3d.x;
+            y = vec3d.y;
+            z = vec3d.z;
         }
-        else
-        {
+
+        if (x != 0.0D || y != 0.0D || z != 0.0D) {
             this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
+            this.resetPositionToBB();
         }
 
-        this.resetPositionToBB();
-        //was y != y before
-        //this.isCollided = yy != y && yy < 0.0D;
-        this.onGround = yy != y || xx != x || zz != z;
+        this.onGround = yy != y && yy < 0.0D;
         this.isCollidedHorizontally = xx != x || zz != z;
         this.isCollidedVerticallyDownwards = yy < y;
         this.isCollidedVerticallyUpwards = yy > y;
-
-        if (xx != x)
-        {
+        if (xx != x) {
             this.motionX = 0.0D;
         }
 
-        if (zz != z)
-        {
+        if (zz != z) {
             this.motionZ = 0.0D;
         }
+
     }
     
     public void setFacePlayer(boolean val) {
@@ -696,7 +665,7 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
     }
     
     public TextureAtlasSprite getParticleTexture() {
-    	return this.particleTexture;
+    	return this.sprite;
     }
     
     public boolean isVanillaMotionDampen() {
@@ -756,5 +725,12 @@ public class EntityRotFX extends Particle implements IWindHandler, IShaderRender
 
     public boolean isCollidedVertically() {
 	    return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
+    }
+
+    @Override
+    public IParticleRenderType getRenderType() {
+        //TODO: replaces getFXLayer of 5, possibly reimplement extra layers later for clouds etc
+        //actually anything > 2 was custom texture sheet, then it just uses higher numbers for diff render orders, higher = later
+        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 }
