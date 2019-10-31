@@ -1,6 +1,7 @@
 package extendedrenderer.shader;
 
-import org.lwjgl.util.vector.Quaternion;
+
+import extendedrenderer.placeholders.Quaternion;
 
 import javax.vecmath.Vector3f;
 

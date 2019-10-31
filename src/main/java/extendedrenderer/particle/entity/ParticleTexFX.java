@@ -21,9 +21,9 @@ public class ParticleTexFX extends EntityRotFX {
         this.setCanCollide(false);
     }
 
-    @Override
+    /*@Override
     public int getFXLayer()
     {
         return 1;
-    }
+    }*/
 }

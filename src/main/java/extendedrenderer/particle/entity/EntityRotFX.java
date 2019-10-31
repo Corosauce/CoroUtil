@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.Vec3;
+import extendedrenderer.placeholders.Quaternion;
+import extendedrenderer.placeholders.Vector4f;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.IShaderRenderedEntity;
 import extendedrenderer.shader.InstancedMeshParticle;
@@ -31,8 +33,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import extendedrenderer.ExtendedRenderer;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
-import org.lwjgl.util.vector.Quaternion;
-import org.lwjgl.util.vector.Vector4f;
 
 import javax.vecmath.Vector3f;
 
@@ -349,11 +349,11 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         }
     }
     
-    public void setParticleTextureIndex(int par1)
+    /*public void setParticleTextureIndex(int par1)
     {
         this.particleTextureIndexInt = par1;
         if (this.getFXLayer() == 0) super.setParticleTextureIndex(par1);
-    }
+    }*/
 
     /*@Override
     public int getFXLayer()
@@ -732,5 +732,10 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         //TODO: replaces getFXLayer of 5, possibly reimplement extra layers later for clouds etc
         //actually anything > 2 was custom texture sheet, then it just uses higher numbers for diff render orders, higher = later
         return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    }
+
+    @Override
+    public void setSprite(TextureAtlasSprite sprite) {
+        this.sprite = sprite;
     }
 }

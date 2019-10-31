@@ -1,11 +1,14 @@
 package extendedrenderer.particle.entity;
 
 import CoroUtil.util.CoroUtilBlockLightCache;
+import extendedrenderer.placeholders.Quaternion;
+import extendedrenderer.placeholders.Vector4f;
 import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.InstancedMeshParticle;
 import extendedrenderer.shader.Matrix4fe;
 import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
@@ -14,8 +17,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilParticle;
-import org.lwjgl.util.vector.Quaternion;
-import org.lwjgl.util.vector.Vector4f;
+import net.minecraft.world.gen.Heightmap;
 
 import javax.vecmath.Vector3f;
 
@@ -80,7 +82,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	}
 
 	@Override
-	public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
+	public void renderParticle(BufferBuilder worldRendererIn, ActiveRenderInfo entityIn,
 			float partialTicks, float rotationX, float rotationZ,
 			float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -101,11 +103,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			//rotationZ -= 1;
 		}
 
-		
-		float f = (float)this.particleTextureIndexX / 16.0F;
-        float f1 = f + 0.0624375F;
-        float f2 = (float)this.particleTextureIndexY / 16.0F;
-        float f3 = f2 + 0.0624375F;
+
+		float f = this.getMinU();
+		float f1 = this.getMaxU();
+		float f2 = this.getMinV();
+		float f3 = this.getMaxV();
         float f4 = 0.1F * this.particleScale;
 		float scaleY = 0.4F * this.particleScale;
 
@@ -116,12 +118,12 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 		float fixY = 0;
 
-        if (this.particleTexture != null)
-        {
-            f = this.particleTexture.getMinU();
-            f1 = this.particleTexture.getMaxU();
-            f2 = this.particleTexture.getMinV();
-            f3 = this.particleTexture.getMaxV();
+        /*if (this.particleTexture != null)
+        {*/
+            /*f = this.getMinU();
+            f1 = this.getMaxU();
+            f2 = this.getMinV();
+            f3 = this.getMaxV();*/
 
 			/*f = this.particleTexture.getInterpolatedU((double)(this.particleTextureJitterX / 4.0F * 16.0F));
 			f1 = this.particleTexture.getInterpolatedU((double)((this.particleTextureJitterX + 1.0F) / 4.0F * 16.0F));
@@ -132,7 +134,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			float offset = 0;
 			float posBottom = (float)(this.posY - 10D);
 
-			float height = this.world.getPrecipitationHeight(new BlockPos(this.posX, this.posY, this.posZ)).getY();
+			float height = world.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(this.posX, this.posY, this.posZ)).getY();
 
 			if (posBottom < height) {
 				float diff = height - posBottom;
@@ -150,7 +152,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			f1 = this.particleTexture.getInterpolatedU(12);
 			f2 = this.particleTexture.getInterpolatedV(16);
 			f3 = this.particleTexture.getInterpolatedV(8);*/
-        }
+        //}
 
 		//int rainDrops = extraParticlesBaseAmount + ((Math.max(0, severityOfRainRate-1)) * 5);
 		int renderAmount = 0;
@@ -185,8 +187,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 				//prevent precip under overhangs/inside for extra render
 				if (this.isDontRenderUnderTopmostBlock()) {
-					int height = this.world.getPrecipitationHeight(new BlockPos(this.posX + xx, this.posY, this.posZ + zz)).getY();
-					if (this.posY + yy <= height) continue;
+					int height2 = world.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(this.posX + xx, this.posY, this.posZ + zz)).getY();
+					if (this.posY + yy <= height2) continue;
 				}
 
 				if (ii != 0) {
@@ -283,7 +285,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			}
 
 			if (this.isDontRenderUnderTopmostBlock()) {
-				int height = this.world.getPrecipitationHeight(new BlockPos(pos.x, this.posY, pos.z)).getY();
+				int height = world.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(pos.x, this.posY, pos.z)).getY();
 				if (pos.y <= height) continue;
 			}
 
@@ -315,11 +317,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			//rgba to buffer
 			int rgbaIndex = 0;
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleRed);
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleGreen);
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleBlue);
 			mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
 					+ mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 

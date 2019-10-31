@@ -72,11 +72,11 @@ public class ParticleCustomMatrix extends ParticleTexFX {
 
         int rgbaIndex = 0;
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getRedColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleRed);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getGreenColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleGreen);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
-                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getBlueColorF());
+                + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.particleBlue);
         mesh.instanceDataBuffer.put(mesh.INSTANCE_SIZE_FLOATS * (mesh.curBufferPos)
                 + mesh.MATRIX_SIZE_FLOATS + 1 + (rgbaIndex++), this.getAlphaF());
 
