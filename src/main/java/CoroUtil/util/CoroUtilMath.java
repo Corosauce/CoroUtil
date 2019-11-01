@@ -1,6 +1,6 @@
 package CoroUtil.util;
 
-import org.lwjgl.util.vector.Quaternion;
+import extendedrenderer.placeholders.Quaternion;
 
 import java.text.DecimalFormat;
 

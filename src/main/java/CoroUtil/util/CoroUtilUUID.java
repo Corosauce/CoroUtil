@@ -3,10 +3,12 @@ package CoroUtil.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class CoroUtilUUID {
 
@@ -17,7 +19,7 @@ public class CoroUtilUUID {
 		Entity ent = null;
         
 		UUID uuid = new UUID(UUIDMost, UUIDLeast);
-        List list = parWorld.loadedEntityList;//.getEntitiesWithinAABB(EntityLivingBase.class, this.bounds.expand(10.0D, 10.0D, 10.0D));
+        List list = ((ServerWorld)parWorld).getEntities().collect(Collectors.toList());//.getEntitiesWithinAABB(EntityLivingBase.class, this.bounds.expand(10.0D, 10.0D, 10.0D));
         Iterator iterator = list.iterator();
 
         while (iterator.hasNext())

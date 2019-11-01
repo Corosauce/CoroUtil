@@ -1,13 +1,9 @@
 package extendedrenderer.particle;
 
-import extendedrenderer.render.FoliageRenderer;
-import extendedrenderer.render.RotatingParticleManager;
-import extendedrenderer.shader.MeshBufferManagerFoliage;
-import extendedrenderer.shader.MeshBufferManagerParticle;
+import extendedrenderer.ExtendedRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import extendedrenderer.ExtendedRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +63,9 @@ public class ParticleRegistry {
 			return;
 		}
 
-		MeshBufferManagerParticle.cleanup();
-		MeshBufferManagerFoliage.cleanup();
+		//TODO: 1.14 uncomment
+		/*MeshBufferManagerParticle.cleanup();
+		MeshBufferManagerFoliage.cleanup();*/
 
 		squareGrey = addSprite(event, new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
 		//smoke = addSprite(event, new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
@@ -113,11 +110,12 @@ public class ParticleRegistry {
 		grass = addSprite(event, new ResourceLocation(ExtendedRenderer.modid + ":particles/grass"));
 	}
 
-	public static void initPost(TextureStitchEvent.Post event) {
+	//TODO: 1.14 uncomment
+	/*public static void initPost(TextureStitchEvent.Post event) {
 		if (RotatingParticleManager.useShaders) {
 			RotatingParticleManager.forceShaderReset = true;
 		}
-	}
+	}*/
 
 	public static TextureAtlasSprite addSprite(TextureStitchEvent.Pre event, ResourceLocation resourceLocation) {
 		event.addSprite(resourceLocation);

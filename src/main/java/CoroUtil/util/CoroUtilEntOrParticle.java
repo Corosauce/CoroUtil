@@ -45,7 +45,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static double getMotionX(Object obj) {
 		if (obj instanceof Entity) {
-			return ((Entity)obj).motionX;
+			return ((Entity)obj).getMotion().x;
 		} else {
 			return getMotionXParticle(obj);
 		}
@@ -57,7 +57,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static double getMotionY(Object obj) {
 		if (obj instanceof Entity) {
-			return ((Entity)obj).motionY;
+			return ((Entity)obj).getMotion().y;
 		} else {
 			return getMotionYParticle(obj);
 		}
@@ -69,7 +69,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static double getMotionZ(Object obj) {
 		if (obj instanceof Entity) {
-			return ((Entity)obj).motionZ;
+			return ((Entity)obj).getMotion().z;
 		} else {
 			return getMotionZParticle(obj);
 		}
@@ -81,7 +81,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static void setMotionX(Object obj, double val) {
 		if (obj instanceof Entity) {
-			((Entity)obj).motionX = val;
+			((Entity)obj).setMotion(val, ((Entity)obj).getMotion().y, ((Entity)obj).getMotion().z);
 		} else {
 			setMotionXParticle(obj, val);
 		}
@@ -93,7 +93,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static void setMotionY(Object obj, double val) {
 		if (obj instanceof Entity) {
-			((Entity)obj).motionY = val;
+			((Entity)obj).setMotion(((Entity)obj).getMotion().y, val, ((Entity)obj).getMotion().z);
 		} else {
 			setMotionYParticle(obj, val);
 		}
@@ -105,7 +105,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static void setMotionZ(Object obj, double val) {
 		if (obj instanceof Entity) {
-			((Entity)obj).motionZ = val;
+			((Entity)obj).setMotion(((Entity)obj).getMotion().y, ((Entity)obj).getMotion().y, val);
 		} else {
 			setMotionZParticle(obj, val);
 		}

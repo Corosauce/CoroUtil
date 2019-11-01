@@ -1,9 +1,7 @@
 package CoroUtil.util;
 
 import CoroUtil.config.ConfigCoroUtilAdvanced;
-import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
@@ -187,11 +185,12 @@ public class CoroUtilCrossMod {
              * Aggressively remove infernal modifiers and nbt data for it, unless we added them ourselves
              */
             if (ent.getPersistentData().contains(infernalNBTString)) {
-                if (!ent.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
+                //TODO: 1.14 uncomment
+                /*if (!ent.getPersistentData().getCompound(UtilEntityBuffs.dataEntityBuffed_Data).getBoolean(UtilEntityBuffs.dataEntityBuffed_AI_Infernal)) {
                     CULog.dbg("detected infernal mob, overriding its attributes for " + event.getEntity().getName());
                     infernalMobs_RemoveAllModifiers(ent);
                     ent.getPersistentData().remove(infernalNBTString);
-                }
+                }*/
             }
         }
     }

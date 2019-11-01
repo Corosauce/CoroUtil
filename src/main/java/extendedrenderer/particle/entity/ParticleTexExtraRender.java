@@ -1,12 +1,8 @@
 package extendedrenderer.particle.entity;
 
-import CoroUtil.util.CoroUtilBlockLightCache;
+import CoroUtil.util.CoroUtilParticle;
 import extendedrenderer.placeholders.Quaternion;
 import extendedrenderer.placeholders.Vector4f;
-import extendedrenderer.render.RotatingParticleManager;
-import extendedrenderer.shader.InstancedMeshParticle;
-import extendedrenderer.shader.Matrix4fe;
-import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -16,10 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import CoroUtil.util.CoroUtilParticle;
 import net.minecraft.world.gen.Heightmap;
-
-import javax.vecmath.Vector3f;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
 
@@ -191,9 +184,10 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 					if (this.posY + yy <= height2) continue;
 				}
 
-				if (ii != 0) {
+				//TODO: 1.14 uncomment
+				/*if (ii != 0) {
 					RotatingParticleManager.debugParticleRenderCount++;
-				}
+				}*/
 
 				/*int height = entityIn.world.getPrecipitationHeight(new BlockPos(ActiveRenderInfo.getPosition().xCoord + f5, this.posY + f6, ActiveRenderInfo.getPosition().zCoord + f7)).getY();
 				if (ActiveRenderInfo.getPosition().yCoord + f6 <= height) continue;*/
@@ -246,7 +240,8 @@ public class ParticleTexExtraRender extends ParticleTexFX {
         
 	}
 
-	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+	//TODO: 1.14 uncomment
+	/*public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
 										float partialTicks, float rotationX, float rotationZ,
 										float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -328,7 +323,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 			mesh.curBufferPos++;
 		}
 
-	}
+	}*/
 
 	/*@Override
 	public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {

@@ -1,28 +1,19 @@
 package extendedrenderer.particle.entity;
 
-import java.util.List;
-import java.util.stream.Stream;
-
 import CoroUtil.api.weather.IWindHandler;
-import CoroUtil.util.CoroUtilBlockLightCache;
 import CoroUtil.util.Vec3;
+import extendedrenderer.particle.behavior.ParticleBehaviors;
 import extendedrenderer.placeholders.Quaternion;
 import extendedrenderer.placeholders.Vector4f;
-import extendedrenderer.render.RotatingParticleManager;
 import extendedrenderer.shader.IShaderRenderedEntity;
-import extendedrenderer.shader.InstancedMeshParticle;
-import extendedrenderer.shader.Matrix4fe;
-import extendedrenderer.shader.Transformation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.SpriteTexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ReuseableStream;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -31,10 +22,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import extendedrenderer.ExtendedRenderer;
-import extendedrenderer.particle.behavior.ParticleBehaviors;
 
 import javax.vecmath.Vector3f;
+import java.util.stream.Stream;
 
 @OnlyIn(Dist.CLIENT)
 public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler, IShaderRenderedEntity
@@ -150,7 +140,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 
         rotation = new Quaternion();
 
-        brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
+        //TODO: 1.14 uncomment
+        //brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
     }
 
     public boolean isSlantParticleToWind() {
@@ -314,7 +305,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         }
 
         if (world.getGameTime() % 5 == 0) {
-            brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
+            //TODO: 1.14 uncomment
+            //brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
         }
 
         rotationAroundCenter += rotationSpeedAroundCenter;
@@ -364,7 +356,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     public void spawnAsWeatherEffect()
     {
         weatherEffect = true;
-        ExtendedRenderer.rotEffRenderer.addEffect(this);
+        //TODO: 1.14 uncomment
+        /*ExtendedRenderer.rotEffRenderer.addEffect(this);*/
         //RELOCATED TO CODE AFTER CALLING spawnAsWeatherEffect(), also uses list in WeatherManagerClient
         //this.world.addWeatherEffect(this);
     }
@@ -547,7 +540,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 		}*/
 	}
 
-	public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
+    //TODO: 1.14 uncomment
+	/*public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                         float partialTicks, float rotationX, float rotationZ,
                                         float rotationYZ, float rotationXY, float rotationXZ) {
 
@@ -587,7 +581,7 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 
         mesh.curBufferPos++;
         
-    }
+    }*/
 
     /*public void renderParticleForShaderTest(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
                                             float partialTicks, float rotationX, float rotationZ,
@@ -706,13 +700,15 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     @Override
     public void setColor(float particleRedIn, float particleGreenIn, float particleBlueIn) {
         super.setColor(particleRedIn, particleGreenIn, particleBlueIn);
-        RotatingParticleManager.markDirtyVBO2();
+        //TODO: 1.14 uncomment
+        /*RotatingParticleManager.markDirtyVBO2();*/
     }
 
     @Override
     public void setAlphaF(float alpha) {
         super.setAlphaF(alpha);
-        RotatingParticleManager.markDirtyVBO2();
+        //TODO: 1.14 uncomment
+        /*RotatingParticleManager.markDirtyVBO2();*/
     }
 
     public int getKillWhenUnderTopmostBlock_ScanAheadRange() {

@@ -1,22 +1,13 @@
 package CoroUtil.util;
 
-import CoroUtil.forge.CULog;
 import com.google.common.collect.Lists;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.biome.Biome;
 
 import java.util.Collection;
-import java.util.List;
 
 public class CoroUtilMisc {
 
@@ -90,14 +81,6 @@ public class CoroUtilMisc {
 	public static BlockCoord addCoords(BlockCoord coords1, BlockCoord coords2) {
 		return new BlockCoord(coords1.posX+coords2.posX, coords1.posY+coords2.posY, coords1.posZ+coords2.posZ);
 	}
-	
-	public static void sendPlayerMsg(ServerPlayerEntity entP, String msg) {
-		sendCommandSenderMsg(entP, msg);
-	}
-	
-	public static void sendCommandSenderMsg(ICommandSender entP, String msg) {
-		entP.sendMessage(new StringTextComponent(msg));
-	}
 
     public static float adjVal(float source, float target, float adj) {
         if (source < target) {
@@ -120,7 +103,8 @@ public class CoroUtilMisc {
      * Game likes to force an exception and crash out if a mod adds a zero weight spawn entry to a biome+enum ceature type when the total weight is zero for all entries in the list
      * this method checks for this and removes them
      */
-    public static void fixBadBiomeEntitySpawns() {
+    //TODO: 1.14 uncomment
+    /*public static void fixBadBiomeEntitySpawns() {
         for (Biome biome : Biome.REGISTRY) {
 
             for (EntityClassification type : EntityClassification.values()) {
@@ -159,7 +143,7 @@ public class CoroUtilMisc {
                 }
             }
         }
-    }
+    }*/
 
     //because the vanilla method is flagged client only
     public static void removeAllModifiers(IAttributeInstance attributeInstance) {

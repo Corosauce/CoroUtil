@@ -1,13 +1,9 @@
 package CoroUtil.config;
 
-import java.io.File;
-import java.util.Arrays;
-
-import CoroUtil.util.CoroUtilCompatibility;
 import modconfig.ConfigComment;
-import modconfig.ConfigMod;
 import modconfig.IConfigCategory;
-import CoroUtil.util.DimensionChunkCacheNew;
+
+import java.io.File;
 
 public class ConfigCoroUtil implements IConfigCategory {
 
@@ -71,25 +67,27 @@ public class ConfigCoroUtil implements IConfigCategory {
 	@Override
 	public void hookUpdatedValues() {
 		try {
-			String[] ids = ConfigCoroUtilAdvanced.chunkCacheDimensionBlacklist_IDs.split(",");
+			//TODO: 1.14 remove entirely? from old threaded pathfinder
+			/*String[] ids = ConfigCoroUtilAdvanced.chunkCacheDimensionBlacklist_IDs.split(",");
 			String[] names = ConfigCoroUtilAdvanced.chunkCacheDimensionBlacklist_Names.split(",");
 			
 			DimensionChunkCacheNew.listBlacklistIDs.clear();
 			for (int i = 0; i < ids.length; i++) {
 				DimensionChunkCacheNew.listBlacklistIDs.add(Integer.valueOf(ids[i]));
 			}
-			DimensionChunkCacheNew.listBlacklistNamess = Arrays.asList(names);
+			DimensionChunkCacheNew.listBlacklistNamess = Arrays.asList(names);*/
 		} catch (Exception ex) {
 			//silence!
 		}
 
-		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles || CoroUtilCompatibility.isHWInvasionsInstalled() || CoroUtilCompatibility.isHWMonstersInstalled()) {
+		//TODO: 1.14 uncomment
+		/*if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles || CoroUtilCompatibility.isHWInvasionsInstalled() || CoroUtilCompatibility.isHWMonstersInstalled()) {
 			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configDD);
 		}
 		if (ConfigCoroUtil.enableAdvancedDeveloperConfigFiles) {
 			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configHWMonsters);
 			ConfigMod.addConfigFile(CoroUtil.forge.CoroUtil.configDev);
-		}
+		}*/
 	}
 
 }

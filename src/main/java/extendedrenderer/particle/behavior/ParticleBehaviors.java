@@ -106,20 +106,20 @@ public class ParticleBehaviors {
 		
 		if (particle.getAge() < stateChangeTick) {
 			particle.setGravity(-0.2F);
-			particle.setColor(particle.getRedColorF() - brightnessShiftRate, particle.getGreenColorF() - brightnessShiftRate, particle.getBlueColorF() - brightnessShiftRate);
+			particle.setColor(particle.particleRed - brightnessShiftRate, particle.particleGreen - brightnessShiftRate, particle.particleBlue - brightnessShiftRate);
 		} else if (particle.getAge() == stateChangeTick) {
 			particle.setColor(0,0,0);
 		} else {
 			brightnessShiftRate = rateBrighten;
 			particle.setGravity(-0.05F);
 			//particle.motionY *= 0.99F;
-			if (particle.getRedColorF() < 0.3F) {
+			if (particle.particleRed < 0.3F) {
 				
 			} else {
 				brightnessShiftRate = rateBrightenSlower;
 			}
 			
-			particle.setColor(particle.getRedColorF() + brightnessShiftRate, particle.getGreenColorF() + brightnessShiftRate, particle.getBlueColorF() + brightnessShiftRate);
+			particle.setColor(particle.particleRed + brightnessShiftRate, particle.particleGreen + brightnessShiftRate, particle.particleBlue + brightnessShiftRate);
 			
 			if (particle.getAlphaF() > 0) {
 				particle.setAlphaF(particle.getAlphaF() - rateAlpha);

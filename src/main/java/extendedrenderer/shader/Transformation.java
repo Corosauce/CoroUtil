@@ -3,7 +3,7 @@ package extendedrenderer.shader;
 
 import CoroUtil.util.CoroUtilMath;
 import extendedrenderer.particle.entity.EntityRotFX;
-import org.lwjgl.util.vector.Quaternion;
+import extendedrenderer.placeholders.Quaternion;
 
 import javax.vecmath.Vector3f;
 

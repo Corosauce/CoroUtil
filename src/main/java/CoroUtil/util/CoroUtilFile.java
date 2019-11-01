@@ -1,24 +1,19 @@
 package CoroUtil.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.commons.io.IOUtils;
 
 public class CoroUtilFile {
 	public static String lastWorldFolder = "";
@@ -59,18 +54,22 @@ public class CoroUtilFile {
 	
 	//this must be used while server is active
     public static String getWorldFolderName() {
-		World world = DimensionManager.getWorld(0);
+		World world = getWorld(0);
 		
 		if (world != null) {
-			lastWorldFolder = ((ServerWorld)world).getChunkSaveLocation().getName();
+			lastWorldFolder = ((ServerWorld)world).getSaveHandler().getWorldDirectory().getPath();
 			return lastWorldFolder + File.separator;
 		}
 		
 		return lastWorldFolder + File.separator;
 	}
+
+	public static ServerWorld getWorld(int dimID) {
+		return DimensionManager.getWorld(ServerLifecycleHooks.getCurrentServer(), DimensionType.getById(dimID), true, true);
+	}
 	
 	public static String getSaveFolderPath() {
-    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
+    	if (ServerLifecycleHooks.getCurrentServer() == null || ServerLifecycleHooks.getCurrentServer().isSinglePlayer()) {
     		return getClientSidePath() + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;
@@ -79,7 +78,7 @@ public class CoroUtilFile {
     }
 	
 	public static String getMinecraftSaveFolderPath() {
-    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
+    	if (ServerLifecycleHooks.getCurrentServer() == null || ServerLifecycleHooks.getCurrentServer().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "config" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator + "config" + File.separator;
@@ -87,7 +86,7 @@ public class CoroUtilFile {
     }
 	
 	public static String getWorldSaveFolderPath() {
-    	if (FMLCommonHandler.instance().getMinecraftServerInstance() == null || FMLCommonHandler.instance().getMinecraftServerInstance().isSinglePlayer()) {
+    	if (ServerLifecycleHooks.getCurrentServer() == null || ServerLifecycleHooks.getCurrentServer().isSinglePlayer()) {
     		return getClientSidePath() + File.separator + "saves" + File.separator;
     	} else {
     		return new File(".").getAbsolutePath() + File.separator;
@@ -96,7 +95,7 @@ public class CoroUtilFile {
     
     @OnlyIn(Dist.CLIENT)
 	public static String getClientSidePath() {
-		return FMLClientHandler.instance().getClient().gameDir/*getAppDir("minecraft")*/.getPath();
+		return Minecraft.getInstance().gameDir/*getAppDir("minecraft")*/.getPath();
 	}
     
     public static void writeCoords(String name, BlockCoord coords, CompoundNBT nbt) {
@@ -107,13 +106,14 @@ public class CoroUtilFile {
     
     public static BlockCoord readCoords(String name, CompoundNBT nbt) {
     	if (nbt.contains(name + "X")) {
-    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInt(name + "Y"), nbt.getInt(name + "Z"));
+    		return new BlockCoord(nbt.getInt(name + "X"), nbt.getInt(name + "Y"), nbt.getInt(name + "Z"));
     	} else {
     		return null;
     	}
     }
 
-    @OnlyIn(Dist.CLIENT)
+	//TODO: 1.14 uncomment
+    /*@OnlyIn(Dist.CLIENT)
     public static String getContentsFromResourceLocation(ResourceLocation resourceLocation) {
 		try {
 			IResourceManager resourceManager = Minecraft.getInstance().gameRenderer.resourceManager;
@@ -124,5 +124,5 @@ public class CoroUtilFile {
 			ex.printStackTrace();
 		}
 		return "";
-	}
+	}*/
 }

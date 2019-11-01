@@ -835,8 +835,8 @@ public class Matrix4fe extends Matrix4f {
         return new Vector3f(m30(), m31(), m32());
     }
 
-    public org.lwjgl.util.vector.Matrix4f toLWJGLMathMatrix() {
-        org.lwjgl.util.vector.Matrix4f mat = new org.lwjgl.util.vector.Matrix4f();
+    public Matrix4f toLWJGLMathMatrix() {
+        Matrix4f mat = new Matrix4f();
         mat.m00 = this.m00;
         mat.m01 = this.m01;
         mat.m02 = this.m02;

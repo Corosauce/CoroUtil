@@ -11,9 +11,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.ModList;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -75,7 +74,7 @@ public class CoroUtilCompatibility {
                 ex.printStackTrace();
                 //prevent error spam
                 tanInstalled = false;
-                return biome.getFloatTemperature(pos);
+                return biome.getTemperature(pos);
             }
         } else if (isSereneSeasonsInstalled()) {
             try {
@@ -87,10 +86,10 @@ public class CoroUtilCompatibility {
                 ex.printStackTrace();
                 //prevent error spam
                 sereneSeasonsInstalled = false;
-                return biome.getFloatTemperature(pos);
+                return biome.getTemperature(pos);
             }
         } else {
-            return biome.getFloatTemperature(pos);
+            return biome.getTemperature(pos);
         }
     }
 
@@ -210,7 +209,8 @@ public class CoroUtilCompatibility {
 
             int value = -1;
 
-            IEnergyStorage cap = tEnt.getCapability(CapabilityEnergy.ENERGY, null);
+            //TODO: 1.14 uncomment
+            IEnergyStorage cap = null;//tEnt.getCapability(CapabilityEnergy.ENERGY, null);
 
             if (cap != null) {
                 value = cap.getEnergyStored();
@@ -326,11 +326,11 @@ public class CoroUtilCompatibility {
     }*/
 
     public static boolean isHWMonstersInstalled() {
-        return Loader.isModLoaded(CoroUtil.modID_HWMonsters);
+        return ModList.get().isLoaded(CoroUtil.modID_HWMonsters);
     }
 
     public static boolean isHWInvasionsInstalled() {
-        return Loader.isModLoaded(CoroUtil.modID_HWInvasions);
+        return ModList.get().isLoaded(CoroUtil.modID_HWInvasions);
     }
 
     public static boolean canTornadoGrabBlockRefinedRules(BlockState state) {

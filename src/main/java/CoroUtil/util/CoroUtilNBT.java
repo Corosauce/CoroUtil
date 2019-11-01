@@ -3,8 +3,7 @@ package CoroUtil.util;
 import java.util.Iterator;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 
 public class CoroUtilNBT {
 
@@ -17,7 +16,7 @@ public class CoroUtilNBT {
 			Iterator it = nbtSource.keySet().iterator();
 			while (it.hasNext()) {
 				tagName = (String) it.next();
-				NBTBase data = nbtSource.get(tagName);
+				INBT data = nbtSource.get(tagName);
 				newNBT.put(tagName, data);
 			}
 		} catch (Exception ex) {
@@ -79,7 +78,7 @@ public class CoroUtilNBT {
     
     public static BlockCoord readCoords(String name, CompoundNBT nbt) {
     	if (nbt.contains(name + "X")) {
-    		return new BlockCoord(nbt.getInteger(name + "X"), nbt.getInt(name + "Y"), nbt.getInt(name + "Z"));
+    		return new BlockCoord(nbt.getInt(name + "X"), nbt.getInt(name + "Y"), nbt.getInt(name + "Z"));
     	} else {
     		return null;
     	}

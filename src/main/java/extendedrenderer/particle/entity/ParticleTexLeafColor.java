@@ -1,39 +1,34 @@
 package extendedrenderer.particle.entity;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.minecraft.block.Block;
-import net.minecraft.block.DoublePlantBlock;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.registries.IRegistryDelegate;
-import org.apache.commons.lang3.ArrayUtils;
-
-import CoroUtil.util.CoroUtilColor;
-import net.minecraft.block.DoublePlantBlock;
-import net.minecraft.block.DoublePlantBlock.EnumBlockHalf;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.IRegistryDelegate;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
     
 	// Save a few stack depth by caching this
 	private static BlockColors colors;
 
-	private static final Field _blockColorMap = ReflectionHelper.findField(BlockColors.class, "blockColorMap");
+	private static final Field _blockColorMap = ObfuscationReflectionHelper.findField(BlockColors.class, "field_186725_a");
 	private static Map<IRegistryDelegate<Block>, IBlockColor> blockColorMap;
 
 	private static ConcurrentHashMap<BlockState, int[]> colorCache = new ConcurrentHashMap<>();
-	static {
+	/*static {
 		((SimpleReloadableResourceManager) Minecraft.getInstance().getResourceManager()).registerReloadListener(rm -> colorCache.clear());
-	}
+	}*/
 
 	//only use positives for now
 	public float rotationYawMomentum = 0;
@@ -57,16 +52,19 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 		BlockState state = worldIn.getBlockState(pos);
 
 	    // top of double plants doesn't have variant property
-		if (state.getBlock() instanceof DoublePlantBlock && state.get(DoublePlantBlock.HALF) == EnumBlockHalf.UP) {
+		//TODO: 1.14 uncomment
+		/*if (state.getBlock() instanceof DoublePlantBlock && state.get(DoublePlantBlock.HALF) == EnumBlockHalf.UP) {
 		    state = state.with(DoublePlantBlock.name, worldIn.getBlockState(pos.down()).get(DoublePlantBlock.name));
-		}
+		}*/
 
 		int multiplier = this.colors.getColor(state, this.world, pos, 0);
 
 		int[] colors = colorCache.get(state);
 		if (colors == null) {
 
-		    colors = CoroUtilColor.getColors(state);
+			colors = IntArrays.EMPTY_ARRAY;
+			//TODO: 1.14 uncomment
+		    //colors = CoroUtilColor.getColors(state);
 
 		    if (colors.length == 0) {
 
