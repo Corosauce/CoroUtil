@@ -2,6 +2,6 @@ package extendedrenderer;
 
 public class ExtendedRenderer {
 
-    public static String modid = "extendedrenderer";
+    public static String modid = "weather2";
 
 }
