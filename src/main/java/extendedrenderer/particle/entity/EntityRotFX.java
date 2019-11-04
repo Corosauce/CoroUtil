@@ -140,7 +140,7 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 
         rotation = new Quaternion();
 
-        //TODO: 1.14 uncomment
+        //TODO: 1.14 uncomment for shaders
         //brightnessCache = CoroUtilBlockLightCache.getBrightnessCached(world, (float)posX, (float)posY, (float)posZ);
     }
 
@@ -745,6 +745,10 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 
     @Override
     public void setSprite(TextureAtlasSprite sprite) {
-        this.sprite = sprite;
+        super.setSprite(sprite);
+    }
+
+    public TextureAtlasSprite getSprite() {
+        return sprite;
     }
 }

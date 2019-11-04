@@ -18,31 +18,31 @@ public class ParticleRegistry {
 
 	public static TextureAtlasSprite squareGrey;
 	public static TextureAtlasSprite smoke;
-	public static TextureAtlasSprite smokeTest;
+	//public static TextureAtlasSprite smokeTest;
 	public static TextureAtlasSprite cloud;
 	public static TextureAtlasSprite cloud256;
 	public static TextureAtlasSprite cloud256_fire;
 	public static TextureAtlasSprite cloud256_test;
-	public static TextureAtlasSprite cloud256_2;
+	//public static TextureAtlasSprite cloud256_2;
 	public static TextureAtlasSprite cloud256_6;
-	public static TextureAtlasSprite downfall2;
+	//public static TextureAtlasSprite downfall2;
 	public static TextureAtlasSprite downfall3;
-	public static TextureAtlasSprite downfall4;
-	public static TextureAtlasSprite cloud256_7;
+	//public static TextureAtlasSprite downfall4;
+	//public static TextureAtlasSprite cloud256_7;
 	public static TextureAtlasSprite chicken;
 	public static TextureAtlasSprite potato;
 	public static TextureAtlasSprite leaf;
 	public static TextureAtlasSprite rain;
 	public static TextureAtlasSprite rain_white;
-	public static TextureAtlasSprite rain_white_trans;
-	public static TextureAtlasSprite rain_white_2;
+	//public static TextureAtlasSprite rain_white_trans;
+	//public static TextureAtlasSprite rain_white_2;
 	//public static TextureAtlasSprite rain_10;
 	//public static TextureAtlasSprite rain_vanilla;
 	//public static TextureAtlasSprite snow_vanilla;
 	public static TextureAtlasSprite snow;
 	//public static TextureAtlasSprite test;
-	public static TextureAtlasSprite cloud256dark;
-	public static TextureAtlasSprite cloudDownfall;
+	//public static TextureAtlasSprite cloud256dark;
+	//public static TextureAtlasSprite cloudDownfall;
 	public static TextureAtlasSprite tumbleweed;
 	public static TextureAtlasSprite debris_1;
 	public static TextureAtlasSprite debris_2;
@@ -50,7 +50,7 @@ public class ParticleRegistry {
 	public static TextureAtlasSprite test_texture;
 	public static TextureAtlasSprite white_square;
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
-	public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
+	//public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
 	public static TextureAtlasSprite grass;
 
 	@SubscribeEvent
@@ -76,7 +76,7 @@ public class ParticleRegistry {
 		MeshBufferManagerFoliage.cleanup();*/
 
 		event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
-		//smoke = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
+		event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
 		//smokeTest = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
 		//cloud = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
 		event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256"));
@@ -127,7 +127,7 @@ public class ParticleRegistry {
 		}
 
 		squareGrey = event.getMap().getSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/white"));
-		//smoke = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
+		smoke = event.getMap().getSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_00"));
 		//smokeTest = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/smoke_2"));
 		//cloud = event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud64"));
 		cloud256 = event.getMap().getSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/cloud256"));
