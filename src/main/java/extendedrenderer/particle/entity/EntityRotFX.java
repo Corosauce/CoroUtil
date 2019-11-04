@@ -540,6 +540,17 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 		if (state.getBlock() != Blocks.AIR) {
 			System.out.println("particle in: " + state);
 		}*/
+
+		//particleScale = 30;
+
+        //1.12 did 0.1F * scale in render, but removed it, this makes my scales backwards compatible
+        //changing just for render, yes, very hacky
+        particleScale *= 0.1F;
+
+        super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
+                rotationZ, rotationYZ, rotationXY, rotationXZ);
+
+        particleScale *= 10F;
 	}
 
     //TODO: 1.14 uncomment
