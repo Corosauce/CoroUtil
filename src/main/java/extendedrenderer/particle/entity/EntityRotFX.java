@@ -358,6 +358,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         weatherEffect = true;
         //TODO: 1.14 uncomment
         /*ExtendedRenderer.rotEffRenderer.addEffect(this);*/
+        //TODO: 1.14 remove after above fixed
+        Minecraft.getInstance().particles.addEffect(this);
         //RELOCATED TO CODE AFTER CALLING spawnAsWeatherEffect(), also uses list in WeatherManagerClient
         //this.world.addWeatherEffect(this);
     }

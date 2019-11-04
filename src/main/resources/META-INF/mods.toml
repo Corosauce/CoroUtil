@@ -1,0 +1,23 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+[[mods]]
+modId="coroutil"
+version="1.0"
+displayName="coroutil"
+authors="Corosus"
+description='''
+
+'''
+
+[[dependencies.coroutil]]
+    modId="forge"
+    mandatory=true
+    versionRange="[28,)"
+    ordering="NONE"
+    side="CLIENT"
+[[dependencies.coroutil]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.14.4]"
+    ordering="NONE"
+    side="CLIENT"
