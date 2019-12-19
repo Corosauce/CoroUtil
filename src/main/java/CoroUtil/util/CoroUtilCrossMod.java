@@ -4,10 +4,12 @@ import CoroUtil.config.ConfigCoroUtilAdvanced;
 import CoroUtil.difficulty.UtilEntityBuffs;
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,8 +26,24 @@ import java.util.List;
  */
 public class CoroUtilCrossMod {
 
+    //infernal mobs
+
     private static boolean checkHasInfernalMobs = true;
     private static boolean hasInfernalMobs = false;
+
+    private static Class class_IM_InfernalMobsCore = null;
+    private static Method method_IM_instance = null;
+    private static Method method_IM_addEntityModifiersByString = null;
+    private static Method method_IM_removeEntFromElites = null;
+
+    //gamestages
+
+    private static boolean checkHasGameStages = true;
+    private static boolean hasGameStages = false;
+
+    private static Class class_GS_GameStageHelper = null;
+    private static Method method_GS_hasAnyOf = null;
+    private static Method method_GS_hasAllOf = null;
 
     public static List<String> listModifiers = new ArrayList<>();
 
@@ -72,8 +90,8 @@ public class CoroUtilCrossMod {
             checkHasInfernalMobs = false;
             try {
                 //this throws exception when its not installed
-                Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
-                if (clazz != null) {
+                class_IM_InfernalMobsCore = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
+                if (class_IM_InfernalMobsCore != null) {
                     hasInfernalMobs = true;
                 }
             } catch (Exception ex) {
@@ -128,16 +146,19 @@ public class CoroUtilCrossMod {
          */
 
         try {
-            Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
-            if (clazz != null) {
-                Method method = clazz.getDeclaredMethod("instance");
-                Object obj = method.invoke(null);
-                Method methodMods = obj.getClass().getDeclaredMethod("addEntityModifiersByString", EntityLivingBase.class, String.class);
-                methodMods.invoke(obj, ent, modifiers);
-                return true;
+            //Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
+            if (method_IM_instance == null) {
+                method_IM_instance = class_IM_InfernalMobsCore.getDeclaredMethod("instance");
             }
+            Object obj = method_IM_instance.invoke(null);
+            if (method_IM_addEntityModifiersByString == null) {
+                method_IM_addEntityModifiersByString = obj.getClass().getDeclaredMethod("addEntityModifiersByString", EntityLivingBase.class, String.class);
+            }
+            method_IM_addEntityModifiersByString.invoke(obj, ent, modifiers);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
+            hasInfernalMobs = false;
         }
 
 
@@ -148,16 +169,14 @@ public class CoroUtilCrossMod {
         if (!hasInfernalMobs()) return false;
 
         try {
-            Class clazz = Class.forName("atomicstryker.infernalmobs.common.InfernalMobsCore");
-            if (clazz != null) {
-
-                Method method = clazz.getDeclaredMethod("removeEntFromElites", EntityLivingBase.class);
-                method.invoke(null, ent);
-
-                return true;
+            if (method_IM_removeEntFromElites == null) {
+                method_IM_removeEntFromElites = class_IM_InfernalMobsCore.getDeclaredMethod("removeEntFromElites", EntityLivingBase.class);
             }
+            method_IM_removeEntFromElites.invoke(null, ent);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
+            hasInfernalMobs = false;
         }
 
         return false;
@@ -193,5 +212,56 @@ public class CoroUtilCrossMod {
                 }
             }
         }
+    }
+
+    public static boolean hasGameStages() {
+        if (!checkHasGameStages) {
+            return hasGameStages;
+        } else {
+            checkHasGameStages = false;
+            try {
+                //this throws exception when its not installed
+                class_GS_GameStageHelper = Class.forName("net.darkhax.gamestages.GameStageHelper");
+                if (class_GS_GameStageHelper != null) {
+                    hasGameStages = true;
+                }
+            } catch (Exception ex) {
+                //ex.printStackTrace();
+            }
+            CULog.log("CoroUtil detected GameStages mod " + (hasGameStages ? "Installed" : "Not Installed") + " for use");
+            return hasGameStages;
+        }
+    }
+
+
+
+    public static boolean gameStages_hasStages(EntityPlayer player, List<String> stages, boolean matchAllOf) {
+        // public static boolean hasAnyOf (EntityPlayer player, Collection<String> stages) {
+        // public static boolean hasAllOf (EntityPlayer player, Collection<String> stages) {
+
+        if (!hasGameStages()) return false;
+
+        if (matchAllOf) {
+            try {
+                if (method_GS_hasAllOf == null) {
+                    method_GS_hasAllOf = class_GS_GameStageHelper.getDeclaredMethod("hasAllOf", EntityPlayer.class, Collection.class);
+                }
+                return (Boolean)method_GS_hasAllOf.invoke(null, player, stages);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                hasGameStages = false;
+            }
+        } else {
+            try {
+                if (method_GS_hasAnyOf == null) {
+                    method_GS_hasAnyOf = class_GS_GameStageHelper.getDeclaredMethod("hasAnyOf", EntityPlayer.class, Collection.class);
+                }
+                return (Boolean)method_GS_hasAnyOf.invoke(null, player, stages);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                hasGameStages = false;
+            }
+        }
+        return false;
     }
 }

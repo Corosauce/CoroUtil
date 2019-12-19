@@ -116,6 +116,7 @@ public class DifficultyDataReader {
         lookupJsonNameToConditionDeserializer.put("filter_mobs", ConditionFilterMobs.class);
         lookupJsonNameToConditionDeserializer.put("template", ConditionTemplateReference.class);
         lookupJsonNameToConditionDeserializer.put("mod_loaded", ConditionModLoaded.class);
+        lookupJsonNameToConditionDeserializer.put("game_stages", ConditionGameStages.class);
 
         /**
          * Buff appliers
