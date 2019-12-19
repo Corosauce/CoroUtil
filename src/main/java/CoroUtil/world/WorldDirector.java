@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import CoroUtil.config.ConfigCoroUtilAdvanced;
+import CoroUtil.forge.CULog;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -152,7 +153,7 @@ public class WorldDirector implements Runnable {
 				//relocated to a ticking first time init so it can be after readnbt
 				//if (init) location.init();
 			} else {
-				System.out.println("warning: location already exists at these coords: " + location.getOrigin());
+				CULog.dbg("warning: location already exists at these coords: " + location.getOrigin());
 			}
 		}
 		listTickingLocations.add(location);
@@ -165,7 +166,7 @@ public class WorldDirector implements Runnable {
 				lookupTickingManagedLocations.remove(hash);
 				location.cleanup();
 			} else {
-				System.out.println("Error, couldnt find location for removal");
+				CULog.dbg("Error, couldnt find location for removal");
 			}
 		}
 		listTickingLocations.remove(location);
@@ -313,7 +314,7 @@ public class WorldDirector implements Runnable {
     		
     		boolean bool = false;
     		if (extraData != null) bool = extraData.getBoolean("generatedTown");
-    		//System.out.println("writing nbt, generatedTown: " + bool);
+    		//CULog.dbg("writing nbt, generatedTown: " + bool);
     		
     		//update runtime data to nbt
     		writeToNBT(nbt);
@@ -321,7 +322,7 @@ public class WorldDirector implements Runnable {
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
     		
-    		//System.out.println("saveFolder: " + saveFolder);
+    		//CULog.dbg("saveFolder: " + saveFolder);
     		
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
@@ -359,7 +360,7 @@ public class WorldDirector implements Runnable {
 			
 		    try {
 		        aClass = classLoader.loadClass(classname);
-		        //System.out.println("aClass.getName() = " + aClass.getName());
+		        //CULog.dbg("aClass.getName() = " + aClass.getName());
 		    } catch (ClassNotFoundException e) {
 		        e.printStackTrace();
 		    }
@@ -378,7 +379,7 @@ public class WorldDirector implements Runnable {
 				locationObj.initPost();
 				addTickingLocation(locationObj);
 				
-				//System.out.println("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
+				//CULog.dbg("reading in ticking location: " + nbt.toString() + " - " + entrance.getOrigin().posX + " - " + entrance.spawn.posZ);
 		    }
 		}
 	}
