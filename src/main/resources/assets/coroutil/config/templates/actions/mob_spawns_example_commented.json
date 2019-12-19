@@ -17,6 +17,16 @@
           "condition": "difficulty",
           "min": 0,
           "max": 0.1
+        },
+        {
+          "condition": "game_stages",
+          "game_stages": [ "stage1", "stage2" ],
+          "match_mode": "any_of"
+        },
+        {
+          "condition": "game_stages",
+          "game_stages": [ "stage1", "sub_stage1" ],
+          "match_mode": "all_of"
         }
       ],
       "comment": "//conditions are optional, but should be structured like this above, see json file all_conditions for everything you can use",
