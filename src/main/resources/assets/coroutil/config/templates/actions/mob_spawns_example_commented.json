@@ -69,8 +69,10 @@
         },
         {
           "comment": "//you can have multiple object entries in the spawns array, this is the second, this is the last comment, everything below is just more examples of the same structures",
+          "comment": "//you can spawn entities with nbt as well, just make sure to escape the quotes correctly",
           "entities": [
-            "minecraft:zombie"
+            "minecraft:zombie",
+            "minecraft:bat{Passengers:[{id:\"tnt\",Fuse:5000}]}"
           ],
           "count": 5,
           "count_max": 15,
