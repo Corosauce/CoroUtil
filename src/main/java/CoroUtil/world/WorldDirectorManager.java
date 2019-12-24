@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -23,7 +24,7 @@ public class WorldDirectorManager {
 	
 	//modID<dimID, WorldDirector>
 	private HashMap<String, HashMap<Integer, WorldDirector>> lookupWorldDirectors = new HashMap<String, HashMap<Integer, WorldDirector>>();
-	private List<WorldDirector> listWorldDirectors = new ArrayList<WorldDirector>();
+	private List<WorldDirector> listWorldDirectors = new CopyOnWriteArrayList<>();
 	
 	private static WorldDirectorManager instanceServer;
 	private static WorldDirectorManager instanceClient; //not setup yet
