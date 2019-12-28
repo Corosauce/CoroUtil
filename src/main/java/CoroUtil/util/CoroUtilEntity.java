@@ -281,4 +281,23 @@ public class CoroUtilEntity {
     public static void updateLastTimeLongDistPathfinded(EntityCreature ent) {
         ent.getEntityData().setLong(UtilEntityBuffs.dataEntityBuffed_LastTimePathfindLongDist, ent.world.getTotalWorldTime() + (ent.getEntityId() % 20));
     }
+
+    public static String getEntityNameStringFromNBTLoadedName(String entityString) {
+        entityString = entityString.trim();
+        String spawn = entityString;
+        if (spawn.contains("{")) {
+            spawn = entityString.substring(0, entityString.indexOf("{"));
+        }
+        return spawn;
+    }
+
+    public static String getEntityNBTStringFromNBTLoadedName(String entityString) {
+        entityString = entityString.trim();
+        String spawn = entityString;
+        String spawnStrNBT = "";
+        if (spawn.contains("{")) {
+            spawnStrNBT = entityString.substring(entityString.indexOf("{"));
+        }
+        return spawnStrNBT;
+    }
 }

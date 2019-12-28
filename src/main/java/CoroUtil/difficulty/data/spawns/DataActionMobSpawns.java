@@ -21,6 +21,7 @@ public class DataActionMobSpawns {
     public double count_difficulty_multiplier = 0;
     public EnumSpawnPlacementType spawnType = EnumSpawnPlacementType.GROUND;
 
+    //NOTE: this can contain special NBT data now, whatever uses this must parse that out if needed
     public List<String> entities = new ArrayList<>();
     public List<DataCmod> cmods = new ArrayList<>();
 
@@ -54,7 +55,8 @@ public class DataActionMobSpawns {
             String code = "";
             if (DifficultyDataReader.debugValidate()) {
                 code = TextFormatting.GREEN.toString();
-                if (CoroUtilEntity.getClassFromRegistry(entity) == null)
+                if (CoroUtilEntity.getClassFromRegistry(CoroUtilEntity.getEntityNameStringFromNBTLoadedName(
+                        entity)) == null)
                     code = TextFormatting.RED.toString() + "MISSING! ";
             }
             str += code + entity + ", ";

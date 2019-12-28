@@ -18,6 +18,7 @@ import CoroUtil.world.location.ISimulationTickable;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.*;
@@ -27,6 +28,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -38,6 +42,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraftforge.common.DimensionManager;
 import CoroUtil.OldUtil;
 import CoroUtil.pathfinding.PFQueue;
@@ -730,28 +735,63 @@ public class CommandCoroUtil extends CommandBase {
         return count;
 	}
 
-	public void spawnInvasionMob(World world, EntityPlayer player, String spawn, DataActionMobSpawns spawns, Vec3d posVec) {
+	public void spawnInvasionMob(World world, EntityPlayer player, String spawnStr, DataActionMobSpawns spawns, Vec3d posVec) throws CommandException {
+
+		String spawn = CoroUtilEntity.getEntityNameStringFromNBTLoadedName(spawnStr);
+		String spawnStrNBT = CoroUtilEntity.getEntityNBTStringFromNBTLoadedName(spawnStr);
+
+
 
 		if (spawn.equals("minecraft:bat")) {
 			spawn = "coroutil:bat_smart";
 		}
 
 		Class clazz = EntityList.getClass(new ResourceLocation(spawn));
-
 		if (clazz != null) {
-			Entity entL = EntityList.newEntity(clazz, world);
-			if (entL != null && entL instanceof EntityCreature) {
+			//Entity entL = EntityList.newEntity(clazz, world);
+			/*if (entL != null && entL instanceof EntityCreature) {*/
+			if (EntityCreature.class.isAssignableFrom(clazz)) {
 
-				EntityCreature ent = (EntityCreature) entL;
+				//EntityCreature ent = (EntityCreature) entL;
 
 				BlockCoord pos = new BlockCoord(MathHelper.floor(posVec.x), MathHelper.floor(posVec.y), MathHelper.floor(posVec.z));
 				float difficultyScale = DynamicDifficulty.getDifficultyScaleAverage(world, player, pos);
 
+				EntityCreature ent = null;
+				NBTTagCompound spawnNBT = null;
+
+				boolean handleSpawning = true;
+
+				if (spawnStrNBT != "") {
+					handleSpawning = false;
+					try {
+						spawnNBT = JsonToNBT.getTagFromJson(spawnStrNBT);
+						spawnNBT.setString("id", spawn);
+						spawnNBT.setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
+					} catch (NBTException nbtexception) {
+						throw new CommandException("commands.summon.tagError", new Object[]{nbtexception.getMessage()});
+					}
+					ent = (EntityCreature) AnvilChunkLoader.readWorldEntityPos(spawnNBT, player.world, pos.posX, pos.posY + 1, pos.posZ, true);
+				} else {
+					try {
+						ent = (EntityCreature) clazz.getConstructor(new Class[]{World.class}).newInstance(new Object[]{player.world});
+					} catch (Exception ex) {
+						throw new CommandException("spawn error: ", new Object[]{ex.getMessage()});
+					}
+
+				}
+
 				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityWaveSpawned, true);
 				UtilEntityBuffs.registerAndApplyCmods(ent, spawns.cmods, difficultyScale);
 
-				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
-				spawnEntity(player, ent);
+				/*ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
+				spawnEntity(player, ent);*/
+				if (handleSpawning) {
+					//put into nbt above before entity instanced otherwise
+					ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, true);
+					//player.world.spawnEntity(ent);
+					spawnEntity(player, ent);
+				}
 				ent.getEntityData().setBoolean(UtilEntityBuffs.dataEntityInitialSpawn, false);
 
 				//add a bit of random to space multi spawns out
