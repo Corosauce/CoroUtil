@@ -58,14 +58,7 @@ public class ConfigBlockDestruction implements IConfigCategory {
 	public void hookUpdatedValues() {
         UtilMining.processBlockLists();
 
-        //TODO: sync on connect too
-		try {
-			PacketHelper.syncBlockLists();
-		} catch (NullPointerException ex) {
-			//silence
-			//workaround for https://github.com/Corosauce/CoroUtil/issues/38
-			//TODO: fix correctly in 1.14 since networking is being redone for that
-		}
+		PacketHelper.syncBlockLists();
 	}
 
 }

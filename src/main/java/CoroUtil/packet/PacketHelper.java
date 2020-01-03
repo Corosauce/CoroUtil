@@ -13,6 +13,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
@@ -253,7 +254,14 @@ public class PacketHelper {
     }
 
 	public static void syncBlockLists() {
+		if (getServerPlayerCount() <= 0) return;
 		CoroUtil.eventChannel.sendToAll(PacketHelper.getPacketForUpdateBlockList());
+	}
+
+	public static int getServerPlayerCount() {
+		if (FMLCommonHandler.instance().getMinecraftServerInstance() == null) return 0;
+		if (FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList() == null) return 0;
+		return FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getCurrentPlayerCount();
 	}
 	
 }
