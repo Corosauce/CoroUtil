@@ -7,8 +7,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import CoroUtil.forge.CULog;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import CoroUtil.util.CoroUtilFile;
 
@@ -20,6 +22,10 @@ public class ChunkDataGrid
 	
 	public World world;
     public HashMap<Integer, ChunkDataPoint> grid;
+
+    //runtime nbt data, required for injecting partial datasets into nbt to write out
+	//solves long term servers getting overloaded with chunk data
+    public NBTTagCompound dataAllChunks = new NBTTagCompound();
 
     public ChunkDataGrid(World parWorld)
     {
@@ -54,10 +60,22 @@ public class ChunkDataGrid
         if (!grid.containsKey(hash))
         {
         	if (!onlyIfExists) {
-        		ChunkDataPoint newVec = new ChunkDataPoint(this, i, k);
-        		newVec.initFirstTime();
-                grid.put(newVec.hash, newVec);
-                return newVec;
+        		//NEW, try load from persistent nbt first
+				if (dataAllChunks.hasKey(""+hash)) {
+					NBTTagCompound nbt = dataAllChunks.getCompoundTag(""+hash);
+
+					//ChunkDataPoint bdp = this.getChunkData(nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
+					ChunkDataPoint bdp = new ChunkDataPoint(this, nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
+					bdp.initFirstTime();
+					bdp.readFromNBT(nbt);
+					grid.put(bdp.hash, bdp);
+					return bdp;
+				} else {
+					ChunkDataPoint newVec = new ChunkDataPoint(this, i, k);
+					newVec.initFirstTime();
+					grid.put(newVec.hash, newVec);
+					return newVec;
+				}
 	        } else {
         		return null;
         	}
@@ -88,23 +106,30 @@ public class ChunkDataGrid
 			String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
 			
 			if ((new File(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat")).exists()) {
-				NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat"));
+				//NBTTagCompound data = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat"));
+				dataAllChunks = CompressedStreamTools.readCompressed(new FileInputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat"));
 				
 				/*Collection playerDataCl = data.getTags();
 				Iterator it = playerDataCl.iterator();*/
 				
-				Iterator it = data.getKeySet().iterator();
+				Iterator it = dataAllChunks.getKeySet().iterator();
 				
 				while (it.hasNext()) {
 					String keyName = (String)it.next();
-					NBTTagCompound nbt = data.getCompoundTag(keyName);
-					
-					ChunkDataPoint bdp = this.getChunkData(nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
+					NBTTagCompound nbt = dataAllChunks.getCompoundTag(keyName);
+
+					//removed to prevent recursive loop for the fix
+					/*ChunkDataPoint bdp = this.getChunkData(nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
 					if (bdp != null) {
 						bdp.readFromNBT(nbt);
 					} else {
 						//must have been set to air at some point...
-					}
+					}*/
+
+					ChunkDataPoint bdp = new ChunkDataPoint(this, nbt.getInteger("xCoord"), nbt.getInteger("zCoord"));
+					bdp.initFirstTime();
+					bdp.readFromNBT(nbt);
+					grid.put(bdp.hash, bdp);
 					
 				}
 			}
@@ -117,14 +142,24 @@ public class ChunkDataGrid
 	public void writeToFile(boolean unloadInstances) {
     	try {
     		
-    		NBTTagCompound data = new NBTTagCompound();
-    		
     		Collection playerDataCl = grid.values();
 			Iterator it = playerDataCl.iterator();
 			
 			while (it.hasNext()) {
 				ChunkDataPoint bdp = (ChunkDataPoint)it.next();
-				data.setTag(""+bdp.hash, bdp.writeToNBT());
+				dataAllChunks.setTag(""+bdp.hash, bdp.writeToNBT());
+
+				//if were not mass unloading everything later, carefully trim out ones from chunks now unloaded
+				if (!unloadInstances) {
+					if (world != null) {
+						if (!world.isBlockLoaded(new BlockPos(bdp.xCoord * 16, 0, bdp.zCoord * 16))) {
+							CULog.dbg("detected saving chunk data for unloaded chunk, removing its data from memory");
+							//grid.remove(bdp.hash);
+							bdp.cleanup();
+							it.remove();
+						}
+					}
+				}
 			}
     		
     		String saveFolder = CoroUtilFile.getWorldSaveFolderPath() + CoroUtilFile.getWorldFolderName() + "CoroUtil" + File.separator + "World" + File.separator;
@@ -132,11 +167,15 @@ public class ChunkDataGrid
     		//Write out to file
     		if (!(new File(saveFolder).exists())) (new File(saveFolder)).mkdirs();
     		FileOutputStream fos = new FileOutputStream(saveFolder + "ChunkDataDim_" + world.provider.getDimension() + ".dat");
-	    	CompressedStreamTools.writeCompressed(data, fos);
+	    	CompressedStreamTools.writeCompressed(dataAllChunks, fos);
 	    	fos.close();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+
+    	if (unloadInstances) {
+    		dataAllChunks = new NBTTagCompound();
 		}
 	}
 

@@ -888,6 +888,8 @@ public class DynamicDifficulty {
 		int chunkX = MathHelper.floor(ent.posX / 16);
 		int chunkZ = MathHelper.floor(ent.posZ / 16);
 		ChunkDataPoint cdp = WorldDirectorManager.instance().getChunkDataGrid(world).getChunkData(chunkX, chunkZ);
+
+		CULog.dbg("averageDPS " + cdp.averageDPS);
 		
 		if (log.getListDPSs().size() == 0 && log.getLastDamage() > 0) {
 			//add an insta kill dps that assumes can be done every half second

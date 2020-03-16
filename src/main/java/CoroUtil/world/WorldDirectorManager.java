@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import CoroUtil.forge.CULog;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -207,10 +208,12 @@ public class WorldDirectorManager {
     		
     		for (int i = 0; i < listGridsChunks.size(); i++) {
     			listGridsChunks.get(i).writeToFile(unloadInstances);
+
+				CULog.dbg("listGridsChunks chunks size: " + listGridsChunks.get(i).grid.values().size());
 			}
 	    	
 	    	if (unloadInstances) {
-	    		listGridsBlocks.clear();
+	    		listWorldDirectors.clear();
 	    		lookupWorldDirectors.clear();
 	    		
 	    		listGridsBlocks.clear();
