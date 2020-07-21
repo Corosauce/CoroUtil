@@ -1,6 +1,7 @@
 package CoroUtil.util;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 
 import CoroUtil.repack.de.androidpit.colorthief.ColorThief;
 import extendedrenderer.foliage.FoliageData;
@@ -45,7 +46,16 @@ public class CoroUtilColor {
         for (int i = 0; i < frames; i++) {
             img.setRGB(0, i * height, width, height, sprite.getFrameTextureData(0)[0], 0, width);
         }
-        
+
+        byte[] pixels = ((DataBufferByte) img.getRaster().getDataBuffer()).getData();
+        // Convert transparent pixels to white
+        for (int i = 0; i < pixels.length; i += 4) {
+            if (pixels[i] < 25) { // Alpha channel is zero (or close to it)
+                // Set color to full white
+                pixels[i] = pixels[i + 1] = pixels[i + 2] = pixels[i + 3] = (byte) 0xFF;
+            }
+        }
+
         int[][] colorData = ColorThief.getPalette(img, 6, 5, true);
         if (colorData != null) {
             int[] ret = new int[colorData.length];
