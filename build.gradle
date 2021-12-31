@@ -19,9 +19,9 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.16.5-1.11.16'
-group = 'com.corosus.zombieawareness' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'zombieawareness'
+version = '1.16.5-1.2.37'
+group = 'com.corosus.coroutil' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'coroutil'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -43,7 +43,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
             
-            arg "-mixin.config=zombieawareness.mixins.json"
+            arg "-mixin.config=coroutil.mixins.json"
 
             // Recommended logging data for a userdev environment
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -126,21 +126,21 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, "zombieawareness.refmap.json"
+    add sourceSets.main, "coroutil.refmap.json"
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
     manifest {
         attributes([
-            "Specification-Title": "zombieawareness",
+            "Specification-Title": "coroutil",
             "Specification-Vendor": "Corosus",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"Corosus",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "zombieawareness.mixins.json"
+            "MixinConfigs": "coroutil.mixins.json"
         ])
     }
 }

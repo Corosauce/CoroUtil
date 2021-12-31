@@ -1,4 +1,4 @@
-package modconfig;
+package com.corosus.modconfig;
 
 import java.util.Comparator;
 

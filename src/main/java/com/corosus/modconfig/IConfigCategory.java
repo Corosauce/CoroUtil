@@ -1,4 +1,4 @@
-package modconfig;
+package com.corosus.modconfig;
 
 public interface IConfigCategory {
 

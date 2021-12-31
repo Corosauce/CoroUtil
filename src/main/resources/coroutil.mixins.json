@@ -1,9 +1,9 @@
 {
   "required": true,
-  "package": "com.corosus.zombieawareness.mixin",
+  "package": "com.corosus.coroutil.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "zombieawareness.refmap.json",
-  "client": ["MixinPlaySound", "MixinLevelEvent"],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   },

@@ -1,8 +1,7 @@
-package modconfig;
+package com.corosus.modconfig;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
-import com.corosus.zombieawareness.config.ZAConfig;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,13 +25,10 @@ public class ConfigMod {
     //for new forge config, routing reloaded config event to the class to update
 	public static HashMap<String, ModConfigData> lookupFilePathToConfig = new HashMap<>();
 
-    public static final String MODID = "modconfig";
+    public static final String MODID = "coroutil";
 	
     public ConfigMod() {
-
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        //modBus.addListener(this::onLoad);
-        //modBus.addListener(this::onReload);
         MinecraftForge.EVENT_BUS.addListener(this::serverStart);
     }
 
@@ -46,17 +42,7 @@ public class ConfigMod {
         updateAllConfigsFromForge();
     }
 
-    public static void onLoad(final ModConfig.Loading configEvent, String modID) {
-        System.out.println("filename1: " + configEvent.getConfig().getFileName());
-        ModConfigData configData = ConfigMod.lookupRegistryNameToConfig.get("zaconfig");
-        configData.updateConfigFieldValues();
-        System.out.println("maxPFRangeSense1: " + ZAConfig.maxPFRangeSense);
-    }
-
-
-    public static void onReload(final ModConfig.Reloading configEvent/*, String modID*/) {
-
-
+    public static void onReload(final ModConfig.Reloading configEvent) {
         //for new forge config, we set our simple configs field values based on what forge config loaded from file now that the file is fully loaded and ready
         //we cant do this on the fly per field like we used to, forge complains the config builder isnt done yet
         ModConfigData configData = ConfigMod.lookupFilePathToConfig.get(configEvent.getConfig().getFileName());
@@ -124,16 +110,11 @@ public class ConfigMod {
     	configs.add(configData);
     	if (liveEdit) liveEditConfigs.add(configData);
     	lookupRegistryNameToConfig.put(categoryName, configData);
-        System.out.println("adding: " + configCat.getConfigFileName() + ".toml");
+        //System.out.println("adding: " + configCat.getConfigFileName() + ".toml");
         lookupFilePathToConfig.put(configCat.getConfigFileName() + ".toml", configData);
 
     	configData.initData();
     	configData.writeConfigFile(false);
-
-        //for new forge config, we set our simple configs field values based on what forge config loaded from file now that the file is fully loaded and ready
-        //we cant do this on the fly per field like we used to, forge complains the config builder isnt done yet
-        //no work here, values not updated yet
-        //configData.updateConfigFieldValues();
     }
     
     /* Get Inner Field value */
@@ -162,7 +143,7 @@ public class ConfigMod {
 
         return null;
     }
-    
+
     /* Update Config Field Entirely */
     public static boolean updateField(String configID, String name, Object obj) {
     	if (lookupRegistryNameToConfig.get(configID).setFieldBasedOnType(name, obj)) {
@@ -187,11 +168,11 @@ public class ConfigMod {
             data.writeConfigFile(false);
         }
     }
-    
+
     /* Sync the HashMap data if an outside source modified one of the config fields */
     public static void updateHashMaps() {
     	/*Field[] fields = configLookup.get(configID).getDeclaredFields();
-    	
+
     	for (int i = 0; i < fields.length; i++) {
     		Field field = fields[i];
     		String name = field.getName();

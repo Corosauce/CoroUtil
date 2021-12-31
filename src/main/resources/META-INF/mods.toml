@@ -1,21 +1,12 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[35,)"
 license="All Rights Reserved"
 
 [[mods]]
-modId="zombieawareness"
+modId="coroutil"
 version="${file.jarVersion}"
-displayName="zombieawareness"
+displayName="CoroUtil"
 authors="Corosus"
 description='''
-They smellz
-'''
-
-[[mods]]
-modId="modconfig"
-version="${file.jarVersion}"
-displayName="modconfig"
-authors="Corosus"
-description='''
-
+Library for Corosus mods
 '''

@@ -1,4 +1,4 @@
-package modconfig;
+package com.corosus.modconfig;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
@@ -6,7 +6,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
