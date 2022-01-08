@@ -1,7 +1,7 @@
 package com.corosus.coroutil.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Material;
 
 public class CoroUtilBlock {
 	

@@ -3,11 +3,11 @@ package com.corosus.modconfig;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.lang.reflect.Field;
@@ -35,14 +35,14 @@ public class ConfigMod {
 
 
     @SubscribeEvent
-    public void serverStart(FMLServerStartingEvent event) {
+    public void serverStart(ServerStartingEvent event) {
         //force a full update right before server starts because forge file watching is unreliable
         //itll randomly not invoke ModConfig.Reloading for configs and stick with old values
         dbg("Performing a full config mod force sync");
         updateAllConfigsFromForge();
     }
 
-    public static void onReload(final ModConfig.Reloading configEvent) {
+    public static void onReload(final ModConfigEvent.Reloading configEvent) {
         //for new forge config, we set our simple configs field values based on what forge config loaded from file now that the file is fully loaded and ready
         //we cant do this on the fly per field like we used to, forge complains the config builder isnt done yet
         ModConfigData configData = ConfigMod.lookupFilePathToConfig.get(configEvent.getConfig().getFileName());
