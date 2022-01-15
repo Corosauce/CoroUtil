@@ -1,11 +1,10 @@
 package com.corosus.coroutil.util;
 
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.antlr.v4.runtime.misc.NotNull;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 public class OldUtil {
 
