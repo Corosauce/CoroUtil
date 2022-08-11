@@ -65,7 +65,7 @@ public class CoroUtilPath {
 
 					Mob center = ent;
 
-					Random rand = world.random;
+					Random rand = new Random();
 
 					float randLook = rand.nextInt(90) - 45;
 					//int height = 10;

@@ -4,6 +4,7 @@ import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
