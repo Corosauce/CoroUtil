@@ -1,5 +1,6 @@
 package com.corosus.modconfig;
 
+import com.corosus.coroutil.config.ConfigCoroUtil;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraftforge.common.MinecraftForge;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -30,6 +32,9 @@ public class ConfigMod {
     public ConfigMod() {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         MinecraftForge.EVENT_BUS.addListener(this::serverStart);
+
+        new File("./config/CoroUtil").mkdirs();
+        ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
     }
 
 
