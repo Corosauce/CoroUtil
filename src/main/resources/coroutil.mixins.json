@@ -1,10 +1,11 @@
 {
   "required": true,
+  "priority": -1,
   "package": "com.corosus.coroutil.lazydfu.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "coroutil.refmap.json",
   "mixins": [
-    "SchemasMixin"
+
   ],
   "injectors": {
     "defaultRequire": 1
