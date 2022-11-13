@@ -55,7 +55,7 @@ apply plugin: 'org.spongepowered.mixin'
 ext.buildnumber = 0
 ext.projversion = 0
 
-project.projversion = '1.18.1-1.2.37'
+project.projversion = '1.18.1-1.2.38'
 group = 'com.corosus.coroutil' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'coroutil'
 
