@@ -1,6 +1,7 @@
 package com.corosus.coroutil.util;
 
 import com.corosus.coroutil.config.ConfigCoroUtil;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -65,7 +66,7 @@ public class CoroUtilPath {
 
 					Mob center = ent;
 
-					Random rand = world.random;
+					RandomSource rand = world.random;
 
 					float randLook = rand.nextInt(90) - 45;
 					//int height = 10;
