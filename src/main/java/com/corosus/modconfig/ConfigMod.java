@@ -139,14 +139,14 @@ public class ConfigMod {
         try {
             Field field = lookupRegistryNameToConfig.get(configID).configClass.getDeclaredField(name);
             ConfigComment anno_comment = field.getAnnotation(ConfigComment.class);
-            return anno_comment == null ? null : anno_comment.value()[0];
+            return anno_comment == null ? "" : anno_comment.value()[0];
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
             e.printStackTrace();
         }
 
-        return null;
+        return "";
     }
 
     /* Update Config Field Entirely */
@@ -162,12 +162,13 @@ public class ConfigMod {
     public static void forceSaveAllFilesFromRuntimeSettings() {
         CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
-            data.writeConfigFile(true);
+            //data.writeConfigFile(true);
+            data.updateConfigFileWithRuntimeValues();
         }
     }
 
     public static void forceLoadRuntimeSettingsFromFile() {
-        CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
+        CULog.dbg("forceLoadRuntimeSettingsFromFile invoked");
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.reloadRuntimeFromFile();
             data.writeConfigFile(false);

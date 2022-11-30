@@ -197,6 +197,42 @@ public class ModConfigData {
 		ForgeConfigSpec CONFIG = BUILDER.build();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
     }
+
+	public void updateConfigFileWithRuntimeValues() {
+		Field[] fields = configClass.getDeclaredFields();
+
+		for (int i = 0; i < fields.length; i++) {
+			Field field = fields[i];
+			String name = field.getName();
+			saveField(name);
+		}
+	}
+
+	//updates values in lists, updates forges config field, saves field
+	private void saveField(String fieldName) {
+		try {
+			Object obj = ConfigMod.getField(configID, fieldName);
+			if (obj instanceof String) {
+				valsString.put(fieldName, (String)obj);
+				valsStringConfig.get(fieldName).set((String)obj);
+				valsStringConfig.get(fieldName).save();
+			} else if (obj instanceof Integer) {
+				valsInteger.put(fieldName, (Integer)obj);
+				valsIntegerConfig.get(fieldName).set((Integer)obj);
+				valsIntegerConfig.get(fieldName).save();
+			} else if (obj instanceof Double) {
+				valsDouble.put(fieldName, (Double)obj);
+				valsDoubleConfig.get(fieldName).set((Double)obj);
+				valsDoubleConfig.get(fieldName).save();
+			} else if (obj instanceof Boolean) {
+				valsBoolean.put(fieldName, (Boolean)obj);
+				valsBooleanConfig.get(fieldName).set((Boolean)obj);
+				valsBooleanConfig.get(fieldName).save();
+			} else {
+				//dbg("unhandled datatype, update initField");
+			}
+		} catch (Exception ex) { ex.printStackTrace(); }
+	}
     
     /**
      * Perform the actual adding of values to the config file
@@ -219,8 +255,8 @@ public class ModConfigData {
         if (obj instanceof String) {
             //obj = preInitConfig.get(configInstance.getCategory(), name, (String)obj, comment).getString();
 			//obj = builder.define(name, (String)obj).get();
-			builder.comment(comment).define(name, (String)obj);
-			valsStringConfig.put(name, builder.define(name, (String)obj));
+			//builder.comment(comment).define(name, (String)obj);
+			valsStringConfig.put(name, builder.comment(comment).define(name, (String)obj));
         } else if (obj instanceof Integer) {
             //obj = preInitConfig.get(configInstance.getCategory(), name, (Integer)obj, comment).getInt((Integer)obj);
 			//obj = builder.defineInRange(name, (Integer)obj, Integer.MIN_VALUE, Integer.MAX_VALUE).get();
