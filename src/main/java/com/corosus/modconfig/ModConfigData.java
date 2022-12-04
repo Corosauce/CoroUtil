@@ -4,12 +4,12 @@ import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ModConfigData {
 	public String configID;
@@ -27,11 +27,7 @@ public class ModConfigData {
 	public HashMap<String, ForgeConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
 
 	//Client data
-	public List<ConfigEntryInfo> configData = new ArrayList<ConfigEntryInfo>();	
-	
-    //public Configuration preInitConfig;
-	//public static final CategoryGeneral GENERAL = new CategoryGeneral();
-    //public File saveFilePath;
+	public List<ConfigEntryInfo> configData = new ArrayList<ConfigEntryInfo>();
     public String saveFilePath;
 
 	public ModConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
@@ -72,7 +68,6 @@ public class ModConfigData {
 				valsInteger.put(fieldName, (Integer)obj);
 				int what = valsIntegerConfig.get(fieldName).get();
 				setFieldBasedOnType(fieldName, what);
-				//OldUtil.setPrivateValue();
 			} else if (obj instanceof Double) {
 				valsDouble.put(fieldName, (Double)obj);
 				Double val = valsDoubleConfig.get(fieldName).get();
@@ -122,8 +117,6 @@ public class ModConfigData {
     		} else {
     			return false;
     		}
-    		
-    		configInstance.hookUpdatedValues();
     		
     		return true;
     	}
@@ -192,11 +185,46 @@ public class ModConfigData {
     	}
 
 		CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
-    	//preInitConfig.save();
 		BUILDER.pop();
 		ForgeConfigSpec CONFIG = BUILDER.build();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+		reloadSpecificConfig();
+		updateConfigFieldValues();
+		configInstance.hookUpdatedValues();
     }
+
+	/**
+	 * since we cant use reflection to invoke these private methods, or AT forge methods, this is happening
+	 *
+	 * save a backup of all config sets for ModConfig.Type.COMMON
+	 * find this config file in the set and save it
+	 * clear existing set
+	 * add in this config file to set
+	 * run loadConfigs which runs on the set which now only contains my new config
+	 * restore original config set
+	 *
+	 * result is my config loaded from file as I register it
+	 */
+	public void reloadSpecificConfig() {
+		CULog.dbg("reloading specific config: " + saveFilePath);
+		Set<ModConfig> setBackup = Collections.synchronizedSet(new LinkedHashSet<>());
+		Set<ModConfig> setMine = Collections.synchronizedSet(new LinkedHashSet<>());
+		Set<ModConfig> setOrig = ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON);
+		CULog.dbg("total configs: " + setOrig.size());
+		for (ModConfig config : setOrig) {
+			setBackup.add(config);
+			if (config.getFileName().equals(saveFilePath + ".toml")) {
+				CULog.dbg("found: " + saveFilePath);
+				setMine.add(config);
+			}
+		}
+		setOrig.clear();
+		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).addAll(setMine);
+		ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).clear();
+		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).addAll(setBackup);
+		CULog.dbg("restored configs list: " + ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).size());
+	}
 
 	public void updateConfigFileWithRuntimeValues() {
 		Field[] fields = configClass.getDeclaredFields();
@@ -242,7 +270,8 @@ public class ModConfigData {
     private void addToConfig(ForgeConfigSpec.Builder builder, Field field, String name) {
 
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
-        String comment = "";
+		//space intentional here to workaround forge hating blank comments
+        String comment = " ";
 
         ConfigComment anno_comment = field.getAnnotation(ConfigComment.class);
         if (anno_comment != null) {
