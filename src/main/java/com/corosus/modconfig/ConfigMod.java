@@ -30,7 +30,6 @@ public class ConfigMod {
     public static final String MODID = "coroutil";
 	
     public ConfigMod() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         MinecraftForge.EVENT_BUS.addListener(this::serverStart);
 
         new File("./config/CoroUtil").mkdirs();
@@ -78,14 +77,6 @@ public class ConfigMod {
 	        ConfigEntryInfo info = new ConfigEntryInfo(lookupRegistryNameToConfig.get(modid).configData.size(), name, val, comment);
 	        lookupRegistryNameToConfig.get(modid).configData.add(info);
 	    }
-    }
-    
-    public void initData() {
-    	
-    }
-    
-    public void writeConfigFiles(Boolean resetData) {
-    	
     }
     
     public static void dbg(Object obj) {
@@ -173,17 +164,6 @@ public class ConfigMod {
             //data.reloadRuntimeFromFile();
             data.writeConfigFile(false);
         }
-    }
-
-    /* Sync the HashMap data if an outside source modified one of the config fields */
-    public static void updateHashMaps() {
-    	/*Field[] fields = configLookup.get(configID).getDeclaredFields();
-
-    	for (int i = 0; i < fields.length; i++) {
-    		Field field = fields[i];
-    		String name = field.getName();
-    		instance.processField(name);
-    	}*/
     }
     
     /* Main Usage Methods End */
