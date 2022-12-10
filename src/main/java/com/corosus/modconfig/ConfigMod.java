@@ -80,9 +80,7 @@ public class ConfigMod {
     }
     
     public static void dbg(Object obj) {
-		if (true) {
-			System.out.println(obj);
-		}
+		CULog.dbg("" + obj);
 	}
     
     /* Main Usage Methods Start */
