@@ -32,6 +32,8 @@ public class ConfigMod {
     public ConfigMod() {
         MinecraftForge.EVENT_BUS.addListener(this::serverStart);
 
+        MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
+
         new File("./config/CoroUtil").mkdirs();
         ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
     }

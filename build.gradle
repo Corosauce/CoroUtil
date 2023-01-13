@@ -56,7 +56,7 @@ apply plugin: 'org.spongepowered.mixin'
 ext.buildnumber = 0
 ext.projversion = 0
 
-project.projversion = '1.18.1-1.2.42'
+project.projversion = '1.18.1-1.2.43'
 group = 'com.corosus.coroutil' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'coroutil'
 
@@ -191,7 +191,8 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.5'
+    //minecraft 'net.minecraftforge:forge:1.18.1-39.0.5'
+    minecraft 'net.minecraftforge:forge:1.18.1-39.0.46'
     annotationProcessor 'org.spongepowered:mixin:0.8.5-SNAPSHOT:processor'
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
