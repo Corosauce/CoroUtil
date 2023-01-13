@@ -188,13 +188,16 @@ public class ModConfigData {
 		BUILDER.pop();
 		ForgeConfigSpec CONFIG = BUILDER.build();
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
-		reloadSpecificConfig();
+		//reloadSpecificConfig();
 		updateConfigFieldValues();
 		configInstance.hookUpdatedValues();
     }
 
 	/**
-	 * since we cant use reflection to invoke these private methods, or AT forge methods, this is happening
+	 * TODO: causes race condition that drops others configs due to not accounting for parallel mod loading, see https://github.com/Corosauce/CoroUtil/issues/54
+	 * not to be used, find another way
+	 *
+	 * method uses a workaround to load specifically our config since AT and reflection isnt working in this scenario
 	 *
 	 * save a backup of all config sets for ModConfig.Type.COMMON
 	 * find this config file in the set and save it
