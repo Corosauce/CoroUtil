@@ -56,7 +56,7 @@ apply plugin: 'org.spongepowered.mixin'
 ext.buildnumber = 0
 ext.projversion = 0
 
-project.projversion = '1.18.1-1.2.44'
+project.projversion = '1.18.2-1.2.45'
 group = 'com.corosus.coroutil' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'coroutil'
 
@@ -192,8 +192,10 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     //minecraft 'net.minecraftforge:forge:1.18.1-39.0.5'
-    minecraft 'net.minecraftforge:forge:1.18.1-39.0.46'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.0'
     annotationProcessor 'org.spongepowered:mixin:0.8.5-SNAPSHOT:processor'
+
+    implementation fg.deobf('sereneseasons:SereneSeasons:1.18.2-7.0.0.15')
 
     // Real mod deobf dependency examples - these get remapped to your current mappings
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}:${jei_version}:api") // Adds JEI API as a compile dependency
