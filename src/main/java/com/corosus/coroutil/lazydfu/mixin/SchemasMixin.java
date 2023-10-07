@@ -15,10 +15,10 @@ public class SchemasMixin {
      * @author Corosus
      * @reason stop mojangs rediculous and pointless cpu usage on load that no modpack user would ever benefit from
      */
-    @Overwrite
+    /*@Overwrite
     private static DataFixer createFixerUpper() {
-        LazyDataFixerBuilder datafixerbuilder = new LazyDataFixerBuilder(SharedConstants.getCurrentVersion().getWorldVersion());
+        LazyDataFixerBuilder datafixerbuilder = new LazyDataFixerBuilder(SharedConstants.WORLD_VERSION);
         DataFixers.addFixers(datafixerbuilder);
         return datafixerbuilder.build(Util.bootstrapExecutor());
-    }
+    }*/
 }

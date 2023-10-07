@@ -274,7 +274,7 @@ public class ModConfigData {
 
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
 		//space intentional here to workaround forge hating blank comments
-        String comment = " ";
+        String comment = "-";
 
         ConfigComment anno_comment = field.getAnnotation(ConfigComment.class);
         if (anno_comment != null) {

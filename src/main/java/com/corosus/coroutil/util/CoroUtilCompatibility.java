@@ -40,7 +40,7 @@ public class CoroUtilCompatibility {
                 if (method_sereneSeasons_getFloatTemperature == null) {
                     method_sereneSeasons_getFloatTemperature = class_SereneSeasons_ASMHelper.getDeclaredMethod("getBiomeTemperature", Level.class, Holder.class, BlockPos.class);
                 }
-                Holder<Biome> biomeHolder = world.m_204166_(pos);
+                Holder<Biome> biomeHolder = world.getBiome(pos);
                 return (float) method_sereneSeasons_getFloatTemperature.invoke(null, world, biomeHolder, pos);
             } catch (Exception ex) {
                 ex.printStackTrace();

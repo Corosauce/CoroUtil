@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.awt.image.BufferedImage;
 
@@ -25,8 +24,8 @@ public class CoroUtilColor {
 //        }
 
         if (model != null && !model.isCustomRenderer()) {
-            TextureAtlasSprite sprite = model.getParticleIcon(EmptyModelData.INSTANCE);
-            if (sprite != null && !sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
+            TextureAtlasSprite sprite = model.getParticleIcon(net.minecraftforge.client.model.data.ModelData.EMPTY);
+            if (sprite != null && !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
                 return getColors(sprite);
             }
         }
@@ -34,9 +33,9 @@ public class CoroUtilColor {
     }
 
     public static int[] getColors(TextureAtlasSprite sprite) {
-        int width = sprite.getWidth();
-        int height = sprite.getHeight();
-        int frames = sprite.getFrameCount();
+        int width = sprite.contents().width();
+        int height = sprite.contents().height();
+        int frames = sprite.contents().getFrameCount();
         
         BufferedImage img = new BufferedImage(width, height * frames, BufferedImage.TYPE_4BYTE_ABGR);
         for (int i = 0; i < frames; i++) {

@@ -2,6 +2,7 @@ package com.corosus.coroutil.lazydfu;
 
 import com.mojang.datafixers.*;
 
+import java.util.Set;
 import java.util.concurrent.Executor;
 
 public class LazyDataFixerBuilder extends DataFixerBuilder {
@@ -13,7 +14,7 @@ public class LazyDataFixerBuilder extends DataFixerBuilder {
     }
 
     @Override
-    public DataFixer build(Executor executor) {
-        return super.build(NO_OP_EXECUTOR);
+    public DataFixer buildOptimized(final Set<DSL.TypeReference> requiredTypes, final Executor executor) {
+        return super.buildOptimized(requiredTypes, NO_OP_EXECUTOR);
     }
 }

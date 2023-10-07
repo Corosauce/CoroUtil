@@ -6,7 +6,7 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -22,7 +22,7 @@ public class CommandReloadConfigClient {
 										.then(Commands.literal("client").executes(c -> {
 											CULog.log("reloading all mods client configurations from disk");
 											ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
-											c.getSource().sendSuccess(new TextComponent("Reloading all client configs from disk"), true);
+											c.getSource().sendSuccess(() -> Component.literal("Reloading all client configs from disk"), true);
 											return Command.SINGLE_SUCCESS;
 										}))
 								)
@@ -31,7 +31,7 @@ public class CommandReloadConfigClient {
 											CULog.log("saving all coro mods runtime configs to disk");
 											/** dummy literal for autocomplete sake, see EventHandlerForge.clientChat for what actually "intercepts" this */
 											ConfigMod.forceSaveAllFilesFromRuntimeSettings();
-											c.getSource().sendSuccess(new TextComponent("Saving all client coro configs to disk"), true);
+											c.getSource().sendSuccess(() -> Component.literal("Saving all client coro configs to disk"), true);
 											return Command.SINGLE_SUCCESS;
 										}))
 								)

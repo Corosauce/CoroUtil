@@ -120,7 +120,7 @@ public class CoroUtilEntOrParticle {
 	
 	public static Level getWorld(Object obj) {
 		if (obj instanceof Entity) {
-			return ((Entity)obj).level;
+			return ((Entity)obj).level();
 		} else {
 			return getWorldParticle(obj);
 		}
