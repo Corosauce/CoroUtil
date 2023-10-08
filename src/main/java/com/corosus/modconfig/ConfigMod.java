@@ -1,8 +1,12 @@
 package com.corosus.modconfig;
 
+import com.corosus.coroconfig.CoroConfigTracker;
+import com.corosus.coroconfig.CoroModConfig;
 import com.corosus.coroutil.config.ConfigCoroUtil;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -10,9 +14,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @Mod(ConfigMod.MODID)
@@ -32,7 +40,11 @@ public class ConfigMod {
     public ConfigMod() {
         MinecraftForge.EVENT_BUS.addListener(this::serverStart);
 
-        MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
+        EventHandlerForge eventHandlerForge = new EventHandlerForge();
+        MinecraftForge.EVENT_BUS.register(eventHandlerForge);
+
+        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        //modBus.addListener(EventHandlerForge::serverStart);
 
         new File("./config/CoroUtil").mkdirs();
         ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
@@ -45,6 +57,10 @@ public class ConfigMod {
         //force a full update right before server starts because forge file watching is unreliable
         //itll randomly not invoke ModConfig.Reloading for configs and stick with old values
         dbg("Performing a full config mod force sync");
+
+        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.SERVER, getServerConfigPath(event.getServer()));
+        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+
         updateAllConfigsFromForge();
     }
 
@@ -164,6 +180,21 @@ public class ConfigMod {
             //data.reloadRuntimeFromFile();
             data.writeConfigFile(false);
         }
+    }
+
+    private static final LevelResource SERVERCONFIG = new LevelResource("serverconfig");
+
+    private static Path getServerConfigPath(final MinecraftServer server)
+    {
+        final Path serverConfig = server.getWorldPath(SERVERCONFIG);
+        if (!Files.isDirectory(serverConfig)) {
+            try {
+                Files.createDirectories(serverConfig);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return serverConfig;
     }
     
     /* Main Usage Methods End */

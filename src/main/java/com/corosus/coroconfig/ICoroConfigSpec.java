@@ -1,9 +1,9 @@
-package com.corosus.forgeconfig;
+package com.corosus.coroconfig;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.UnmodifiableConfig;
 
-public interface IConfigSpec<T extends IConfigSpec<T>> extends UnmodifiableConfig {
+public interface ICoroConfigSpec<T extends ICoroConfigSpec<T>> extends UnmodifiableConfig {
     @SuppressWarnings("unchecked")
     default T self() {
         return (T) this;

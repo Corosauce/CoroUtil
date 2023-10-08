@@ -1,4 +1,4 @@
-package com.corosus.forgeconfig;
+package com.corosus.coroconfig;
 
 import static com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction.ADD;
 import static com.electronwill.nightconfig.core.ConfigSpec.CorrectionAction.REMOVE;
@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements IConfigSpec<ForgeConfigSpec>
+public class CoroConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfig> implements ICoroConfigSpec<CoroConfigSpec>
 {
     private Map<List<String>, String> levelComments;
     private Map<List<String>, String> levelTranslationKeys;
@@ -53,7 +53,7 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private ForgeConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments, Map<List<String>, String> levelTranslationKeys) {
+    private CoroConfigSpec(UnmodifiableConfig storage, UnmodifiableConfig values, Map<List<String>, String> levelComments, Map<List<String>, String> levelTranslationKeys) {
         super(storage);
         this.values = values;
         this.levelComments = levelComments;
@@ -599,18 +599,18 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
             return this;
         }
 
-        public <T> Pair<T, ForgeConfigSpec> configure(Function<Builder, T> consumer) {
+        public <T> Pair<T, CoroConfigSpec> configure(Function<Builder, T> consumer) {
             T o = consumer.apply(this);
             return Pair.of(o, this.build());
         }
 
-        public ForgeConfigSpec build()
+        public CoroConfigSpec build()
         {
             context.ensureEmpty();
             Config valueCfg = Config.of(Config.getDefaultMapCreator(true, true), InMemoryFormat.withSupport(ConfigValue.class::isAssignableFrom));
             values.forEach(v -> valueCfg.set(v.getPath(), v));
 
-            ForgeConfigSpec ret = new ForgeConfigSpec(storage, valueCfg, levelComments, levelTranslationKeys);
+            CoroConfigSpec ret = new CoroConfigSpec(storage, valueCfg, levelComments, levelTranslationKeys);
             values.forEach(v -> v.spec = ret);
             return ret;
         }
@@ -807,7 +807,7 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
 
         private T cachedValue = null;
 
-        private ForgeConfigSpec spec;
+        private CoroConfigSpec spec;
 
         ConfigValue(Builder parent, List<String> path, Supplier<T> defaultSupplier)
         {
@@ -826,7 +826,7 @@ public class ForgeConfigSpec extends UnmodifiableConfigWrapper<UnmodifiableConfi
          * Returns the actual value for the configuration setting, throwing if the config has not yet been loaded.
          *
          * @return the actual value for the setting
-         * @throws NullPointerException if the {@link ForgeConfigSpec config spec} object that will contain this has
+         * @throws NullPointerException if the {@link CoroConfigSpec config spec} object that will contain this has
          *                              not yet been built
          * @throws IllegalStateException if the associated config has not yet been loaded
          */

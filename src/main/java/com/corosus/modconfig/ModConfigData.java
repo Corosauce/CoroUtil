@@ -1,10 +1,12 @@
 package com.corosus.modconfig;
 
+import com.corosus.coroconfig.CoroConfigTracker;
+import com.corosus.coroconfig.CoroModConfig;
+import com.corosus.coroconfig.CoroModContainerConfig;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
-import net.minecraftforge.common.ForgeConfigSpec;
+import com.corosus.coroconfig.CoroConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -21,20 +23,23 @@ public class ModConfigData {
 	public HashMap<String, Double> valsDouble = new HashMap<String, Double>();
 	public HashMap<String, Boolean> valsBoolean = new HashMap<String, Boolean>();
 
-	public HashMap<String, ForgeConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
-	public HashMap<String, ForgeConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
-	public HashMap<String, ForgeConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
-	public HashMap<String, ForgeConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
+	public HashMap<String, CoroConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
+	public HashMap<String, CoroConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
+	public HashMap<String, CoroConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
+	public HashMap<String, CoroConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
 
 	//Client data
 	public List<ConfigEntryInfo> configData = new ArrayList<ConfigEntryInfo>();
     public String saveFilePath;
+
+	public CoroModContainerConfig container;
 
 	public ModConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
 		configID = parStr;
 		configClass = parClass;
 		configInstance = parConfig;
 		saveFilePath = savePath;
+		container = new CoroModContainerConfig(parStr);
 	}
 	
 	public void updateHashMaps() {
@@ -172,7 +177,7 @@ public class ModConfigData {
         //if (resetConfig) if (saveFilePath.exists()) saveFilePath.delete();
     	//preInitConfig = new Configuration(saveFilePath);
     	//preInitConfig.load();
-		ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+		CoroConfigSpec.Builder BUILDER = new CoroConfigSpec.Builder();
 		BUILDER.comment("General mod settings").push("general");
     	
     	Field[] fields = configClass.getDeclaredFields();
@@ -186,8 +191,10 @@ public class ModConfigData {
 
 		CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
 		BUILDER.pop();
-		ForgeConfigSpec CONFIG = BUILDER.build();
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+		CoroConfigSpec CONFIG = BUILDER.build();
+		//ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+		container.addConfig(new CoroModConfig(CoroModConfig.Type.COMMON, CONFIG, container, saveFilePath + ".toml"));
+
 		//reloadSpecificConfig();
 		updateConfigFieldValues();
 		configInstance.hookUpdatedValues();
@@ -210,11 +217,11 @@ public class ModConfigData {
 	 */
 	public void reloadSpecificConfig() {
 		CULog.dbg("reloading specific config: " + saveFilePath);
-		Set<ModConfig> setBackup = Collections.synchronizedSet(new LinkedHashSet<>());
-		Set<ModConfig> setMine = Collections.synchronizedSet(new LinkedHashSet<>());
-		Set<ModConfig> setOrig = ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON);
+		Set<CoroModConfig> setBackup = Collections.synchronizedSet(new LinkedHashSet<>());
+		Set<CoroModConfig> setMine = Collections.synchronizedSet(new LinkedHashSet<>());
+		Set<CoroModConfig> setOrig = CoroConfigTracker.INSTANCE.configSets().get(CoroModConfig.Type.COMMON);
 		CULog.dbg("total configs: " + setOrig.size());
-		for (ModConfig config : setOrig) {
+		for (CoroModConfig config : setOrig) {
 			setBackup.add(config);
 			if (config.getFileName().equals(saveFilePath + ".toml")) {
 				CULog.dbg("found: " + saveFilePath);
@@ -222,11 +229,11 @@ public class ModConfigData {
 			}
 		}
 		setOrig.clear();
-		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).addAll(setMine);
-		ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
-		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).clear();
-		ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).addAll(setBackup);
-		CULog.dbg("restored configs list: " + ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.COMMON).size());
+		CoroConfigTracker.INSTANCE.configSets().get(CoroModConfig.Type.COMMON).addAll(setMine);
+		CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+		CoroConfigTracker.INSTANCE.configSets().get(CoroModConfig.Type.COMMON).clear();
+		CoroConfigTracker.INSTANCE.configSets().get(CoroModConfig.Type.COMMON).addAll(setBackup);
+		CULog.dbg("restored configs list: " + CoroConfigTracker.INSTANCE.configSets().get(CoroModConfig.Type.COMMON).size());
 	}
 
 	public void updateConfigFileWithRuntimeValues() {
@@ -270,7 +277,7 @@ public class ModConfigData {
      * @param name Name of the variable
      * @param field Field in the file the variable is
      */
-    private void addToConfig(ForgeConfigSpec.Builder builder, Field field, String name) {
+    private void addToConfig(CoroConfigSpec.Builder builder, Field field, String name) {
 
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
 		//space intentional here to workaround forge hating blank comments
