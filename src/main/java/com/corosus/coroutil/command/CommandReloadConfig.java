@@ -1,5 +1,7 @@
 package com.corosus.coroutil.command;
 
+import com.corosus.coroconfig.CoroConfigTracker;
+import com.corosus.coroconfig.CoroModConfig;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
 import com.mojang.brigadier.Command;
@@ -22,6 +24,7 @@ public class CommandReloadConfig {
 										.then(Commands.literal("common").executes(c -> {
 											CULog.log("reloading all mods common configurations from disk");
 											ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+											CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
 											c.getSource().sendSuccess(() -> Component.literal("Reloading all common configs from disk"), true);
 											return Command.SINGLE_SUCCESS;
 										}))

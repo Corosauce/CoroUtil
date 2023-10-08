@@ -42,7 +42,7 @@ public class CoroModContainerConfig
     //protected final IModInfo modInfo;
     protected final EnumMap<CoroModConfig.Type, CoroModConfig> configs = new EnumMap<>(CoroModConfig.Type.class);
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    protected Optional<Consumer<ICoroConfigEvent>> configHandler = Optional.empty();
+    //protected Optional<Consumer<ICoroConfigEvent>> configHandler = Optional.empty();
 
     public CoroModContainerConfig(String modID)
     {
@@ -71,9 +71,9 @@ public class CoroModContainerConfig
        configs.put(modConfig.getType(), modConfig);
     }
 
-    public void dispatchConfigEvent(ICoroConfigEvent event) {
+    /*public void dispatchConfigEvent(ICoroConfigEvent event) {
         configHandler.ifPresent(configHandler->configHandler.accept(event));
-    }
+    }*/
 
     /**
      * Accept an arbitrary event for processing by the mod. Probably posted to an event bus in the lower level container.

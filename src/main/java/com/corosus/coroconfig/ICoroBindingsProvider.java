@@ -10,6 +10,8 @@ import net.minecraftforge.fml.I18NParser;
 
 import java.util.function.Supplier;
 
+//unused since we arent setting our stuff up through the main busses
+@Deprecated
 public interface ICoroBindingsProvider {
     Supplier<IEventBus> getForgeBusSupplier();
     Supplier<I18NParser> getMessageParser();

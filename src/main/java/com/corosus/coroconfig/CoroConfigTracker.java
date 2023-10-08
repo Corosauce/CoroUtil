@@ -74,6 +74,7 @@ public class CoroConfigTracker {
             LOGGER.trace(CONFIG, "Closing config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
             // stop the filewatcher before we save the file and close it, so reload doesn't fire
             config.getHandler().unload(configBasePath, config);
+            config.eventUnload();
             var unloading = ICoroConfigEvent.unloading(config);
             if (unloading != null)
                 config.fireEvent(unloading);
@@ -88,6 +89,7 @@ public class CoroConfigTracker {
             modConfig.getSpec().correct(commentedConfig);
             modConfig.setConfigData(commentedConfig);
             modConfig.fireEvent(ICoroConfigEvent.loading(modConfig));
+            modConfig.eventLoad();
         });
     }
 

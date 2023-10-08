@@ -13,6 +13,8 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 
+//unused since we arent setting our stuff up through the main busses
+@Deprecated
 public class CoroBindings {
     private static final CoroBindings INSTANCE = new CoroBindings();
 

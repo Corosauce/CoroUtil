@@ -79,6 +79,19 @@ public class CoroModConfig
         //this.container.dispatchConfigEvent(configEvent);
     }
 
+    //events
+    public void eventLoad() {
+
+    }
+
+    public void eventUnload() {
+
+    }
+
+    public void eventReload() {
+
+    }
+
     public void load() {
         ((CommentedFileConfig)this.configData).load();
     }
@@ -94,6 +107,7 @@ public class CoroModConfig
     public void acceptSyncedConfig(byte[] bytes) {
         setConfigData(TomlFormat.instance().createParser().parse(new ByteArrayInputStream(bytes)));
         fireEvent(ICoroConfigEvent.reloading(this));
+        this.eventReload();
     }
 
     public enum Type {

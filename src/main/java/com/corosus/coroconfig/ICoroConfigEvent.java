@@ -11,6 +11,8 @@ import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
+//unused since we arent setting our stuff up through the main busses
+@Deprecated
 public interface ICoroConfigEvent {
     record ConfigConfig(Function<CoroModConfig, ICoroConfigEvent> loading, Function<CoroModConfig, ICoroConfigEvent> reloading, @Nullable Function<CoroModConfig, ICoroConfigEvent> unloading) {}
 
