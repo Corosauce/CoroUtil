@@ -193,7 +193,9 @@ public class ModConfigData {
 		BUILDER.pop();
 		CoroConfigSpec CONFIG = BUILDER.build();
 		//ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
-		container.addConfig(new CoroModConfig(CoroModConfig.Type.COMMON, CONFIG, container, saveFilePath + ".toml"));
+		CoroModConfig config = new CoroModConfig(CoroModConfig.Type.COMMON, CONFIG, container, saveFilePath + ".toml");
+		container.addConfig(config);
+		CoroConfigTracker.INSTANCE.openConfig(config, FMLPaths.CONFIGDIR.get());
 
 		//reloadSpecificConfig();
 		updateConfigFieldValues();

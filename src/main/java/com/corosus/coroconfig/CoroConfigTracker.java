@@ -55,7 +55,7 @@ public class CoroConfigTracker {
         this.configSets.get(type).forEach(config -> closeConfig(config, configBasePath));
     }
 
-    private void openConfig(final CoroModConfig config, final Path configBasePath) {
+    public void openConfig(final CoroModConfig config, final Path configBasePath) {
         LOGGER.trace(CONFIG, "Loading config file type {} at {} for {}", config.getType(), config.getFileName(), config.getModId());
         try {
             final CommentedFileConfig configData = config.getHandler().reader(configBasePath).apply(config);

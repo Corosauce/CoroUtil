@@ -6,7 +6,6 @@
 package com.corosus.coroconfig;
 
 import com.corosus.coroutil.util.CULog;
-import com.corosus.coroutil.util.CoroUtilMisc;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.toml.TomlFormat;

@@ -7,11 +7,15 @@ import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ConfigTracker;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -46,8 +50,17 @@ public class ConfigMod {
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         //modBus.addListener(EventHandlerForge::serverStart);
 
+        System.out.println("ConfigCoroUtil.useLoggingDebug: " + ConfigCoroUtil.useLoggingDebug);
+
         new File("./config/CoroUtil").mkdirs();
         ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
+
+        System.out.println("ConfigCoroUtil.useLoggingDebug: " + ConfigCoroUtil.useLoggingDebug);
+
+        //now loaded as its registered
+        /*DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get()));
+        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());*/
     }
 
 
@@ -58,10 +71,11 @@ public class ConfigMod {
         //itll randomly not invoke ModConfig.Reloading for configs and stick with old values
         dbg("Performing a full config mod force sync");
 
-        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.SERVER, getServerConfigPath(event.getServer()));
-        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+        //this is where this should go if we ever add server support for our config mod setup
+        //CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.SERVER, getServerConfigPath(event.getServer()));
 
-        updateAllConfigsFromForge();
+        //also done instantly per config now
+        //updateAllConfigsFromForge();
     }
 
     public static void onReload(final ModConfigEvent.Reloading configEvent) {
