@@ -1,11 +1,13 @@
 package com.corosus.coroutil.config;
 
+import com.corosus.modconfig.ConfigParams;
 import com.corosus.modconfig.IConfigCategory;
 
 import java.io.File;
 
 public class ConfigCoroUtil implements IConfigCategory {
 
+	@ConfigParams(comment = "logging", min = 0, max = 0)
 	public static boolean useLoggingLog = true;
 	public static boolean useLoggingDebug = false;
 	public static boolean useLoggingError = true;

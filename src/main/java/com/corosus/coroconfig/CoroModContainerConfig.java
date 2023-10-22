@@ -40,7 +40,7 @@ public class CoroModContainerConfig
     protected final String modId;
     protected final String namespace;
     //protected final IModInfo modInfo;
-    protected final EnumMap<CoroModConfig.Type, CoroModConfig> configs = new EnumMap<>(CoroModConfig.Type.class);
+    public final EnumMap<CoroModConfig.Type, CoroModConfig> configs = new EnumMap<>(CoroModConfig.Type.class);
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     //protected Optional<Consumer<ICoroConfigEvent>> configHandler = Optional.empty();
 

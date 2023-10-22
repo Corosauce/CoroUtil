@@ -125,29 +125,29 @@ public class CoroConfigFileTypeHandler {
 
         @Override
         public void run() {
+            boolean correctConfigs = false;
             // Force the regular classloader onto the special thread
             Thread.currentThread().setContextClassLoader(realClassLoader);
             if (!this.modConfig.getSpec().isCorrecting()) {
-                try
-                {
-                    this.commentedFileConfig.load();
-                    if(!this.modConfig.getSpec().isCorrect(commentedFileConfig))
-                    {
-                        LOGGER.warn(CONFIG, "Configuration file {} is not correct. Correcting", commentedFileConfig.getFile().getAbsolutePath());
-                        CoroConfigFileTypeHandler.backUpConfig(commentedFileConfig);
-                        this.modConfig.getSpec().correct(commentedFileConfig);
-                        commentedFileConfig.save();
+                if (correctConfigs) {
+                    try {
+                        this.commentedFileConfig.load();
+                        if (!this.modConfig.getSpec().isCorrect(commentedFileConfig)) {
+                            LOGGER.warn(CONFIG, "Configuration file {} is not correct. Correcting", commentedFileConfig.getFile().getAbsolutePath());
+                            CoroConfigFileTypeHandler.backUpConfig(commentedFileConfig);
+                            this.modConfig.getSpec().correct(commentedFileConfig);
+                            commentedFileConfig.save();
+                        }
+                    } catch (ParsingException ex) {
+                        throw new ConfigLoadingException(modConfig, ex);
                     }
-                }
-                catch (ParsingException ex)
-                {
-                    throw new ConfigLoadingException(modConfig, ex);
                 }
                 LOGGER.debug(CONFIG, "Config file {} changed, sending notifies", this.modConfig.getFileName());
                 this.modConfig.getSpec().afterReload();
                 //this.modConfig.fireEvent(ICoroConfigEvent.reloading(this.modConfig));
                 this.modConfig.load();
-                ConfigMod.updateAllConfigsFromForge();
+                ConfigMod.updateConfig(this.modConfig);
+                //ConfigMod.updateAllConfigsFromForge();
             }
         }
     }

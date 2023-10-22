@@ -32,12 +32,12 @@ public class EventHandlerForge {
         CommandReloadConfigClient.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public void onEntityLivingUpdate(LivingEvent.LivingTickEvent event) {
         if (event.getEntity().level().getGameTime() % 40 == 0) {
             System.out.println("use debug: " + ConfigCoroUtil.useLoggingDebug);
         }
-    }
+    }*/
 
     @SubscribeEvent
     public void serverStart(ServerAboutToStartEvent event) {

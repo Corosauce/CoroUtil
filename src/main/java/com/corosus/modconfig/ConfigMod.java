@@ -98,6 +98,18 @@ public class ConfigMod {
             configData.configInstance.hookUpdatedValues();
         }
     }
+
+    public static void updateConfig(CoroModConfig config) {
+        for (ModConfigData configData : ConfigMod.lookupFilePathToConfig.values()) {
+            for (Map.Entry<CoroModConfig.Type, CoroModConfig> entrySet : configData.container.configs.entrySet()) {
+                if (entrySet.getValue() == config) {
+                    dbg("Coro ConfigMod updating runtime values for file: " + configData.saveFilePath);
+                    configData.updateConfigFieldValues();
+                    configData.configInstance.hookUpdatedValues();
+                }
+            }
+        }
+    }
     
     public static void processHashMap(String modid, Map map) {
     	Iterator it = map.entrySet().iterator();
@@ -131,7 +143,7 @@ public class ConfigMod {
             return;
         }
     	
-    	ModConfigData configData = new ModConfigData(configCat.getConfigFileName()/*new File(getSaveFolderPath() + "config" + File.separator + configCat.getConfigFileName() + ".cfg")*/, categoryName, configCat.getClass(), configCat);
+    	ModConfigData configData = new ModConfigData(configCat.getConfigFileName(), categoryName, configCat.getClass(), configCat);
     	
     	configs.add(configData);
     	if (liveEdit) liveEditConfigs.add(configData);
