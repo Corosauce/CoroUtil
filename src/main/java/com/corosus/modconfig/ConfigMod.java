@@ -47,20 +47,8 @@ public class ConfigMod {
         EventHandlerForge eventHandlerForge = new EventHandlerForge();
         MinecraftForge.EVENT_BUS.register(eventHandlerForge);
 
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        //modBus.addListener(EventHandlerForge::serverStart);
-
-        System.out.println("ConfigCoroUtil.useLoggingDebug: " + ConfigCoroUtil.useLoggingDebug);
-
         new File("./config/CoroUtil").mkdirs();
         ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
-
-        System.out.println("ConfigCoroUtil.useLoggingDebug: " + ConfigCoroUtil.useLoggingDebug);
-
-        //now loaded as its registered
-        /*DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get()));
-        CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());*/
     }
 
 
@@ -186,7 +174,8 @@ public class ConfigMod {
     public static boolean updateField(String configID, String name, Object obj) {
     	if (lookupRegistryNameToConfig.get(configID).setFieldBasedOnType(name, obj)) {
         	//writeHashMapsToFile();
-    		lookupRegistryNameToConfig.get(configID).writeConfigFile(true);
+            //invalid here now it just fully re-registers configs which is bad, we just force save outside here now
+            //lookupRegistryNameToConfig.get(configID).writeConfigFile(true);
         	return true;
     	}
     	return false;
@@ -194,6 +183,12 @@ public class ConfigMod {
 
     public static void forceSaveAllFilesFromRuntimeSettings() {
         CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
+        for (ModConfigData data : lookupRegistryNameToConfig.values()) {
+            //data.writeConfigFile(true);
+            data.updateConfigFileWithRuntimeValues();
+        }
+
+        //TODO: theres a bug where it takes 2 tries, find out why
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
             data.updateConfigFileWithRuntimeValues();
