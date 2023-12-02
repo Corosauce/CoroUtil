@@ -61,7 +61,7 @@ public class CommandCoroConfig {
 		return literal("get").then(Commands.argument("file_name", StringArgumentType.word()).suggests((p_136339_, p_136340_) -> SharedSuggestionProvider.suggest(getConfigs(), p_136340_))
 				.then(Commands.argument("setting_name", StringArgumentType.word()).suggests((p_136339_, p_136340_) -> SharedSuggestionProvider.suggest(getConfigSettings(StringArgumentType.getString(p_136339_, "file_name")), p_136340_))
 						.executes(c -> {
-							String fileName = StringArgumentType.getString(c, "file_name").replace("--", "\\");
+							String fileName = fileToConfig(StringArgumentType.getString(c, "file_name"));
 							String configName = ConfigMod.lookupFilePathToConfig.get(fileName).configID;
 							String settingName = StringArgumentType.getString(c, "setting_name");
 							Object obj = ConfigMod.getField(configName, settingName);
@@ -75,14 +75,18 @@ public class CommandCoroConfig {
 				.then(Commands.argument("setting_name", StringArgumentType.word()).suggests((p_136339_, p_136340_) -> SharedSuggestionProvider.suggest(getConfigSettings(StringArgumentType.getString(p_136339_, "file_name")), p_136340_))
 						.then(Commands.argument("value", StringArgumentType.string())
 								.executes(c -> {
-									String fileName = StringArgumentType.getString(c, "file_name").replace("--", "\\");
+									String fileName = fileToConfig(StringArgumentType.getString(c, "file_name"));
 									String configName = ConfigMod.lookupFilePathToConfig.get(fileName).configID;
 									String settingName = StringArgumentType.getString(c, "setting_name");
 									String value = StringArgumentType.getString(c, "value");
-									ConfigMod.updateField(configName, settingName, value);
-									Object obj = ConfigMod.getField(configName, settingName);
-									ConfigMod.forceSaveAllFilesFromRuntimeSettings();
-									c.getSource().sendSuccess(() -> Component.literal("Set " + settingName + " to " + obj + " in " + fileName), true);
+									boolean result = ConfigMod.updateField(configName, settingName, value);
+									if (result) {
+										Object obj = ConfigMod.getField(configName, settingName);
+										ConfigMod.forceSaveAllFilesFromRuntimeSettings();
+										c.getSource().sendSuccess(() -> Component.literal("Set " + settingName + " to " + obj + " in " + fileName), true);
+									} else {
+										c.getSource().sendSuccess(() -> Component.literal("Invalid setting to use for " + settingName), true);
+									}
 									return Command.SINGLE_SUCCESS;
 								}))));
 	}
@@ -92,11 +96,11 @@ public class CommandCoroConfig {
 	}
 
 	public static Iterable<String> getConfigs() {
-		return ConfigMod.lookupRegistryNameToConfig.values().stream().map((e) -> e.saveFilePath.replace("\\", "--") + ".toml").toList();
+		return ConfigMod.lookupFilePathToConfig.keySet().stream().map((e) -> e.replace("\\", "--")).toList();
 	}
 
 	public static Iterable<String> getConfigSettings(String config_name) {
-		ModConfigData modConfigData = ConfigMod.lookupFilePathToConfig.get(config_name.replace("--", "\\"));
+		ModConfigData modConfigData = ConfigMod.lookupFilePathToConfig.get(fileToConfig(config_name));
 		if (modConfigData != null) {
 			List<String> joinedList = new ArrayList<>();
 			joinedList.addAll(modConfigData.valsString.keySet());
@@ -108,5 +112,9 @@ public class CommandCoroConfig {
 		} else {
 			return List.of("<-- invalid config name");
 		}
+	}
+
+	public static String fileToConfig(String str) {
+		return str.replace("--", "\\");
 	}
 }
