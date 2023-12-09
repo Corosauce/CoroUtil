@@ -1,7 +1,5 @@
 package com.corosus.coroutil.command;
 
-import com.corosus.coroconfig.CoroConfigTracker;
-import com.corosus.coroconfig.CoroModConfig;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.ConfigMod;
 import com.corosus.modconfig.ModConfigData;
@@ -42,7 +40,6 @@ public class CommandCoroConfig {
 		return literal("reload").executes(c -> {
 			CULog.log("reloading all mods common configurations from disk");
 			ConfigTracker.INSTANCE.loadConfigs(type, FMLPaths.CONFIGDIR.get());
-			CoroConfigTracker.INSTANCE.loadConfigs(type == ModConfig.Type.COMMON ? CoroModConfig.Type.COMMON : CoroModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
 			c.getSource().sendSuccess(() -> Component.literal("Reloading all common configs from disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});

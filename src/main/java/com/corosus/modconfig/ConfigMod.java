@@ -1,24 +1,14 @@
 package com.corosus.modconfig;
 
-import com.corosus.coroconfig.CoroConfigTracker;
-import com.corosus.coroconfig.CoroModConfig;
 import com.corosus.coroutil.config.ConfigCoroUtil;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,40 +32,26 @@ public class ConfigMod {
     public static final String MODID = "coroutil";
 	
     public ConfigMod() {
-        MinecraftForge.EVENT_BUS.addListener(this::serverStart);
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         EventHandlerForge eventHandlerForge = new EventHandlerForge();
         MinecraftForge.EVENT_BUS.register(eventHandlerForge);
+        modEventBus.register(EventHandlerForge.class);
 
         new File("./config/CoroUtil").mkdirs();
         ConfigMod.addConfigFile(MODID, new ConfigCoroUtil());
     }
 
-
-
-    @SubscribeEvent
-    public void serverStart(ServerStartingEvent event) {
-        //force a full update right before server starts because forge file watching is unreliable
-        //itll randomly not invoke ModConfig.Reloading for configs and stick with old values
-        dbg("Performing a full config mod force sync");
-
-        //this is where this should go if we ever add server support for our config mod setup
-        //CoroConfigTracker.INSTANCE.loadConfigs(CoroModConfig.Type.SERVER, getServerConfigPath(event.getServer()));
-
-        //also done instantly per config now
-        //updateAllConfigsFromForge();
-    }
-
-    public static void onReload(final ModConfigEvent.Reloading configEvent) {
+    public static void onLoadOrReload(String filename) {
         //for new forge config, we set our simple configs field values based on what forge config loaded from file now that the file is fully loaded and ready
         //we cant do this on the fly per field like we used to, forge complains the config builder isnt done yet
-        ModConfigData configData = ConfigMod.lookupFilePathToConfig.get(configEvent.getConfig().getFileName());
+        ModConfigData configData = ConfigMod.lookupFilePathToConfig.get(filename);
         if (configData != null) {
-            dbg("Coro ConfigMod updating runtime values for file: " + configEvent.getConfig().getFileName());
+            dbg("Coro ConfigMod updating runtime values for file: " + filename);
             configData.updateConfigFieldValues();
             configData.configInstance.hookUpdatedValues();
         } else {
-            dbg("ERROR, cannot find ModConfigData reference for filename: " + configEvent.getConfig().getFileName());
+            dbg("ERROR, cannot find ModConfigData reference for filename: " + filename);
         }
     }
 
@@ -87,9 +63,9 @@ public class ConfigMod {
         }
     }
 
-    public static void updateConfig(CoroModConfig config) {
+    /*public static void updateConfig(ModConfig config) {
         for (ModConfigData configData : ConfigMod.lookupFilePathToConfig.values()) {
-            for (Map.Entry<CoroModConfig.Type, CoroModConfig> entrySet : configData.container.configs.entrySet()) {
+            for (Map.Entry<ModConfig.Type, ModConfig> entrySet : configData.container.configs.entrySet()) {
                 if (entrySet.getValue() == config) {
                     dbg("Coro ConfigMod updating runtime values for file: " + configData.saveFilePath);
                     configData.updateConfigFieldValues();
@@ -97,7 +73,7 @@ public class ConfigMod {
                 }
             }
         }
-    }
+    }*/
     
     public static void processHashMap(String modid, Map map) {
     	Iterator it = map.entrySet().iterator();

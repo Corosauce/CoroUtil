@@ -1,15 +1,15 @@
 package com.corosus.modconfig;
 
-import com.corosus.coroconfig.CoroConfigTracker;
-import com.corosus.coroconfig.CoroModConfig;
-import com.corosus.coroconfig.CoroModContainerConfig;
 import com.corosus.coroutil.util.CULog;
 import com.corosus.coroutil.util.OldUtil;
-import com.corosus.coroconfig.CoroConfigSpec;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ModConfigData {
 	public String configID;
@@ -21,23 +21,20 @@ public class ModConfigData {
 	public HashMap<String, Double> valsDouble = new HashMap<>();
 	public HashMap<String, Boolean> valsBoolean = new HashMap<>();
 
-	public HashMap<String, CoroConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
-	public HashMap<String, CoroConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
-	public HashMap<String, CoroConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
-	public HashMap<String, CoroConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
+	public HashMap<String, ForgeConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
+	public HashMap<String, ForgeConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
+	public HashMap<String, ForgeConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
+	public HashMap<String, ForgeConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
 
 	//Client data
 	public List<ConfigEntryInfo> configData = new ArrayList<>();
     public String saveFilePath;
-
-	public CoroModContainerConfig container;
 
 	public ModConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
 		configID = parStr;
 		configClass = parClass;
 		configInstance = parConfig;
 		saveFilePath = savePath;
-		container = new CoroModContainerConfig(parStr);
 	}
 	
 	public void updateHashMaps() {
@@ -175,7 +172,7 @@ public class ModConfigData {
         //if (resetConfig) if (saveFilePath.exists()) saveFilePath.delete();
     	//preInitConfig = new Configuration(saveFilePath);
     	//preInitConfig.load();
-		CoroConfigSpec.Builder BUILDER = new CoroConfigSpec.Builder();
+		ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 		BUILDER.comment("General mod settings").push("general");
     	
     	Field[] fields = configClass.getDeclaredFields();
@@ -189,15 +186,8 @@ public class ModConfigData {
 
 		CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
 		BUILDER.pop();
-		CoroConfigSpec CONFIG = BUILDER.build();
-		//ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
-		CoroModConfig config = new CoroModConfig(CoroModConfig.Type.COMMON, CONFIG, container, saveFilePath + ".toml");
-		container.addConfig(config);
-		CoroConfigTracker.INSTANCE.openConfig(config, FMLPaths.CONFIGDIR.get());
-
-		//reloadSpecificConfig();
-		updateConfigFieldValues();
-		configInstance.hookUpdatedValues();
+		ForgeConfigSpec CONFIG = BUILDER.build();
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
     }
 
 	public void updateConfigFileWithRuntimeValues() {
@@ -241,7 +231,7 @@ public class ModConfigData {
      * @param name Name of the variable
      * @param field Field in the file the variable is
      */
-    private void addToConfig(CoroConfigSpec.Builder builder, Field field, String name) {
+    private void addToConfig(ForgeConfigSpec.Builder builder, Field field, String name) {
 
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
 		//space intentional here to workaround forge hating blank comments

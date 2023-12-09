@@ -4,8 +4,8 @@ import com.corosus.coroutil.command.CommandCoroConfig;
 import com.corosus.coroutil.command.CommandCoroConfigClient;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 public class EventHandlerForge {
 
@@ -27,8 +27,12 @@ public class EventHandlerForge {
     }*/
 
     @SubscribeEvent
-    public void serverStart(ServerAboutToStartEvent event) {
+    public static void configLoad(ModConfigEvent.Loading event) {
+        ConfigMod.onLoadOrReload(event.getConfig().getFileName());
     }
 
-
+    @SubscribeEvent
+    public static void configReload(ModConfigEvent.Reloading event) {
+        ConfigMod.onLoadOrReload(event.getConfig().getFileName());
+    }
 }
