@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "license": "${mod_license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.corosus.coroutil.loader.fabric.ConfigModFabric"
+    ],
+    "client": [
+      "com.corosus.coroutil.loader.fabric.ConfigModFabricClient"
+    ],
+    "modmenu": [
+      "com.corosus.coroutil.loader.fabric.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "fabric-api": "*",
+    "minecraft": "1.20.x",
+    "java": ">=17",
+    "completeconfig-base": ">=2.4.0"
+  }
+}

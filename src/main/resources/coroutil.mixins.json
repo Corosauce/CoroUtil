@@ -1,7 +1,7 @@
 {
   "required": true,
   "priority": -1,
-  "package": "com.corosus.coroutil.lazydfu.mixin",
+  "package": "com.corosus.coroutil.loader.forge.lazydfu.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "coroutil.refmap.json",
   "mixins": [
