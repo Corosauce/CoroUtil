@@ -1,8 +1,8 @@
 package com.corosus.coroutil.loader.forge;
 
 import com.corosus.coroutil.common.core.modconfig.ConfigMod;
-import com.corosus.coroutil.loader.forge.command.CommandCoroConfig;
-import com.corosus.coroutil.loader.forge.command.CommandCoroConfigClient;
+import com.corosus.coroutil.common.core.command.CommandCoroConfig;
+import com.corosus.coroutil.common.core.command.CommandCoroConfigClient;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

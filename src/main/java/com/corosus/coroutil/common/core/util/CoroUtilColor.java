@@ -24,12 +24,22 @@ public class CoroUtilColor {
 //        }
 
         if (model != null && !model.isCustomRenderer()) {
-            TextureAtlasSprite sprite = model.getParticleIcon(net.minecraftforge.client.model.data.ModelData.EMPTY);
+            //TODO: this requires a param in forge, but not in fabric, resolve this
+            TextureAtlasSprite sprite = model.getParticleIcon(/*net.minecraftforge.client.model.data.ModelData.EMPTY*/);
             if (sprite != null && !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
                 return getColors(sprite);
             }
         }
         return IntArrays.EMPTY_ARRAY;
+    }
+
+    public static int getPixelRGBA(TextureAtlasSprite textureAtlasSprite, int frameIndex, int x, int y) {
+        if (textureAtlasSprite.contents().animatedTexture != null) {
+            x += textureAtlasSprite.contents().animatedTexture.getFrameX(frameIndex) * textureAtlasSprite.contents().width();
+            y += textureAtlasSprite.contents().animatedTexture.getFrameY(frameIndex) * textureAtlasSprite.contents().height();
+        }
+
+        return textureAtlasSprite.contents().originalImage.getPixelRGBA(x, y);
     }
 
     public static int[] getColors(TextureAtlasSprite sprite) {
@@ -41,7 +51,7 @@ public class CoroUtilColor {
         for (int i = 0; i < frames; i++) {
         	for (int x = 0; x < width; x++) {
         		for (int y = 0; y < height; y++) {
-                    int abgr = sprite.getPixelRGBA(i, x, y);
+                    int abgr = getPixelRGBA(sprite, i, x, y);
                     int red = abgr & 0xFF;
                     int green = (abgr >> 8) & 0xFF;
                     int blue = (abgr >> 16) & 0xFF;

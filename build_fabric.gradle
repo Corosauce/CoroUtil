@@ -59,7 +59,7 @@ dependencies {
 
 //If there's mixins
 loom {
-//	accessWidenerPath = file("src/main/resources/${project.mod_id}.accesswidener")
+	accessWidenerPath = file("src/main/resources/coroutil.accesswidener")
 	mixin {
 		defaultRefmapName = "${project.mod_id}.refmap.json"
 	}
@@ -68,8 +68,8 @@ loom {
 sourceSets {
 	main {
 		java {
-            exclude "me/ichun/mods/${project.mod_id}/api/forge/**"
-			exclude "me/ichun/mods/${project.mod_id}/loader/forge/**"
+            exclude "com/corosus/${project.mod_id}/api/forge/**"
+			exclude "com/corosus/${project.mod_id}/loader/forge/**"
 		}
 	}
 }
@@ -82,7 +82,7 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "mod_id": project.mod_id, "version": project.version, "mod_name": project.mod_name, "mod_description": project.mod_description, "mod_authors": project.mod_authors, "mod_license": project.mod_license
 	}
 	
 	exclude("META-INF/mods.toml")

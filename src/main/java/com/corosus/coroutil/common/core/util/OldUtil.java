@@ -1,8 +1,5 @@
 package com.corosus.coroutil.common.core.util;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
 public class OldUtil {
@@ -23,7 +20,7 @@ public class OldUtil {
         }
     }
 
-    public static <T, E> void setPrivateValue(@NotNull final Class<? super T> classToAccess, @NotNull final T instance, @NotNull final String fieldName, @Nullable final E value)
+    public static <T, E> void setPrivateValue(final Class<? super T> classToAccess, final T instance, final String fieldName, final E value)
     {
         ReflectionHelper.setPrivateValue(classToAccess, instance, value, fieldName);
     }

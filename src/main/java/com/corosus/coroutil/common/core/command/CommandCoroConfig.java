@@ -1,4 +1,4 @@
-package com.corosus.coroutil.loader.forge.command;
+package com.corosus.coroutil.common.core.command;
 
 import com.corosus.coroutil.common.core.util.CULog;
 import com.corosus.coroutil.common.core.modconfig.ConfigMod;
@@ -11,9 +11,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +24,7 @@ public class CommandCoroConfig {
 			Commands.literal(getCommandName())
 			.then(literal("config")
 				.then(literal("common")
-					.then(argumentReload(ModConfig.Type.COMMON))
+					//.then(argumentReload(ModConfig.Type.COMMON))
 					.then(argumentSave())
 					.then(argumentGet())
 					.then(argumentSet())
@@ -36,14 +33,14 @@ public class CommandCoroConfig {
 		);
 	}
 
-	public static ArgumentBuilder<CommandSourceStack, ?> argumentReload(ModConfig.Type type) {
+	/*public static ArgumentBuilder<CommandSourceStack, ?> argumentReload(ModConfig.Type type) {
 		return literal("reload").executes(c -> {
 			CULog.log("reloading all mods common configurations from disk");
 			ConfigTracker.INSTANCE.loadConfigs(type, FMLPaths.CONFIGDIR.get());
 			c.getSource().sendSuccess(() -> Component.literal("Reloading all common configs from disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
-	}
+	}*/
 
 	public static ArgumentBuilder<CommandSourceStack, ?> argumentSave() {
 		return literal("save").executes(c -> {

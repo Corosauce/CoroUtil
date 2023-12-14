@@ -102,6 +102,11 @@ public abstract class ConfigMod {
         }
     	
     	ModConfigData configData = makeLoaderSpecificConfigData(configCat.getConfigFileName(), categoryName, configCat.getClass(), configCat);
+
+        if (configData == null) {
+            CULog.err("ERROR: makeLoaderSpecificConfigData not implemented for active loader");
+            return;
+        }
     	
     	configs.add(configData);
     	if (liveEdit) liveEditConfigs.add(configData);
@@ -175,7 +180,7 @@ public abstract class ConfigMod {
         }
     }
 
-    private final LevelResource SERVERCONFIG = new LevelResource("serverconfig");
+    /*private final LevelResource SERVERCONFIG = new LevelResource("serverconfig");
 
     private Path getServerConfigPath(final MinecraftServer server)
     {
@@ -188,7 +193,7 @@ public abstract class ConfigMod {
             }
         }
         return serverConfig;
-    }
+    }*/
     
     /* Main Usage Methods End */
 }

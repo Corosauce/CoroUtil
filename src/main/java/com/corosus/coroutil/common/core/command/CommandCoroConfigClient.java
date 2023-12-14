@@ -1,9 +1,8 @@
-package com.corosus.coroutil.loader.forge.command;
+package com.corosus.coroutil.common.core.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.fml.config.ModConfig;
 
 import static net.minecraft.commands.Commands.literal;
 
@@ -13,7 +12,7 @@ public class CommandCoroConfigClient {
 			Commands.literal(getCommandName())
 			.then(literal("config")
 				.then(literal("client")
-						.then(CommandCoroConfig.argumentReload(ModConfig.Type.CLIENT))
+						//.then(CommandCoroConfig.argumentReload(ModConfig.Type.CLIENT))
 						.then(CommandCoroConfig.argumentSave())
 						.then(CommandCoroConfig.argumentGet())
 						.then(CommandCoroConfig.argumentSet())

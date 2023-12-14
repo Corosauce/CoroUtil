@@ -3,7 +3,11 @@ package com.corosus.coroutil.loader.fabric;
 import com.corosus.coroutil.common.core.modconfig.ConfigMod;
 import com.corosus.coroutil.common.core.modconfig.IConfigCategory;
 import com.corosus.coroutil.common.core.modconfig.ModConfigData;
+import com.corosus.coroutil.common.core.command.CommandCoroConfig;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +24,17 @@ public class ConfigModFabric extends ConfigMod implements ModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("Hello Fabric world!");
+
+		//TODO: use this for watut
+		ServerTickEvents.END_SERVER_TICK.register((minecraftServer) -> {
+			for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+
+			}
+		});
+
+		CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> {
+			CommandCoroConfig.register(dispatcher);
+		}));
 
 	}
 
