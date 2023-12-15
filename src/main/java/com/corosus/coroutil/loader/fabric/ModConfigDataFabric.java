@@ -1,46 +1,26 @@
-package com.corosus.coroutil.loader.forge;
+package com.corosus.coroutil.loader.fabric;
 
 import com.corosus.coroutil.common.core.modconfig.*;
 import com.corosus.coroutil.common.core.util.CULog;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-public class ModConfigDataForge extends ModConfigData {
+public class ModConfigDataFabric extends ModConfigData {
 
     public HashMap<String, ForgeConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
     public HashMap<String, ForgeConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
     public HashMap<String, ForgeConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
     public HashMap<String, ForgeConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
 
-    public ModConfigDataForge(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
+    public ModConfigDataFabric(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
         super(savePath, parStr, parClass, parConfig);
     }
-
-    /*@Override
-    public void initConfigString(String name, String comment, String value) {
-        valsStringConfig.put(name, builder.comment(comment).define(name, (String)obj));
-    }
-
-    @Override
-    public void initConfigInteger(String name, String comment, int value, int min, int max) {
-
-    }
-
-    @Override
-    public void initConfigDouble(String name, String comment, double value, double min, double max) {
-
-    }
-
-    @Override
-    public void initConfigBoolean(String name, String comment, boolean value) {
-
-    }*/
 
     @Override
     public String getConfigString(String fieldName) {
@@ -103,7 +83,7 @@ public class ModConfigDataForge extends ModConfigData {
         CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
         BUILDER.pop();
         ForgeConfigSpec CONFIG = BUILDER.build();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+        ForgeConfigRegistry.INSTANCE.register(ConfigMod.instance().MODID, ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
     }
 
     /**

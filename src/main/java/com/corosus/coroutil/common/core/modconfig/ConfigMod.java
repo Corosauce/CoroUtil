@@ -196,4 +196,6 @@ public abstract class ConfigMod {
     }*/
     
     /* Main Usage Methods End */
+
+    public abstract Path getConfigPath();
 }

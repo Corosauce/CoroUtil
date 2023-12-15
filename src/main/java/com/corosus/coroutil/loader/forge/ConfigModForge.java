@@ -7,6 +7,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
+
+import java.nio.file.Path;
 
 @Mod(ConfigModForge.MODID)
 public class ConfigModForge extends ConfigMod {
@@ -25,5 +28,10 @@ public class ConfigModForge extends ConfigMod {
     @Override
     public ModConfigData makeLoaderSpecificConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
         return new ModConfigDataForge(savePath, parStr, parClass, parConfig);
+    }
+
+    @Override
+    public Path getConfigPath() {
+        return FMLPaths.CONFIGDIR.get();
     }
 }
