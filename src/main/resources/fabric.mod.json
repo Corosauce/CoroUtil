@@ -16,9 +16,6 @@
     ],
     "client": [
       "com.corosus.coroutil.loader.fabric.ConfigModFabricClient"
-    ],
-    "modmenu": [
-      "com.corosus.coroutil.loader.fabric.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -29,7 +26,6 @@
     "fabricloader": ">=0.14.21",
     "fabric-api": "*",
     "minecraft": "1.20.x",
-    "java": ">=17",
-    "completeconfig-base": ">=2.4.0"
+    "java": ">=17"
   }
 }

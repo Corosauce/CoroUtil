@@ -33,6 +33,9 @@ repositories {
 		name = "ParchmentMC"
 		url = "https://maven.parchmentmc.net/"
 	}
+	maven {
+		url "https://cursemaven.com"
+	}
 	flatDir {
 		dir 'libs'
 	}
@@ -50,16 +53,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation "ForgeConfigAPIPort:ForgeConfigAPIPort:v8.0.0-1.20.1-Fabric"
-
-	// Uncomment the following line to enable the deprecated Fabric API modules. 
-	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
-
-	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
-
-	// Complete Config dep
-	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-	modImplementation "com.github.Lortseam.completeconfig:gui-cloth:${project.completeconfig_version}"
+	//include(modImplementation("ForgeConfigAPIPort:ForgeConfigAPIPort:v8.0.0-1.20.1-Fabric"))
+	//using https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/files/4583000
+	include(modImplementation("curse.maven:forge-config-api-port-fabric-547434:4583000"))
+	//include(modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:v8.0.0-1.20.1-Fabric"))
 }
 
 //If there's mixins
@@ -80,7 +77,7 @@ sourceSets {
 }
 
 base {
-	archivesName = "${project.archives_base_name}-${project.minecraft_version}-Fabric"
+	archivesName = "${project.archives_base_name}-fabric"
 }
 
 processResources {

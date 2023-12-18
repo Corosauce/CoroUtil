@@ -12,7 +12,7 @@ plugins {
 }
 apply plugin: 'org.spongepowered.mixin'
 
-archivesBaseName = "${project.archives_base_name}-${project.minecraft_version}-Forge"
+archivesBaseName = "${project.archives_base_name}-forge"
 version = project.mod_version
 group = project.maven_group
 
