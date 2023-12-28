@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CoroConfigRegistry {
 
@@ -23,7 +24,7 @@ public class CoroConfigRegistry {
 	public ConcurrentHashMap<String, ModConfigData> lookupFilePathToConfig = new ConcurrentHashMap<>();
 
     //fabric doesnt believe in mod load ordering, so we use a queue when a mod tries to add a config before ConfigMod instance is setup
-    public List<ConfigAddQueue> deferredRegistryQueue = new ArrayList<>();
+    public ConcurrentLinkedQueue<ConfigAddQueue> deferredRegistryQueue = new ConcurrentLinkedQueue<>();
 
     private boolean fullyLoaded = false;
 
