@@ -3,12 +3,10 @@ package com.corosus.coroutil.loader.fabric;
 import com.corosus.coroutil.common.core.modconfig.*;
 import com.corosus.coroutil.common.core.util.CULog;
 import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 public class ModConfigDataFabric extends ModConfigData {
@@ -113,7 +111,7 @@ public class ModConfigDataFabric extends ModConfigData {
 
         //System.out.println("registering config field: " + name);
 
-        Object obj = ConfigMod.instance().getField(configID, name);
+        Object obj = CoroConfigRegistry.instance().getField(configID, name);
         if (obj instanceof String) {
             valsStringConfig.put(name, builder.comment(comment).define(name, (String)obj));
         } else if (obj instanceof Integer) {

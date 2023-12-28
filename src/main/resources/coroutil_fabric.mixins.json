@@ -4,8 +4,11 @@
   "package": "com.corosus.coroutil.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "coroutil.refmap.json",
-  "mixins": [
-
+  "client": [
+    "client.RenderSystemInitRender"
+  ],
+  "server": [
+    "Bootstrap"
   ],
   "injectors": {
     "defaultRequire": 1

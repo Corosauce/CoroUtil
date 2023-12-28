@@ -1,7 +1,8 @@
 package com.corosus.coroutil.common.core.command;
 
-import com.corosus.coroutil.common.core.util.CULog;
 import com.corosus.coroutil.common.core.modconfig.ConfigMod;
+import com.corosus.coroutil.common.core.modconfig.CoroConfigRegistry;
+import com.corosus.coroutil.common.core.util.CULog;
 import com.corosus.coroutil.common.core.modconfig.ModConfigData;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
@@ -23,7 +24,7 @@ import static net.minecraft.commands.Commands.literal;
 public class CommandCoroConfig {
 	public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
-			Commands.literal(getCommandName())
+			Commands.literal(getCommandName()).requires(s -> s.hasPermission(2))
 			.then(literal("config")
 				.then(literal("common")
 					.then(argumentReload(ModConfig.Type.COMMON))
@@ -47,7 +48,7 @@ public class CommandCoroConfig {
 	public static ArgumentBuilder<CommandSourceStack, ?> argumentSave() {
 		return literal("save").executes(c -> {
 			CULog.log("saving all coro mods runtime configs to disk");
-			ConfigMod.instance().forceSaveAllFilesFromRuntimeSettings();
+			CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
 			c.getSource().sendSuccess(() -> Component.literal("Saving all common coro configs to disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
@@ -58,9 +59,9 @@ public class CommandCoroConfig {
 				.then(Commands.argument("setting_name", StringArgumentType.word()).suggests((p_136339_, p_136340_) -> SharedSuggestionProvider.suggest(getConfigSettings(StringArgumentType.getString(p_136339_, "file_name")), p_136340_))
 						.executes(c -> {
 							String fileName = fileToConfig(StringArgumentType.getString(c, "file_name"));
-							String configName = ConfigMod.instance().lookupFilePathToConfig.get(fileName).configID;
+							String configName = CoroConfigRegistry.instance().lookupFilePathToConfig.get(fileName).configID;
 							String settingName = StringArgumentType.getString(c, "setting_name");
-							Object obj = ConfigMod.instance().getField(configName, settingName);
+							Object obj = CoroConfigRegistry.instance().getField(configName, settingName);
 							c.getSource().sendSuccess(() -> Component.literal(settingName + " = " + obj + " in " + fileName), true);
 							return Command.SINGLE_SUCCESS;
 						})));
@@ -72,13 +73,13 @@ public class CommandCoroConfig {
 						.then(Commands.argument("value", StringArgumentType.string())
 								.executes(c -> {
 									String fileName = fileToConfig(StringArgumentType.getString(c, "file_name"));
-									String configName = ConfigMod.instance().lookupFilePathToConfig.get(fileName).configID;
+									String configName = CoroConfigRegistry.instance().lookupFilePathToConfig.get(fileName).configID;
 									String settingName = StringArgumentType.getString(c, "setting_name");
 									String value = StringArgumentType.getString(c, "value");
-									boolean result = ConfigMod.instance().updateField(configName, settingName, value);
+									boolean result = CoroConfigRegistry.instance().updateField(configName, settingName, value);
 									if (result) {
-										Object obj = ConfigMod.instance().getField(configName, settingName);
-										ConfigMod.instance().forceSaveAllFilesFromRuntimeSettings();
+										Object obj = CoroConfigRegistry.instance().getField(configName, settingName);
+										CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
 										c.getSource().sendSuccess(() -> Component.literal("Set " + settingName + " to " + obj + " in " + fileName), true);
 									} else {
 										c.getSource().sendSuccess(() -> Component.literal("Invalid setting to use for " + settingName), true);
@@ -92,11 +93,11 @@ public class CommandCoroConfig {
 	}
 
 	public static Iterable<String> getConfigs() {
-		return ConfigMod.instance().lookupFilePathToConfig.keySet().stream().map((e) -> e.replace("\\", "--")).toList();
+		return CoroConfigRegistry.instance().lookupFilePathToConfig.keySet().stream().map((e) -> e.replace("\\", "--")).toList();
 	}
 
 	public static Iterable<String> getConfigSettings(String config_name) {
-		ModConfigData modConfigData = ConfigMod.instance().lookupFilePathToConfig.get(fileToConfig(config_name));
+		ModConfigData modConfigData = CoroConfigRegistry.instance().lookupFilePathToConfig.get(fileToConfig(config_name));
 		if (modConfigData != null) {
 			List<String> joinedList = new ArrayList<>();
 			joinedList.addAll(modConfigData.valsString.keySet());

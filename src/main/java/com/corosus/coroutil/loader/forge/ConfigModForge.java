@@ -11,10 +11,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
-@Mod(ConfigModForge.MODID)
+@Mod(ConfigMod.MODID)
 public class ConfigModForge extends ConfigMod {
-
-    public static final String MODID = "coroutil";
 	
     public ConfigModForge() {
         super();
@@ -23,6 +21,8 @@ public class ConfigModForge extends ConfigMod {
         EventHandlerForge eventHandlerForge = new EventHandlerForge();
         MinecraftForge.EVENT_BUS.register(eventHandlerForge);
         modEventBus.register(EventHandlerForge.class);
+
+        ConfigMod.instance().registerForgeConfigs();
     }
 
     @Override

@@ -1,8 +1,9 @@
 package com.corosus.coroutil.loader.forge;
 
-import com.corosus.coroutil.common.core.modconfig.ConfigMod;
+import com.corosus.coroutil.common.core.modconfig.CoroConfigRegistry;
 import com.corosus.coroutil.common.core.command.CommandCoroConfig;
 import com.corosus.coroutil.common.core.command.CommandCoroConfigClient;
+import com.corosus.coroutil.common.core.util.CULog;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -29,11 +30,13 @@ public class EventHandlerForge {
 
     @SubscribeEvent
     public static void configLoad(ModConfigEvent.Loading event) {
-        ConfigMod.instance().onLoadOrReload(event.getConfig().getFileName());
+        CULog.dbg("configLoad for " + event.getConfig().getFileName());
+        CoroConfigRegistry.instance().onLoadOrReload(event.getConfig().getFileName());
     }
 
     @SubscribeEvent
     public static void configReload(ModConfigEvent.Reloading event) {
-        ConfigMod.instance().onLoadOrReload(event.getConfig().getFileName());
+        CULog.dbg("configReload " + event.getConfig().getFileName());
+        CoroConfigRegistry.instance().onLoadOrReload(event.getConfig().getFileName());
     }
 }
