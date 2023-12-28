@@ -2,13 +2,11 @@ package com.corosus.coroutil.loader.forge;
 
 import com.corosus.coroutil.common.core.modconfig.*;
 import com.corosus.coroutil.common.core.util.CULog;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 public class ModConfigDataForge extends ModConfigData {
@@ -21,26 +19,6 @@ public class ModConfigDataForge extends ModConfigData {
     public ModConfigDataForge(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
         super(savePath, parStr, parClass, parConfig);
     }
-
-    /*@Override
-    public void initConfigString(String name, String comment, String value) {
-        valsStringConfig.put(name, builder.comment(comment).define(name, (String)obj));
-    }
-
-    @Override
-    public void initConfigInteger(String name, String comment, int value, int min, int max) {
-
-    }
-
-    @Override
-    public void initConfigDouble(String name, String comment, double value, double min, double max) {
-
-    }
-
-    @Override
-    public void initConfigBoolean(String name, String comment, boolean value) {
-
-    }*/
 
     @Override
     public String getConfigString(String fieldName) {
@@ -133,7 +111,7 @@ public class ModConfigDataForge extends ModConfigData {
 
         //System.out.println("registering config field: " + name);
 
-        Object obj = ConfigMod.instance().getField(configID, name);
+        Object obj = CoroConfigRegistry.instance().getField(configID, name);
         if (obj instanceof String) {
             valsStringConfig.put(name, builder.comment(comment).define(name, (String)obj));
         } else if (obj instanceof Integer) {

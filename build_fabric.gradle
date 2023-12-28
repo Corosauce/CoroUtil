@@ -51,7 +51,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	include(modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
 	//include(modImplementation("ForgeConfigAPIPort:ForgeConfigAPIPort:v8.0.0-1.20.1-Fabric"))
 	//using https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/files/4583000

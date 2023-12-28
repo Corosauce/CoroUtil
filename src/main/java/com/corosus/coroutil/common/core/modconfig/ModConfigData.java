@@ -1,10 +1,8 @@
 package com.corosus.coroutil.common.core.modconfig;
 
 import com.corosus.coroutil.common.core.util.OldUtil;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.lang.reflect.Field;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +50,7 @@ public abstract class ModConfigData {
 
 	private void processFieldFromForgeConfig(String fieldName) {
 		try {
-			Object obj = ConfigMod.instance().getField(configID, fieldName);
+			Object obj = CoroConfigRegistry.instance().getField(configID, fieldName);
 			if (obj instanceof String) {
 				valsString.put(fieldName, (String)obj);
 				setFieldBasedOnType(fieldName, getConfigString(fieldName));
@@ -126,7 +124,7 @@ public abstract class ModConfigData {
     
     private void processField(String fieldName) {
     	try {
-	    	Object obj = ConfigMod.instance().getField(configID, fieldName);
+	    	Object obj = CoroConfigRegistry.instance().getField(configID, fieldName);
 	    	if (obj instanceof String) {
 	    		valsString.put(fieldName, (String)obj);
 	    	} else if (obj instanceof Integer) {
@@ -170,7 +168,7 @@ public abstract class ModConfigData {
 	//updates values in lists, updates forges config field, saves field
 	private void saveField(String fieldName) {
 		try {
-			Object obj = ConfigMod.instance().getField(configID, fieldName);
+			Object obj = CoroConfigRegistry.instance().getField(configID, fieldName);
 			if (obj instanceof String) {
 				valsString.put(fieldName, (String)obj);
 			} else if (obj instanceof Integer) {
