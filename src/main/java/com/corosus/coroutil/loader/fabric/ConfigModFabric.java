@@ -1,13 +1,14 @@
 package com.corosus.coroutil.loader.fabric;
 
-import com.corosus.coroutil.common.core.modconfig.ConfigMod;
-import com.corosus.coroutil.common.core.modconfig.CoroConfigRegistry;
-import com.corosus.coroutil.common.core.modconfig.IConfigCategory;
-import com.corosus.coroutil.common.core.modconfig.ModConfigData;
-import com.corosus.coroutil.common.core.command.CommandCoroConfig;
+import com.corosus.modconfig.ConfigMod;
+import com.corosus.modconfig.CoroConfigRegistry;
+import com.corosus.modconfig.IConfigCategory;
+import com.corosus.modconfig.ModConfigData;
+import com.corosus.coroutil.command.CommandCoroConfig;
 import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -22,19 +23,10 @@ public class ConfigModFabric extends ConfigMod implements ModInitializer {
 			CommandCoroConfig.register(dispatcher);
 		}));
 
-		ModConfigEvents.loading(ConfigMod.instance().MODID).register((ModConfig config) -> {
-			CoroConfigRegistry.instance().onLoadOrReload(config.getFileName());
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+			CoroConfigRegistry.instance().allModsConfigsLoadedAndRegisteredHook();
 		});
 
-		ModConfigEvents.reloading(ConfigMod.instance().MODID).register((ModConfig config) -> {
-			CoroConfigRegistry.instance().onLoadOrReload(config.getFileName());
-		});
-
-	}
-
-	@Override
-	public ModConfigData makeLoaderSpecificConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
-		return new ModConfigDataFabric(savePath, parStr, parClass, parConfig);
 	}
 
 	@Override

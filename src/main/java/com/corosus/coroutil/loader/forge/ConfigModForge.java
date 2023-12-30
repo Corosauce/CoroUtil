@@ -1,8 +1,8 @@
 package com.corosus.coroutil.loader.forge;
 
-import com.corosus.coroutil.common.core.modconfig.ConfigMod;
-import com.corosus.coroutil.common.core.modconfig.IConfigCategory;
-import com.corosus.coroutil.common.core.modconfig.ModConfigData;
+import com.corosus.modconfig.ConfigMod;
+import com.corosus.modconfig.IConfigCategory;
+import com.corosus.modconfig.ModConfigData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -21,13 +21,6 @@ public class ConfigModForge extends ConfigMod {
         EventHandlerForge eventHandlerForge = new EventHandlerForge();
         MinecraftForge.EVENT_BUS.register(eventHandlerForge);
         modEventBus.register(EventHandlerForge.class);
-
-        ConfigMod.instance().registerForgeConfigs();
-    }
-
-    @Override
-    public ModConfigData makeLoaderSpecificConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
-        return new ModConfigDataForge(savePath, parStr, parClass, parConfig);
     }
 
     @Override

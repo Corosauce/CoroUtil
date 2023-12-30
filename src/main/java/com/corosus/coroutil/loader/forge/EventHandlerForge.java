@@ -1,13 +1,19 @@
 package com.corosus.coroutil.loader.forge;
 
-import com.corosus.coroutil.common.core.modconfig.CoroConfigRegistry;
-import com.corosus.coroutil.common.core.command.CommandCoroConfig;
-import com.corosus.coroutil.common.core.command.CommandCoroConfigClient;
-import com.corosus.coroutil.common.core.util.CULog;
+import com.corosus.modconfig.ConfigMod;
+import com.corosus.modconfig.CoroConfigRegistry;
+import com.corosus.coroutil.command.CommandCoroConfig;
+import com.corosus.coroutil.command.CommandCoroConfigClient;
+import com.corosus.coroutil.util.CULog;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 
 public class EventHandlerForge {
 
@@ -29,14 +35,18 @@ public class EventHandlerForge {
     }*/
 
     @SubscribeEvent
-    public static void configLoad(ModConfigEvent.Loading event) {
-        CULog.dbg("configLoad for " + event.getConfig().getFileName());
-        CoroConfigRegistry.instance().onLoadOrReload(event.getConfig().getFileName());
+    public void serverAboutToStart(ServerAboutToStartEvent event) {
+        //i cant get a non async hook between every mod being loaded and the configs being loaded, so for forge we are just going to update the configs on main menu / server start
+        CoroConfigRegistry.instance().allModsConfigsLoadedAndRegisteredHook();
     }
 
     @SubscribeEvent
-    public static void configReload(ModConfigEvent.Reloading event) {
-        CULog.dbg("configReload " + event.getConfig().getFileName());
-        CoroConfigRegistry.instance().onLoadOrReload(event.getConfig().getFileName());
+    @OnlyIn(Dist.CLIENT)
+    public void onGameTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            CoroConfigRegistry.instance().allModsConfigsLoadedAndRegisteredHook();
+        }
     }
+
+
 }

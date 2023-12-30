@@ -1,7 +1,7 @@
 package com.corosus.coroutil.loader.forge;
 
-import com.corosus.coroutil.common.core.modconfig.*;
-import com.corosus.coroutil.common.core.util.CULog;
+import com.corosus.coroutil.util.CULog;
+import com.corosus.modconfig.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;

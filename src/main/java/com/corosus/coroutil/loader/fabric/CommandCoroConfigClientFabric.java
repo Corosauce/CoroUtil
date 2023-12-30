@@ -1,6 +1,5 @@
 package com.corosus.coroutil.loader.fabric;
 
-import com.corosus.coroutil.common.core.command.CommandCoroConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;

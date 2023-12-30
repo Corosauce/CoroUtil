@@ -5,10 +5,10 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "coroutil.refmap.json",
   "client": [
-    "client.RenderSystemInitRender"
+
   ],
   "server": [
-    "Bootstrap"
+
   ],
   "injectors": {
     "defaultRequire": 1
