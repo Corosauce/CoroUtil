@@ -26,7 +26,7 @@ public class CoroUtilColor {
         if (model != null && !model.isCustomRenderer()) {
             //TODO: this requires a param in forge, but not in fabric, resolve this
             TextureAtlasSprite sprite = model.getParticleIcon(/*net.minecraftforge.client.model.data.ModelData.EMPTY*/);
-            if (sprite != null && !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
+            if (sprite != null && !sprite.getName().equals(MissingTextureAtlasSprite.getLocation())) {
                 return getColors(sprite);
             }
         }
@@ -34,18 +34,18 @@ public class CoroUtilColor {
     }
 
     public static int getPixelRGBA(TextureAtlasSprite textureAtlasSprite, int frameIndex, int x, int y) {
-        if (textureAtlasSprite.contents().animatedTexture != null) {
-            x += textureAtlasSprite.contents().animatedTexture.getFrameX(frameIndex) * textureAtlasSprite.contents().width();
-            y += textureAtlasSprite.contents().animatedTexture.getFrameY(frameIndex) * textureAtlasSprite.contents().height();
+        if (textureAtlasSprite.animatedTexture != null) {
+            x += textureAtlasSprite.animatedTexture.getFrameX(frameIndex) * textureAtlasSprite.getWidth();
+            y += textureAtlasSprite.animatedTexture.getFrameY(frameIndex) * textureAtlasSprite.getHeight();
         }
 
-        return textureAtlasSprite.contents().originalImage.getPixelRGBA(x, y);
+        return textureAtlasSprite.mainImage[0].getPixelRGBA(x, y);
     }
 
     public static int[] getColors(TextureAtlasSprite sprite) {
-        int width = sprite.contents().width();
-        int height = sprite.contents().height();
-        int frames = sprite.contents().getFrameCount();
+        int width = sprite.getWidth();
+        int height = sprite.getHeight();
+        int frames = sprite.getFrameCount();
         
         BufferedImage img = new BufferedImage(width, height * frames, BufferedImage.TYPE_4BYTE_ABGR);
         for (int i = 0; i < frames; i++) {

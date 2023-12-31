@@ -7,7 +7,6 @@ import com.corosus.coroutil.command.CommandCoroConfigClient;
 import com.corosus.coroutil.util.CULog;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
@@ -22,10 +21,10 @@ public class EventHandlerForge {
         CommandCoroConfig.register(event.getDispatcher());
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public void registerCommandsClient(RegisterClientCommandsEvent event) {
         CommandCoroConfigClient.register(event.getDispatcher());
-    }
+    }*/
 
     /*@SubscribeEvent
     public void onEntityLivingUpdate(LivingEvent.LivingTickEvent event) {
