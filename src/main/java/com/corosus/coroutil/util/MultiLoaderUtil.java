@@ -8,21 +8,21 @@ public class MultiLoaderUtil {
     //thread safe eager initialization
     private static final MultiLoaderUtil instance = new MultiLoaderUtil();
 
-    private static boolean checkForge = true;
-    private static boolean isForge = false;
+    private boolean checkForge = true;
+    private boolean isForge = false;
 
-    private static boolean checkFabric = true;
-    private static boolean isFabric = false;
+    private boolean checkFabric = true;
+    private boolean isFabric = false;
 
     private MultiLoaderUtil() {
 
     }
 
-    public static MultiLoaderUtil instance() {
+    public static synchronized MultiLoaderUtil instance() {
         return instance;
     }
 
-    public boolean isForge() {
+    public synchronized boolean isForge() {
         if (checkForge) {
             try {
                 checkForge = false;
@@ -31,6 +31,8 @@ public class MultiLoaderUtil {
                     CULog.log("forge loader environment detected");
                 }
             } catch (ClassNotFoundException ex) {
+                //CULog.log("no forge loader environment detected");
+                //ex.printStackTrace();
                 //loader not detected
             }
         }
@@ -41,7 +43,7 @@ public class MultiLoaderUtil {
         return isForge;
     }
 
-    public boolean isFabric() {
+    public synchronized boolean isFabric() {
         if (checkFabric) {
             try {
                 checkFabric = false;
@@ -50,13 +52,15 @@ public class MultiLoaderUtil {
                     CULog.log("fabric loader environment detected");
                 }
             } catch (ClassNotFoundException ex) {
+                //CULog.log("no fabric loader environment detected");
+                //ex.printStackTrace();
                 //loader not detected
             }
         }
         return isFabric;
     }
 
-    public ModConfigData makeLoaderSpecificConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
+    public synchronized ModConfigData makeLoaderSpecificConfigData(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
         if (isFabric()) {
             return constructLoaderSpecificConfigData("com.corosus.coroutil.loader.fabric.ModConfigDataFabric", savePath, parStr, parClass, parConfig);
         } else if (isForge()) {
@@ -66,6 +70,7 @@ public class MultiLoaderUtil {
     }
 
     private ModConfigData constructLoaderSpecificConfigData(String clazz, String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
+        //CULog.dbg("constructing " + clazz);
         try {
             Class classToLoad = Class.forName(clazz);
 

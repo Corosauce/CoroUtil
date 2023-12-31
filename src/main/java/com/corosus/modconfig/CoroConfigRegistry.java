@@ -27,7 +27,7 @@ public class CoroConfigRegistry {
 
     }
 
-    public static CoroConfigRegistry instance() {
+    public static synchronized CoroConfigRegistry instance() {
         return instance;
     }
 
@@ -91,7 +91,7 @@ public class CoroConfigRegistry {
     
     /* Main Inits */
 
-    public void addConfigFile(String modID, IConfigCategory configCat) {
+    public synchronized void addConfigFile(String modID, IConfigCategory configCat) {
     	addConfigFile(modID, configCat.getRegistryName(), configCat, true);
     }
     
@@ -166,7 +166,7 @@ public class CoroConfigRegistry {
     	return false;
     }
 
-    public void forceSaveAllFilesFromRuntimeSettings() {
+    public synchronized void forceSaveAllFilesFromRuntimeSettings() {
         CULog.dbg("forceSaveAllFilesFromRuntimeSettings invoked");
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
