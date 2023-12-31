@@ -40,7 +40,7 @@ public class CommandCoroConfig {
 		return literal("reload").executes(c -> {
 			CULog.log("reloading all mods common configurations from disk");
 			ConfigTracker.INSTANCE.loadConfigs(type, ConfigMod.instance().getConfigPath());
-			c.getSource().sendSuccess(() -> Component.literal("Reloading all common configs from disk"), true);
+			c.getSource().sendSuccess(Component.literal("Reloading all common configs from disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
 	}
@@ -49,7 +49,7 @@ public class CommandCoroConfig {
 		return literal("save").executes(c -> {
 			CULog.log("saving all coro mods runtime configs to disk");
 			CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
-			c.getSource().sendSuccess(() -> Component.literal("Saving all common coro configs to disk"), true);
+			c.getSource().sendSuccess(Component.literal("Saving all common coro configs to disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
 	}
@@ -62,7 +62,7 @@ public class CommandCoroConfig {
 							String configName = CoroConfigRegistry.instance().lookupFilePathToConfig.get(fileName).configID;
 							String settingName = StringArgumentType.getString(c, "setting_name");
 							Object obj = CoroConfigRegistry.instance().getField(configName, settingName);
-							c.getSource().sendSuccess(() -> Component.literal(settingName + " = " + obj + " in " + fileName), true);
+							c.getSource().sendSuccess(Component.literal(settingName + " = " + obj + " in " + fileName), true);
 							return Command.SINGLE_SUCCESS;
 						})));
 	}
@@ -80,9 +80,9 @@ public class CommandCoroConfig {
 									if (result) {
 										Object obj = CoroConfigRegistry.instance().getField(configName, settingName);
 										CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
-										c.getSource().sendSuccess(() -> Component.literal("Set " + settingName + " to " + obj + " in " + fileName), true);
+										c.getSource().sendSuccess(Component.literal("Set " + settingName + " to " + obj + " in " + fileName), true);
 									} else {
-										c.getSource().sendSuccess(() -> Component.literal("Invalid setting to use for " + settingName), true);
+										c.getSource().sendSuccess(Component.literal("Invalid setting to use for " + settingName), true);
 									}
 									return Command.SINGLE_SUCCESS;
 								}))));
