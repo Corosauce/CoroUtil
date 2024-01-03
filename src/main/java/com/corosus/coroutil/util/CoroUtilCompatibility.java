@@ -1,8 +1,6 @@
 package com.corosus.coroutil.util;
 
-import net.minecraft.entity.MobEntity;
-
-import java.lang.reflect.Method;
+import net.minecraft.world.entity.Mob;
 
 public class CoroUtilCompatibility {
 
@@ -15,11 +13,11 @@ public class CoroUtilCompatibility {
      * @param speed
      * @return
      */
-    public static boolean tryPathToXYZModCompat(MobEntity ent, int x, int y, int z, double speed) {
+    public static boolean tryPathToXYZModCompat(Mob ent, int x, int y, int z, double speed) {
         return tryPathToXYZVanilla(ent, x, y, z, speed);
     }
 
-    public static boolean tryPathToXYZVanilla(MobEntity ent, int x, int y, int z, double speed) {
+    public static boolean tryPathToXYZVanilla(Mob ent, int x, int y, int z, double speed) {
         return ent.getNavigation().moveTo(x, y, z, speed);
     }
 

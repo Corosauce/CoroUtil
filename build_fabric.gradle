@@ -57,7 +57,7 @@ dependencies {
 
 	//include(modImplementation("ForgeConfigAPIPort:ForgeConfigAPIPort:v8.0.0-1.20.1-Fabric"))
 	//using https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/files/4583000
-	include(modImplementation("curse.maven:forge-config-api-port-fabric-547434:3913319"))
+	include(modImplementation("curse.maven:forge-config-api-port-fabric-547434:3943246"))
 	//include(modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:v8.0.0-1.20.1-Fabric"))
 }
 

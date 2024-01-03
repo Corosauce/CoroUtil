@@ -1,10 +1,11 @@
 package com.corosus.coroutil.util;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import com.mojang.math.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class CoroUtilEntity {
 
@@ -13,12 +14,9 @@ public class CoroUtilEntity {
     }
 
     public static boolean canSee(Entity p_70685_1_, BlockPos pos) {
-        Vector3d vector3d = new Vector3d(p_70685_1_.getX(), p_70685_1_.getEyeY(), p_70685_1_.getZ());
-        Vector3d vector3d1 = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-        if (p_70685_1_.level == p_70685_1_.level && !(vector3d1.distanceToSqr(vector3d) > 16384.0)) {
-            return p_70685_1_.level.clip(new RayTraceContext(vector3d, vector3d1, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, p_70685_1_)).getType() == RayTraceResult.Type.MISS;
-        } else {
-            return false;
-        }
+        Vec3 vector3d = new Vec3(p_70685_1_.getX(), p_70685_1_.getEyeY(), p_70685_1_.getZ());
+        Vec3 vector3d1 = new Vec3(pos.getX(), pos.getY(), pos.getZ());
+        if (p_70685_1_.level != p_70685_1_.level || vector3d1.distanceToSqr(vector3d) > 128.0D * 128.0D) return false;
+        return p_70685_1_.level.clip(new ClipContext(vector3d, vector3d1, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, p_70685_1_)).getType() == HitResult.Type.MISS;
     }
 }

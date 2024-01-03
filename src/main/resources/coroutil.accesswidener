@@ -1,15 +1,1 @@
-accessWidener	v2	named
-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite getFrameCount ()I
-accessible field net/minecraft/client/renderer/texture/TextureAtlasSprite animatedTexture Lnet/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture;
-accessible field net/minecraft/client/renderer/texture/TextureAtlasSprite mainImage [Lcom/mojang/blaze3d/platform/NativeImage;
-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameX (I)I
-accessible method net/minecraft/client/renderer/texture/TextureAtlasSprite$AnimatedTexture getFrameY (I)I
-accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;)F
-
-accessible field net/minecraft/client/particle/Particle x D
-accessible field net/minecraft/client/particle/Particle y D
-accessible field net/minecraft/client/particle/Particle z D
-
-accessible field net/minecraft/client/particle/Particle xd D
-accessible field net/minecraft/client/particle/Particle yd D
-accessible field net/minecraft/client/particle/Particle zd D
+accessWidener	v1	named

@@ -1,9 +1,9 @@
 package com.corosus.coroutil.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.math.Vector3f;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.Block;
 
 public class CoroUtilBlock {
 	
@@ -12,11 +12,11 @@ public class CoroUtilBlock {
 	}
 
 	public static BlockPos blockPos(double x, double y, double z) {
-		return new BlockPos(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
+		return new BlockPos(Mth.floor(x), Mth.floor(y), Mth.floor(z));
 	}
 
 	public static BlockPos blockPos(Vector3f vec) {
-		return new BlockPos(MathHelper.floor(vec.x()), MathHelper.floor(vec.y()), MathHelper.floor(vec.z()));
+		return new BlockPos(Mth.floor(vec.x()), Mth.floor(vec.y()), Mth.floor(vec.z()));
 	}
 	
 }
