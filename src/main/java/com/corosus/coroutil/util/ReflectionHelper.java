@@ -4,14 +4,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.StringJoiner;
 
+import org.antlr.v4.runtime.misc.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Some reflection helper code.
@@ -45,7 +46,6 @@ public class ReflectionHelper
      * @throws UnableToAccessFieldException If there was a problem getting the field.
      * @throws UnableToAccessFieldException If there was a problem getting the value.
      */
-    @Nullable
     public static <T, E> T getPrivateValue(Class<? super E> classToAccess, E instance, String fieldName)
     {
         try

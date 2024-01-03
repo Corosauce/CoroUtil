@@ -1,12 +1,8 @@
 package com.corosus.coroutil.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 
-import static net.minecraft.commands.Commands.literal;
-
-public class CommandCoroConfigClient {
+/*public class CommandCoroConfigClient {
 	public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 			Commands.literal(getCommandName())
@@ -24,4 +20,4 @@ public class CommandCoroConfigClient {
 	public static String getCommandName() {
 		return "coro";
 	}
-}
+}*/

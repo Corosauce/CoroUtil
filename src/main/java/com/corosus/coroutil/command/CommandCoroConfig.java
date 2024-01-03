@@ -8,11 +8,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.config.ConfigTracker;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -20,9 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static net.minecraft.commands.Commands.literal;
-
-public class CommandCoroConfig {
+/*public class CommandCoroConfig {
 	public static void register(final CommandDispatcher<CommandSourceStack> dispatcher) {
 		dispatcher.register(
 			Commands.literal(getCommandName()).requires(s -> s.hasPermission(2))
@@ -115,4 +108,4 @@ public class CommandCoroConfig {
 	public static String fileToConfig(String str) {
 		return str.replace("--", "\\");
 	}
-}
+}*/
