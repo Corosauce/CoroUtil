@@ -1,7 +1,7 @@
 package com.corosus.modconfig;
 
 import com.corosus.coroutil.config.ConfigCoroUtil;
-import com.corosus.coroutil.util.CULog;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -40,5 +40,12 @@ public abstract class ConfigMod {
      */
     public static void forceSaveAllFilesFromRuntimeSettings() {
         CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
+    }
+
+    /**
+     * Here for backwards compatibility, dummy empty method because we reload manually later
+     */
+    public static void onReload(final ModConfigEvent.Reloading configEvent) {
+
     }
 }
