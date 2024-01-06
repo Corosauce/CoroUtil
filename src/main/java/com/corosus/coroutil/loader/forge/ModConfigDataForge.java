@@ -94,7 +94,7 @@ public class ModConfigDataForge extends ModConfigData {
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
         //space intentional here to workaround forge hating blank comments
         String comment = "-";
-        double min = Double.MIN_VALUE;
+        double min = -Double.MAX_VALUE;
         double max = Double.MAX_VALUE;
 
         ConfigComment anno_comment = field.getAnnotation(ConfigComment.class);
