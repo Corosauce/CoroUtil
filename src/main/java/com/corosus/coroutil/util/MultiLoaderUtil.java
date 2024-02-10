@@ -26,7 +26,8 @@ public class MultiLoaderUtil {
         if (checkForge) {
             try {
                 checkForge = false;
-                isForge = Class.forName("net.minecraftforge.fml.common.Mod") != null;
+                //isForge = Class.forName("net.minecraftforge.fml.common.Mod") != null;
+                isForge = Class.forName("com.corosus.coroutil.loader.forge.ConfigModForge") != null;
                 if (isForge) {
                     CULog.log("forge loader environment detected");
                 }
@@ -47,7 +48,8 @@ public class MultiLoaderUtil {
         if (checkFabric) {
             try {
                 checkFabric = false;
-                isFabric = Class.forName("net.fabricmc.api.ModInitializer") != null;
+                //isFabric = Class.forName("net.fabricmc.api.ModInitializer") != null;
+                isFabric = Class.forName("com.corosus.coroutil.loader.fabric.ConfigModFabric") != null;
                 if (isFabric) {
                     CULog.log("fabric loader environment detected");
                 }

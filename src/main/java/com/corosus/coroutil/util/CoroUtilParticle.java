@@ -1,5 +1,7 @@
 package com.corosus.coroutil.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
@@ -20,6 +22,10 @@ public class CoroUtilParticle {
         for (int i = 0; i < maxRainDrops; i++) {
         	rainPositions[i] = new Vec3((rand.nextFloat() * range) - (range/2), (rand.nextFloat() * range/1) - (range/2), (rand.nextFloat() * range) - (range/2));
         }
+    }
+
+    public static Level getWorldParticle(Object obj) {
+        return Minecraft.getInstance().level;
     }
 	
 }

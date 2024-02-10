@@ -167,12 +167,8 @@ public class CoroUtilEntOrParticle {
 		if (obj instanceof Entity) {
 			return ((Entity)obj).level();
 		} else {
-			return getWorldParticle(obj);
+			return CoroUtilParticle.getWorldParticle(obj);
 		}
-	}
-
-	private static Level getWorldParticle(Object obj) {
-		return Minecraft.getInstance().level;
 	}
 	
 }
