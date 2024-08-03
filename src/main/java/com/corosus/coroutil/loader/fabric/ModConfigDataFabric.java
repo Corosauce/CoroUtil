@@ -2,7 +2,7 @@ package com.corosus.coroutil.loader.fabric;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.*;
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
