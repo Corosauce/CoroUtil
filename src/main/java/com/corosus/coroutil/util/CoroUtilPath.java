@@ -85,7 +85,7 @@ public class CoroUtilPath {
 						int offset = -5;
 
 						while (tries < 30) {
-							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isPathfindable(ent.level(), pos, PathComputationType.LAND)) {
+							if (CoroUtilBlock.isAir(state.getBlock()) || !state.isPathfindable(PathComputationType.LAND)) {
 								break;
 							}
 							gatherY += offset++;
@@ -96,7 +96,7 @@ public class CoroUtilPath {
 					} else {
 						//int offset = 0;
 						while (tries < 30) {
-							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isPathfindable(ent.level(), pos, PathComputationType.LAND)) {
+							if (!CoroUtilBlock.isAir(state.getBlock()) && state.isPathfindable(PathComputationType.LAND)) {
 								break;
 							}
 							gatherY -= 1;//offset++;
@@ -118,7 +118,7 @@ public class CoroUtilPath {
 						if (!world.isLoaded(pos)) return false;
 
 						state = world.getBlockState(pos);
-						if (state.isPathfindable(ent.level(), pos, PathComputationType.LAND)) {
+						if (state.isPathfindable(PathComputationType.LAND)) {
 							success = CoroUtilCompatibility.tryPathToXYZModCompat(ent, pos.getX(), pos.getY(), pos.getZ(), moveSpeedAmp);
 						}
 					}
