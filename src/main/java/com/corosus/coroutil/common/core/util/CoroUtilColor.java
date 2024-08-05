@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 public class CoroUtilColor {
     
     @SuppressWarnings("null")
-    public static int[] getColors(BlockState state) {
+    /*public static int[] getColors(BlockState state) {
         BakedModel model;
 
         //used when foliage shader is on
@@ -25,7 +25,7 @@ public class CoroUtilColor {
 
         if (model != null && !model.isCustomRenderer()) {
             //TODO: this requires a param in forge, but not in fabric, resolve this
-            TextureAtlasSprite sprite = model.getParticleIcon(/*net.minecraftforge.client.model.data.ModelData.EMPTY*/);
+            TextureAtlasSprite sprite = model.getParticleIcon(*//*net.minecraftforge.client.model.data.ModelData.EMPTY*//*);
             if (sprite != null && !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
                 return getColors(sprite);
             }
@@ -70,7 +70,7 @@ public class CoroUtilColor {
             return ret;
         }
         return IntArrays.EMPTY_ARRAY;
-    }
+    }*/
     
     private static int getColor(int[] colorData) {
         float mr = 1F;//((multiplier >>> 16) & 0xFF) / 255f;
