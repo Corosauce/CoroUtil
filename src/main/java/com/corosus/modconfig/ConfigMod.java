@@ -12,6 +12,7 @@ import java.nio.file.Path;
 public abstract class ConfigMod {
 
     public static final String MODID = "coroutil";
+    public Path configFolder = Path.of("config");
 
     private static ConfigMod instance;
 
@@ -27,6 +28,8 @@ public abstract class ConfigMod {
 
     //TODO: if more needs like this come up, put it in MultiLoaderUtil and setup a class that contains all the methods, including makeLoaderSpecificConfigData
     public abstract Path getConfigPath();
+
+    public abstract void reloadConfigs(String side);
 
     /**
      * Here for backwards compatibility

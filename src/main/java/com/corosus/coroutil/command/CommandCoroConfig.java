@@ -12,8 +12,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +25,7 @@ public class CommandCoroConfig {
 			Commands.literal(getCommandName()).requires(s -> s.hasPermission(2))
 			.then(literal("config")
 				.then(literal("common")
-					.then(argumentReload(ModConfig.Type.COMMON))
+					.then(argumentReload("common"))
 					.then(argumentSave())
 					.then(argumentGet())
 					.then(argumentSet())
@@ -36,11 +34,11 @@ public class CommandCoroConfig {
 		);
 	}
 
-	public static ArgumentBuilder<CommandSourceStack, ?> argumentReload(ModConfig.Type type) {
+	public static ArgumentBuilder<CommandSourceStack, ?> argumentReload(String side) {
 		return literal("reload").executes(c -> {
-			CULog.log("reloading all mods common configurations from disk");
-			ConfigTracker.INSTANCE.loadConfigs(type, ConfigMod.instance().getConfigPath());
-			c.getSource().sendSuccess(() -> Component.literal("Reloading all common configs from disk"), true);
+			CULog.log("reloading all mods " + side + " configurations from disk");
+			ConfigMod.instance().reloadConfigs(side);
+			c.getSource().sendSuccess(() -> Component.literal("Reloading all " + side + " configs from disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
 	}
@@ -49,7 +47,7 @@ public class CommandCoroConfig {
 		return literal("save").executes(c -> {
 			CULog.log("saving all coro mods runtime configs to disk");
 			CoroConfigRegistry.instance().forceSaveAllFilesFromRuntimeSettings();
-			c.getSource().sendSuccess(() -> Component.literal("Saving all common coro configs to disk"), true);
+			c.getSource().sendSuccess(() -> Component.literal("Saving all coro configs to disk"), true);
 			return Command.SINGLE_SUCCESS;
 		});
 	}

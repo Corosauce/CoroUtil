@@ -12,7 +12,7 @@ public class CommandCoroConfigClient {
 			Commands.literal(getCommandName())
 			.then(literal("config")
 				.then(literal("client")
-						//.then(CommandCoroConfig.argumentReload(ModConfig.Type.CLIENT))
+						.then(CommandCoroConfig.argumentReload("client"))
 						.then(CommandCoroConfig.argumentSave())
 						.then(CommandCoroConfig.argumentGet())
 						.then(CommandCoroConfig.argumentSet())

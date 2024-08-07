@@ -172,6 +172,7 @@ sourceSets {
     main {
         java {
             exclude "com/corosus/${project.mod_id}/loader/fabric/**"
+            exclude "com/corosus/${project.mod_id}/loader/neoforge/**"
         }
     }
 }
@@ -193,6 +194,7 @@ tasks.named('processResources', ProcessResources).configure {
 
 processResources {
     exclude("fabric.mod.json")
+    exclude("META-INF/neoforge.mods.toml")
     exclude("${project.mod_id}.accesswidener")
 }
 

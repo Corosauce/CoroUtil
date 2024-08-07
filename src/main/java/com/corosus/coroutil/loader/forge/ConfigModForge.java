@@ -1,13 +1,12 @@
 package com.corosus.coroutil.loader.forge;
 
 import com.corosus.modconfig.ConfigMod;
-import com.corosus.modconfig.IConfigCategory;
-import com.corosus.modconfig.ModConfigData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ConfigTracker;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
@@ -25,6 +24,15 @@ public class ConfigModForge extends ConfigMod {
 
     @Override
     public Path getConfigPath() {
-        return FMLPaths.CONFIGDIR.get();
+        return configFolder;
+    }
+
+    @Override
+    public void reloadConfigs(String side) {
+        if (side.equals("client")) {
+            ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, ConfigMod.instance().getConfigPath());
+        } else if (side.equals("common")) {
+            ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, ConfigMod.instance().getConfigPath());
+        }
     }
 }

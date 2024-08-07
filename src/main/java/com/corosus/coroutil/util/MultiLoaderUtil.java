@@ -11,6 +11,9 @@ public class MultiLoaderUtil {
     private boolean checkForge = true;
     private boolean isForge = false;
 
+    private boolean checkNeoForge = true;
+    private boolean isNeoForge = false;
+
     private boolean checkFabric = true;
     private boolean isFabric = false;
 
@@ -44,6 +47,28 @@ public class MultiLoaderUtil {
         return isForge;
     }
 
+    public synchronized boolean isNeoForge() {
+        if (checkNeoForge) {
+            try {
+                checkNeoForge = false;
+                //isForge = Class.forName("net.minecraftforge.fml.common.Mod") != null;
+                isNeoForge = Class.forName("com.corosus.coroutil.loader.neoforge.ConfigModNeoForge") != null;
+                if (isNeoForge) {
+                    CULog.log("neo forge loader environment detected");
+                }
+            } catch (ClassNotFoundException ex) {
+                //CULog.log("no forge loader environment detected");
+                //ex.printStackTrace();
+                //loader not detected
+            }
+        }
+        //for my build_dev.gradle that has both loaders classes present, might be best to check if fabric installed first, then forge, since dev uses fabric
+        if (isNeoForge && isFabric()) {
+            CULog.err("ERROR: DETECTED FABRIC AND FORGE BOTH PRESENT, THIS MIGHT BREAK THIS LOGIC, should only happen when using build_dev.gradle");
+        }
+        return isNeoForge;
+    }
+
     public synchronized boolean isFabric() {
         if (checkFabric) {
             try {
@@ -67,6 +92,8 @@ public class MultiLoaderUtil {
             return constructLoaderSpecificConfigData("com.corosus.coroutil.loader.fabric.ModConfigDataFabric", savePath, parStr, parClass, parConfig);
         } else if (isForge()) {
             return constructLoaderSpecificConfigData("com.corosus.coroutil.loader.forge.ModConfigDataForge", savePath, parStr, parClass, parConfig);
+        } else if (isNeoForge()) {
+            return constructLoaderSpecificConfigData("com.corosus.coroutil.loader.neoforge.ModConfigDataNeoForge", savePath, parStr, parClass, parConfig);
         }
         return null;
     }
