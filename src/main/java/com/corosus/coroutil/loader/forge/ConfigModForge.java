@@ -15,6 +15,7 @@ public class ConfigModForge extends ConfigMod {
 	
     public ConfigModForge() {
         super();
+        this.init();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         EventHandlerForge eventHandlerForge = new EventHandlerForge();

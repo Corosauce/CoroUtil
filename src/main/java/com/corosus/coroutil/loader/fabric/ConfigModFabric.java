@@ -14,6 +14,10 @@ import java.nio.file.Path;
 
 public class ConfigModFabric extends ConfigMod implements ModInitializer {
 
+	public ConfigModFabric() {
+		this.init();
+	}
+
 	@Override
 	public void onInitialize() {
 

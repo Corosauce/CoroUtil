@@ -18,6 +18,9 @@ public abstract class ConfigMod {
 
     public ConfigMod() {
         instance = this;
+    }
+
+    public void init() {
         new File("./config/CoroUtil").mkdirs();
         CoroConfigRegistry.instance().addConfigFile(MODID, new ConfigCoroUtil());
     }

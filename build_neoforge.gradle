@@ -127,7 +127,7 @@ dependencies {
     // The group id is ignored when searching -- in this case, it is "blank"
     // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
 
-    implementation("curse.maven:forge-config-api-port-fabric-547434:5577288")
+    //include(implementation("curse.maven:forge-config-api-port-fabric-547434:5577288"))
     implementation 'com.electronwill.night-config:core:3.6.5'
     implementation 'com.electronwill.night-config:toml:3.6.5'
 

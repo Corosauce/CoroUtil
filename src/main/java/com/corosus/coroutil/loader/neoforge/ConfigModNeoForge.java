@@ -17,8 +17,12 @@ import java.nio.file.Path;
 @Mod(ConfigMod.MODID)
 public class ConfigModNeoForge extends ConfigMod {
 
+    public static ModContainer container = null;
+
     public ConfigModNeoForge(ModContainer container) {
         super();
+        this.container = container;
+        this.init();
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
@@ -29,6 +33,10 @@ public class ConfigModNeoForge extends ConfigMod {
             NeoForge.EVENT_BUS.addListener(clientEvents::onGameTick);
 
         }
+    }
+
+    public void test(ModContainer container) {
+
     }
 
     private void onServerStarting(ServerStartingEvent event) {

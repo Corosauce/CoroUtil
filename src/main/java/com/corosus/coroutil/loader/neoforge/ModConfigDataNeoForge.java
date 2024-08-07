@@ -2,20 +2,19 @@ package com.corosus.coroutil.loader.neoforge;
 
 import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.*;
-import fuzs.forgeconfigapiport.neoforge.api.forge.v4.ForgeConfigRegistry;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.NeoForgeConfig;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
 public class ModConfigDataNeoForge extends ModConfigData {
 
-    public HashMap<String, ForgeConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
-    public HashMap<String, ForgeConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
-    public HashMap<String, ForgeConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
-    public HashMap<String, ForgeConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
+    public HashMap<String, ModConfigSpec.ConfigValue<String>> valsStringConfig = new HashMap<>();
+    public HashMap<String, ModConfigSpec.ConfigValue<Integer>> valsIntegerConfig = new HashMap<>();
+    public HashMap<String, ModConfigSpec.ConfigValue<Double>> valsDoubleConfig = new HashMap<>();
+    public HashMap<String, ModConfigSpec.ConfigValue<Boolean>> valsBooleanConfig = new HashMap<>();
 
     public ModConfigDataNeoForge(String savePath, String parStr, Class parClass, IConfigCategory parConfig) {
         super(savePath, parStr, parClass, parConfig);
@@ -67,7 +66,7 @@ public class ModConfigDataNeoForge extends ModConfigData {
         //if (resetConfig) if (saveFilePath.exists()) saveFilePath.delete();
         //preInitConfig = new Configuration(saveFilePath);
         //preInitConfig.load();
-        ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
         BUILDER.comment("General mod settings").push("general");
 
         Field[] fields = configClass.getDeclaredFields();
@@ -81,8 +80,8 @@ public class ModConfigDataNeoForge extends ModConfigData {
 
         CULog.dbg("writeConfigFile invoked for " + this.configID + ", resetConfig: " + resetConfig);
         BUILDER.pop();
-        ForgeConfigSpec CONFIG = BUILDER.build();
-        ForgeConfigRegistry.INSTANCE.register(ConfigMod.instance().MODID, ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+        ModConfigSpec CONFIG = BUILDER.build();
+        ConfigModNeoForge.container.registerConfig(ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
     }
 
     /**
@@ -90,7 +89,7 @@ public class ModConfigDataNeoForge extends ModConfigData {
      * @param name Name of the variable
      * @param field Field in the file the variable is
      */
-    private void addToConfig(ForgeConfigSpec.Builder builder, Field field, String name) {
+    private void addToConfig(ModConfigSpec.Builder builder, Field field, String name) {
 
         // Comment from the annotation on the value of the actual variable that 'name' is retrieved from
         //space intentional here to workaround forge hating blank comments
