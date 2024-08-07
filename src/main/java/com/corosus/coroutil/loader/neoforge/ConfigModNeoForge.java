@@ -1,5 +1,6 @@
 package com.corosus.coroutil.loader.neoforge;
 
+import com.corosus.coroutil.command.CommandCoroConfig;
 import com.corosus.modconfig.ConfigMod;
 import com.corosus.modconfig.CoroConfigRegistry;
 import net.neoforged.fml.ModContainer;
@@ -8,6 +9,7 @@ import net.neoforged.fml.config.ConfigTracker;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import java.nio.file.Path;
@@ -19,6 +21,7 @@ public class ConfigModNeoForge extends ConfigMod {
         super();
 
         NeoForge.EVENT_BUS.addListener(this::onServerStarting);
+        NeoForge.EVENT_BUS.addListener(this::registerCommands);
 
         if (FMLEnvironment.dist.isClient()) {
             ClientEvents clientEvents = new ClientEvents();
@@ -32,6 +35,9 @@ public class ConfigModNeoForge extends ConfigMod {
         CoroConfigRegistry.instance().allModsConfigsLoadedAndRegisteredHook();
     }
 
+    public void registerCommands(RegisterCommandsEvent event) {
+        CommandCoroConfig.register(event.getDispatcher());
+    }
 
 
     @Override
