@@ -176,7 +176,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 
 processResources {
     exclude("fabric.mod.json")
-    exclude("META-INF/forge.mods.toml")
+    exclude("META-INF/mods.toml")
     exclude("${project.mod_id}.accesswidener")
 }
 
