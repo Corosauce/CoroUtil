@@ -171,7 +171,6 @@ public class CoroConfigRegistry {
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
             data.updateConfigFileWithRuntimeValues();
-            //TODO: test me
             data.configInstance.hookUpdatedValues();
         }
 
@@ -179,7 +178,6 @@ public class CoroConfigRegistry {
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
             data.updateConfigFileWithRuntimeValues();
-            //TODO: test me
             data.configInstance.hookUpdatedValues();
         }
     }
