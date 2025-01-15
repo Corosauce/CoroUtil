@@ -171,12 +171,16 @@ public class CoroConfigRegistry {
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
             data.updateConfigFileWithRuntimeValues();
+            //TODO: test me
+            data.configInstance.hookUpdatedValues();
         }
 
         //TODO: theres a bug where it takes 2 tries, find out why
         for (ModConfigData data : lookupRegistryNameToConfig.values()) {
             //data.writeConfigFile(true);
             data.updateConfigFileWithRuntimeValues();
+            //TODO: test me
+            data.configInstance.hookUpdatedValues();
         }
     }
 
