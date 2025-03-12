@@ -4,7 +4,7 @@ import com.corosus.coroutil.util.CULog;
 import com.corosus.modconfig.*;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -82,6 +82,7 @@ public class ModConfigDataFabric extends ModConfigData {
         BUILDER.pop();
         ForgeConfigSpec CONFIG = BUILDER.build();
         ForgeConfigRegistry.INSTANCE.register(ConfigMod.instance().MODID, ModConfig.Type.COMMON, CONFIG, saveFilePath + ".toml");
+
     }
 
     /**
