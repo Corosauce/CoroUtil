@@ -168,10 +168,10 @@ publisher {
 	}
 
 	// Enable Debug mode. When enabled, no files will actually be uploaded
-	setDebug(true)
+	setDebug(false)
 
 	// Curseforge Project ID
-	setCurseID("5600660")
+	setCurseID("237749")
 
 	// Modrinth Project ID
 	setModrinthID("coroutil")
