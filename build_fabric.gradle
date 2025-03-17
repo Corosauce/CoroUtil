@@ -1,11 +1,15 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.8-SNAPSHOT'
 	id 'maven-publish'
 	id "com.hypherionmc.modutils.modpublisher" version "2.1.6"
 }
 
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -46,13 +50,17 @@ dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	/*mappings(loom.layered {
-		it.officialMojangMappings { nameSyntheticMembers = false }
-		it.parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
-	})*/
+        it.officialMojangMappings { nameSyntheticMembers = false }
+        it.parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
+    })*/
 	//mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	mappings loom.layered() {
+	/*mappings loom.layered() {
 		officialMojangMappings()
 		parchment("org.parchmentmc.data:parchment-${project.parchment_mc_version}:${project.parchment_version}@zip")
+	}*/
+	mappings loom.layered() {
+		officialMojangMappings()
+		//parchment("org.parchmentmc.data:parchment-${project.parchment_mc_version}:${project.parchment_version}@zip")
 	}
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
@@ -61,7 +69,7 @@ dependencies {
 
 	//include(modImplementation("ForgeConfigAPIPort:ForgeConfigAPIPort:v8.0.0-1.20.1-Fabric"))
 	//using https://www.curseforge.com/minecraft/mc-mods/forge-config-api-port-fabric/files/4583000
-	include(modImplementation("curse.maven:forge-config-api-port-fabric-547434:5982384"))
+	include(modImplementation("curse.maven:forge-config-api-port-fabric-547434:5982389"))
 	implementation 'com.electronwill.night-config:core:3.7.3'
 	implementation 'com.electronwill.night-config:toml:3.7.3'
 	//include(modImplementation("fuzs.forgeconfigapiport:forgeconfigapiport-fabric:v8.0.0-1.20.1-Fabric"))
@@ -69,6 +77,15 @@ dependencies {
 
 //If there's mixins
 loom {
+	/*splitEnvironmentSourceSets()
+
+	mods {
+		"modid" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}*/
+
 	accessWidenerPath = file("src/main/resources/coroutil.accesswidener")
 	mixin {
 		defaultRefmapName = "${project.mod_id}.refmap.json"
@@ -78,8 +95,6 @@ loom {
 sourceSets {
 	main {
 		java {
-			exclude "com/corosus/${project.mod_id}/api/forge/**"
-			exclude "com/corosus/${project.mod_id}/loader/forge/**"
 			exclude "com/corosus/${project.mod_id}/loader/neoforge/**"
 		}
 	}
@@ -119,6 +134,7 @@ java {
 jar {
 	from("LICENSE") {
 		rename { "${it}_${project.archivesBaseName}"}
+		//rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
 
@@ -168,7 +184,7 @@ publisher {
 	// For example: markdown.md, or "This is my changelog"
 	// Or: https://raw.githubusercontent.com/hypherionmc/changelogs/changelog.md
 	// Or https://gist.githubusercontent.com/hypherionmc/92f825d3c9337964cc77c9c8c9bf65e6/raw/ceeaaee5b98c688a23398864fe480b84796a1651/test_gist.md
-	setChangelog("Fix not working correctly for 1.21.1")
+	setChangelog("Update to 1.21.3")
 
 	// Required for Modrinth/GitHub
 	setProjectVersion("${project.version}")
@@ -178,7 +194,7 @@ publisher {
 	setDisplayName("${project.mod_id}-fabric-${project.mod_version}.jar")
 
 	// The supported game versions
-	setGameVersions("1.21.1")
+	setGameVersions("${project.minecraft_version}")
 
 	// The modloaders your upload supports.
 	// This can also be an Enum from ModLoader,

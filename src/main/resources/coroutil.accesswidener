@@ -4,7 +4,6 @@ accessible    field    net/minecraft/client/renderer/texture/SpriteContents    a
 accessible    field    net/minecraft/client/renderer/texture/SpriteContents    originalImage    Lcom/mojang/blaze3d/platform/NativeImage;
 accessible    method    net/minecraft/client/renderer/texture/SpriteContents$AnimatedTexture    getFrameX    (I)I
 accessible    method    net/minecraft/client/renderer/texture/SpriteContents$AnimatedTexture    getFrameY    (I)I
-accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;)F
 
 accessible field net/minecraft/client/particle/Particle x D
 accessible field net/minecraft/client/particle/Particle y D
@@ -13,3 +12,6 @@ accessible field net/minecraft/client/particle/Particle z D
 accessible field net/minecraft/client/particle/Particle xd D
 accessible field net/minecraft/client/particle/Particle yd D
 accessible field net/minecraft/client/particle/Particle zd D
+
+accessible method com/mojang/blaze3d/platform/NativeImage getPixelABGR (II)I
+accessible method net/minecraft/world/level/biome/Biome getTemperature (Lnet/minecraft/core/BlockPos;I)F

@@ -39,7 +39,7 @@ public class CoroUtilColor {
             y += textureAtlasSprite.contents().animatedTexture.getFrameY(frameIndex) * textureAtlasSprite.contents().height();
         }
 
-        return textureAtlasSprite.contents().originalImage.getPixelRGBA(x, y);
+        return textureAtlasSprite.contents().originalImage.getPixelABGR(x, y);
     }
 
     public static int[] getColors(TextureAtlasSprite sprite) {

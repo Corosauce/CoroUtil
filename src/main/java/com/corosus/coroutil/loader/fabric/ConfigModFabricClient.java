@@ -2,9 +2,7 @@ package com.corosus.coroutil.loader.fabric;
 
 import com.corosus.modconfig.CoroConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 
 public class ConfigModFabricClient implements ClientModInitializer {
 	@Override

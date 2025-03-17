@@ -45,10 +45,10 @@ public class CoroUtilCompatibility {
                 ex.printStackTrace();
                 //prevent error spam
                 sereneSeasonsInstalled = false;
-                return biome.getTemperature(pos);
+                return biome.getTemperature(pos, 64);
             }
         } else {
-            return biome.getTemperature(pos);
+            return biome.getTemperature(pos, 64);
         }
     }
 
