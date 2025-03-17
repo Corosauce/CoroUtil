@@ -227,7 +227,7 @@ publisher {
     }
 
     // Enable Debug mode. When enabled, no files will actually be uploaded
-    setDebug(true)
+    setDebug(false)
 
     // Curseforge Project ID
     setCurseID("237749")
