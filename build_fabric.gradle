@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.8-SNAPSHOT'
+	id 'fabric-loom' version '1.9-SNAPSHOT'
 	id 'maven-publish'
 	id "com.hypherionmc.modutils.modpublisher" version "2.1.6"
 }
@@ -184,7 +184,7 @@ publisher {
 	// For example: markdown.md, or "This is my changelog"
 	// Or: https://raw.githubusercontent.com/hypherionmc/changelogs/changelog.md
 	// Or https://gist.githubusercontent.com/hypherionmc/92f825d3c9337964cc77c9c8c9bf65e6/raw/ceeaaee5b98c688a23398864fe480b84796a1651/test_gist.md
-	setChangelog("Update to 1.21.3")
+	setChangelog("Update to 1.21.4")
 
 	// Required for Modrinth/GitHub
 	setProjectVersion("${project.version}")

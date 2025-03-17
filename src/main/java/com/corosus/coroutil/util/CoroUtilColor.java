@@ -23,7 +23,8 @@ public class CoroUtilColor {
             model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state);
 //        }
 
-        if (model != null && !model.isCustomRenderer()) {
+        //TODO: 1.21.4, see if commenting out /* && !model.isCustomRenderer()*/ matters for weather
+        if (model != null/* && !model.isCustomRenderer()*/) {
             //TODO: this requires a param in forge, but not in fabric, resolve this
             TextureAtlasSprite sprite = model.getParticleIcon(/*net.minecraftforge.client.model.data.ModelData.EMPTY*/);
             if (sprite != null && !sprite.contents().name().equals(MissingTextureAtlasSprite.getLocation())) {
