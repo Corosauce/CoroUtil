@@ -155,7 +155,7 @@ publisher {
 	setDebug(true)
 
 	// Curseforge Project ID
-	setCurseID("5600660")
+	setCurseID("237749")
 
 	// Modrinth Project ID
 	setModrinthID("coroutil")
